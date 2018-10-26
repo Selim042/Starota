@@ -1,0 +1,102 @@
+package us.myles_selim.starota.profiles.commands;
+
+import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.IRole;
+import sx.blah.discord.handle.obj.IUser;
+import us.myles_selim.starota.EnumTeam;
+import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.commands.registry.Command;
+import us.myles_selim.starota.commands.registry.CommandRegistry;
+import us.myles_selim.starota.profiles.PlayerProfile;
+import us.myles_selim.starota.profiles.ProfileManager;
+
+public class CommandRegister extends Command {
+
+	public CommandRegister() {
+		super("register", "Registers the given user and assigns them a profile.");
+	}
+
+	@Override
+	public IRole requiredRole(IGuild guild) {
+		if (guild.getLongID() == Starota.PVILLE_SERVER)
+			return guild.getRoleByID(314744756456521728l);
+		return super.requiredRole(guild);
+	}
+
+	@Override
+	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
+		if (args.length != 5) {
+			channel.sendMessage("**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName()
+					+ " [username] [target] [team] [level]");
+			return;
+		}
+
+		IUser target = Starota.findUser(guild.getLongID(), args[2]);
+		if (target == null) {
+			channel.sendMessage("User \"" + args[2] + "\" not found");
+			return;
+		}
+		if (ProfileManager.hasProfile(guild, target)) {
+			channel.sendMessage("User \"" + args[2] + "\" already has a profile");
+			return;
+		}
+
+		EnumTeam team;
+		try {
+			team = EnumTeam.valueOf(args[3].toUpperCase());
+		} catch (IllegalArgumentException e) {
+			team = null;
+		}
+		if (team == null) {
+			channel.sendMessage("Team \"" + args[3] + "\" not found");
+			return;
+		}
+
+		int level;
+		try {
+			level = Integer.parseInt(args[4]);
+		} catch (NumberFormatException e) {
+			level = -1;
+		}
+		if (level == -1) {
+			channel.sendMessage("Invalid level \"" + args[4] + "\"");
+			return;
+		}
+
+		PlayerProfile profile = new PlayerProfile().setPoGoName(args[1]).setDiscordId(target.getLongID())
+				.setLevel(level).setTeam(team);
+		ProfileManager.setProfile(guild, target, profile);
+		channel.sendMessage("Sucessfully registered " + target.getName(),
+				ProfileManager.getProfileEmbed(guild, profile));
+
+		// Role updates (pville only)
+		IRole roleLost = guild.getRoleByID(ROLE_LOST);
+		if (roleLost != null && target.hasRole(roleLost)) {
+			target.removeRole(roleLost);
+			target.addRole(guild.getRoleByID(ROLE_TRAINER));
+			switch (team) {
+			case INSTINCT:
+				target.addRole(guild.getRoleByID(ROLE_INSTINCT));
+				break;
+			case MYSTIC:
+				target.addRole(guild.getRoleByID(ROLE_MYSTIC));
+				break;
+			case VALOR:
+				target.addRole(guild.getRoleByID(ROLE_VALOR));
+				break;
+			case NO_TEAM:
+			default:
+				break;
+			}
+		}
+	}
+
+	private static final long ROLE_LOST = 493950373460181012L;
+	private static final long ROLE_TRAINER = 339514724620304386L;
+	private static final long ROLE_INSTINCT = 336152173257687040L;
+	private static final long ROLE_MYSTIC = 335596106102603792L;
+	private static final long ROLE_VALOR = 336152455433945090L;
+
+}

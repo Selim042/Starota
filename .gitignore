@@ -1,0 +1,10 @@
+.classpath
+.project
+.settings
+
+bin/*
+libs/*
+target/*
+
+starota.properties
+starotaData/*
