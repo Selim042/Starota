@@ -15,6 +15,7 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.ebs.IOHelper;
+import us.myles_selim.starota.EnumTeam;
 import us.myles_selim.starota.Starota;
 
 public class ProfileManager {
@@ -112,30 +113,37 @@ public class ProfileManager {
 			return null;
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withColor(profile.getTeam().getColor());
-		builder.appendDesc("**Profile for " + profile.getPoGoName() + "**\n\n");
+		builder.withTitle("Profile for " + profile.getPoGoName() + ":");
+		// builder.appendDesc("**Profile for " + profile.getPoGoName() + "**");
 		IUser user = Starota.getUser(profile.getDiscordId());
-		builder.appendDesc("**Trainer Level**: " + profile.getLevel() + "\n");
-		builder.appendDesc("**Team**: " + profile.getTeam().getName() + "\n");
+		builder.withAuthorIcon(user.getAvatarURL());
+		builder.withAuthorName(user.getDisplayName(server));
+		builder.appendField("Trainer Level:", "" + profile.getLevel(), true);
+		EnumTeam team = profile.getTeam();
+		builder.appendField("Team:", team.getName(), true);
+		if (team != EnumTeam.NO_TEAM)
+			builder.withThumbnail(team.getIcon());
+		// builder.withImage(team.getIcon());
 		if (user != null) {
 			String nickname = user.getNicknameForGuild(server);
 			if (nickname != null)
-				builder.appendDesc("**Discord User**: " + nickname + " (_" + user.getName() + "#"
-						+ user.getDiscriminator() + "_)\n");
+				builder.appendField("Discord User:",
+						nickname + " (_" + user.getName() + "#" + user.getDiscriminator() + "_)", true);
 			else
-				builder.appendDesc(
-						"**Discord User**: " + user.getName() + "#" + user.getDiscriminator() + "\n");
+				builder.appendField("Discord User:", user.getName() + "#" + user.getDiscriminator(),
+						true);
 		}
 		if (profile.getRealName() != null)
-			builder.appendDesc("**Real Name**: " + profile.getRealName() + "\n");
+			builder.appendField("Real Name: ", profile.getRealName(), true);
 		if (profile.getTrainerCode() != -1)
-			builder.appendDesc("**Trainer Code**: " + profile.getTrainerCodeString() + "\n");
+			builder.appendField("Trainer Code: ", profile.getTrainerCodeString(), true);
 
 		Map<String, Long> alts = profile.getAlts();
 		if (alts == null || !alts.isEmpty()) {
-			builder.appendDesc("**Alternate Accounts**:\n");
+			String altsS = "";
 			for (Entry<String, Long> e : alts.entrySet())
-				builder.appendDesc(
-						"- **" + e.getKey() + "**: " + getTrainerCodeString(e.getValue()) + "\n");
+				altsS += "- **" + e.getKey() + "**: " + getTrainerCodeString(e.getValue()) + "\n";
+			builder.appendField("Alternate Accounts:", altsS, false);
 		}
 		return builder.build();
 	}
