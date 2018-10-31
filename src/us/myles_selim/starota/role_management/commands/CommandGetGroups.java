@@ -6,7 +6,7 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.commands.registry.Command;
-import us.myles_selim.starota.role_management.EnumGroup;
+import us.myles_selim.starota.role_management.GroupManager;
 
 public class CommandGetGroups extends Command {
 
@@ -17,14 +17,9 @@ public class CommandGetGroups extends Command {
 	@Override
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.appendDesc("**Available Roles:**\n");
-		EnumGroup[] groups = EnumGroup.values();
-		for (int i = 0; i < groups.length; i++) {
-			IRole role = guild.getRoleByID(groups[i].id);
-			builder.appendDesc(role.getName());
-			if (i != groups.length - 1)
-				builder.appendDesc("\n");
-		}
+		builder.withTitle("Available Roles:");
+		for (IRole role : GroupManager.getGroups(guild))
+			builder.appendDesc(role.getName() + "\n");
 		channel.sendMessage(builder.build());
 	}
 

@@ -1,5 +1,7 @@
 package us.myles_selim.starota.role_management.commands;
 
+import java.util.List;
+
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
@@ -7,12 +9,19 @@ import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import us.myles_selim.starota.commands.registry.Command;
 import us.myles_selim.starota.commands.registry.CommandRegistry;
-import us.myles_selim.starota.role_management.EnumGroup;
+import us.myles_selim.starota.role_management.GroupManager;
 
 public class CommandAddGroup extends Command {
 
 	public CommandAddGroup() {
 		super("addGroup", "Join the given group.");
+	}
+
+	@Override
+	public List<String> getAliases() {
+		List<String> aliases = super.getAliases();
+		aliases.add("joinGroup");
+		return aliases;
 	}
 
 	@Override
@@ -24,7 +33,7 @@ public class CommandAddGroup extends Command {
 		}
 		IRole targetRole = null;
 		for (IRole role : guild.getRolesByName(args[1])) {
-			if (EnumGroup.isIncluded(role)) {
+			if (GroupManager.isGroup(guild, role)) {
 				targetRole = role;
 				break;
 			}
