@@ -24,7 +24,7 @@ import us.myles_selim.starota.trading.forms.FormSet.Form;
 public class Tradeboard {
 
 	private static boolean inited = false;
-	private static final Map<Long, EBList<TradeboardPost, TradeboardPost>> DATA = new ConcurrentHashMap<>();
+	private static final Map<Long, EBList<TradeboardPost>> DATA = new ConcurrentHashMap<>();
 
 	public static final String TRADE_ID_KEY = "trade_id";
 
@@ -49,7 +49,7 @@ public class Tradeboard {
 				String name = file.getName().substring(0,
 						file.getName().length() - IOHelper.EBS_LIST_EXTENSION.length());
 				long serverId = Long.parseLong(name);
-				EBList<TradeboardPost, TradeboardPost> profiles = IOHelper.readEBList(file);
+				EBList<TradeboardPost> profiles = IOHelper.readEBList(file);
 				DATA.put(serverId, profiles);
 			}
 		}
@@ -59,7 +59,7 @@ public class Tradeboard {
 		File profiles = new File(Starota.DATA_FOLDER, "tradeboard");
 		if (!profiles.exists())
 			profiles.mkdirs();
-		for (Entry<Long, EBList<TradeboardPost, TradeboardPost>> entry : DATA.entrySet())
+		for (Entry<Long, EBList<TradeboardPost>> entry : DATA.entrySet())
 			IOHelper.writeEBList(entry.getValue(),
 					new File(profiles, entry.getKey() + IOHelper.EBS_EXTENSION));
 	}
@@ -67,7 +67,7 @@ public class Tradeboard {
 	public static void addPost(IGuild server, PlayerProfile profile, TradeboardPost post) {
 		if (!DATA.containsKey(server.getLongID()))
 			DATA.put(server.getLongID(), new EBList<>(new TradeboardPost()));
-		EBList<TradeboardPost, TradeboardPost> posts = DATA.get(server.getLongID());
+		EBList<TradeboardPost> posts = DATA.get(server.getLongID());
 		posts.add(post);
 		flush();
 	}
@@ -75,7 +75,7 @@ public class Tradeboard {
 	public static List<TradeboardPost> getPosts(IGuild server) {
 		if (!DATA.containsKey(server.getLongID()))
 			return null;
-		return Collections.unmodifiableList(DATA.get(server.getLongID()));
+		return DATA.get(server.getLongID()).values();
 	}
 
 	public static List<TradeboardPost> findPosts(IGuild server, EnumPokemon pokemon) {
@@ -119,7 +119,7 @@ public class Tradeboard {
 	public static TradeboardPost getPost(IGuild server, int id) {
 		if (!DATA.containsKey(server.getLongID()))
 			return null;
-		for (TradeboardPost t : DATA.get(server.getLongID()))
+		for (TradeboardPost t : DATA.get(server.getLongID()).values())
 			if (t != null && t.getId() == id)
 				return t;
 		return null;
@@ -129,7 +129,7 @@ public class Tradeboard {
 		if (!DATA.containsKey(server.getLongID()))
 			return Collections.emptyList();
 		List<TradeboardPost> posts = new LinkedList<>();
-		for (TradeboardPost t : DATA.get(server.getLongID()))
+		for (TradeboardPost t : DATA.get(server.getLongID()).values())
 			if (t != null && t.getOwner() == user.getLongID())
 				posts.add(t);
 		return Collections.unmodifiableList(posts);
@@ -139,27 +139,29 @@ public class Tradeboard {
 		if (post == null)
 			return null;
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.appendDesc("**Tradeboard Post** #" + String.format("%04d", post.getId()) + "\n\n");
-		builder.appendDesc("**Trade Type**: Poster "
-				+ (post.isLookingFor() ? "is looking for" : "currently has") + "\n");
+		builder.withTitle("Tradeboard Post #" + String.format("%04d", post.getId()) + "\n\n");
+		builder.appendField("Trade Type:",
+				"Poster " + (post.isLookingFor() ? "is looking for" : "currently has"), true);
 		IUser user = Starota.getUser(post.getOwner());
+		builder.withAuthorIcon(user.getAvatarURL());
+		builder.withAuthorName(user.getDisplayName(server));
 		if (user != null) {
 			String nickname = user.getNicknameForGuild(server);
 			if (nickname != null)
-				builder.appendDesc("**Discord User**: " + nickname + " (_" + user.getName() + "#"
-						+ user.getDiscriminator() + "_)\n");
+				builder.appendField("Discord User:",
+						nickname + " (_" + user.getName() + "#" + user.getDiscriminator() + "_)", true);
 			else
-				builder.appendDesc(
-						"**Discord User**: " + user.getName() + "#" + user.getDiscriminator() + "\n");
+				builder.appendField("Discord User:", user.getName() + "#" + user.getDiscriminator(),
+						true);
 		}
 		PlayerProfile profile = ProfileManager.getProfile(server, user);
 		if (profile != null && profile.getTrainerCode() != -1)
-			builder.appendDesc("**Trainer Code**: " + profile.getTrainerCodeString() + "\n");
+			builder.appendField("Trainer Code:", profile.getTrainerCodeString(), true);
 
-		builder.appendDesc("**Pokemon**: " + post.getPokemon() + "\n");
+		builder.appendField("Pokemon:", post.getPokemon().getName(), true);
 		if (post.getForm() != null)
-			builder.appendDesc("**Form**: " + post.getForm() + "\n");
-		builder.appendDesc("**Shiny**: " + post.isShiny() + "\n");
+			builder.appendField("Form:", post.getForm().toString(), true);
+		builder.appendField("Shiny:", "" + post.isShiny(), true);
 		return builder.build();
 	}
 
