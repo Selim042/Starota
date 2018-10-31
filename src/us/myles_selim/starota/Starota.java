@@ -15,7 +15,9 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.DiscordException;
+import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.commands.CommandChangelog;
+import us.myles_selim.starota.commands.CommandChangelogChannel;
 import us.myles_selim.starota.commands.CommandGetTop;
 import us.myles_selim.starota.commands.CommandStatus;
 import us.myles_selim.starota.commands.CommandTest;
@@ -100,6 +102,7 @@ public class Starota {
 		CommandRegistry.registerCommand("Administrative", new CommandAddChannel());
 		CommandRegistry.registerCommand("Administrative", new CommandSetPrefix());
 		CommandRegistry.registerCommand("Administrative", new CommandSetResearchChannel());
+		CommandRegistry.registerCommand("Administrative", new CommandChangelogChannel());
 		if (IS_DEV) {
 			CommandRegistry.registerCommand("Testing", new CommandGetTop());
 			CommandRegistry.registerCommand("Testing", new CommandTest());
@@ -159,6 +162,29 @@ public class Starota {
 		}
 		CLIENT.changePresence(StatusType.DND, ActivityType.PLAYING,
 				"v" + VERSION + (DEBUG || IS_DEV ? "d" : ""));
+
+		Thread changesThread = new Thread() {
+
+			@Override
+			public void run() {
+				for (IGuild s : CLIENT.getGuilds()) {
+					if (!ServerOptions.hasKey(s, CommandChangelogChannel.CHANGES_CHANNEL))
+						continue;
+					IChannel changesChannel = CLIENT.getChannelByID(
+							(long) ServerOptions.getValue(s, CommandChangelogChannel.CHANGES_CHANNEL));
+					if (changesChannel == null)
+						continue;
+					String latestChangelog = (String) ServerOptions.getValue(s, "changesVersion");
+					if (!VERSION.equalsIgnoreCase(latestChangelog)) {
+						RequestBuffer.request(() -> {
+							changesChannel.sendMessage("```" + CHANGELOG + "```");
+						});
+						ServerOptions.setValue(s, "changesVersion", VERSION);
+					}
+				}
+			}
+		};
+		changesThread.start();
 	}
 
 	public static IDiscordClient getClient() {
