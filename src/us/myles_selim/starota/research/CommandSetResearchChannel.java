@@ -11,7 +11,7 @@ import us.myles_selim.starota.commands.registry.CommandRegistry;
 public class CommandSetResearchChannel extends Command {
 
 	public CommandSetResearchChannel() {
-		super("setResearchChannel", "Sets channels for research functionality");
+		super("setResearchChannel", "Sets channels for research functionality.");
 	}
 
 	@Override

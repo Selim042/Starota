@@ -17,7 +17,7 @@ import us.myles_selim.starota.trading.TradeboardPost;
 public class CommandGetUserTrades extends Command {
 
 	public CommandGetUserTrades() {
-		super("getUserTrades", "Get trades either you posted or a specific user");
+		super("getUserTrades", "Get trades either you posted or a specific user.");
 	}
 
 	@Override

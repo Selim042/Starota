@@ -15,7 +15,7 @@ import us.myles_selim.starota.trading.forms.FormSet.Form;
 public class CommandFindTrade extends Command {
 
 	public CommandFindTrade() {
-		super("findTrade", "Searches for a specific trade");
+		super("findTrade", "Searches for a specific trade.");
 	}
 
 	@Override
