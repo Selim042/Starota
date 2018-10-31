@@ -33,6 +33,7 @@ import us.myles_selim.starota.research.ResearchTracker;
 import us.myles_selim.starota.role_management.commands.CommandAddGroup;
 import us.myles_selim.starota.role_management.commands.CommandGetGroups;
 import us.myles_selim.starota.role_management.commands.CommandRemoveGroup;
+import us.myles_selim.starota.role_management.commands.CommandSetAsGroup;
 import us.myles_selim.starota.trading.Tradeboard;
 import us.myles_selim.starota.trading.commands.CommandFindTrade;
 import us.myles_selim.starota.trading.commands.CommandForTrade;
@@ -42,8 +43,13 @@ import us.myles_selim.starota.trading.commands.CommandGetUserTrades;
 
 public class Starota {
 
+	// TODO: Finish tradeboard
+
 	private static IDiscordClient CLIENT;
 	private static final Properties PROPERTIES = new Properties();
+
+	public static final long SELIM_USER_ID = 134855940938661889L;
+	public static final String SUPPORT_SERVER_LINK = "http://discord.gg/jRf4Pzh";
 
 	// public static final long TEST_SERVER = 481646364716040202L;
 	// public static final long TEST_MONITOR = 489249695571509249L;
@@ -62,7 +68,7 @@ public class Starota {
 	public final static String BOT_NAME = "Starota";
 	public final static String VERSION = "1.0.4";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n"
-			+ "Public facing changes:\n * Profile embed improvements\n"
+			+ "Public facing changes:\n * Profile embed improvements\n * Improvements to the help command\n"
 			+ "Administrative changes:\n + Add channel whitelists for command categories\n"
 			+ " + Add server specific settings including command prefixes";
 	public final static File DATA_FOLDER = new File("starotaData");
@@ -99,8 +105,6 @@ public class Starota {
 		CommandRegistry.registerCommand(new CommandChangelog());
 
 		CommandRegistry.registerCommand("Administrative", new CommandStatus());
-		CommandRegistry.registerCommand("Administrative", new CommandAddChannel());
-		CommandRegistry.registerCommand("Administrative", new CommandSetPrefix());
 		CommandRegistry.registerCommand("Administrative", new CommandSetResearchChannel());
 		CommandRegistry.registerCommand("Administrative", new CommandChangelogChannel());
 		if (IS_DEV) {
@@ -117,12 +121,15 @@ public class Starota {
 		CommandRegistry.registerCommand("Groups", new CommandGetGroups());
 		CommandRegistry.registerCommand("Groups", new CommandAddGroup());
 		CommandRegistry.registerCommand("Groups", new CommandRemoveGroup());
+		CommandRegistry.registerCommand("Groups", new CommandSetAsGroup());
 
-		CommandRegistry.registerCommand("Tradeboard", new CommandGetForms());
-		CommandRegistry.registerCommand("Tradeboard", new CommandGetShinies());
-		CommandRegistry.registerCommand("Tradeboard", new CommandForTrade());
-		CommandRegistry.registerCommand("Tradeboard", new CommandGetUserTrades());
-		CommandRegistry.registerCommand("Tradeboard", new CommandFindTrade());
+		if (IS_DEV) {
+			CommandRegistry.registerCommand("Tradeboard", new CommandGetForms());
+			CommandRegistry.registerCommand("Tradeboard", new CommandGetShinies());
+			CommandRegistry.registerCommand("Tradeboard", new CommandForTrade());
+			CommandRegistry.registerCommand("Tradeboard", new CommandGetUserTrades());
+			CommandRegistry.registerCommand("Tradeboard", new CommandFindTrade());
+		}
 
 		try {
 			Thread.sleep(2500);

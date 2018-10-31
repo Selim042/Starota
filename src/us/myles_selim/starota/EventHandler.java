@@ -3,10 +3,16 @@ package us.myles_selim.starota;
 import java.util.List;
 
 import sx.blah.discord.api.events.EventSubscriber;
+import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;
+import sx.blah.discord.handle.impl.events.guild.GuildLeaveEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IEmbed;
+import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.IPrivateChannel;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.util.EmbedBuilder;
+import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.commands.registry.CommandRegistry;
 import us.myles_selim.starota.research.ResearchTracker;
 
@@ -50,6 +56,32 @@ public class EventHandler {
 				ResearchTracker.addPost(event.getGuild().getLongID(), authorId);
 		} else
 			ResearchTracker.addPost(event.getGuild(), event.getAuthor());
+	}
+
+	@EventSubscriber
+	public void onServerCreate(GuildCreateEvent event) {
+		IGuild server = event.getGuild();
+		IUser selimUser = Starota.getUser(Starota.SELIM_USER_ID);
+		RequestBuffer.request(() -> {
+			IPrivateChannel selimPm = selimUser.getOrCreatePMChannel();
+			selimPm.sendMessage("Starota was added to the server: " + server.getName());
+		});
+		RequestBuffer.request(() -> {
+			IUser serverOwner = server.getOwner();
+			IPrivateChannel ownerPm = serverOwner.getOrCreatePMChannel();
+			EmbedBuilder builder = new EmbedBuilder();
+			String ourName = Starota.getOurName(server);
+			builder.withTitle("Thanks for using " + ourName + "!");
+			builder.appendDesc("If you need any assistance with " + ourName
+					+ " or it's features, feel free to join our (temporary) support server at "
+					+ Starota.SUPPORT_SERVER_LINK);
+			ownerPm.sendMessage(builder.build());
+		});
+	}
+
+	@EventSubscriber
+	public void onServerLeave(GuildLeaveEvent event) {
+		ServerOptions.clearOptions(event.getGuild());
 	}
 
 }
