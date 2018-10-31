@@ -97,6 +97,15 @@ public class ServerOptions {
 		options.set(key, val);
 	}
 
+	public static void clearValue(IGuild server, String key) {
+		long id = server.getLongID();
+		if (!OPTIONS.containsKey(id))
+			OPTIONS.put(id,
+					new EBStorage().registerPrimitives().setOnWriteCallback(getFlushCallback(id)));
+		EBStorage options = OPTIONS.get(id);
+		options.clearKey(key);
+	}
+
 	private static final OnWriteCallback getFlushCallback(long id) {
 		return new OnWriteCallback() {
 
