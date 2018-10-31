@@ -106,6 +106,14 @@ public class ServerOptions {
 		options.clearKey(key);
 	}
 
+	public static void clearOptions(IGuild server) {
+		OPTIONS.remove(server.getLongID());
+		File optionsFile = new File(new File(Starota.DATA_FOLDER, "options"),
+				server.getLongID() + IOHelper.EBS_EXTENSION);
+		if (optionsFile.exists())
+			optionsFile.delete();
+	}
+
 	private static final OnWriteCallback getFlushCallback(long id) {
 		return new OnWriteCallback() {
 
