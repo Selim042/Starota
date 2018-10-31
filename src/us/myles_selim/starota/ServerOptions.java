@@ -21,7 +21,7 @@ public class ServerOptions {
 
 		if (!Starota.DATA_FOLDER.exists())
 			Starota.DATA_FOLDER.mkdirs();
-		File[] files = new File(Starota.DATA_FOLDER, "options").listFiles(IOHelper.FILE_FILTER);
+		File[] files = new File(Starota.DATA_FOLDER, "options").listFiles(IOHelper.EBS_FILE_FILTER);
 		if (files != null) {
 			for (File file : files) {
 				String name = file.getName().substring(0,
@@ -100,9 +100,11 @@ public class ServerOptions {
 	private static final OnWriteCallback getFlushCallback(long id) {
 		return new OnWriteCallback() {
 
+			private long iId = id;
+
 			@Override
 			public void onWrite() {
-				flush(id);
+				flush(iId);
 			}
 		};
 	}
