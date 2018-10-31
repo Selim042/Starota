@@ -45,6 +45,10 @@ public class Command implements Comparable<Command> {
 		return aliases;
 	}
 
+	public String getGeneralUsage() {
+		return null;
+	}
+
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {}
 
 	@Override

@@ -1,12 +1,10 @@
-package us.myles_selim.starota.commands;
+package us.myles_selim.starota.commands.registry;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.starota.ServerOptions;
-import us.myles_selim.starota.commands.registry.Command;
-import us.myles_selim.starota.commands.registry.CommandRegistry;
 
 public class CommandSetPrefix extends Command {
 

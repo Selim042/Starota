@@ -11,22 +11,27 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import us.myles_selim.starota.ServerOptions;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.commands.registry.channel_management.ChannelCommandManager;
+import us.myles_selim.starota.commands.registry.channel_management.CommandAddChannelWhitelist;
+import us.myles_selim.starota.commands.registry.channel_management.CommandGetWhitelist;
+import us.myles_selim.starota.commands.registry.channel_management.CommandRemoveChannelWhitelist;
 
 public class CommandRegistry {
 
 	private static final List<Command> COMMANDS = new CopyOnWriteArrayList<>();
+	private static final List<String> CATEGORIES = new CopyOnWriteArrayList<>();
 	private static String DEFAULT_PREFIX = ".";
 
-	public static String PREFIX_KEY = "cmd_prefix";
+	public static final String PREFIX_KEY = "cmd_prefix";
 	public static final String DEFAULT_CATEGORY = "Uncategorized";
 
 	static {
 		registerCommand("Help", new CommandHelp());
-	}
 
-	@Deprecated
-	public static String getPrefix() {
-		return DEFAULT_PREFIX;
+		registerCommand("Commands", new CommandAddChannelWhitelist());
+		registerCommand("Commands", new CommandGetWhitelist());
+		registerCommand("Commands", new CommandSetPrefix());
+		registerCommand("Commands", new CommandRemoveChannelWhitelist());
 	}
 
 	public static String getPrefix(IGuild server) {
@@ -47,6 +52,8 @@ public class CommandRegistry {
 		if (!COMMANDS.contains(cmd)) {
 			cmd.setCategory(category);
 			COMMANDS.add(cmd);
+			if (!CATEGORIES.contains(category))
+				CATEGORIES.add(category);
 		}
 	}
 
@@ -78,33 +85,34 @@ public class CommandRegistry {
 		String[] args = argsL.toArray(new String[0]);
 		// for (String s : args)
 		// System.out.println(s);
-		for (Command cmd : COMMANDS) {
-			for (String alias : cmd.getAliases()) {
-				if (alias != null && args[0].equals(alias)) {
-					if (cmd.requiredPermission() != null && guild != null && !message.getAuthor()
-							.getPermissionsForGuild(guild).contains(cmd.requiredPermission()))
-						continue;
-					channel.setTypingStatus(true);
-					if (Starota.DEBUG)
-						message.addReaction(ReactionEmoji.of("�?"));
-					try {
-						cmd.execute(args, message, guild, channel);
-					} catch (Throwable e) {
-						message.reply("There was an error encountered while executing your command: "
-								+ e.getStackTrace()[0] + e.getLocalizedMessage());
-						System.err.println("executed command: " + cmdS);
-						e.printStackTrace();
-					}
-					channel.setTypingStatus(false);
-					return true;
-				}
-			}
+		Command cmd = findCommand(args[0]);
+		if (cmd == null)
+			return false;
+		if (!ChannelCommandManager.isAllowedHere(guild, cmd.getCategory(), channel)
+				|| (cmd.requiredPermission() != null && guild != null && !message.getAuthor()
+						.getPermissionsForGuild(guild).contains(cmd.requiredPermission())))
+			return false;
+		channel.setTypingStatus(true);
+		if (Starota.DEBUG)
+			message.addReaction(ReactionEmoji.of("�?"));
+		try {
+			cmd.execute(args, message, guild, channel);
+		} catch (Throwable e) {
+			message.reply("There was an error encountered while executing your command: "
+					+ e.getStackTrace()[0] + e.getLocalizedMessage());
+			System.err.println("executed command: " + cmdS);
+			e.printStackTrace();
 		}
-		return false;
+		channel.setTypingStatus(false);
+		return true;
 	}
 
 	protected static List<Command> getAllCommands() {
 		return Collections.unmodifiableList(COMMANDS);
+	}
+
+	public static List<String> getAllCategories() {
+		return Collections.unmodifiableList(CATEGORIES);
 	}
 
 	protected static List<Command> getCommandsByCategory(String category) {
@@ -115,6 +123,17 @@ public class CommandRegistry {
 			if (category.equalsIgnoreCase(c.getCategory()))
 				cmds.add(c);
 		return Collections.unmodifiableList(cmds);
+	}
+
+	public static Command findCommand(String name) {
+		for (Command c : COMMANDS) {
+			if (c != null && c.getName() != null && c.getName().equalsIgnoreCase(name))
+				return c;
+			for (String a : c.getAliases())
+				if (a != null && a.equalsIgnoreCase(name))
+					return c;
+		}
+		return null;
 	}
 
 	// public static void main(String... argsM) {
