@@ -15,12 +15,11 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.DiscordException;
+import us.myles_selim.starota.commands.CommandChangelog;
 import us.myles_selim.starota.commands.CommandGetTop;
-import us.myles_selim.starota.commands.CommandSetPrefix;
 import us.myles_selim.starota.commands.CommandStatus;
 import us.myles_selim.starota.commands.CommandTest;
 import us.myles_selim.starota.commands.registry.CommandRegistry;
-import us.myles_selim.starota.commands.registry.channel_management.CommandAddChannel;
 import us.myles_selim.starota.profiles.ProfileManager;
 import us.myles_selim.starota.profiles.commands.CommandGetProfilelessPlayers;
 import us.myles_selim.starota.profiles.commands.CommandProfile;
@@ -60,6 +59,10 @@ public class Starota {
 	public static boolean IS_DEV;
 	public final static String BOT_NAME = "Starota";
 	public final static String VERSION = "1.0.4";
+	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n"
+			+ "Public facing changes:\n * Profile embed improvements\n"
+			+ "Administrative changes:\n + Add channel whitelists for command categories\n"
+			+ " + Add server specific settings including command prefixes";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static void main(String[] args) {
@@ -90,6 +93,8 @@ public class Starota {
 		}
 		dispatcher.registerListener(new EventHandler());
 		CLIENT.changePresence(StatusType.ONLINE, ActivityType.PLAYING, "registering commands...");
+
+		CommandRegistry.registerCommand(new CommandChangelog());
 
 		CommandRegistry.registerCommand("Administrative", new CommandStatus());
 		CommandRegistry.registerCommand("Administrative", new CommandAddChannel());
