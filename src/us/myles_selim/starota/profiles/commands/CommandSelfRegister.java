@@ -45,10 +45,12 @@ public class CommandSelfRegister extends Command {
 		}
 
 		EnumTeam team = null;
-		try {
-			team = EnumTeam.valueOf(args[3].toUpperCase());
-		} catch (IllegalArgumentException e) {
-			team = null;
+		if (args.length > 3) {
+			try {
+				team = EnumTeam.valueOf(args[3].toUpperCase());
+			} catch (IllegalArgumentException e) {
+				team = null;
+			}
 		}
 		try {
 			for (IRole role : target.getRolesForGuild(guild)) {

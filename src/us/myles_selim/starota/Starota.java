@@ -66,11 +66,9 @@ public class Starota {
 	public final static boolean DEBUG = false;
 	public static boolean IS_DEV;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "1.0.4";
+	public final static String VERSION = "1.0.5";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n"
-			+ "Public facing changes:\n * Profile embed improvements\n * Improvements to the help command\n"
-			+ "Administrative changes:\n + Add channel whitelists for command categories\n"
-			+ " + Add server specific settings including command prefixes";
+			+ "Public facing changes:\n * Fix a error in the sRegister command";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static void main(String[] args) {
