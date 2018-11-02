@@ -5,7 +5,6 @@ public class FormManager {
 	public static final int MAX_DEX = 386;
 	public static final int[] EXCLUDED = new int[] { //
 			235, 251, // Smeargle
-			290, 291, 292, // Nincada family
 			352, // Kecleon
 			366, 367, 368, // Clamperl family
 			385, // Jirachi
@@ -20,18 +19,21 @@ public class FormManager {
 	};
 	public static final int[] SHINYABLE = new int[] { //
 			1, 2, 3, 4, 5, 6, 7, 8, 9, // gen 1 starters
+			10, 11, 12, // caterpie
 			25, 26, // pikachu
 			29, 30, 31, // nidoran female
 			58, 59, // growlithe
 			74, 75, 76, // geodude
 			88, 89, 90, 91, // grimer & shelder
+			94, // gengar
 			96, 97, 98, 99, // drowzee & krabby
-			126, // magmar
+			126, 127, // magmar, pinsir
 			129, 130, // magikarp
 			133, 134, 135, 136, // eeveelutions
 			138, 139, 140, 141, 142, // fossils
-			144, 145, 146, 147, 148, 149, // gen 1 birds
-			152, 153, 154, // gen 2 starters
+			144, 145, 146, 147, 148, 149, // gen 1 birds & dratini
+
+			152, 153, 154, 155, 156, 157, // gen 2 starters
 			172, // pichu
 			175, 176, 177, 178, 179, 180, 181, // togepi, natu & mareep
 			191, 192, // sunkern
@@ -42,19 +44,22 @@ public class FormManager {
 			228, 229, // houndour
 			240, // magby
 			246, 247, 248, 249, 250, // larvitar, lugia, ho-oh
+
 			261, 262, // poochyena
 			278, 279, // wingull
 			296, 297, // makuhita
-			302, 303, 304, 305, 306, 307, 308, // sableye, mawile, aron &
-												// meditite
+			302, 303, // sableye & mawile
+			304, 305, 306, 307, 308, // aron & meditite
 			311, 312, // plusle & minun
 			315, // roselia
 			320, 321, // wailmer
 			333, 334, // swablu
 			353, 354, 355, 356, // shuppet & duskull
 			359, 360, 361, 362, // absol, whynaut & snorunt
+			374, 375, 376, // beldum
 			370, // luvdisc
 			382, // kyogre
+
 			403, 404, 405, // shinx
 			425, 426, // drifloon
 	};
