@@ -1,5 +1,6 @@
 package us.myles_selim.starota.profiles;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -19,6 +20,7 @@ public class PlayerProfile {
 	private EnumTeam team;
 	private long discordId;
 	private Map<String, Long> alts;
+	private long lastUpdated;
 
 	public PlayerProfile() {}
 
@@ -30,6 +32,7 @@ public class PlayerProfile {
 		this.team = profile.team;
 		this.discordId = profile.discordId;
 		this.alts = profile.alts;
+		this.lastUpdated = System.currentTimeMillis() / 1000;
 	}
 
 	public String getRealName() {
@@ -103,6 +106,12 @@ public class PlayerProfile {
 		return this.alts;
 	}
 
+	public Instant getLastUpdated() {
+		if (this.lastUpdated == 0)
+			this.lastUpdated = System.currentTimeMillis() / 1000;
+		return Instant.ofEpochSecond(this.lastUpdated);
+	}
+
 	public static class DataTypePlayerProfile extends DataType<PlayerProfile> {
 
 		private PlayerProfile value;
@@ -152,6 +161,8 @@ public class PlayerProfile {
 					stor.writeLong(ap.getValue());
 				}
 			}
+
+			stor.writeLong(value.lastUpdated);
 		}
 
 		@Override
@@ -170,6 +181,8 @@ public class PlayerProfile {
 				value.alts = new HashMap<>();
 			for (int i = 0; i < alts; i++)
 				value.alts.put(stor.readString(), stor.readLong());
+
+			value.lastUpdated = stor.readLong();
 		}
 
 	}

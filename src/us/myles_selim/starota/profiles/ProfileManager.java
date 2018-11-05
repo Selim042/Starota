@@ -90,6 +90,15 @@ public class ProfileManager {
 		return null;
 	}
 
+	public static PlayerProfile getProfile(long server, long user) {
+		if (!DATA.containsKey(server))
+			return null;
+		EBStorage storage = DATA.get(server);
+		if (storage.containsKey(Long.toString(user)))
+			return storage.get(Long.toString(user), PlayerProfile.class);
+		return null;
+	}
+
 	public static PlayerProfile getProfile(IGuild server, IUser user) {
 		if (!DATA.containsKey(server.getLongID()))
 			return null;
@@ -124,15 +133,6 @@ public class ProfileManager {
 		if (team != EnumTeam.NO_TEAM)
 			builder.withThumbnail(team.getIcon());
 		// builder.withImage(team.getIcon());
-		if (user != null) {
-			String nickname = user.getNicknameForGuild(server);
-			if (nickname != null)
-				builder.appendField("Discord User:",
-						nickname + " (_" + user.getName() + "#" + user.getDiscriminator() + "_)", true);
-			else
-				builder.appendField("Discord User:", user.getName() + "#" + user.getDiscriminator(),
-						true);
-		}
 		if (profile.getRealName() != null)
 			builder.appendField("Real Name: ", profile.getRealName(), true);
 		if (profile.getTrainerCode() != -1)
@@ -145,6 +145,18 @@ public class ProfileManager {
 				altsS += "- **" + e.getKey() + "**: " + getTrainerCodeString(e.getValue()) + "\n";
 			builder.appendField("Alternate Accounts:", altsS, false);
 		}
+		if (user != null) {
+			String nickname = user.getNicknameForGuild(server);
+			if (nickname != null)
+				builder.appendField("Discord User:",
+						nickname + " (_" + user.getName() + "#" + user.getDiscriminator() + "_)", false);
+			else
+				builder.appendField("Discord User:", user.getName() + "#" + user.getDiscriminator(),
+						false);
+		}
+
+		builder.withFooterText("Profile last updated");
+		builder.withTimestamp(profile.getLastUpdated());
 		return builder.build();
 	}
 
