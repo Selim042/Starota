@@ -5,6 +5,7 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.starota.EnumTeam;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.Command;
@@ -16,6 +17,11 @@ public class CommandRegister extends Command {
 
 	public CommandRegister() {
 		super("register", "Registers the given user and assigns them a profile.");
+	}
+
+	@Override
+	public Permissions requiredPermission() {
+		return Permissions.ADMINISTRATOR;
 	}
 
 	@Override
