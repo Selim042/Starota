@@ -18,6 +18,7 @@ import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.commands.CommandChangelog;
 import us.myles_selim.starota.commands.CommandChangelogChannel;
+import us.myles_selim.starota.commands.CommandCredits;
 import us.myles_selim.starota.commands.CommandGetTop;
 import us.myles_selim.starota.commands.CommandStatus;
 import us.myles_selim.starota.commands.CommandTest;
@@ -39,6 +40,7 @@ import us.myles_selim.starota.trading.commands.CommandFindTrade;
 import us.myles_selim.starota.trading.commands.CommandForTrade;
 import us.myles_selim.starota.trading.commands.CommandGetForms;
 import us.myles_selim.starota.trading.commands.CommandGetShinies;
+import us.myles_selim.starota.trading.commands.CommandGetTrade;
 import us.myles_selim.starota.trading.commands.CommandGetUserTrades;
 
 public class Starota {
@@ -66,9 +68,10 @@ public class Starota {
 	public final static boolean DEBUG = false;
 	public static boolean IS_DEV;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "1.0.5";
+	public final static String VERSION = "1.0.6";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n"
-			+ "Public facing changes:\n * Fix a error in the sRegister command";
+			+ "Public facing changes:\n * Display trade post and profile update date\n"
+			+ " * Set trade embed color to poster team color\n * Correct team icon URLs";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static void main(String[] args) {
@@ -101,6 +104,7 @@ public class Starota {
 		CLIENT.changePresence(StatusType.ONLINE, ActivityType.PLAYING, "registering commands...");
 
 		CommandRegistry.registerCommand(new CommandChangelog());
+		CommandRegistry.registerCommand(new CommandCredits());
 
 		CommandRegistry.registerCommand("Administrative", new CommandStatus());
 		CommandRegistry.registerCommand("Administrative", new CommandSetResearchChannel());
@@ -127,6 +131,7 @@ public class Starota {
 			CommandRegistry.registerCommand("Tradeboard", new CommandForTrade());
 			CommandRegistry.registerCommand("Tradeboard", new CommandGetUserTrades());
 			CommandRegistry.registerCommand("Tradeboard", new CommandFindTrade());
+			CommandRegistry.registerCommand("Tradeboard", new CommandGetTrade());
 		}
 
 		try {
@@ -141,6 +146,9 @@ public class Starota {
 		ResearchTracker.init();
 		ProfileManager.init();
 		Tradeboard.init();
+
+		// WebServer.init();
+
 		// Thread reportThread = new ThreadReport(TEST_SERVER);
 		// reportThread.start();
 		// Thread reportThread2 = new ThreadReport(PVILLE_SERVER);
@@ -233,6 +241,12 @@ public class Starota {
 	}
 
 	public static IUser findUser(long serverId, String name) {
+		try {
+			long userId = Long.parseLong(name);
+			IUser user = getUser(userId);
+			if (user != null)
+				return user;
+		} catch (NumberFormatException e) {}
 		String user = name.replaceAll("@", "").replaceAll("#\\d{4}", "");
 		String discrim = null;
 		if (name.matches(".*#\\d{4}")) {
