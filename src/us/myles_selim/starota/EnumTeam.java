@@ -5,19 +5,19 @@ public enum EnumTeam {
 	NO_TEAM(
 			"No team",
 			0x777777,
-			"http://starota.myles-selim.us/assets/instinct.png"),
+			"http://assets.myles-selim.us/starota/teams/instinct.png"),
 	INSTINCT(
 			"Instinct",
 			0xF1C40F,
-			"http://starota.myles-selim.us/assets/instinct.png"),
+			"http://assets.myles-selim.us/starota/teams/instinct.png"),
 	MYSTIC(
 			"Mystic",
 			0x277ECD,
-			"http://starota.myles-selim.us/assets/mystic.png"),
+			"http://assets.myles-selim.us/starota/teams/mystic.png"),
 	VALOR(
 			"Valor",
 			0x992D22,
-			"http://starota.myles-selim.us/assets/valor.png");
+			"http://assets.myles-selim.us/starota/teams/valor.png");
 
 	private String name;
 	private int color;
