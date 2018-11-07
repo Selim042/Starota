@@ -126,22 +126,23 @@ public class CommandHelp extends Command {
 			builder.appendDesc("\n**Page**: " + (page + 1) + "/" + ((disp.size() / CMDS_PER_PAGE) + 1));
 			helpMessage = channel.sendMessage(builder.build());
 		}
-		Thread deleteHelp = new Thread() {
-
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(10000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				message.delete();
-				helpMessage.delete();
-			}
-
-		};
-		if (Starota.getOurUser().getPermissionsForGuild(guild).contains(Permissions.MANAGE_MESSAGES))
-			deleteHelp.start();
+		// Thread deleteHelp = new Thread() {
+		//
+		// @Override
+		// public void run() {
+		// try {
+		// Thread.sleep(10000);
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// }
+		// message.delete();
+		// helpMessage.delete();
+		// }
+		//
+		// };
+		// if
+		// (Starota.getOurUser().getPermissionsForGuild(guild).contains(Permissions.MANAGE_MESSAGES))
+		// deleteHelp.start();
 	}
 
 }
