@@ -4,7 +4,7 @@ public class FormManager {
 
 	public static final int MAX_DEX = 386;
 	public static final int[] EXCLUDED = new int[] { //
-			235, 251, // Smeargle
+			235, // Smeargle
 			352, // Kecleon
 			366, 367, 368, // Clamperl family
 			385, // Jirachi
