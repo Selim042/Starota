@@ -122,7 +122,7 @@ public class CommandRegistry {
 		return Collections.unmodifiableList(CATEGORIES);
 	}
 
-	protected static List<Command> getCommandsByCategory(String category) {
+	public static List<Command> getCommandsByCategory(String category) {
 		if (category == null)
 			return getAllCommands();
 		List<Command> cmds = new ArrayList<>();
