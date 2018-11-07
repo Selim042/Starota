@@ -21,8 +21,6 @@ public class CommandGetShinies extends Command {
 
 	@Override
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
-		if (channel.getLongID() != 353267642410336256L)
-			return;
 		if (args.length != 1) {
 			channel.sendMessage("**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName());
 			return;
