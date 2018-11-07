@@ -9,6 +9,7 @@ import sx.blah.discord.handle.impl.obj.ReactionEmoji;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.ServerOptions;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.channel_management.ChannelCommandManager;
@@ -92,7 +93,9 @@ public class CommandRegistry {
 				|| (cmd.requiredPermission() != null && guild != null && !message.getAuthor()
 						.getPermissionsForGuild(guild).contains(cmd.requiredPermission())))
 			return false;
-		channel.setTypingStatus(true);
+		RequestBuffer.request(() -> {
+			channel.setTypingStatus(true);
+		});
 		if (Starota.DEBUG)
 			message.addReaction(ReactionEmoji.of("�?"));
 		try {
@@ -103,7 +106,9 @@ public class CommandRegistry {
 			System.err.println("executed command: " + cmdS);
 			e.printStackTrace();
 		}
-		channel.setTypingStatus(false);
+		RequestBuffer.request(() -> {
+			channel.setTypingStatus(false);
+		});
 		return true;
 	}
 
