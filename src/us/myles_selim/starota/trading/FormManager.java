@@ -12,7 +12,8 @@ public class FormManager {
 	public static final int[] FORCE_ENABLE = new int[] { //
 			387, 388, 389, 390, 391, 392, 393, 394, 395, // gen 4 starters
 			396, 397, 398, 399, 400, 401, 402, // stary, bidoof, kricketot
-			403, 404, 405, 417, // shinx & pachirisu
+			403, 404, 405, 406, 417, // shinx, budew, pachirisu
+			418, 419, // buizel
 			427, 428, 441, 447, 448, 455, // buneary, chatot, riolu, carnivine
 			425, 426, 434, 435, // drifloon & stunky
 			487, // giratina
@@ -24,9 +25,11 @@ public class FormManager {
 			29, 30, 31, // nidoran female
 			58, 59, // growlithe
 			74, 75, 76, // geodude
+			77, 78, // pontya
 			88, 89, 90, 91, // grimer & shelder
 			94, // gengar
 			96, 97, 98, 99, // drowzee & krabby
+			104, 105, // cubone
 			126, 127, // magmar, pinsir
 			129, 130, // magikarp
 			133, 134, 135, 136, // eeveelutions
@@ -61,6 +64,7 @@ public class FormManager {
 			382, // kyogre
 
 			403, 404, 405, // shinx
+			406, // budew
 			425, 426, // drifloon
 	};
 
