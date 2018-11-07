@@ -100,7 +100,6 @@ public class Starota {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		dispatcher.registerListener(new EventHandler());
 		CLIENT.changePresence(StatusType.ONLINE, ActivityType.PLAYING, "registering commands...");
 
 		CommandRegistry.registerCommand(new CommandChangelog());
@@ -198,6 +197,7 @@ public class Starota {
 			}
 		};
 		changesThread.start();
+		dispatcher.registerListener(new EventHandler());
 	}
 
 	public static IDiscordClient getClient() {
