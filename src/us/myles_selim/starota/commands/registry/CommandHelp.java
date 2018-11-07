@@ -8,9 +8,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.Starota;
 
 public class CommandHelp extends Command {
 
@@ -54,25 +52,26 @@ public class CommandHelp extends Command {
 					}
 					builder.appendField("Aliases:", aliasesS.substring(0, aliasesS.length() - 2), false);
 				}
-				IMessage helpMessage = channel.sendMessage(builder.build());
+				// IMessage helpMessage =
+				channel.sendMessage(builder.build());
 
-				Thread deleteHelp = new Thread() {
-
-					@Override
-					public void run() {
-						try {
-							Thread.sleep(10000);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-						message.delete();
-						helpMessage.delete();
-					}
-
-				};
-				if (Starota.getOurUser().getPermissionsForGuild(guild)
-						.contains(Permissions.MANAGE_MESSAGES))
-					deleteHelp.start();
+				// Thread deleteHelp = new Thread() {
+				//
+				// @Override
+				// public void run() {
+				// try {
+				// Thread.sleep(10000);
+				// } catch (InterruptedException e) {
+				// e.printStackTrace();
+				// }
+				// message.delete();
+				// helpMessage.delete();
+				// }
+				//
+				// };
+				// if (Starota.getOurUser().getPermissionsForGuild(guild)
+				// .contains(Permissions.MANAGE_MESSAGES))
+				// deleteHelp.start();
 				return;
 			}
 		}
@@ -104,9 +103,10 @@ public class CommandHelp extends Command {
 		if (page > disp.size() / CMDS_PER_PAGE)
 			page = 0;
 
-		IMessage helpMessage;
+		// IMessage helpMessage;
 		if (disp.isEmpty())
-			helpMessage = channel.sendMessage("No commands found");
+			// helpMessage =
+			channel.sendMessage("No commands found");
 		else {
 			String prevCategory = null;
 			EmbedBuilder builder = new EmbedBuilder().appendDescription("**Available Commands:**\n\n");
@@ -124,7 +124,8 @@ public class CommandHelp extends Command {
 				}
 			}
 			builder.appendDesc("\n**Page**: " + (page + 1) + "/" + ((disp.size() / CMDS_PER_PAGE) + 1));
-			helpMessage = channel.sendMessage(builder.build());
+			// helpMessage =
+			channel.sendMessage(builder.build());
 		}
 		// Thread deleteHelp = new Thread() {
 		//
