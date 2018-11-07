@@ -6,6 +6,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.Command;
 import us.myles_selim.starota.commands.registry.CommandRegistry;
@@ -48,12 +49,10 @@ public class CommandGetUserTrades extends Command {
 		List<TradeboardPost> posts = Tradeboard.getPosts(guild, target);
 		channel.sendMessage(
 				target.getDisplayName(guild) + " has " + posts.size() + " active trade posts");
-		for (TradeboardPost p : posts) {
-			channel.sendMessage(Tradeboard.getPostEmbed(guild, p));
-			try {
-				Thread.sleep(1500);
-			} catch (InterruptedException e) {}
-		}
+		for (TradeboardPost p : posts)
+			RequestBuffer.request(() -> {
+				channel.sendMessage(Tradeboard.getPostEmbed(guild, p));
+			});
 	}
 
 }
