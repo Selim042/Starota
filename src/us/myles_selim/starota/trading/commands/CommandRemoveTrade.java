@@ -34,12 +34,13 @@ public class CommandRemoveTrade extends Command {
 					"**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName() + " [postId]");
 			return;
 		}
-		TradeboardPost post = Tradeboard.removePost(guild, id);
-		if (post == null)
-			channel.sendMessage("Trade #" + String.format("%04d", id) + " not found");
-		else
+		TradeboardPost post = Tradeboard.getPost(guild, id);
+		if (post != null && post.getOwner() == message.getAuthor().getLongID()) {
+			Tradeboard.removePost(guild, id);
 			channel.sendMessage("Trade #" + String.format("%04d", id) + " removed",
 					Tradeboard.getPostEmbed(guild, post));
+		} else
+			channel.sendMessage("Trade #" + String.format("%04d", id) + " not found");
 	}
 
 }
