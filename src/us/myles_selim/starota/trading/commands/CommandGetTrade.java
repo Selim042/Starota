@@ -15,6 +15,11 @@ public class CommandGetTrade extends Command {
 	}
 
 	@Override
+	public String getGeneralUsage() {
+		return "[tradeId]";
+	}
+
+	@Override
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
 		if (args.length < 2) {
 			channel.sendMessage(

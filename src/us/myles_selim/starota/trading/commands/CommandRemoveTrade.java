@@ -11,7 +11,12 @@ import us.myles_selim.starota.trading.TradeboardPost;
 public class CommandRemoveTrade extends Command {
 
 	public CommandRemoveTrade() {
-		super("removeTrade", "Removes a given trade posted by yourself from the tradeboard");
+		super("removeTrade", "Removes a given trade posted by yourself from the tradeboard.");
+	}
+
+	@Override
+	public String getGeneralUsage() {
+		return "[postId]";
 	}
 
 	@Override

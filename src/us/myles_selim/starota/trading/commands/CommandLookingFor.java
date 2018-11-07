@@ -19,7 +19,12 @@ import us.myles_selim.starota.trading.forms.FormSet.Form;
 public class CommandLookingFor extends Command {
 
 	public CommandLookingFor() {
-		super("lookingFor", "Looks for a trade matching your search, creates one if it doesn't exist");
+		super("lookingFor", "Looks for a trade matching your search, creates one if it doesn't exist.");
+	}
+
+	@Override
+	public String getGeneralUsage() {
+		return "[pokemon] <form> <shiny>";
 	}
 
 	@Override

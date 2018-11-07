@@ -22,6 +22,11 @@ public class CommandGetUserTrades extends Command {
 	}
 
 	@Override
+	public String getGeneralUsage() {
+		return "<target>";
+	}
+
+	@Override
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
 		IUser target;
 		if (args.length == 1)

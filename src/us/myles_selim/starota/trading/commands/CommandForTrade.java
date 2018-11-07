@@ -19,7 +19,12 @@ import us.myles_selim.starota.trading.forms.FormSet.Form;
 public class CommandForTrade extends Command {
 
 	public CommandForTrade() {
-		super("forTrade", "Posts the given Pokemon up for trade");
+		super("forTrade", "Posts the given Pokemon up for trade.");
+	}
+
+	@Override
+	public String getGeneralUsage() {
+		return "[pokemon] <form> <shiny>";
 	}
 
 	@Override
