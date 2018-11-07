@@ -1,5 +1,7 @@
 package us.myles_selim.starota.trading;
 
+import java.time.Instant;
+
 import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
@@ -12,30 +14,49 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 	private EnumPokemon pokemon;
 	private Form form;
 	private boolean shiny;
+	private long timePosted;
+	private EnumGenderPossible gender;
 
 	public TradeboardPost() {}
 
 	protected TradeboardPost(int id, boolean lookingFor, long owner, EnumPokemon pokemon) {
-		this(id, lookingFor, owner, pokemon, null, false);
+		this(id, lookingFor, owner, pokemon, null, false, EnumGenderPossible.EITHER);
+	}
+
+	protected TradeboardPost(int id, boolean lookingFor, long owner, EnumPokemon pokemon,
+			EnumGenderPossible gender) {
+		this(id, lookingFor, owner, pokemon, null, false, gender);
 	}
 
 	protected TradeboardPost(int id, boolean lookingFor, long owner, EnumPokemon pokemon,
 			boolean shiny) {
-		this(id, lookingFor, owner, pokemon, null, shiny);
+		this(id, lookingFor, owner, pokemon, null, shiny, EnumGenderPossible.EITHER);
+	}
+
+	protected TradeboardPost(int id, boolean lookingFor, long owner, EnumPokemon pokemon, boolean shiny,
+			EnumGenderPossible gender) {
+		this(id, lookingFor, owner, pokemon, null, shiny, gender);
 	}
 
 	protected TradeboardPost(int id, boolean lookingFor, long owner, EnumPokemon pokemon, Form form) {
-		this(id, lookingFor, owner, pokemon, form, false);
+		this(id, lookingFor, owner, pokemon, form, false, EnumGenderPossible.EITHER);
 	}
 
 	protected TradeboardPost(int id, boolean lookingFor, long owner, EnumPokemon pokemon, Form form,
-			boolean shiny) {
+			EnumGenderPossible gender) {
+		this(id, lookingFor, owner, pokemon, form, false, gender);
+	}
+
+	protected TradeboardPost(int id, boolean lookingFor, long owner, EnumPokemon pokemon, Form form,
+			boolean shiny, EnumGenderPossible gender) {
 		this.id = id;
 		this.lookingFor = lookingFor;
 		this.owner = owner;
 		this.pokemon = pokemon;
 		this.form = form;
 		this.shiny = shiny;
+		this.timePosted = System.currentTimeMillis() / 1000;
+		this.gender = gender;
 	}
 
 	public int getId() {
@@ -60,7 +81,17 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 
 	public boolean isShiny() {
 		return this.shiny && ((this.form != null && this.form.canBeShiny(pokemon)))
-				|| FormManager.isShinyable(this.pokemon);
+				|| (this.shiny && FormManager.isShinyable(this.pokemon));
+	}
+
+	public Instant getTimePosted() {
+		if (this.timePosted == 0)
+			this.timePosted = System.currentTimeMillis() / 1000;
+		return Instant.ofEpochSecond(this.timePosted);
+	}
+
+	public EnumGenderPossible getGender() {
+		return this.gender;
 	}
 
 	@Override
@@ -78,6 +109,7 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 		this.pokemon = value.pokemon;
 		this.form = value.form;
 		this.shiny = value.shiny;
+		this.timePosted = value.timePosted;
 	}
 
 	@Override
@@ -97,9 +129,14 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 		stor.writeBoolean(this.lookingFor);
 		stor.writeLong(this.owner);
 		stor.writeInt(this.pokemon.getId());
+		System.out.println("toBytes form: " + this.pokemon.getFormSet().getForms().indexOf(this.form));
 		if (this.pokemon.getFormSet() != null)
 			stor.writeInt(this.pokemon.getFormSet().getForms().indexOf(this.form));
+		else
+			stor.writeInt(-1);
 		stor.writeBoolean(this.shiny);
+		stor.writeLong(this.timePosted);
+		stor.writeInt(this.gender.ordinal());
 	}
 
 	@Override
@@ -109,9 +146,16 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 		this.owner = stor.readLong();
 		this.pokemon = EnumPokemon.getPokemon(stor.readInt());
 		int form = stor.readInt();
+		System.out.println("fromBytes form: " + form);
 		if (form != -1 && this.pokemon.getFormSet() != null)
-			this.pokemon.getFormSet().getForms().get(form);
+			this.form = this.pokemon.getFormSet().getForms().get(form);
 		this.shiny = stor.readBoolean();
+		this.timePosted = stor.readLong();
+		if (this.timePosted <= 0 || this.timePosted >= System.currentTimeMillis() / 1000)
+			this.timePosted = System.currentTimeMillis() / 1000;
+		// TODO: Fix this
+		this.gender = EnumGenderPossible.values()[stor.readInt()];
+		// this.gender = EnumGenderPossible.EITHER;
 	}
 
 }
