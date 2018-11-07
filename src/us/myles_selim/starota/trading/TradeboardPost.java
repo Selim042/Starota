@@ -129,7 +129,6 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 		stor.writeBoolean(this.lookingFor);
 		stor.writeLong(this.owner);
 		stor.writeInt(this.pokemon.getId());
-		System.out.println("toBytes form: " + this.pokemon.getFormSet().getForms().indexOf(this.form));
 		if (this.pokemon.getFormSet() != null)
 			stor.writeInt(this.pokemon.getFormSet().getForms().indexOf(this.form));
 		else
@@ -146,7 +145,6 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 		this.owner = stor.readLong();
 		this.pokemon = EnumPokemon.getPokemon(stor.readInt());
 		int form = stor.readInt();
-		System.out.println("fromBytes form: " + form);
 		if (form != -1 && this.pokemon.getFormSet() != null)
 			this.form = this.pokemon.getFormSet().getForms().get(form);
 		this.shiny = stor.readBoolean();
