@@ -28,12 +28,6 @@
 			<artifactId>gson</artifactId>
 			<version>2.8.0</version>
 		</dependency>
-		<dependency><!-- PokeAPI -->
-			<groupId>me.sargunvohra.lib</groupId>
-			<artifactId>pokekotlin</artifactId>
-			<version>2.3.0</version>
-			<type>jar</type>
-		</dependency>
 	</dependencies>
 
 	<build>
