@@ -39,9 +39,10 @@ import us.myles_selim.starota.trading.Tradeboard;
 import us.myles_selim.starota.trading.commands.CommandFindTrade;
 import us.myles_selim.starota.trading.commands.CommandForTrade;
 import us.myles_selim.starota.trading.commands.CommandGetForms;
-import us.myles_selim.starota.trading.commands.CommandGetShinies;
 import us.myles_selim.starota.trading.commands.CommandGetTrade;
 import us.myles_selim.starota.trading.commands.CommandGetUserTrades;
+import us.myles_selim.starota.trading.commands.CommandLookingFor;
+import us.myles_selim.starota.trading.commands.CommandRemoveTrade;
 
 public class Starota {
 
@@ -68,10 +69,9 @@ public class Starota {
 	public final static boolean DEBUG = false;
 	public static boolean IS_DEV;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "1.0.6";
+	public final static String VERSION = "1.0.7";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n"
-			+ "Public facing changes:\n * Display trade post and profile update date\n"
-			+ " * Set trade embed color to poster team color\n * Correct team icon URLs";
+			+ "Public facing changes:\n";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static void main(String[] args) {
@@ -124,14 +124,16 @@ public class Starota {
 		CommandRegistry.registerCommand("Groups", new CommandRemoveGroup());
 		CommandRegistry.registerCommand("Groups", new CommandSetAsGroup());
 
-		if (IS_DEV) {
-			CommandRegistry.registerCommand("Tradeboard", new CommandGetForms());
-			CommandRegistry.registerCommand("Tradeboard", new CommandGetShinies());
-			CommandRegistry.registerCommand("Tradeboard", new CommandForTrade());
-			CommandRegistry.registerCommand("Tradeboard", new CommandGetUserTrades());
-			CommandRegistry.registerCommand("Tradeboard", new CommandFindTrade());
-			CommandRegistry.registerCommand("Tradeboard", new CommandGetTrade());
-		}
+		CommandRegistry.registerCommand("Tradeboard", new CommandTradeboardHelp());
+		CommandRegistry.registerCommand("Tradeboard", new CommandGetForms());
+		// CommandRegistry.registerCommand("Tradeboard", new
+		// CommandGetShinies());
+		CommandRegistry.registerCommand("Tradeboard", new CommandForTrade());
+		CommandRegistry.registerCommand("Tradeboard", new CommandGetUserTrades());
+		CommandRegistry.registerCommand("Tradeboard", new CommandFindTrade());
+		CommandRegistry.registerCommand("Tradeboard", new CommandGetTrade());
+		CommandRegistry.registerCommand("Tradeboard", new CommandLookingFor());
+		CommandRegistry.registerCommand("Tradeboard", new CommandRemoveTrade());
 
 		try {
 			Thread.sleep(2500);
