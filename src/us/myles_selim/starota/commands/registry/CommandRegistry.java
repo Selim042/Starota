@@ -101,8 +101,10 @@ public class CommandRegistry {
 		try {
 			cmd.execute(args, message, guild, channel);
 		} catch (Throwable e) {
-			message.reply("There was an error encountered while executing your command: "
-					+ e.getStackTrace()[0] + e.getLocalizedMessage());
+			RequestBuffer.request(() -> {
+				message.reply("There was an error encountered while executing your command: "
+						+ e.getStackTrace()[0] + e.getLocalizedMessage());
+			});
 			System.err.println("executed command: " + cmdS);
 			e.printStackTrace();
 		}
