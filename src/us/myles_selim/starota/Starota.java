@@ -126,6 +126,7 @@ public class Starota {
 
 		CommandRegistry.registerCommand("Tradeboard", new CommandTradeboardHelp());
 		CommandRegistry.registerCommand("Tradeboard", new CommandGetForms());
+		// CommandRegistry.registerCommand("Tradeboard", new CommandGetForms());
 		// CommandRegistry.registerCommand("Tradeboard", new
 		// CommandGetShinies());
 		CommandRegistry.registerCommand("Tradeboard", new CommandForTrade());
