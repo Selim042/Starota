@@ -32,8 +32,7 @@ public class CommandFindTrade extends Command {
 		Form form = null;
 		boolean shiny = false;
 		if (pokemon == null) {
-			channel.sendMessage("**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName()
-					+ " [pokemon] <form> <shiny>");
+			channel.sendMessage("Pokemon \"" + args[1] + "\" not found");
 			return;
 		}
 
