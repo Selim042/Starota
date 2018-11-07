@@ -66,8 +66,6 @@ public class CommandFindTrade extends Command {
 				}
 			}
 		}
-		if (pokemon.getFormSet() != null && form == null)
-			form = pokemon.getFormSet().getDefaultForm();
 
 		if (shiny && ((form == null && !FormManager.isShinyable(pokemon))
 				|| (form != null && !form.canBeShiny(pokemon)))) {
