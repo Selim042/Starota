@@ -627,6 +627,12 @@ public enum EnumPokemon {
 		return this.forms;
 	}
 
+	public Form getDefaultForm() {
+		if (this.forms == null)
+			return null;
+		return this.forms.getDefaultForm();
+	}
+
 	public EnumGenderPossible getGenderPossible() {
 		return this.gender;
 	}
