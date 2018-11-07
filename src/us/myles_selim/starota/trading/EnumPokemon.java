@@ -55,7 +55,7 @@ public enum EnumPokemon {
 	CLEFAIRY(EnumPokemonType.FAIRY),
 	CLEFABLE(EnumPokemonType.FAIRY),
 	VULPIX(EnumPokemonType.FIRE, FormSetAlolan.FORM_SET),
-	NINETAILS(EnumPokemonType.FIRE, FormSetAlolan.FORM_SET),
+	NINETALES(EnumPokemonType.FIRE, FormSetAlolan.FORM_SET),
 	JIGGLYPUFF(EnumPokemonType.NORMAL, EnumPokemonType.FAIRY),
 	WIGGLYTUFF(EnumPokemonType.NORMAL, EnumPokemonType.FAIRY),
 	ZUBAT(EnumPokemonType.POISON, EnumPokemonType.FLYING),
