@@ -1,5 +1,7 @@
 package us.myles_selim.starota.trading.forms;
 
+import us.myles_selim.starota.trading.EnumPokemon;
+
 public class FormSetDeoxys extends FormSet {
 
 	private static final FormString NORMAL = new FormString("Normal");
@@ -7,9 +9,27 @@ public class FormSetDeoxys extends FormSet {
 
 	private FormSetDeoxys() {
 		this.addForm(NORMAL);
-		this.addForm(new FormString("Attack"));
-		this.addForm(new FormString("Defense"));
-		this.addForm(new FormString("Speed"));
+		this.addForm(new FormString("Attack") {
+
+			@Override
+			public String getSpritePostfix(EnumPokemon pokemon) {
+				return "attack";
+			}
+		});
+		this.addForm(new FormString("Defense") {
+
+			@Override
+			public String getSpritePostfix(EnumPokemon pokemon) {
+				return "defense";
+			}
+		});
+		this.addForm(new FormString("Speed") {
+
+			@Override
+			public String getSpritePostfix(EnumPokemon pokemon) {
+				return "speed";
+			}
+		});
 	}
 
 	@Override

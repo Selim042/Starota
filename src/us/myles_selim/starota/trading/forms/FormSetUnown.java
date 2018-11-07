@@ -1,5 +1,7 @@
 package us.myles_selim.starota.trading.forms;
 
+import us.myles_selim.starota.trading.EnumPokemon;
+
 public class FormSetUnown extends FormSet {
 
 	private static final FormUnown F = new FormUnown('F');
@@ -11,8 +13,20 @@ public class FormSetUnown extends FormSet {
 				this.addForm(F);
 			else
 				this.addForm(new FormUnown(c));
-		this.addForm(new FormUnown('!'));
-		this.addForm(new FormUnown('?'));
+		this.addForm(new FormUnown('!') {
+
+			@Override
+			public String getSpritePostfix(EnumPokemon pokemon) {
+				return "exclaimation";
+			}
+		});
+		this.addForm(new FormUnown('?') {
+
+			@Override
+			public String getSpritePostfix(EnumPokemon pokemon) {
+				return "question";
+			}
+		});
 	}
 
 	@Override
@@ -29,6 +43,11 @@ public class FormSetUnown extends FormSet {
 				this.letter = letter;
 			else
 				throw new IllegalArgumentException("letter must be alphabetic or '?' or '!'");
+		}
+
+		@Override
+		public String getSpritePostfix(EnumPokemon pokemon) {
+			return Character.toString(Character.toLowerCase(this.letter));
 		}
 
 		@Override

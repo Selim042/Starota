@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import us.myles_selim.starota.trading.EnumPokemon;
+import us.myles_selim.starota.trading.EnumPokemonType;
 import us.myles_selim.starota.trading.FormManager;
 
 public abstract class FormSet {
@@ -38,6 +39,18 @@ public abstract class FormSet {
 
 		public boolean canBeShiny(EnumPokemon pokemon) {
 			return FormManager.isShinyable(pokemon.getId());
+		}
+
+		public EnumPokemonType getType1(EnumPokemon pokemon) {
+			return pokemon.getType1();
+		}
+
+		public EnumPokemonType getType2(EnumPokemon pokemon) {
+			return pokemon.getType2();
+		}
+
+		public String getSpritePostfix(EnumPokemon pokemon) {
+			return null;
 		}
 
 		@Override

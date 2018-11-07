@@ -1,5 +1,6 @@
 package us.myles_selim.starota.trading.forms;
 
+import us.myles_selim.starota.trading.EnumPokemon;
 import us.myles_selim.starota.trading.EnumPokemonType;
 
 public class FormSetArceus extends FormSet {
@@ -26,6 +27,11 @@ public class FormSetArceus extends FormSet {
 
 		public FormArceus(EnumPokemonType type) {
 			this.type = type;
+		}
+
+		@Override
+		public EnumPokemonType getType1(EnumPokemon pokemon) {
+			return type;
 		}
 
 		@Override

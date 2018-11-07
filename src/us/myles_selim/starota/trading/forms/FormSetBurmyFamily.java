@@ -1,5 +1,8 @@
 package us.myles_selim.starota.trading.forms;
 
+import us.myles_selim.starota.trading.EnumPokemon;
+import us.myles_selim.starota.trading.EnumPokemonType;
+
 public class FormSetBurmyFamily extends FormSet {
 
 	private static final FormString PLANT = new FormString("Plant");
@@ -7,8 +10,30 @@ public class FormSetBurmyFamily extends FormSet {
 
 	private FormSetBurmyFamily() {
 		this.addForm(PLANT);
-		this.addForm(new FormString("Sandy"));
-		this.addForm(new FormString("Trash"));
+		this.addForm(new FormString("Sandy") {
+
+			@Override
+			public EnumPokemonType getType2(EnumPokemon pokemon) {
+				switch (pokemon) {
+				case WORMADAM:
+					return EnumPokemonType.GROUND;
+				default:
+					return super.getType2(pokemon);
+				}
+			}
+		});
+		this.addForm(new FormString("Trash") {
+
+			@Override
+			public EnumPokemonType getType2(EnumPokemon pokemon) {
+				switch (pokemon) {
+				case WORMADAM:
+					return EnumPokemonType.STEEL;
+				default:
+					return super.getType2(pokemon);
+				}
+			}
+		});
 	}
 
 	@Override
