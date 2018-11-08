@@ -1,11 +1,10 @@
 package us.myles_selim.starota.trading;
 
 public enum EnumGender {
-	UNKNOWN,
-	EITHER(
-			"male/female"),
-	MALE,
-	FEMALE;
+	UNKNOWN("Unknown"),
+	EITHER("Male/female"),
+	MALE("Male"),
+	FEMALE("Female");
 
 	private String display;
 
