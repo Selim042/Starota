@@ -14,7 +14,6 @@ import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.trading.PokemonInstance;
 import us.myles_selim.starota.trading.Tradeboard;
 import us.myles_selim.starota.trading.TradeboardPost;
-import us.myles_selim.starota.trading.forms.FormSet;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 
 public class CommandForTrade extends Command {
@@ -39,61 +38,33 @@ public class CommandForTrade extends Command {
 		EnumPokemon pokemon = pokemonInst.getPokemon();
 		Form form = pokemonInst.getForm();
 		boolean shiny = pokemonInst.getShiny();
+		EnumGender gender = pokemonInst.getGender();
 		if (pokemon == null) {
 			channel.sendMessage("Pokemon \"" + args[1] + "\" not found");
 			return;
 		}
-
 		if (!FormManager.isAvailable(pokemon)) {
 			channel.sendMessage("Pokemon **" + pokemon + "** is not available");
 			return;
 		}
-
 		if (!pokemon.isTradable()) {
 			channel.sendMessage("Pokemon **" + pokemon + "** is not tradable");
 			return;
 		}
-
-		if (args.length >= 3) {
-			boolean arg2Shiny = false;
-			switch (args[2].toLowerCase()) {
-			case "shiny":
-			case "s":
-			case "true":
-				arg2Shiny = true;
-				shiny = true;
-			}
-			if (!arg2Shiny && args.length >= 4) {
-				switch (args[3].toLowerCase()) {
-				case "shiny":
-				case "s":
-				case "true":
-					shiny = true;
-				}
-			}
-			if (!arg2Shiny) {
-				FormSet forms = pokemon.getFormSet();
-				if (forms != null)
-					form = forms.getForm(args[2]);
-				if (form == null) {
-					channel.sendMessage(
-							"Pokemon **" + pokemon + "** cannot have form \"" + args[2] + "\"");
-					return;
-				}
-			}
-		}
-		if (pokemon.getFormSet() != null && form == null)
-			form = pokemon.getFormSet().getDefaultForm();
-
 		if (shiny && ((form == null && !FormManager.isShinyable(pokemon))
 				|| (form != null && !form.canBeShiny(pokemon)))) {
 			channel.sendMessage("Pokemon **" + pokemon + "** cannot be shiny"
 					+ (form == null ? "" : " in form \"" + form + "\""));
 			return;
 		}
+		if (pokemon.getGenderPossible() != gender && pokemon.getGenderPossible() != EnumGender.EITHER) {
+			channel.sendMessage("Pokemon **" + pokemon + "** cannot be " + gender);
+			return;
+		}
 
 		boolean foundTrade = false;
-		List<TradeboardPost> posts = Tradeboard.findPosts(false, guild, pokemon, form, shiny);
+		List<TradeboardPost> posts = Tradeboard.findPosts(false, guild, pokemon, form, shiny, gender,
+				pokemonInst.isLegacy());
 		for (int i = 0; i < posts.size(); i++) {
 			TradeboardPost p = posts.get(i);
 			if (!foundTrade)
@@ -111,14 +82,10 @@ public class CommandForTrade extends Command {
 
 		if (!foundTrade) {
 			TradeboardPost post = Tradeboard.newPost(guild, false, message.getAuthor().getLongID(),
-					pokemon, form, shiny, EnumGender.EITHER);
+					pokemon, form, shiny, gender, pokemonInst.isLegacy());
 			channel.sendMessage("Posted a new trade for your search",
 					Tradeboard.getPostEmbed(guild, post));
 		}
-		// TradeboardPost post = Tradeboard.newPost(guild, false,
-		// message.getAuthor().getLongID(), pokemon,
-		// form, shiny, EnumGenderPossible.EITHER);
-		// channel.sendMessage(Tradeboard.getPostEmbed(guild, post));
 	}
 
 }

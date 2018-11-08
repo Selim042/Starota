@@ -26,6 +26,7 @@ import us.myles_selim.starota.commands.registry.CommandRegistry;
 import us.myles_selim.starota.profiles.ProfileManager;
 import us.myles_selim.starota.profiles.commands.CommandGetProfilelessPlayers;
 import us.myles_selim.starota.profiles.commands.CommandProfile;
+import us.myles_selim.starota.profiles.commands.CommandProfileHelp;
 import us.myles_selim.starota.profiles.commands.CommandRegister;
 import us.myles_selim.starota.profiles.commands.CommandSelfRegister;
 import us.myles_selim.starota.profiles.commands.CommandUpdateProfile;
@@ -76,6 +77,7 @@ public class Starota {
 			+ " * Fix Pichu witch hat form\n" //
 			+ " * Trade command form order no longer matters\n"
 			+ " * The form argument has been tweaked, \"ashhat\" and \"ash\" now work for \"Ash Hat\"";
+			+ " * You can now specify gender and legacy in trade posts";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static void main(String[] args) {

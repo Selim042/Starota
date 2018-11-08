@@ -94,18 +94,18 @@ public class Tradeboard {
 
 	public static List<TradeboardPost> findPosts(boolean lookingFor, IGuild server, EnumPokemon pokemon,
 			Form form) {
-		return findPosts(lookingFor, server, pokemon, form, false);
+		return findPosts(lookingFor, server, pokemon, form, false, EnumGender.EITHER, false);
 	}
 
 	public static List<TradeboardPost> findPosts(boolean lookingFor, IGuild server, EnumPokemon pokemon,
 			boolean shiny) {
 		FormSet fSet = pokemon.getFormSet();
-		return findPosts(lookingFor, server, pokemon, fSet == null ? null : fSet.getDefaultForm(),
-				shiny);
+		return findPosts(lookingFor, server, pokemon, fSet == null ? null : fSet.getDefaultForm(), shiny,
+				EnumGender.EITHER, false);
 	}
 
 	public static List<TradeboardPost> findPosts(boolean lookingFor, IGuild server, EnumPokemon pokemon,
-			Form form, boolean shiny) {
+			Form form, boolean shiny, EnumGender gender, boolean legacy) {
 		List<TradeboardPost> allPosts = getPosts(server);
 		if (allPosts == null)
 			return Collections.emptyList();
@@ -114,7 +114,9 @@ public class Tradeboard {
 		for (TradeboardPost p : allPosts)
 			if (p.isLookingFor() != lookingFor && p.getPokemon().equals(pokemon)
 					&& (fSet == null || p.getForm() == null || form.equals(p.getForm()))
-					&& (!shiny || p.isShiny() == shiny))
+					&& (!shiny || p.isShiny() == shiny) && (p.getGender() == EnumGender.EITHER
+							|| gender == EnumGender.EITHER || gender == p.getGender())
+					&& (!legacy || p.isLegacy()))
 				matching.add(p);
 		return matching;
 	}
@@ -124,47 +126,56 @@ public class Tradeboard {
 	}
 
 	public static List<TradeboardPost> findPosts(IGuild server, EnumPokemon pokemon, Form form) {
-		return findPosts(server, pokemon, form, false);
+		return findPosts(server, pokemon, form, false, EnumGender.EITHER, false);
 	}
 
 	public static List<TradeboardPost> findPosts(IGuild server, EnumPokemon pokemon, boolean shiny) {
 		FormSet fSet = pokemon.getFormSet();
-		return findPosts(server, pokemon, fSet == null ? null : fSet.getDefaultForm(), shiny);
+		return findPosts(server, pokemon, fSet == null ? null : fSet.getDefaultForm(), shiny,
+				EnumGender.EITHER, false);
 	}
 
 	public static List<TradeboardPost> findPosts(IGuild server, EnumPokemon pokemon, Form form,
-			boolean shiny) {
+			boolean shiny, EnumGender gender, boolean legacy) {
 		List<TradeboardPost> allPosts = getPosts(server);
 		List<TradeboardPost> matching = new LinkedList<>();
 		for (TradeboardPost p : allPosts)
 			if (p.getPokemon().equals(pokemon) && (form == null || p.getForm() == form)
-					&& (!shiny || p.isShiny() == shiny))
+					&& (!shiny || p.isShiny() == shiny)
+					&& (gender == EnumGender.EITHER || gender == p.getGender())
+					&& (!legacy || p.isLegacy()))
 				matching.add(p);
 		return matching;
 	}
 
 	public static TradeboardPost newPost(IGuild server, boolean lookingFor, long owner,
 			EnumPokemon pokemon) {
-		return newPost(server, lookingFor, owner, pokemon, null, false, EnumGender.EITHER);
+		return newPost(server, lookingFor, owner, pokemon, null, false, EnumGender.EITHER, false);
 	}
 
 	public static TradeboardPost newPost(IGuild server, boolean lookingFor, long owner,
 			EnumPokemon pokemon, boolean shiny) {
-		return newPost(server, lookingFor, owner, pokemon, null, shiny, EnumGender.EITHER);
+		return newPost(server, lookingFor, owner, pokemon, null, shiny, EnumGender.EITHER, false);
 	}
 
 	public static TradeboardPost newPost(IGuild server, boolean lookingFor, long owner,
 			EnumPokemon pokemon, Form form) {
-		return newPost(server, lookingFor, owner, pokemon, form, false, EnumGender.EITHER);
+		return newPost(server, lookingFor, owner, pokemon, form, false, EnumGender.EITHER, false);
 	}
 
 	public static TradeboardPost newPost(IGuild server, boolean lookingFor, long owner,
-			EnumPokemon pokemon, Form form, boolean shiny, EnumGender gender) {
+			EnumPokemon pokemon, Form form, boolean shiny, EnumGender gender, boolean legacy) {
 		int nextPostId = 1;
 		if (ServerOptions.hasKey(server, TRADE_ID_KEY))
 			nextPostId = (int) ServerOptions.getValue(server, TRADE_ID_KEY);
+		if (nextPostId >= 9999) {
+			IUser serverOwner = server.getOwner();
+			System.out.println("Server " + server.getName() + ", run by " + serverOwner.getName() + "#"
+					+ serverOwner.getDiscriminator() + " has hit the 9,999 trade post limit");
+			return null;
+		}
 		TradeboardPost post = new TradeboardPost(nextPostId, lookingFor, owner, pokemon, form, shiny,
-				gender);
+				gender, legacy);
 		ServerOptions.setValue(server, TRADE_ID_KEY, nextPostId + 1);
 		if (!DATA.containsKey(server.getLongID()))
 			DATA.put(server.getLongID(), new EBList<>(new TradeboardPost()));
@@ -265,10 +276,12 @@ public class Tradeboard {
 		if (FormManager.isShinyable(pokemon) || (form != null && form.canBeShiny(pokemon))) {
 			String isShinyS = Boolean.toString(post.isShiny());
 			builder.appendField("Shiny:",
-					"" + Character.toUpperCase(isShinyS.charAt(0)) + isShinyS.substring(1), true);
+					Character.toUpperCase(isShinyS.charAt(0)) + isShinyS.substring(1), true);
 		}
-		// if (post.getGender() != EnumGenderPossible.UNKNOWN)
-		// builder.appendField("Gender:", post.getGender().toString(), true);
+		builder.appendField("Gender:", post.getGender().toString(), true);
+		String isLegacyS = Boolean.toString(post.isLegacy());
+		builder.appendField("Legacy:",
+				Character.toUpperCase(isLegacyS.charAt(0)) + isLegacyS.substring(1), true);
 
 		builder.withFooterText("Trade posted");
 		builder.withTimestamp(post.getTimePosted());
