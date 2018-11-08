@@ -17,14 +17,15 @@ public class FormSetPichuHat extends FormSet {
 			}
 		});
 		this.addForm(new FormString("Party Hat"));
-		this.addForm(new FormString("Witch Hat") {
+		this.addForm(new FormString("Witch Hat"));
+		this.addForm(new FormString("Summer Hat") {
 
 			@Override
 			public boolean canBeShiny(EnumPokemon pokemon) {
 				return false;
 			}
 		});
-		this.addForm(new FormString("Summer Hat") {
+		this.addForm(new FormString("Ash Hat") {
 
 			@Override
 			public boolean canBeShiny(EnumPokemon pokemon) {
