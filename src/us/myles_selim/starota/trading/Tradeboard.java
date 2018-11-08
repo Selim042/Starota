@@ -262,8 +262,11 @@ public class Tradeboard {
 		builder.appendField("Pokemon:", pokemon.getName(), false);
 		if (form != null)
 			builder.appendField("Form:", form.toString(), true);
-		if (FormManager.isShinyable(pokemon) || (form != null && form.canBeShiny(pokemon)))
-			builder.appendField("Shiny:", "" + post.isShiny(), true);
+		if (FormManager.isShinyable(pokemon) || (form != null && form.canBeShiny(pokemon))) {
+			String isShinyS = Boolean.toString(post.isShiny());
+			builder.appendField("Shiny:",
+					"" + Character.toUpperCase(isShinyS.charAt(0)) + isShinyS.substring(1), true);
+		}
 		// if (post.getGender() != EnumGenderPossible.UNKNOWN)
 		// builder.appendField("Gender:", post.getGender().toString(), true);
 
