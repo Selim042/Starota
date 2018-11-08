@@ -10,6 +10,7 @@ import us.myles_selim.starota.commands.registry.Command;
 import us.myles_selim.starota.commands.registry.CommandRegistry;
 import us.myles_selim.starota.trading.EnumPokemon;
 import us.myles_selim.starota.trading.FormManager;
+import us.myles_selim.starota.trading.PokemonInstance;
 import us.myles_selim.starota.trading.Tradeboard;
 import us.myles_selim.starota.trading.TradeboardPost;
 import us.myles_selim.starota.trading.forms.FormSet;
@@ -22,15 +23,21 @@ public class CommandFindTrade extends Command {
 	}
 
 	@Override
+	public String getGeneralUsage() {
+		return "[pokemon] <form> <shiny> <gender>";
+	}
+
+	@Override
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
 		if (args.length < 2) {
 			channel.sendMessage("**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName()
-					+ " [pokemon] <form> <shiny>");
+					+ " [pokemon] <form> <shiny> <gender>");
 			return;
 		}
-		EnumPokemon pokemon = EnumPokemon.getPokemon(args[1]);
-		Form form = null;
-		boolean shiny = false;
+		PokemonInstance pokemonInst = PokemonInstance.getInstance(args);
+		EnumPokemon pokemon = pokemonInst.getPokemon();
+		Form form = pokemonInst.getForm();
+		boolean shiny = pokemonInst.getShiny();
 		if (pokemon == null) {
 			channel.sendMessage("Pokemon \"" + args[1] + "\" not found");
 			return;
