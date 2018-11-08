@@ -49,8 +49,6 @@ import us.myles_selim.starota.trading.commands.CommandTradeboardHelp;
 
 public class Starota {
 
-	// TODO: Finish tradeboard
-
 	private static IDiscordClient CLIENT;
 	private static final Properties PROPERTIES = new Properties();
 
