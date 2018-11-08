@@ -9,7 +9,7 @@ public class FormSetSquirtleSquad extends FormSet {
 		if (NO_GLASSES == null)
 			System.out.println("NO_GLASSES IS NULL");
 		this.addForm(NO_GLASSES);
-		this.addForm(new FormString("Squirtle Squad"));
+		this.addForm(new FormString("Glasses"));
 	}
 
 	@Override
