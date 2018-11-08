@@ -122,6 +122,7 @@ public class Starota {
 		CommandRegistry.registerCommand("Profiles", new CommandProfile());
 		CommandRegistry.registerCommand("Profiles", new CommandSelfRegister());
 		CommandRegistry.registerCommand("Profiles", new CommandGetProfilelessPlayers());
+		CommandRegistry.registerCommand("Profiles", new CommandProfileHelp());
 
 		CommandRegistry.registerCommand("Groups", new CommandGetGroups());
 		CommandRegistry.registerCommand("Groups", new CommandAddGroup());

@@ -15,6 +15,11 @@ public class CommandUpdateProfile extends Command {
 	}
 
 	@Override
+	public String getGeneralUsage() {
+		return "[level/trainerCode/realName/alt] [value]";
+	}
+
+	@Override
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
 		if (!ProfileManager.hasProfile(guild, message.getAuthor())) {
 			channel.sendMessage("You do not yet have a profile.  Please contact an admin of \""

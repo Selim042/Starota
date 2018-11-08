@@ -17,6 +17,11 @@ public class CommandProfile extends Command {
 	}
 
 	@Override
+	public String getGeneralUsage() {
+		return "<target>";
+	}
+
+	@Override
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
 		IUser target;
 		if (args.length == 1)
@@ -24,7 +29,7 @@ public class CommandProfile extends Command {
 		else {
 			if (args.length != 2) {
 				channel.sendMessage(
-						"**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName() + " [target]");
+						"**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName() + " <target>");
 				return;
 			}
 			target = Starota.findUser(args[1]);

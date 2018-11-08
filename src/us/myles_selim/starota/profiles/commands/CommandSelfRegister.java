@@ -6,7 +6,6 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import us.myles_selim.starota.EnumTeam;
-import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.Command;
 import us.myles_selim.starota.commands.registry.CommandRegistry;
 import us.myles_selim.starota.profiles.PlayerProfile;
@@ -19,10 +18,8 @@ public class CommandSelfRegister extends Command {
 	}
 
 	@Override
-	public IRole requiredRole(IGuild guild) {
-		if (guild.getLongID() == Starota.PVILLE_SERVER)
-			return guild.getRoleByID(335777489534320640L); // Backer
-		return super.requiredRole(guild);
+	public String getGeneralUsage() {
+		return "[poGoName] [level] <team>";
 	}
 
 	@Override
@@ -30,7 +27,7 @@ public class CommandSelfRegister extends Command {
 		if (args.length < 3) {
 			if (!hasTeamRoles(guild)) {
 				channel.sendMessage("**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName()
-						+ " [username] [level] [team]");
+						+ " [poGoName] [level] [team]");
 				return;
 			}
 			channel.sendMessage("**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName()

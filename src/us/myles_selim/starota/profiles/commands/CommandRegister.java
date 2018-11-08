@@ -20,6 +20,11 @@ public class CommandRegister extends Command {
 	}
 
 	@Override
+	public String getGeneralUsage() {
+		return "[poGoName] [target] [team] [level]";
+	}
+
+	@Override
 	public Permissions requiredPermission() {
 		return Permissions.ADMINISTRATOR;
 	}
@@ -35,7 +40,7 @@ public class CommandRegister extends Command {
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
 		if (args.length != 5) {
 			channel.sendMessage("**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName()
-					+ " [username] [target] [team] [level]");
+					+ " [poGoName] [target] [team] [level]");
 			return;
 		}
 
