@@ -71,13 +71,11 @@ public class Starota {
 	public final static boolean DEBUG = false;
 	public static boolean IS_DEV;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "1.1.1";
+	public final static String VERSION = "1.1.2";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n"
 			+ "Public facing changes:\n" //
-			+ " * Fix Pichu witch hat form\n" //
-			+ " * Trade command form order no longer matters\n"
-			+ " * The form argument has been tweaked, \"ashhat\" and \"ash\" now work for \"Ash Hat\"";
-			+ " * You can now specify gender and legacy in trade posts";
+			+ " * You can now specify gender and legacy in trade posts\n"
+			+ " + Add Silph Road card information to profiles";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static void main(String[] args) {

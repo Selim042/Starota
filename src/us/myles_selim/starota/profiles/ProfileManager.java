@@ -130,7 +130,11 @@ public class ProfileManager {
 		builder.appendField("Trainer Level:", "" + profile.getLevel(), true);
 		EnumTeam team = profile.getTeam();
 		builder.appendField("Team:", team.getName(), true);
-		if (team != EnumTeam.NO_TEAM)
+
+		String silphAvatar = SilphRoadUtils.getCardAvatar(profile.getPoGoName());
+		if (silphAvatar != null)
+			builder.withThumbnail(silphAvatar);
+		else if (team != EnumTeam.NO_TEAM)
 			builder.withThumbnail(team.getIcon());
 		// builder.withImage(team.getIcon());
 		if (profile.getRealName() != null)
@@ -145,6 +149,9 @@ public class ProfileManager {
 				altsS += "- **" + e.getKey() + "**: " + getTrainerCodeString(e.getValue()) + "\n";
 			builder.appendField("Alternate Accounts:", altsS, false);
 		}
+		String silphCard = SilphRoadUtils.getCard(profile.getPoGoName());
+		if (silphCard != null)
+			builder.appendField("Silph Road Card:", silphCard, false);
 		if (user != null) {
 			String nickname = user.getNicknameForGuild(server);
 			if (nickname != null)
