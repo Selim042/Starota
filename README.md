@@ -1,7 +1,7 @@
 # Starota
 Starota is a Discord bot designed for use on Pokemon Go oriented servers.
 
-If you want to add Starota to your own server, you can use [this](https://discordapp.com/oauth2/authorize?client_id=489245655710040099&scope=bot) link.  If you want to join the (temporary) support server, you can join [here](http://discord.gg/jRf4Pzh).
+If you want to add Starota to your own server, you can use [this](https://discordapp.com/oauth2/authorize?client_id=489245655710040099&scope=bot) link.  If you want to join the support server, you can join [here](https://discord.gg/NxverNw).
 
 It currently has a command system as well as player profiles, a WIP research reporting tracker, some basic role management functionality, a tradeboard system, and a WIP web-sided interface.
 
