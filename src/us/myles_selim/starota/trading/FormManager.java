@@ -76,6 +76,8 @@ public class FormManager {
 	// 406, // budew
 	// 425, 426, // drifloon
 	// };
+	private static final File MANAGER_FOLDER = new File("starotaData", "formManager");
+
 	private static final List<Integer> EXCLUDED = new ArrayList<>();
 	private static final List<Integer> FORCE_ENABLE = new ArrayList<>();
 	private static final List<Integer> SHINYABLE = new ArrayList<>();
@@ -114,31 +116,6 @@ public class FormManager {
 		}
 	}
 
-	public static void main(String... args) {
-		File managerFolder = new File("starotaData", "formManager");
-		try {
-			File file = new File(managerFolder, "excluded.dat");
-			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-			for (int p : EXCLUDED)
-				writer.append(p + ",");
-			writer.close();
-
-			file = new File(managerFolder, "forceEnable.dat");
-			writer = new BufferedWriter(new FileWriter(file));
-			for (int p : FORCE_ENABLE)
-				writer.append(p + ",");
-			writer.close();
-
-			file = new File(managerFolder, "shinyable.dat");
-			writer = new BufferedWriter(new FileWriter(file));
-			for (int p : SHINYABLE)
-				writer.append(p + ",");
-			writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	public static boolean isAvailable(EnumPokemon pokemon) {
 		return pokemon != null && isAvailable(pokemon.getId());
 	}
@@ -155,6 +132,44 @@ public class FormManager {
 
 	public static boolean isShinyable(int id) {
 		return SHINYABLE.contains(id);
+	}
+
+	public static void removeExcluded(EnumPokemon pokemon) {
+		removeExcluded(pokemon.getId());
+	}
+
+	public static void removeExcluded(int id) {
+		EXCLUDED.remove(new Integer(id));
+		writeListToFile(new File(MANAGER_FOLDER, "excluded.dat"), EXCLUDED);
+	}
+
+	public static void addForceEnable(EnumPokemon pokemon) {
+		addForceEnable(pokemon.getId());
+	}
+
+	public static void addForceEnable(int id) {
+		FORCE_ENABLE.add(new Integer(id));
+		writeListToFile(new File(MANAGER_FOLDER, "forceEnable.dat"), FORCE_ENABLE);
+	}
+
+	public static void addShinyable(EnumPokemon pokemon) {
+		addShinyable(pokemon.getId());
+	}
+
+	public static void addShinyable(int id) {
+		SHINYABLE.add(new Integer(id));
+		writeListToFile(new File(MANAGER_FOLDER, "shinyable.dat"), SHINYABLE);
+	}
+
+	private static void writeListToFile(File file, List<Integer> list) {
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+			for (int p : EXCLUDED)
+				writer.append(p + ",");
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

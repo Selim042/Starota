@@ -15,6 +15,8 @@ import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.commands.registry.CommandRegistry;
 import us.myles_selim.starota.research.ResearchTracker;
+import us.myles_selim.starota.trading.EnumPokemon;
+import us.myles_selim.starota.trading.FormManager;
 
 public class EventHandler {
 
@@ -82,6 +84,43 @@ public class EventHandler {
 	@EventSubscriber
 	public void onServerLeave(GuildLeaveEvent event) {
 		ServerOptions.clearOptions(event.getGuild());
+	}
+
+	@EventSubscriber
+	public void formManagerHandler(MessageReceivedEvent event) {
+		if (!(event.getChannel() instanceof IPrivateChannel))
+			return;
+		IPrivateChannel channel = (IPrivateChannel) event.getChannel();
+		// Selim's user id
+		if (channel.getRecipient().getLongID() != 134855940938661889L)
+			return;
+		String message = event.getMessage().getContent();
+		if (message.startsWith(".help")) {
+			channel.sendMessage(".removeExclude\n" + ".forceEnable\n" + ".addShinyable\n");
+			return;
+		}
+		String[] args = message.split(" ");
+		if (args.length != 2)
+			return;
+		EnumPokemon pokemon = EnumPokemon.getPokemon(args[1]);
+		if (pokemon == null)
+			pokemon = EnumPokemon.getPokemon(Integer.parseInt(args[1]));
+		switch (args[0].toLowerCase()) {
+		case ".removeExclude":
+			FormManager.removeExcluded(pokemon);
+			channel.sendMessage("Removed " + pokemon + " from exclusion");
+			break;
+		case ".forceEnable":
+			FormManager.addForceEnable(pokemon);
+			channel.sendMessage("Forced enabled " + pokemon);
+			break;
+		case ".addShinyable":
+			FormManager.addShinyable(pokemon);
+			channel.sendMessage("Added " + pokemon + " as shinyable");
+			break;
+		default:
+			break;
+		}
 	}
 
 }

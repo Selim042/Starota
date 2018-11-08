@@ -35,14 +35,15 @@ import us.myles_selim.starota.role_management.commands.CommandAddGroup;
 import us.myles_selim.starota.role_management.commands.CommandGetGroups;
 import us.myles_selim.starota.role_management.commands.CommandRemoveGroup;
 import us.myles_selim.starota.role_management.commands.CommandSetAsGroup;
+import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.trading.Tradeboard;
 import us.myles_selim.starota.trading.commands.CommandFindTrade;
 import us.myles_selim.starota.trading.commands.CommandForTrade;
-import us.myles_selim.starota.trading.commands.CommandGetForms;
 import us.myles_selim.starota.trading.commands.CommandGetTrade;
 import us.myles_selim.starota.trading.commands.CommandGetUserTrades;
 import us.myles_selim.starota.trading.commands.CommandLookingFor;
 import us.myles_selim.starota.trading.commands.CommandRemoveTrade;
+import us.myles_selim.starota.trading.commands.CommandTradeboardHelp;
 
 public class Starota {
 
@@ -69,9 +70,9 @@ public class Starota {
 	public final static boolean DEBUG = false;
 	public static boolean IS_DEV;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "1.0.7";
+	public final static String VERSION = "1.1.1";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n"
-			+ "Public facing changes:\n";
+			+ "No public or administrative changes";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static void main(String[] args) {
@@ -125,7 +126,6 @@ public class Starota {
 		CommandRegistry.registerCommand("Groups", new CommandSetAsGroup());
 
 		CommandRegistry.registerCommand("Tradeboard", new CommandTradeboardHelp());
-		CommandRegistry.registerCommand("Tradeboard", new CommandGetForms());
 		// CommandRegistry.registerCommand("Tradeboard", new CommandGetForms());
 		// CommandRegistry.registerCommand("Tradeboard", new
 		// CommandGetShinies());
@@ -144,6 +144,7 @@ public class Starota {
 		CLIENT.changePresence(StatusType.IDLE, ActivityType.PLAYING,
 				"starting threads and loading settings...");
 
+		FormManager.init();
 		ServerOptions.init();
 		ResearchTracker.init();
 		ProfileManager.init();
