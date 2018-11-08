@@ -15,40 +15,45 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 	private Form form;
 	private boolean shiny;
 	private long timePosted;
-	private EnumGenderPossible gender;
+	private EnumGender gender;
 
 	public TradeboardPost() {}
 
+	protected TradeboardPost(int id, boolean lookingFor, long owner, PokemonInstance instance) {
+		this(id, lookingFor, owner, instance.getPokemon(), instance.getForm(), instance.getShiny(),
+				instance.getGender());
+	}
+
 	protected TradeboardPost(int id, boolean lookingFor, long owner, EnumPokemon pokemon) {
-		this(id, lookingFor, owner, pokemon, null, false, EnumGenderPossible.EITHER);
+		this(id, lookingFor, owner, pokemon, null, false, EnumGender.EITHER);
 	}
 
 	protected TradeboardPost(int id, boolean lookingFor, long owner, EnumPokemon pokemon,
-			EnumGenderPossible gender) {
+			EnumGender gender) {
 		this(id, lookingFor, owner, pokemon, null, false, gender);
 	}
 
 	protected TradeboardPost(int id, boolean lookingFor, long owner, EnumPokemon pokemon,
 			boolean shiny) {
-		this(id, lookingFor, owner, pokemon, null, shiny, EnumGenderPossible.EITHER);
+		this(id, lookingFor, owner, pokemon, null, shiny, EnumGender.EITHER);
 	}
 
 	protected TradeboardPost(int id, boolean lookingFor, long owner, EnumPokemon pokemon, boolean shiny,
-			EnumGenderPossible gender) {
+			EnumGender gender) {
 		this(id, lookingFor, owner, pokemon, null, shiny, gender);
 	}
 
 	protected TradeboardPost(int id, boolean lookingFor, long owner, EnumPokemon pokemon, Form form) {
-		this(id, lookingFor, owner, pokemon, form, false, EnumGenderPossible.EITHER);
+		this(id, lookingFor, owner, pokemon, form, false, EnumGender.EITHER);
 	}
 
 	protected TradeboardPost(int id, boolean lookingFor, long owner, EnumPokemon pokemon, Form form,
-			EnumGenderPossible gender) {
+			EnumGender gender) {
 		this(id, lookingFor, owner, pokemon, form, false, gender);
 	}
 
 	protected TradeboardPost(int id, boolean lookingFor, long owner, EnumPokemon pokemon, Form form,
-			boolean shiny, EnumGenderPossible gender) {
+			boolean shiny, EnumGender gender) {
 		this.id = id;
 		this.lookingFor = lookingFor;
 		this.owner = owner;
@@ -90,7 +95,7 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 		return Instant.ofEpochSecond(this.timePosted);
 	}
 
-	public EnumGenderPossible getGender() {
+	public EnumGender getGender() {
 		return this.gender;
 	}
 
@@ -152,7 +157,7 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 		if (this.timePosted <= 0 || this.timePosted >= System.currentTimeMillis() / 1000)
 			this.timePosted = System.currentTimeMillis() / 1000;
 		// TODO: Fix this
-		this.gender = EnumGenderPossible.values()[stor.readInt()];
+		this.gender = EnumGender.values()[stor.readInt()];
 		// this.gender = EnumGenderPossible.EITHER;
 	}
 

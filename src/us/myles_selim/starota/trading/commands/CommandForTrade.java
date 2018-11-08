@@ -8,7 +8,7 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.commands.registry.Command;
 import us.myles_selim.starota.commands.registry.CommandRegistry;
-import us.myles_selim.starota.trading.EnumGenderPossible;
+import us.myles_selim.starota.trading.EnumGender;
 import us.myles_selim.starota.trading.EnumPokemon;
 import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.trading.Tradeboard;
@@ -109,7 +109,7 @@ public class CommandForTrade extends Command {
 
 		if (!foundTrade) {
 			TradeboardPost post = Tradeboard.newPost(guild, false, message.getAuthor().getLongID(),
-					pokemon, form, shiny, EnumGenderPossible.EITHER);
+					pokemon, form, shiny, EnumGender.EITHER);
 			channel.sendMessage("Posted a new trade for your search",
 					Tradeboard.getPostEmbed(guild, post));
 		}

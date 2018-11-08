@@ -145,21 +145,21 @@ public class Tradeboard {
 
 	public static TradeboardPost newPost(IGuild server, boolean lookingFor, long owner,
 			EnumPokemon pokemon) {
-		return newPost(server, lookingFor, owner, pokemon, null, false, EnumGenderPossible.EITHER);
+		return newPost(server, lookingFor, owner, pokemon, null, false, EnumGender.EITHER);
 	}
 
 	public static TradeboardPost newPost(IGuild server, boolean lookingFor, long owner,
 			EnumPokemon pokemon, boolean shiny) {
-		return newPost(server, lookingFor, owner, pokemon, null, shiny, EnumGenderPossible.EITHER);
+		return newPost(server, lookingFor, owner, pokemon, null, shiny, EnumGender.EITHER);
 	}
 
 	public static TradeboardPost newPost(IGuild server, boolean lookingFor, long owner,
 			EnumPokemon pokemon, Form form) {
-		return newPost(server, lookingFor, owner, pokemon, form, false, EnumGenderPossible.EITHER);
+		return newPost(server, lookingFor, owner, pokemon, form, false, EnumGender.EITHER);
 	}
 
 	public static TradeboardPost newPost(IGuild server, boolean lookingFor, long owner,
-			EnumPokemon pokemon, Form form, boolean shiny, EnumGenderPossible gender) {
+			EnumPokemon pokemon, Form form, boolean shiny, EnumGender gender) {
 		int nextPostId = 1;
 		if (ServerOptions.hasKey(server, TRADE_ID_KEY))
 			nextPostId = (int) ServerOptions.getValue(server, TRADE_ID_KEY);

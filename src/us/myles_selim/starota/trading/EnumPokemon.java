@@ -47,12 +47,12 @@ public enum EnumPokemon {
 	RAICHU(EnumPokemonType.ELECTRIC, FormSetRaichuHat.FORM_SET),
 	SANDSHREW(EnumPokemonType.GROUND, FormSetAlolan.FORM_SET),
 	SANDSLASH(EnumPokemonType.GROUND, FormSetAlolan.FORM_SET),
-	NIDORAN_F(EnumPokemonType.POISON, "Nidoran♀", EnumGenderPossible.FEMALE),
-	NIDORINA(EnumPokemonType.POISON, EnumGenderPossible.FEMALE),
-	NIDOQUEEN(EnumPokemonType.POISON, EnumPokemonType.GROUND, EnumGenderPossible.FEMALE),
-	NIDORAN_M(EnumPokemonType.POISON, "Nidoran♂", EnumGenderPossible.MALE),
-	NIDORINO(EnumPokemonType.POISON, EnumGenderPossible.MALE),
-	NIDOKING(EnumPokemonType.POISON, EnumPokemonType.GROUND, EnumGenderPossible.MALE),
+	NIDORAN_F(EnumPokemonType.POISON, "Nidoran♀", EnumGender.FEMALE),
+	NIDORINA(EnumPokemonType.POISON, EnumGender.FEMALE),
+	NIDOQUEEN(EnumPokemonType.POISON, EnumPokemonType.GROUND, EnumGender.FEMALE),
+	NIDORAN_M(EnumPokemonType.POISON, "Nidoran♂", EnumGender.MALE),
+	NIDORINO(EnumPokemonType.POISON, EnumGender.MALE),
+	NIDOKING(EnumPokemonType.POISON, EnumPokemonType.GROUND, EnumGender.MALE),
 	CLEFAIRY(EnumPokemonType.FAIRY),
 	CLEFABLE(EnumPokemonType.FAIRY),
 	VULPIX(EnumPokemonType.FIRE, FormSetAlolan.FORM_SET),
@@ -99,8 +99,8 @@ public enum EnumPokemon {
 	RAPIDASH(EnumPokemonType.FIRE),
 	SOWPOKE(EnumPokemonType.WATER, EnumPokemonType.PSYCHIC),
 	SLOWBRO(EnumPokemonType.WATER, EnumPokemonType.PSYCHIC),
-	MAGNEMITE(EnumPokemonType.ELECTRIC, EnumPokemonType.STEEL, EnumGenderPossible.UNKNOWN),
-	MAGNETON(EnumPokemonType.ELECTRIC, EnumPokemonType.STEEL, EnumGenderPossible.UNKNOWN),
+	MAGNEMITE(EnumPokemonType.ELECTRIC, EnumPokemonType.STEEL, EnumGender.UNKNOWN),
+	MAGNETON(EnumPokemonType.ELECTRIC, EnumPokemonType.STEEL, EnumGender.UNKNOWN),
 	FARFETCHD(EnumPokemonType.NORMAL, EnumPokemonType.FLYING, "Farfetch'd"),
 	DODUO(EnumPokemonType.NORMAL, EnumPokemonType.FLYING),
 	DODRIO(EnumPokemonType.NORMAL, EnumPokemonType.FLYING),
@@ -118,35 +118,35 @@ public enum EnumPokemon {
 	HYPNO(EnumPokemonType.PSYCHIC),
 	KRABBY(EnumPokemonType.WATER),
 	KINGLER(EnumPokemonType.WATER),
-	VOLTORB(EnumPokemonType.ELECTRIC, EnumGenderPossible.UNKNOWN),
-	ELECTRODE(EnumPokemonType.ELECTRIC, EnumGenderPossible.UNKNOWN),
+	VOLTORB(EnumPokemonType.ELECTRIC, EnumGender.UNKNOWN),
+	ELECTRODE(EnumPokemonType.ELECTRIC, EnumGender.UNKNOWN),
 	EXEGGCUTE(EnumPokemonType.GRASS, EnumPokemonType.PSYCHIC),
 	EXEGGUTOR(EnumPokemonType.GRASS, EnumPokemonType.PSYCHIC, FormSetAlolan.FORM_SET),
 	CUBONE(EnumPokemonType.GROUND),
 	MAROWAK(EnumPokemonType.GROUND, FormSetAlolan.FORM_SET),
-	HITMONLEE(EnumPokemonType.FIGHTING, EnumGenderPossible.MALE),
-	HITMONCHAN(EnumPokemonType.FIGHTING, EnumGenderPossible.MALE),
+	HITMONLEE(EnumPokemonType.FIGHTING, EnumGender.MALE),
+	HITMONCHAN(EnumPokemonType.FIGHTING, EnumGender.MALE),
 	LICKITUNG(EnumPokemonType.NORMAL),
 	KOFFING(EnumPokemonType.POISON),
 	WEEZING(EnumPokemonType.POISON),
 	RHYHORN(EnumPokemonType.ROCK, EnumPokemonType.GROUND),
 	RHYDON(EnumPokemonType.ROCK, EnumPokemonType.GROUND),
-	CHANSEY(EnumPokemonType.NORMAL, EnumGenderPossible.FEMALE),
+	CHANSEY(EnumPokemonType.NORMAL, EnumGender.FEMALE),
 	TANGELA(EnumPokemonType.GRASS),
-	KANGASKHAN(EnumPokemonType.NORMAL, EnumGenderPossible.FEMALE),
+	KANGASKHAN(EnumPokemonType.NORMAL, EnumGender.FEMALE),
 	HORSEA(EnumPokemonType.WATER),
 	SEADRA(EnumPokemonType.WATER),
 	GOLDEEN(EnumPokemonType.WATER),
 	SEAKING(EnumPokemonType.WATER),
-	STARYU(EnumPokemonType.WATER, EnumGenderPossible.UNKNOWN),
-	STARMIE(EnumPokemonType.WATER, EnumPokemonType.PSYCHIC, EnumGenderPossible.UNKNOWN),
+	STARYU(EnumPokemonType.WATER, EnumGender.UNKNOWN),
+	STARMIE(EnumPokemonType.WATER, EnumPokemonType.PSYCHIC, EnumGender.UNKNOWN),
 	MR_MIME(EnumPokemonType.PSYCHIC, "Mr. Mime"),
 	SCYTHER(EnumPokemonType.BUG, EnumPokemonType.FLYING),
-	JYNX(EnumPokemonType.ICE, EnumPokemonType.PSYCHIC, EnumGenderPossible.FEMALE),
+	JYNX(EnumPokemonType.ICE, EnumPokemonType.PSYCHIC, EnumGender.FEMALE),
 	ELECTABUZZ(EnumPokemonType.ELECTRIC),
 	MAGMAR(EnumPokemonType.FIRE),
 	PINSIR(EnumPokemonType.BUG),
-	TAUROS(EnumPokemonType.NORMAL, EnumGenderPossible.MALE),
+	TAUROS(EnumPokemonType.NORMAL, EnumGender.MALE),
 	MAGIKARP(EnumPokemonType.WATER),
 	GYARADOS(EnumPokemonType.WATER, EnumPokemonType.FLYING),
 	LAPRAS(EnumPokemonType.WATER, EnumPokemonType.ICE),
@@ -155,21 +155,21 @@ public enum EnumPokemon {
 	VAPOREON(EnumPokemonType.WATER),
 	JOLTEON(EnumPokemonType.ELECTRIC),
 	FLAREON(EnumPokemonType.FIRE),
-	PORYGON(EnumPokemonType.NORMAL, EnumGenderPossible.UNKNOWN),
+	PORYGON(EnumPokemonType.NORMAL, EnumGender.UNKNOWN),
 	OMANYTE(EnumPokemonType.ROCK, EnumPokemonType.WATER),
 	OMASTAR(EnumPokemonType.ROCK, EnumPokemonType.WATER),
 	KABUTO(EnumPokemonType.ROCK, EnumPokemonType.WATER),
 	KABUTOPS(EnumPokemonType.ROCK, EnumPokemonType.WATER),
 	AERODACTYL(EnumPokemonType.ROCK, EnumPokemonType.FLYING),
 	SNORLAX(EnumPokemonType.NORMAL),
-	ARTICUNO(EnumPokemonType.ICE, EnumPokemonType.FLYING, EnumGenderPossible.UNKNOWN),
-	ZAPDOS(EnumPokemonType.ICE, EnumPokemonType.FLYING, EnumGenderPossible.UNKNOWN),
-	MOLTRES(EnumPokemonType.ICE, EnumPokemonType.FLYING, EnumGenderPossible.UNKNOWN),
+	ARTICUNO(EnumPokemonType.ICE, EnumPokemonType.FLYING, EnumGender.UNKNOWN),
+	ZAPDOS(EnumPokemonType.ICE, EnumPokemonType.FLYING, EnumGender.UNKNOWN),
+	MOLTRES(EnumPokemonType.ICE, EnumPokemonType.FLYING, EnumGender.UNKNOWN),
 	DRATINI(EnumPokemonType.DRAGON),
 	DRAGONAIR(EnumPokemonType.DRAGON),
 	DRAGONITE(EnumPokemonType.DRAGON, EnumPokemonType.FLYING),
-	MEWTWO(EnumPokemonType.PSYCHIC, EnumGenderPossible.UNKNOWN),
-	MEW(EnumPokemonType.PSYCHIC, EnumGenderPossible.UNKNOWN),
+	MEWTWO(EnumPokemonType.PSYCHIC, EnumGender.UNKNOWN),
+	MEW(EnumPokemonType.PSYCHIC, EnumGender.UNKNOWN),
 	// GEN 2
 	CHIKORITA(EnumPokemonType.GRASS),
 	BAYLEEF(EnumPokemonType.GRASS),
@@ -220,7 +220,7 @@ public enum EnumPokemon {
 	MURKROW(EnumPokemonType.DARK, EnumPokemonType.FLYING),
 	SLOWKING(EnumPokemonType.WATER, EnumPokemonType.PSYCHIC),
 	MISDREAVUS(EnumPokemonType.GHOST),
-	UNOWN(EnumPokemonType.PSYCHIC, FormSetUnown.FORM_SET, EnumGenderPossible.UNKNOWN),
+	UNOWN(EnumPokemonType.PSYCHIC, FormSetUnown.FORM_SET, EnumGender.UNKNOWN),
 	WOBBUFFET(EnumPokemonType.PSYCHIC),
 	GIRAFARIG(EnumPokemonType.PSYCHIC),
 	PINECO(EnumPokemonType.BUG),
@@ -252,24 +252,24 @@ public enum EnumPokemon {
 	KINGDRA(EnumPokemonType.WATER, EnumPokemonType.DRAGON),
 	PHANPY(EnumPokemonType.GROUND),
 	DONPHAN(EnumPokemonType.GROUND),
-	PORYGON2(EnumPokemonType.NORMAL, EnumGenderPossible.UNKNOWN),
+	PORYGON2(EnumPokemonType.NORMAL, EnumGender.UNKNOWN),
 	STANTLER(EnumPokemonType.NORMAL),
 	SMEARGLE(EnumPokemonType.NORMAL),
-	TYROGUE(EnumPokemonType.FIGHTING, EnumGenderPossible.MALE),
-	HITMONTOP(EnumPokemonType.FIGHTING, EnumGenderPossible.MALE),
-	SMOOCHUM(EnumPokemonType.ICE, EnumPokemonType.PSYCHIC, EnumGenderPossible.FEMALE),
+	TYROGUE(EnumPokemonType.FIGHTING, EnumGender.MALE),
+	HITMONTOP(EnumPokemonType.FIGHTING, EnumGender.MALE),
+	SMOOCHUM(EnumPokemonType.ICE, EnumPokemonType.PSYCHIC, EnumGender.FEMALE),
 	ELEKID(EnumPokemonType.ELECTRIC),
 	MAGBY(EnumPokemonType.FIRE),
-	MILTANK(EnumPokemonType.NORMAL, EnumGenderPossible.FEMALE),
-	BLISSEY(EnumPokemonType.NORMAL, EnumGenderPossible.FEMALE),
-	RAIKOU(EnumPokemonType.ELECTRIC, EnumGenderPossible.UNKNOWN),
-	ENTEI(EnumPokemonType.FIRE, EnumGenderPossible.UNKNOWN),
-	SUICUNE(EnumPokemonType.WATER, EnumGenderPossible.UNKNOWN),
+	MILTANK(EnumPokemonType.NORMAL, EnumGender.FEMALE),
+	BLISSEY(EnumPokemonType.NORMAL, EnumGender.FEMALE),
+	RAIKOU(EnumPokemonType.ELECTRIC, EnumGender.UNKNOWN),
+	ENTEI(EnumPokemonType.FIRE, EnumGender.UNKNOWN),
+	SUICUNE(EnumPokemonType.WATER, EnumGender.UNKNOWN),
 	LARVITAR(EnumPokemonType.ROCK, EnumPokemonType.GROUND),
 	PUPITAR(EnumPokemonType.ROCK, EnumPokemonType.GROUND),
 	TYRANITAR(EnumPokemonType.ROCK, EnumPokemonType.DARK),
-	LUGIA(EnumPokemonType.PSYCHIC, EnumPokemonType.FLYING, EnumGenderPossible.UNKNOWN),
-	HO_OH(EnumPokemonType.WATER, EnumPokemonType.FLYING, "Ho-Oh", EnumGenderPossible.UNKNOWN),
+	LUGIA(EnumPokemonType.PSYCHIC, EnumPokemonType.FLYING, EnumGender.UNKNOWN),
+	HO_OH(EnumPokemonType.WATER, EnumPokemonType.FLYING, "Ho-Oh", EnumGender.UNKNOWN),
 	CELEBI(EnumPokemonType.PSYCHIC, EnumPokemonType.GRASS),
 	// GEN 3
 	TREECKO(EnumPokemonType.GRASS),
@@ -312,7 +312,7 @@ public enum EnumPokemon {
 	SLAKING(EnumPokemonType.NORMAL),
 	NINCADA(EnumPokemonType.BUG, EnumPokemonType.GROUND),
 	NINJASK(EnumPokemonType.BUG, EnumPokemonType.FLYING),
-	SHEDINJA(EnumPokemonType.BUG, EnumPokemonType.GHOST, EnumGenderPossible.UNKNOWN),
+	SHEDINJA(EnumPokemonType.BUG, EnumPokemonType.GHOST, EnumGender.UNKNOWN),
 	WHISMUR(EnumPokemonType.NORMAL),
 	LOUDRED(EnumPokemonType.NORMAL),
 	EXPLOUD(EnumPokemonType.NORMAL),
@@ -333,8 +333,8 @@ public enum EnumPokemon {
 	MANECTRIC(EnumPokemonType.ELECTRIC),
 	PLUSLE(EnumPokemonType.ELECTRIC),
 	MINUN(EnumPokemonType.ELECTRIC),
-	VOLBEAT(EnumPokemonType.BUG, EnumGenderPossible.MALE),
-	ILLUMISE(EnumPokemonType.BUG, EnumGenderPossible.FEMALE),
+	VOLBEAT(EnumPokemonType.BUG, EnumGender.MALE),
+	ILLUMISE(EnumPokemonType.BUG, EnumGender.FEMALE),
 	ROSELIA(EnumPokemonType.GRASS, EnumPokemonType.POISON),
 	GULPIN(EnumPokemonType.POISON),
 	SWALOT(EnumPokemonType.POISON),
@@ -357,14 +357,14 @@ public enum EnumPokemon {
 	ALTARIA(EnumPokemonType.DRAGON, EnumPokemonType.FLYING),
 	ZANGOOSE(EnumPokemonType.NORMAL),
 	SEVIPER(EnumPokemonType.POISON),
-	LUNATONE(EnumPokemonType.ROCK, EnumPokemonType.PSYCHIC, EnumGenderPossible.UNKNOWN),
-	SOLROCK(EnumPokemonType.ROCK, EnumPokemonType.PSYCHIC, EnumGenderPossible.UNKNOWN),
+	LUNATONE(EnumPokemonType.ROCK, EnumPokemonType.PSYCHIC, EnumGender.UNKNOWN),
+	SOLROCK(EnumPokemonType.ROCK, EnumPokemonType.PSYCHIC, EnumGender.UNKNOWN),
 	BARBOACH(EnumPokemonType.WATER, EnumPokemonType.GROUND),
 	WHISCASH(EnumPokemonType.WATER, EnumPokemonType.GROUND),
 	CORPHISH(EnumPokemonType.WATER),
 	CRAWDAUNT(EnumPokemonType.WATER, EnumPokemonType.DARK),
-	BALTOY(EnumPokemonType.GROUND, EnumPokemonType.PSYCHIC, EnumGenderPossible.UNKNOWN),
-	CLAYDOL(EnumPokemonType.GROUND, EnumPokemonType.PSYCHIC, EnumGenderPossible.UNKNOWN),
+	BALTOY(EnumPokemonType.GROUND, EnumPokemonType.PSYCHIC, EnumGender.UNKNOWN),
+	CLAYDOL(EnumPokemonType.GROUND, EnumPokemonType.PSYCHIC, EnumGender.UNKNOWN),
 	LILEEP(EnumPokemonType.ROCK, EnumPokemonType.GRASS),
 	CRADILY(EnumPokemonType.ROCK, EnumPokemonType.GRASS),
 	ANORITH(EnumPokemonType.ROCK, EnumPokemonType.BUG),
@@ -394,19 +394,19 @@ public enum EnumPokemon {
 	BAGON(EnumPokemonType.DRAGON),
 	SHELGON(EnumPokemonType.DRAGON),
 	SALAMENCE(EnumPokemonType.DRAGON, EnumPokemonType.FLYING),
-	BELDUM(EnumPokemonType.STEEL, EnumPokemonType.PSYCHIC, EnumGenderPossible.UNKNOWN),
-	METANG(EnumPokemonType.STEEL, EnumPokemonType.PSYCHIC, EnumGenderPossible.UNKNOWN),
-	METAGROSS(EnumPokemonType.STEEL, EnumPokemonType.PSYCHIC, EnumGenderPossible.UNKNOWN),
-	REGIROCK(EnumPokemonType.ROCK, EnumGenderPossible.UNKNOWN),
-	REGICE(EnumPokemonType.ICE, EnumGenderPossible.UNKNOWN),
-	REGISTEEL(EnumPokemonType.STEEL, EnumGenderPossible.UNKNOWN),
-	LATIAS(EnumPokemonType.DRAGON, EnumPokemonType.PSYCHIC, EnumGenderPossible.FEMALE),
-	LATIOS(EnumPokemonType.DRAGON, EnumPokemonType.PSYCHIC, EnumGenderPossible.MALE),
-	KYOGRE(EnumPokemonType.WATER, EnumGenderPossible.UNKNOWN),
-	GROUDON(EnumPokemonType.GROUND, EnumGenderPossible.UNKNOWN),
-	RAYQUAZA(EnumPokemonType.DRAGON, EnumPokemonType.FLYING, EnumGenderPossible.UNKNOWN),
-	JIRACHI(EnumPokemonType.STEEL, EnumPokemonType.PSYCHIC, EnumGenderPossible.UNKNOWN),
-	DEOXYS(EnumPokemonType.PSYCHIC, FormSetDeoxys.FORM_SET, EnumGenderPossible.UNKNOWN),
+	BELDUM(EnumPokemonType.STEEL, EnumPokemonType.PSYCHIC, EnumGender.UNKNOWN),
+	METANG(EnumPokemonType.STEEL, EnumPokemonType.PSYCHIC, EnumGender.UNKNOWN),
+	METAGROSS(EnumPokemonType.STEEL, EnumPokemonType.PSYCHIC, EnumGender.UNKNOWN),
+	REGIROCK(EnumPokemonType.ROCK, EnumGender.UNKNOWN),
+	REGICE(EnumPokemonType.ICE, EnumGender.UNKNOWN),
+	REGISTEEL(EnumPokemonType.STEEL, EnumGender.UNKNOWN),
+	LATIAS(EnumPokemonType.DRAGON, EnumPokemonType.PSYCHIC, EnumGender.FEMALE),
+	LATIOS(EnumPokemonType.DRAGON, EnumPokemonType.PSYCHIC, EnumGender.MALE),
+	KYOGRE(EnumPokemonType.WATER, EnumGender.UNKNOWN),
+	GROUDON(EnumPokemonType.GROUND, EnumGender.UNKNOWN),
+	RAYQUAZA(EnumPokemonType.DRAGON, EnumPokemonType.FLYING, EnumGender.UNKNOWN),
+	JIRACHI(EnumPokemonType.STEEL, EnumPokemonType.PSYCHIC, EnumGender.UNKNOWN),
+	DEOXYS(EnumPokemonType.PSYCHIC, FormSetDeoxys.FORM_SET, EnumGender.UNKNOWN),
 	// GEN 4
 	TURTWIG(EnumPokemonType.GRASS),
 	GROTLE(EnumPokemonType.GRASS),
@@ -437,10 +437,10 @@ public enum EnumPokemon {
 	WORMADAM(	EnumPokemonType.BUG,
 				EnumPokemonType.GRASS,
 				FormSetBurmyFamily.FORM_SET,
-				EnumGenderPossible.FEMALE),
-	MOTHIM(EnumPokemonType.BUG, EnumPokemonType.FLYING, EnumGenderPossible.MALE),
+				EnumGender.FEMALE),
+	MOTHIM(EnumPokemonType.BUG, EnumPokemonType.FLYING, EnumGender.MALE),
 	COMBEE(EnumPokemonType.BUG, EnumPokemonType.FLYING),
-	VESPIQUEN(EnumPokemonType.BUG, EnumPokemonType.FLYING, EnumGenderPossible.FEMALE),
+	VESPIQUEN(EnumPokemonType.BUG, EnumPokemonType.FLYING, EnumGender.FEMALE),
 	PACHIRISU(EnumPokemonType.ELECTRIC),
 	BUIZEL(EnumPokemonType.WATER),
 	FLOATZEL(EnumPokemonType.WATER),
@@ -460,11 +460,11 @@ public enum EnumPokemon {
 	CHINGLING(EnumPokemonType.PSYCHIC),
 	STUNKY(EnumPokemonType.POISON, EnumPokemonType.DARK),
 	SKUNTANK(EnumPokemonType.POISON, EnumPokemonType.DARK),
-	BRONZOR(EnumPokemonType.STEEL, EnumPokemonType.PSYCHIC, EnumGenderPossible.UNKNOWN),
-	BRONZONG(EnumPokemonType.STEEL, EnumPokemonType.PSYCHIC, EnumGenderPossible.UNKNOWN),
+	BRONZOR(EnumPokemonType.STEEL, EnumPokemonType.PSYCHIC, EnumGender.UNKNOWN),
+	BRONZONG(EnumPokemonType.STEEL, EnumPokemonType.PSYCHIC, EnumGender.UNKNOWN),
 	BONSLY(EnumPokemonType.ROCK),
 	MIME_JR(EnumPokemonType.PSYCHIC, EnumPokemonType.FAIRY, "Mime Jr."),
-	HAPPINY(EnumPokemonType.NORMAL, EnumGenderPossible.FEMALE),
+	HAPPINY(EnumPokemonType.NORMAL, EnumGender.FEMALE),
 	CHATOT(EnumPokemonType.NORMAL, EnumPokemonType.FLYING),
 	SPIRITOMB(EnumPokemonType.GHOST, EnumPokemonType.DARK),
 	GIBLE(EnumPokemonType.DRAGON, EnumPokemonType.GROUND),
@@ -486,7 +486,7 @@ public enum EnumPokemon {
 	SNOVER(EnumPokemonType.GRASS, EnumPokemonType.ICE),
 	ABOMASNOW(EnumPokemonType.GRASS, EnumPokemonType.ICE),
 	WEAVILE(EnumPokemonType.DARK, EnumPokemonType.ICE),
-	MAGNEZONE(EnumPokemonType.ELECTRIC, EnumPokemonType.STEEL, EnumGenderPossible.UNKNOWN),
+	MAGNEZONE(EnumPokemonType.ELECTRIC, EnumPokemonType.STEEL, EnumGender.UNKNOWN),
 	LICKILICKY(EnumPokemonType.NORMAL),
 	RHYPERIOR(EnumPokemonType.GROUND, EnumPokemonType.ROCK),
 	TANGROWTH(EnumPokemonType.GRASS),
@@ -498,32 +498,32 @@ public enum EnumPokemon {
 	GLACEON(EnumPokemonType.ICE),
 	GLISCOR(EnumPokemonType.GROUND, EnumPokemonType.FLYING),
 	MAMOSWINE(EnumPokemonType.ICE, EnumPokemonType.GROUND),
-	PORYGON_Z(EnumPokemonType.NORMAL, "Porygon-Z", EnumGenderPossible.UNKNOWN),
-	GALLADE(EnumPokemonType.PSYCHIC, EnumPokemonType.FIGHTING, EnumGenderPossible.MALE),
+	PORYGON_Z(EnumPokemonType.NORMAL, "Porygon-Z", EnumGender.UNKNOWN),
+	GALLADE(EnumPokemonType.PSYCHIC, EnumPokemonType.FIGHTING, EnumGender.MALE),
 	PROBOPASS(EnumPokemonType.ROCK, EnumPokemonType.STEEL),
 	DUSKNOIR(EnumPokemonType.GHOST),
-	FROSLASS(EnumPokemonType.ICE, EnumPokemonType.GHOST, EnumGenderPossible.FEMALE),
+	FROSLASS(EnumPokemonType.ICE, EnumPokemonType.GHOST, EnumGender.FEMALE),
 	ROTOM(	EnumPokemonType.ELECTRIC,
 			EnumPokemonType.GHOST,
 			FormSetRotom.FORM_SET,
-			EnumGenderPossible.UNKNOWN),
-	UXIE(EnumPokemonType.PSYCHIC, EnumGenderPossible.UNKNOWN),
-	MESPRIT(EnumPokemonType.PSYCHIC, EnumGenderPossible.UNKNOWN),
-	AZELF(EnumPokemonType.PSYCHIC, EnumGenderPossible.UNKNOWN),
-	DIALGA(EnumPokemonType.STEEL, EnumPokemonType.DRAGON, EnumGenderPossible.UNKNOWN),
-	PALKIA(EnumPokemonType.WATER, EnumPokemonType.DRAGON, EnumGenderPossible.UNKNOWN),
+			EnumGender.UNKNOWN),
+	UXIE(EnumPokemonType.PSYCHIC, EnumGender.UNKNOWN),
+	MESPRIT(EnumPokemonType.PSYCHIC, EnumGender.UNKNOWN),
+	AZELF(EnumPokemonType.PSYCHIC, EnumGender.UNKNOWN),
+	DIALGA(EnumPokemonType.STEEL, EnumPokemonType.DRAGON, EnumGender.UNKNOWN),
+	PALKIA(EnumPokemonType.WATER, EnumPokemonType.DRAGON, EnumGender.UNKNOWN),
 	HEATRAN(EnumPokemonType.FIRE, EnumPokemonType.STEEL),
-	REGIGIGAS(EnumPokemonType.NORMAL, EnumGenderPossible.UNKNOWN),
+	REGIGIGAS(EnumPokemonType.NORMAL, EnumGender.UNKNOWN),
 	GIRATINA(	EnumPokemonType.GHOST,
 				EnumPokemonType.DRAGON,
 				FormSetGiratina.FORM_SET,
-				EnumGenderPossible.UNKNOWN),
-	CRESSELIA(EnumPokemonType.PSYCHIC, EnumGenderPossible.FEMALE),
-	PHIONE(EnumPokemonType.WATER, EnumGenderPossible.UNKNOWN),
-	MANAPHY(EnumPokemonType.WATER, EnumGenderPossible.UNKNOWN),
-	DARKRAI(EnumPokemonType.DARK, EnumGenderPossible.UNKNOWN),
-	SHAYMIN(EnumPokemonType.GRASS, EnumGenderPossible.UNKNOWN),
-	ARCEUS(EnumPokemonType.NORMAL, FormSetArceus.FORM_SET, EnumGenderPossible.UNKNOWN),
+				EnumGender.UNKNOWN),
+	CRESSELIA(EnumPokemonType.PSYCHIC, EnumGender.FEMALE),
+	PHIONE(EnumPokemonType.WATER, EnumGender.UNKNOWN),
+	MANAPHY(EnumPokemonType.WATER, EnumGender.UNKNOWN),
+	DARKRAI(EnumPokemonType.DARK, EnumGender.UNKNOWN),
+	SHAYMIN(EnumPokemonType.GRASS, EnumGender.UNKNOWN),
+	ARCEUS(EnumPokemonType.NORMAL, FormSetArceus.FORM_SET, EnumGender.UNKNOWN),
 	// GEN 5 TODO: genders, forms
 	VICTINI(EnumPokemonType.PSYCHIC, EnumPokemonType.FIRE),
 	SNIVY(EnumPokemonType.GRASS),
@@ -685,7 +685,7 @@ public enum EnumPokemon {
 	private EnumPokemonType type1;
 	private EnumPokemonType type2;
 	private FormSet forms;
-	private EnumGenderPossible gender;
+	private EnumGender gender;
 
 	EnumPokemon(EnumPokemonType type1) {
 		this(type1, (EnumPokemonType) null);
@@ -695,7 +695,7 @@ public enum EnumPokemon {
 		this(type1, (EnumPokemonType) null, name);
 	}
 
-	EnumPokemon(EnumPokemonType type1, String name, EnumGenderPossible gender) {
+	EnumPokemon(EnumPokemonType type1, String name, EnumGender gender) {
 		this(type1, (EnumPokemonType) null, name, gender);
 	}
 
@@ -703,7 +703,7 @@ public enum EnumPokemon {
 		this(type1, (EnumPokemonType) null, formSet);
 	}
 
-	EnumPokemon(EnumPokemonType type1, FormSet formSet, EnumGenderPossible gender) {
+	EnumPokemon(EnumPokemonType type1, FormSet formSet, EnumGender gender) {
 		this(type1, (EnumPokemonType) null, formSet, gender);
 	}
 
@@ -711,11 +711,11 @@ public enum EnumPokemon {
 		this(type1, (EnumPokemonType) null, name, formSet);
 	}
 
-	EnumPokemon(EnumPokemonType type1, String name, FormSet formSet, EnumGenderPossible gender) {
+	EnumPokemon(EnumPokemonType type1, String name, FormSet formSet, EnumGender gender) {
 		this(type1, (EnumPokemonType) null, name, formSet);
 	}
 
-	EnumPokemon(EnumPokemonType type1, EnumGenderPossible gender) {
+	EnumPokemon(EnumPokemonType type1, EnumGender gender) {
 		this(type1, (EnumPokemonType) null, gender);
 	}
 
@@ -724,17 +724,17 @@ public enum EnumPokemon {
 		name = name.substring(0, 1).toUpperCase() + name.substring(1, name.length()).toLowerCase();
 		this.type1 = type1;
 		this.type2 = type2;
-		this.gender = EnumGenderPossible.EITHER;
+		this.gender = EnumGender.EITHER;
 	}
 
 	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, String name) {
 		this.name = name;
 		this.type1 = type1;
 		this.type2 = type2;
-		this.gender = EnumGenderPossible.EITHER;
+		this.gender = EnumGender.EITHER;
 	}
 
-	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, String name, EnumGenderPossible gender) {
+	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, String name, EnumGender gender) {
 		this(type1, type2, name);
 		this.gender = gender;
 	}
@@ -742,11 +742,11 @@ public enum EnumPokemon {
 	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, FormSet formSet) {
 		this(type1, type2);
 		this.forms = formSet;
-		this.gender = EnumGenderPossible.EITHER;
+		this.gender = EnumGender.EITHER;
 	}
 
 	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, FormSet formSet,
-			EnumGenderPossible gender) {
+			EnumGender gender) {
 		this(type1, type2, formSet);
 		this.gender = gender;
 	}
@@ -754,16 +754,16 @@ public enum EnumPokemon {
 	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, String name, FormSet formSet) {
 		this(type1, type2, name);
 		this.forms = formSet;
-		this.gender = EnumGenderPossible.EITHER;
+		this.gender = EnumGender.EITHER;
 	}
 
 	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, String name, FormSet formSet,
-			EnumGenderPossible gender) {
+			EnumGender gender) {
 		this(type1, type2, name, formSet);
 		this.gender = gender;
 	}
 
-	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, EnumGenderPossible gender) {
+	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, EnumGender gender) {
 		this(type1, type2);
 		this.gender = gender;
 	}
@@ -790,7 +790,7 @@ public enum EnumPokemon {
 		return this.forms.getDefaultForm();
 	}
 
-	public EnumGenderPossible getGenderPossible() {
+	public EnumGender getGenderPossible() {
 		return this.gender;
 	}
 
@@ -851,7 +851,7 @@ public enum EnumPokemon {
 		for (EnumPokemon p : EnumPokemon.values()) {
 			// for (int i = 0; i < FormManager.MAX_DEX; i++) {
 			// EnumPokemon p = EnumPokemon.values()[i];
-			int genderMult = p.getGenderPossible() == EnumGenderPossible.EITHER ? 2 : 1;
+			int genderMult = p.getGenderPossible() == EnumGender.EITHER ? 2 : 1;
 			int shinyMult = FormManager.isShinyable(p) ? 2 : 1;
 			space += ((p.getFormSet() == null ? 1 : p.getFormSet().getNumForms()) * genderMult
 					* shinyMult);

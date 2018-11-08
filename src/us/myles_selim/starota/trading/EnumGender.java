@@ -1,6 +1,6 @@
 package us.myles_selim.starota.trading;
 
-public enum EnumGenderPossible {
+public enum EnumGender {
 	UNKNOWN,
 	EITHER(
 			"male/female"),
@@ -9,11 +9,11 @@ public enum EnumGenderPossible {
 
 	private String display;
 
-	EnumGenderPossible() {
+	EnumGender() {
 		this(null);
 	}
 
-	EnumGenderPossible(String display) {
+	EnumGender(String display) {
 		this.display = display;
 	}
 
