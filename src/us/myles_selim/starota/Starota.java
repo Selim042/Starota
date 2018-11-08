@@ -55,7 +55,7 @@ public class Starota {
 	private static final Properties PROPERTIES = new Properties();
 
 	public static final long SELIM_USER_ID = 134855940938661889L;
-	public static final String SUPPORT_SERVER_LINK = "http://discord.gg/jRf4Pzh";
+	public static final String SUPPORT_SERVER_LINK = "https://discord.gg/NxverNw";
 
 	// public static final long TEST_SERVER = 481646364716040202L;
 	// public static final long TEST_MONITOR = 489249695571509249L;
