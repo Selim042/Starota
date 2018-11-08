@@ -21,6 +21,7 @@ import us.myles_selim.starota.commands.CommandChangelogChannel;
 import us.myles_selim.starota.commands.CommandCredits;
 import us.myles_selim.starota.commands.CommandGetTop;
 import us.myles_selim.starota.commands.CommandStatus;
+import us.myles_selim.starota.commands.CommandSupportStarota;
 import us.myles_selim.starota.commands.CommandTest;
 import us.myles_selim.starota.commands.registry.CommandRegistry;
 import us.myles_selim.starota.profiles.ProfileManager;
@@ -75,7 +76,8 @@ public class Starota {
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n"
 			+ "Public facing changes:\n" //
 			+ " * You can now specify gender and legacy in trade posts\n"
-			+ " + Add Silph Road card information to profiles";
+			+ " + Add Silph Road card information to profiles\n" + " + Add a command to help support "
+			+ BOT_NAME;
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static void main(String[] args) {
@@ -108,6 +110,7 @@ public class Starota {
 
 		CommandRegistry.registerCommand(new CommandChangelog());
 		CommandRegistry.registerCommand(new CommandCredits());
+		CommandRegistry.registerCommand(new CommandSupportStarota());
 
 		CommandRegistry.registerCommand("Administrative", new CommandStatus());
 		CommandRegistry.registerCommand("Administrative", new CommandSetResearchChannel());
