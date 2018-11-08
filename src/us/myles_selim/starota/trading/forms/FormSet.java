@@ -28,10 +28,12 @@ public abstract class FormSet {
 	}
 
 	public Form getForm(String form) {
-		form = form.replaceAll("_", " ");
-		for (Form f : forms)
-			if (f.toString().equalsIgnoreCase(form))
+		for (Form f : forms) {
+			String formName = f.toString().replaceAll("\\.", "").replaceAll(" ", "_");
+			if (formName.equalsIgnoreCase(form) || formName.split("_")[0].equalsIgnoreCase(form)
+					|| formName.replaceAll("_", "").equalsIgnoreCase(form))
 				return f;
+		}
 		return null;
 	}
 
