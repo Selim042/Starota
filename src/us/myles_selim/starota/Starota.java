@@ -12,6 +12,7 @@ import sx.blah.discord.api.events.EventDispatcher;
 import sx.blah.discord.handle.obj.ActivityType;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.DiscordException;
@@ -24,6 +25,8 @@ import us.myles_selim.starota.commands.CommandStatus;
 import us.myles_selim.starota.commands.CommandSupportStarota;
 import us.myles_selim.starota.commands.CommandTest;
 import us.myles_selim.starota.commands.registry.CommandRegistry;
+import us.myles_selim.starota.lua.LuaEventHandler;
+import us.myles_selim.starota.lua.commands.CommandUploadScript;
 import us.myles_selim.starota.profiles.ProfileManager;
 import us.myles_selim.starota.profiles.commands.CommandGetProfilelessPlayers;
 import us.myles_selim.starota.profiles.commands.CommandProfile;
@@ -141,6 +144,8 @@ public class Starota {
 		CommandRegistry.registerCommand("Tradeboard", new CommandLookingFor());
 		CommandRegistry.registerCommand("Tradeboard", new CommandRemoveTrade());
 
+		CommandRegistry.registerCommand("Lua", new CommandUploadScript());
+
 		try {
 			Thread.sleep(2500);
 		} catch (InterruptedException e) {
@@ -207,6 +212,7 @@ public class Starota {
 		};
 		changesThread.start();
 		dispatcher.registerListener(new EventHandler());
+		dispatcher.registerListener(new LuaEventHandler());
 	}
 
 	public static IDiscordClient getClient() {
@@ -324,6 +330,20 @@ public class Starota {
 					return ch;
 		}
 		return null;
+	}
+
+	public static boolean canUseLua(IGuild server) {
+		if (server == null)
+			return false;
+		IUser owner = server.getOwner();
+		IGuild supportServer = getGuild(436614503606779914L); // support server
+		if (!supportServer.getUsers().contains(owner))
+			return false;
+		if (owner.getLongID() == supportServer.getOwnerLongID())
+			return true;
+		IRole requiredRole = supportServer.getRoleByID(436617921620606976L); // supporter
+																				// role
+		return owner.hasRole(requiredRole);
 	}
 
 	// public static void sendTestMessage(String message) {
