@@ -18,6 +18,7 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.commands.registry.Command;
 import us.myles_selim.starota.lua.DiscordLib;
+import us.myles_selim.starota.lua.ServerOptionsLib;
 
 public class CommandTest extends Command {
 
@@ -48,6 +49,7 @@ public class CommandTest extends Command {
 
 		LuaTable _G = JsePlatform.standardGlobals(state);
 		_G.load(state, new DiscordLib(guild));
+		_G.load(state, new ServerOptionsLib(guild));
 		try {
 			_G.get(state, "dofile").checkFunction().call(state, ValueFactory.valueOf(script));
 		} catch (LuaError e) {

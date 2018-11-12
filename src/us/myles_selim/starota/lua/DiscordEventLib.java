@@ -16,7 +16,8 @@ import org.squiddev.cobalt.lib.platform.AbstractResourceManipulator;
 
 import sx.blah.discord.handle.impl.events.guild.GuildEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.ChannelEvent;
-import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
+import sx.blah.discord.handle.impl.events.guild.channel.message.MessageEvent;
+import sx.blah.discord.handle.impl.events.guild.channel.message.reaction.ReactionEvent;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.util.RequestBuffer;
 
@@ -61,16 +62,16 @@ public class DiscordEventLib extends DiscordLib {
 		LuaTable _G = JsePlatform.standardGlobals(state);
 		DiscordEventLib eventLib = new DiscordEventLib(server);
 		_G.load(state, eventLib);
+		_G.load(state, new ServerOptionsLib(server));
 		try {
 			_G.get(state, "dofile").checkFunction().call(state, ValueFactory.valueOf(script));
 			LuaTable eventHandler = _G.get(state, DiscordEventLib.KEY).checkTable();
-			LuaValue funcV = eventHandler.get(state, "test");
-			LuaValue v = eventLib.getEvent(event);
-			System.out.println(v);
-			if (funcV.isFunction())
-				((LuaFunction) funcV).call(state, v);
-			// eventHandler.get(state, "test").checkFunction().call(state,
-			// getEvent(event));
+			String functName = "on" + event.getClass().getSimpleName();
+			LuaValue funcV = eventHandler.get(state, functName);
+			System.out.println(functName);
+			if (funcV == null || !funcV.isFunction())
+				return;
+			((LuaFunction) funcV).call(state, eventHandler, eventLib.getEvent(event));
 		} catch (LuaError e) {
 			if (event instanceof ChannelEvent)
 				RequestBuffer.request(() -> ((ChannelEvent) event).getChannel()
@@ -84,9 +85,14 @@ public class DiscordEventLib extends DiscordLib {
 		ret.rawset("server", getServer(event.getGuild()));
 		if (event instanceof ChannelEvent)
 			ret.rawset("channel", getChannel(((ChannelEvent) event).getChannel()));
-		if (event instanceof MessageReceivedEvent)
-			ret.rawset("message", ValueFactory
-					.valueOf(((MessageReceivedEvent) event).getMessage().getFormattedContent()));
+		if (event instanceof MessageEvent) {
+			ret.rawset("user", getUser(((MessageEvent) event).getAuthor()));
+			ret.rawset("message",
+					ValueFactory.valueOf(((MessageEvent) event).getMessage().getFormattedContent()));
+		}
+		if (event instanceof ReactionEvent)
+			ret.rawset("reaction",
+					ValueFactory.valueOf(((ReactionEvent) event).getReaction().getEmoji().getName()));
 		return ret;
 	}
 

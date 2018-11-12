@@ -15,9 +15,7 @@ public class LuaEventHandler {
 				handle = !handle;
 		if (!handle)
 			return;
-		// System.out.println(event.getClass().getName());
-		if (event instanceof MessageReceivedEvent)
-			DiscordEventLib.handleEvent(event);
+		DiscordEventLib.handleEvent(event);
 	}
 
 }
