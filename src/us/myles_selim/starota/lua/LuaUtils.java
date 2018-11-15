@@ -23,7 +23,7 @@ public class LuaUtils {
 		if (obj instanceof byte[])
 			return ValueFactory.valueOf((byte[]) obj);
 		if (obj instanceof EBStorage)
-			return ServerOptionsLib.storageToValue((EBStorage) obj);
+			return StarotaLib.storageToValue((EBStorage) obj);
 		return Constants.NIL;
 	}
 

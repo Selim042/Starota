@@ -17,11 +17,11 @@ import us.myles_selim.starota.ServerOptions;
 import us.myles_selim.starota.commands.CommandChangelogChannel;
 import us.myles_selim.starota.trading.Tradeboard;
 
-public class ServerOptionsLib implements LuaLibrary {
+public class StarotaLib implements LuaLibrary {
 
 	private final IGuild server;
 
-	public ServerOptionsLib(IGuild server) {
+	public StarotaLib(IGuild server) {
 		this.server = server;
 	}
 

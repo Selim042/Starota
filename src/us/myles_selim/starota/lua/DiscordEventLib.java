@@ -62,7 +62,7 @@ public class DiscordEventLib extends DiscordLib {
 		LuaTable _G = JsePlatform.standardGlobals(state);
 		DiscordEventLib eventLib = new DiscordEventLib(server);
 		_G.load(state, eventLib);
-		_G.load(state, new ServerOptionsLib(server));
+		_G.load(state, new StarotaLib(server));
 		try {
 			_G.get(state, "dofile").checkFunction().call(state, ValueFactory.valueOf(script));
 			LuaTable eventHandler = _G.get(state, DiscordEventLib.KEY).checkTable();
