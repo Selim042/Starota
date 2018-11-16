@@ -6,12 +6,12 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import us.myles_selim.starota.EnumTeam;
-import us.myles_selim.starota.commands.registry.Command;
-import us.myles_selim.starota.commands.registry.CommandRegistry;
+import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
+import us.myles_selim.starota.commands.registry.java.JavaCommand;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.profiles.ProfileManager;
 
-public class CommandSelfRegister extends Command {
+public class CommandSelfRegister extends JavaCommand {
 
 	public CommandSelfRegister() {
 		super("sregister", "Registers your own profile and assigns you a profile.");
@@ -26,11 +26,11 @@ public class CommandSelfRegister extends Command {
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
 		if (args.length < 3) {
 			if (!hasTeamRoles(guild)) {
-				channel.sendMessage("**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName()
+				channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName()
 						+ " [poGoName] [level] [team]");
 				return;
 			}
-			channel.sendMessage("**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName()
+			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName()
 					+ " [username] [level]");
 			return;
 		}

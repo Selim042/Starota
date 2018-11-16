@@ -3,12 +3,12 @@ package us.myles_selim.starota.trading.commands;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
-import us.myles_selim.starota.commands.registry.Command;
-import us.myles_selim.starota.commands.registry.CommandRegistry;
+import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
+import us.myles_selim.starota.commands.registry.java.JavaCommand;
 import us.myles_selim.starota.trading.Tradeboard;
 import us.myles_selim.starota.trading.TradeboardPost;
 
-public class CommandRemoveTrade extends Command {
+public class CommandRemoveTrade extends JavaCommand {
 
 	public CommandRemoveTrade() {
 		super("removeTrade", "Removes a given trade posted by yourself from the tradeboard.");
@@ -23,7 +23,7 @@ public class CommandRemoveTrade extends Command {
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
 		if (args.length < 2) {
 			channel.sendMessage(
-					"**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName() + " [postId]");
+					"**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName() + " [postId]");
 			return;
 		}
 		int id;
@@ -31,7 +31,7 @@ public class CommandRemoveTrade extends Command {
 			id = Integer.parseInt(args[1]);
 		} catch (NumberFormatException e) {
 			channel.sendMessage(
-					"**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName() + " [postId]");
+					"**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName() + " [postId]");
 			return;
 		}
 		TradeboardPost post = Tradeboard.getPost(guild, id);

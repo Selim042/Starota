@@ -5,9 +5,9 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IMessage.Attachment;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.registry.Command;
+import us.myles_selim.starota.commands.registry.java.JavaCommand;
 
-public class CommandUploadScript extends Command {
+public class CommandUploadScript extends JavaCommand {
 
 	public CommandUploadScript() {
 		super("uploadScript", "Uploads a Lua script to Starota.");

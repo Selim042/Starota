@@ -7,11 +7,11 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.commands.registry.Command;
+import us.myles_selim.starota.commands.registry.java.JavaCommand;
 import us.myles_selim.starota.research.ResearchTracker;
 import us.myles_selim.starota.research.Researcher;
 
-public class CommandGetTop extends Command {
+public class CommandGetTop extends JavaCommand {
 
 	public CommandGetTop() {
 		super("gettop");

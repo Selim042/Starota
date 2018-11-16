@@ -10,11 +10,11 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.commands.registry.Command;
+import us.myles_selim.starota.commands.registry.java.JavaCommand;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.profiles.ProfileManager;
 
-public class CommandGetProfilelessPlayers extends Command {
+public class CommandGetProfilelessPlayers extends JavaCommand {
 
 	public CommandGetProfilelessPlayers() {
 		super("getProfilelessPlayers");

@@ -5,10 +5,10 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.commands.registry.Command;
+import us.myles_selim.starota.commands.registry.java.JavaCommand;
 import us.myles_selim.starota.role_management.GroupManager;
 
-public class CommandGetGroups extends Command {
+public class CommandGetGroups extends JavaCommand {
 
 	public CommandGetGroups() {
 		super("getGroups", "Shows a list of groups.");

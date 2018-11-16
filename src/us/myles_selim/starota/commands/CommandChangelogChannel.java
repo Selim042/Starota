@@ -6,10 +6,10 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.starota.ServerOptions;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.registry.Command;
-import us.myles_selim.starota.commands.registry.CommandRegistry;
+import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
+import us.myles_selim.starota.commands.registry.java.JavaCommand;
 
-public class CommandChangelogChannel extends Command {
+public class CommandChangelogChannel extends JavaCommand {
 
 	public static final String CHANGES_CHANNEL = "changesChannel";
 
@@ -25,8 +25,8 @@ public class CommandChangelogChannel extends Command {
 	@Override
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
 		if (args.length < 2) {
-			channel.sendMessage(
-					"**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName() + " <channel>");
+			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName()
+					+ " <channel>");
 			return;
 		}
 

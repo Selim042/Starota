@@ -13,7 +13,6 @@ import sx.blah.discord.handle.obj.IPrivateChannel;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
-import us.myles_selim.starota.commands.registry.CommandRegistry;
 import us.myles_selim.starota.research.ResearchTracker;
 import us.myles_selim.starota.trading.EnumPokemon;
 import us.myles_selim.starota.trading.FormManager;
@@ -28,8 +27,9 @@ public class EventHandler {
 		if (Starota.DEBUG)
 			System.out.println("Channel: " + event.getChannel() + ", Author: " + event.getAuthor()
 					+ ", Message: " + event.getMessage());
-		if (CommandRegistry.executeCommand(event.getMessage(), event.getGuild(), event.getChannel()))
-			return;
+		// if (JavaCommandHandler.executeCommand(event.getMessage(),
+		// event.getGuild(), event.getChannel()))
+		// return;
 		if (event.getGuild().getLongID() == Starota.PVILLE_SERVER) {
 			long authorId = event.getAuthor().getLongID();
 			long webhookId = event.getMessage().getWebhookLongID();
@@ -75,7 +75,7 @@ public class EventHandler {
 			String ourName = Starota.getOurName(server);
 			builder.withTitle("Thanks for using " + ourName + "!");
 			builder.appendDesc("If you need any assistance with " + ourName
-					+ " or it's features, feel free to join our (temporary) support server at "
+					+ " or it's features, feel free to join our support server at "
 					+ Starota.SUPPORT_SERVER_LINK);
 			ownerPm.sendMessage(builder.build());
 		});

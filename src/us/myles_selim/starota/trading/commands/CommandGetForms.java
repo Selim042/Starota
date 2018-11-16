@@ -4,13 +4,13 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.commands.registry.Command;
-import us.myles_selim.starota.commands.registry.CommandRegistry;
+import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
+import us.myles_selim.starota.commands.registry.java.JavaCommand;
 import us.myles_selim.starota.trading.EnumPokemon;
 import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 
-public class CommandGetForms extends Command {
+public class CommandGetForms extends JavaCommand {
 
 	public CommandGetForms() {
 		super("getForms");
@@ -20,7 +20,7 @@ public class CommandGetForms extends Command {
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
 		if (args.length != 2) {
 			channel.sendMessage(
-					"**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName() + " [Pokemon]");
+					"**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName() + " [Pokemon]");
 			return;
 		}
 		EnumPokemon pokemon = EnumPokemon.getPokemon(args[1]);

@@ -6,9 +6,9 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.registry.Command;
+import us.myles_selim.starota.commands.registry.java.JavaCommand;
 
-public class CommandChangelog extends Command {
+public class CommandChangelog extends JavaCommand {
 
 	public CommandChangelog() {
 		super("changelog");

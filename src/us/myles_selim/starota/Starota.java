@@ -24,7 +24,8 @@ import us.myles_selim.starota.commands.CommandGetTop;
 import us.myles_selim.starota.commands.CommandStatus;
 import us.myles_selim.starota.commands.CommandSupportStarota;
 import us.myles_selim.starota.commands.CommandTest;
-import us.myles_selim.starota.commands.registry.CommandRegistry;
+import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
+import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 import us.myles_selim.starota.lua.LuaEventHandler;
 import us.myles_selim.starota.lua.commands.CommandUploadScript;
 import us.myles_selim.starota.profiles.ProfileManager;
@@ -109,42 +110,42 @@ public class Starota {
 		}
 		CLIENT.changePresence(StatusType.ONLINE, ActivityType.PLAYING, "registering commands...");
 
-		CommandRegistry.registerCommand(new CommandChangelog());
-		CommandRegistry.registerCommand(new CommandCredits());
-		CommandRegistry.registerCommand(new CommandSupportStarota());
+		JavaCommandHandler.registerCommand(new CommandChangelog());
+		JavaCommandHandler.registerCommand(new CommandCredits());
+		JavaCommandHandler.registerCommand(new CommandSupportStarota());
 
-		CommandRegistry.registerCommand("Administrative", new CommandStatus());
-		CommandRegistry.registerCommand("Administrative", new CommandSetResearchChannel());
-		CommandRegistry.registerCommand("Administrative", new CommandChangelogChannel());
+		JavaCommandHandler.registerCommand("Administrative", new CommandStatus());
+		JavaCommandHandler.registerCommand("Administrative", new CommandSetResearchChannel());
+		JavaCommandHandler.registerCommand("Administrative", new CommandChangelogChannel());
 		if (IS_DEV) {
-			CommandRegistry.registerCommand("Testing", new CommandGetTop());
-			CommandRegistry.registerCommand("Testing", new CommandTest());
+			JavaCommandHandler.registerCommand("Testing", new CommandGetTop());
+			JavaCommandHandler.registerCommand("Testing", new CommandTest());
 		}
 
-		CommandRegistry.registerCommand("Profiles", new CommandRegister());
-		CommandRegistry.registerCommand("Profiles", new CommandUpdateProfile());
-		CommandRegistry.registerCommand("Profiles", new CommandProfile());
-		CommandRegistry.registerCommand("Profiles", new CommandSelfRegister());
-		CommandRegistry.registerCommand("Profiles", new CommandGetProfilelessPlayers());
-		CommandRegistry.registerCommand("Profiles", new CommandProfileHelp());
+		JavaCommandHandler.registerCommand("Profiles", new CommandRegister());
+		JavaCommandHandler.registerCommand("Profiles", new CommandUpdateProfile());
+		JavaCommandHandler.registerCommand("Profiles", new CommandProfile());
+		JavaCommandHandler.registerCommand("Profiles", new CommandSelfRegister());
+		JavaCommandHandler.registerCommand("Profiles", new CommandGetProfilelessPlayers());
+		JavaCommandHandler.registerCommand("Profiles", new CommandProfileHelp());
 
-		CommandRegistry.registerCommand("Groups", new CommandGetGroups());
-		CommandRegistry.registerCommand("Groups", new CommandAddGroup());
-		CommandRegistry.registerCommand("Groups", new CommandRemoveGroup());
-		CommandRegistry.registerCommand("Groups", new CommandSetAsGroup());
+		JavaCommandHandler.registerCommand("Groups", new CommandGetGroups());
+		JavaCommandHandler.registerCommand("Groups", new CommandAddGroup());
+		JavaCommandHandler.registerCommand("Groups", new CommandRemoveGroup());
+		JavaCommandHandler.registerCommand("Groups", new CommandSetAsGroup());
 
-		CommandRegistry.registerCommand("Tradeboard", new CommandTradeboardHelp());
+		JavaCommandHandler.registerCommand("Tradeboard", new CommandTradeboardHelp());
 		// CommandRegistry.registerCommand("Tradeboard", new CommandGetForms());
 		// CommandRegistry.registerCommand("Tradeboard", new
 		// CommandGetShinies());
-		CommandRegistry.registerCommand("Tradeboard", new CommandForTrade());
-		CommandRegistry.registerCommand("Tradeboard", new CommandGetUserTrades());
-		CommandRegistry.registerCommand("Tradeboard", new CommandFindTrade());
-		CommandRegistry.registerCommand("Tradeboard", new CommandGetTrade());
-		CommandRegistry.registerCommand("Tradeboard", new CommandLookingFor());
-		CommandRegistry.registerCommand("Tradeboard", new CommandRemoveTrade());
+		JavaCommandHandler.registerCommand("Tradeboard", new CommandForTrade());
+		JavaCommandHandler.registerCommand("Tradeboard", new CommandGetUserTrades());
+		JavaCommandHandler.registerCommand("Tradeboard", new CommandFindTrade());
+		JavaCommandHandler.registerCommand("Tradeboard", new CommandGetTrade());
+		JavaCommandHandler.registerCommand("Tradeboard", new CommandLookingFor());
+		JavaCommandHandler.registerCommand("Tradeboard", new CommandRemoveTrade());
 
-		CommandRegistry.registerCommand("Lua", new CommandUploadScript());
+		JavaCommandHandler.registerCommand("Lua", new CommandUploadScript());
 
 		try {
 			Thread.sleep(2500);
@@ -211,6 +212,7 @@ public class Starota {
 			}
 		};
 		changesThread.start();
+		dispatcher.registerListener(new PrimaryCommandHandler());
 		dispatcher.registerListener(new EventHandler());
 		dispatcher.registerListener(new LuaEventHandler());
 	}

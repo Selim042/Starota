@@ -3,12 +3,12 @@ package us.myles_selim.starota.profiles.commands;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
-import us.myles_selim.starota.commands.registry.Command;
-import us.myles_selim.starota.commands.registry.CommandRegistry;
+import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
+import us.myles_selim.starota.commands.registry.java.JavaCommand;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.profiles.ProfileManager;
 
-public class CommandUpdateProfile extends Command {
+public class CommandUpdateProfile extends JavaCommand {
 
 	public CommandUpdateProfile() {
 		super("updateProfile", "Update parts of your profile.");
@@ -27,7 +27,7 @@ public class CommandUpdateProfile extends Command {
 			return;
 		}
 		if (args.length < 3) {
-			channel.sendMessage("**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName()
+			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName()
 					+ " [level/trainerCode/realName/alt] [value]");
 			return;
 		}

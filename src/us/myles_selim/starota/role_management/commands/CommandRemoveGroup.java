@@ -7,11 +7,11 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
-import us.myles_selim.starota.commands.registry.Command;
-import us.myles_selim.starota.commands.registry.CommandRegistry;
+import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
+import us.myles_selim.starota.commands.registry.java.JavaCommand;
 import us.myles_selim.starota.role_management.GroupManager;
 
-public class CommandRemoveGroup extends Command {
+public class CommandRemoveGroup extends JavaCommand {
 
 	public CommandRemoveGroup() {
 		super("removeGroup", "Leave the given group.");
@@ -28,7 +28,7 @@ public class CommandRemoveGroup extends Command {
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
 		if (args.length != 2) {
 			channel.sendMessage(
-					"**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName() + " [group]");
+					"**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName() + " [group]");
 			return;
 		}
 		IRole targetRole = null;
