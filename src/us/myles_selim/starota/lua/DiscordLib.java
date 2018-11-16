@@ -34,6 +34,7 @@ public class DiscordLib implements LuaLibrary {
 
 	@Override
 	public LuaValue add(LuaState state, LuaTable env) {
+		env.rawset("_STAROTA_VERSION", ValueFactory.valueOf(Starota.VERSION));
 		env.rawset("discord", getServer(server));
 		return env;
 	}

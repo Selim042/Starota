@@ -60,7 +60,7 @@ public class StarotaLib implements LuaLibrary {
 			public LuaValue call(LuaState state, LuaValue arg) throws LuaError {
 				if (arg instanceof LuaNil)
 					return Constants.NIL;
-				return LuaUtils.objToValue(stor.get(arg.toString()));
+				return LuaUtils.objToValue(state, stor.get(arg.toString()));
 			}
 		});
 		options.rawset("setValue", new TwoArgFunction() {
@@ -70,7 +70,7 @@ public class StarotaLib implements LuaLibrary {
 				if (arg1 instanceof LuaNil || arg1 instanceof LuaNil
 						|| arrCont(lockedKeys, arg1.toString()))
 					return Constants.NIL;
-				stor.set(arg1.toString(), LuaUtils.valueToObj(arg2));
+				stor.set(arg1.toString(), LuaUtils.valueToObj(state, arg2));
 				return Constants.NIL;
 			}
 		});

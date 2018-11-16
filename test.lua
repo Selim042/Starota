@@ -37,16 +37,6 @@ for k,v in pairs(roles) do
 end
 
 print("options");
---keys = options.getKeys();
---for k,v in pairs(keys) do
---  val = options.getValue(v);
---  print(" - " .. v .. ": " .. tostring(val));
---  if (type(val) == "table") then
---    for k1,v1 in pairs(val) do
---      print("   - " .. k1 .. ": " .. tostring(v1));
---    end
---  end
---end
 print("oldVal: " .. options.getValue("trade_id"));
 options.setValue("trade_id", -1);
 print("newVal: " .. options.getValue("trade_id"));
