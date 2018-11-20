@@ -24,10 +24,20 @@ import sx.blah.discord.handle.impl.events.guild.channel.ChannelEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageEvent;
 import sx.blah.discord.handle.impl.events.guild.member.GuildMemberEvent;
 import sx.blah.discord.handle.impl.events.guild.role.RoleEvent;
+import sx.blah.discord.handle.obj.ICategory;
+import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.IRole;
+import sx.blah.discord.handle.obj.IUser;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
+import us.myles_selim.starota.lua.conversion.discord.CategoryConverter;
+import us.myles_selim.starota.lua.conversion.discord.ChannelConverter;
+import us.myles_selim.starota.lua.conversion.discord.MessageConverter;
+import us.myles_selim.starota.lua.conversion.discord.RoleConverter;
 import us.myles_selim.starota.lua.conversion.discord.ServerConverter;
+import us.myles_selim.starota.lua.conversion.discord.UserConverter;
 import us.myles_selim.starota.lua.conversion.starota.PlayerProfileConverter;
 import us.myles_selim.starota.profiles.PlayerProfile;
 
@@ -43,7 +53,13 @@ public class LuaUtils {
 		registeredConverters = true;
 
 		ConversionHandler.registerConverter(PlayerProfile.class, new PlayerProfileConverter());
+
+		ConversionHandler.registerConverter(ICategory.class, new CategoryConverter());
+		ConversionHandler.registerConverter(IChannel.class, new ChannelConverter());
+		ConversionHandler.registerConverter(IMessage.class, new MessageConverter());
+		ConversionHandler.registerConverter(IRole.class, new RoleConverter());
 		ConversionHandler.registerConverter(IGuild.class, new ServerConverter());
+		ConversionHandler.registerConverter(IUser.class, new UserConverter());
 	}
 
 	public static LuaState getState(IGuild server) {
