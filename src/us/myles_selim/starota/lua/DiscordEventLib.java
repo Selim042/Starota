@@ -40,7 +40,7 @@ public class DiscordEventLib extends DiscordLib {
 			System.out.println(functName);
 			if (funcV == null || !funcV.isFunction())
 				return;
-			((LuaFunction) funcV).call(state, eventLib, LuaUtils.getEvent(event));
+			((LuaFunction) funcV).call(state, eventLib, LuaUtils.getEvent(state, event));
 		} catch (LuaError e) {}
 	}
 

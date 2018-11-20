@@ -1,8 +1,5 @@
 package us.myles_selim.starota.lua.conversion;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +13,7 @@ import org.squiddev.cobalt.ValueFactory;
 import org.squiddev.cobalt.function.OneArgFunction;
 import org.squiddev.cobalt.lib.platform.AbstractResourceManipulator;
 
+import us.myles_selim.starota.lua.conversion.starota.PlayerProfileConverter;
 import us.myles_selim.starota.profiles.PlayerProfile;
 
 public class ConversionHandler {
@@ -70,46 +68,20 @@ public class ConversionHandler {
 	}
 
 	public static void main(String... args) {
-		registerConverter(PlayerProfile.class, new IConverter() {
-
-			@Override
-			public LuaValue toLua(LuaState state, Object val) {
-				LuaTable ret = new LuaTable();
-				ret.rawset("getDiscordUser", ValueFactory.valueOf("12345"));
-				return ret;
-			}
-
-			@Override
-			public Object toJava(LuaState state, LuaValue val) throws LuaError {
-				LuaTable tbl = val.checkTable();
-				PlayerProfile ret = new PlayerProfile();
-				ret.setDiscordId(Long.parseLong(tbl.get(state, "getDiscordUser").toString()));
-				return new PlayerProfile();
-			}
-		});
+		registerConverter(PlayerProfile.class, new PlayerProfileConverter());
 		LuaState state = new LuaState(new AbstractResourceManipulator() {
-
-			private boolean hasRun = false;
 
 			@Override
 			public InputStream findResource(String filename) {
-				if (hasRun)
-					return null;
-				hasRun = true;
-				try {
-					return new FileInputStream(new File(filename));
-				} catch (FileNotFoundException e) {
-					return null;
-				}
+				return null;
 			}
 		});
-		PlayerProfile prof = new PlayerProfile();
+		PlayerProfile prof = new PlayerProfile().setLevel(38).setPoGoName("042Selim");
 		LuaValue profL = convertToLua(state, prof);
-		LuaTable mt = profL.getMetatable(state);
-		try {
-			System.out.println(mt.get(state, "javaType"));
-		} catch (LuaError e) {}
 		System.out.println(profL);
+		try {
+			System.out.println(profL.get(state, "getPoGoName").checkFunction().call(state));
+		} catch (LuaError e) {}
 		System.out.println(convertToJava(state, profL));
 	}
 

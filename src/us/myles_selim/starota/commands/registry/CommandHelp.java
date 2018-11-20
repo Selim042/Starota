@@ -92,7 +92,7 @@ public class CommandHelp extends JavaCommand {
 			}
 		}
 
-		List<ICommand> cmds = PrimaryCommandHandler.getCommandsByCategory(category);
+		List<ICommand> cmds = PrimaryCommandHandler.getCommandsByCategory(guild, category);
 		List<ICommand> disp = new LinkedList<>();
 		for (ICommand cmd : cmds)
 			if (guild != null

@@ -8,11 +8,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
+import us.myles_selim.starota.commands.registry.CommandHelp;
+import us.myles_selim.starota.commands.registry.CommandSetPrefix;
+import us.myles_selim.starota.commands.registry.ICommand;
 import us.myles_selim.starota.commands.registry.ICommandHandler;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.channel_management.ChannelCommandManager;
+import us.myles_selim.starota.commands.registry.channel_management.CommandAddChannelWhitelist;
+import us.myles_selim.starota.commands.registry.channel_management.CommandGetWhitelist;
+import us.myles_selim.starota.commands.registry.channel_management.CommandRemoveChannelWhitelist;
 
-public class JavaCommandHandler implements ICommandHandler<JavaCommand> {
+public class JavaCommandHandler implements ICommandHandler {
 
 	public static final JavaCommandHandler INSTANCE;
 
@@ -22,6 +28,13 @@ public class JavaCommandHandler implements ICommandHandler<JavaCommand> {
 	static {
 		INSTANCE = new JavaCommandHandler();
 		PrimaryCommandHandler.registerCommandHandler(INSTANCE);
+
+		registerCommand("Help", new CommandHelp());
+
+		registerCommand("Commands", new CommandAddChannelWhitelist());
+		registerCommand("Commands", new CommandGetWhitelist());
+		registerCommand("Commands", new CommandSetPrefix());
+		registerCommand("Commands", new CommandRemoveChannelWhitelist());
 	}
 
 	public static void registerCommand(JavaCommand cmd) {
@@ -51,7 +64,7 @@ public class JavaCommandHandler implements ICommandHandler<JavaCommand> {
 	}
 
 	@Override
-	public List<JavaCommand> getAllCommands(IGuild server) {
+	public List<ICommand> getAllCommands(IGuild server) {
 		return Collections.unmodifiableList(COMMANDS);
 	}
 
@@ -59,7 +72,7 @@ public class JavaCommandHandler implements ICommandHandler<JavaCommand> {
 		return Collections.unmodifiableList(CATEGORIES);
 	}
 
-	public List<JavaCommand> getCommandsByCategory(String category) {
+	public List<ICommand> getCommandsByCategory(String category) {
 		if (category == null)
 			return getAllCommands(null);
 		List<JavaCommand> cmds = new ArrayList<>();

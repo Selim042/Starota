@@ -28,6 +28,7 @@ import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 import us.myles_selim.starota.lua.LuaEventHandler;
 import us.myles_selim.starota.lua.commands.CommandUploadScript;
+import us.myles_selim.starota.lua.commands.LuaCommandHandler;
 import us.myles_selim.starota.profiles.ProfileManager;
 import us.myles_selim.starota.profiles.commands.CommandGetProfilelessPlayers;
 import us.myles_selim.starota.profiles.commands.CommandProfile;
@@ -215,6 +216,7 @@ public class Starota {
 		dispatcher.registerListener(new PrimaryCommandHandler());
 		dispatcher.registerListener(new EventHandler());
 		dispatcher.registerListener(new LuaEventHandler());
+		PrimaryCommandHandler.registerCommandHandler(new LuaCommandHandler());
 	}
 
 	public static IDiscordClient getClient() {

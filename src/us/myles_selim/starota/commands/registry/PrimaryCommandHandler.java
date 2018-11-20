@@ -16,7 +16,7 @@ import us.myles_selim.starota.Starota;
 
 public class PrimaryCommandHandler {
 
-	private static final List<ICommandHandler<?>> COMMAND_HANDLERS = new CopyOnWriteArrayList<>();
+	private static final List<ICommandHandler> COMMAND_HANDLERS = new CopyOnWriteArrayList<>();
 	private static String DEFAULT_PREFIX = ".";
 
 	public static final String PREFIX_KEY = "cmd_prefix";
@@ -32,7 +32,7 @@ public class PrimaryCommandHandler {
 		ServerOptions.setValue(server, PREFIX_KEY, prefix);
 	}
 
-	public static void registerCommandHandler(ICommandHandler<?> handler) {
+	public static void registerCommandHandler(ICommandHandler handler) {
 		if (!COMMAND_HANDLERS.contains(handler))
 			COMMAND_HANDLERS.add(handler);
 	}
@@ -53,7 +53,7 @@ public class PrimaryCommandHandler {
 		if (Starota.DEBUG)
 			message.addReaction(ReactionEmoji.of("�?"));
 		try {
-			for (ICommandHandler<?> h : COMMAND_HANDLERS)
+			for (ICommandHandler h : COMMAND_HANDLERS)
 				if (h.executeCommand(args, message, server, channel))
 					continue;
 		} catch (Throwable e) {
@@ -69,9 +69,22 @@ public class PrimaryCommandHandler {
 		});
 	}
 
-	public static List<ICommand> getCommandsByCategory(String category) {
-		// TODO
-		return null;
+	public static List<ICommand> getCommandsByCategory(IGuild server, String category) {
+		if (category == null || category.isEmpty())
+			return getAllCommands(server);
+		List<ICommand> ret = new ArrayList<>();
+		for (ICommandHandler h : COMMAND_HANDLERS)
+			for (ICommand c : h.getAllCommands(server))
+				if (category.equalsIgnoreCase(c.getCategory()))
+					ret.add(c);
+		return ret;
+	}
+
+	public static List<ICommand> getAllCommands(IGuild server) {
+		List<ICommand> ret = new ArrayList<>();
+		for (ICommandHandler h : COMMAND_HANDLERS)
+			ret.addAll(h.getAllCommands(server));
+		return ret;
 	}
 
 	private static String[] getArgs(IMessage message, IGuild guild) {
