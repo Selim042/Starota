@@ -8,6 +8,7 @@ import org.squiddev.cobalt.function.LuaFunction;
 
 import sx.blah.discord.handle.impl.events.guild.GuildEvent;
 import sx.blah.discord.handle.obj.IGuild;
+import us.myles_selim.starota.lua.libraries.DiscordLib;
 
 public class DiscordEventLib extends DiscordLib {
 

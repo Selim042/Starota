@@ -27,10 +27,16 @@ public class ConversionHandler {
 
 	public static LuaValue convertToLua(LuaState state, Object obj) {
 		Class<?> clazz = obj.getClass();
-		if (!CONVERTERS.containsKey(clazz))
+		IConverter conv = CONVERTERS.get(clazz);
+		if (conv == null)
+			for (Class<?> c : CONVERTERS.keySet())
+				if (c.isInstance(obj)) {
+					conv = CONVERTERS.get(c);
+					break;
+				}
+		if (conv == null)
 			return null;
 		try {
-			IConverter conv = CONVERTERS.get(clazz);
 			LuaValue val = conv.toLua(state, obj);
 			LuaTable mt = val.getMetatable(state);
 			if (mt == null)

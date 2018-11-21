@@ -1,4 +1,4 @@
-package us.myles_selim.starota.lua;
+package us.myles_selim.starota.lua.libraries;
 
 import java.util.List;
 

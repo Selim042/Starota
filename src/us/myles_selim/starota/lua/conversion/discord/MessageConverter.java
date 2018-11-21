@@ -61,7 +61,7 @@ public class MessageConverter implements IConverter {
 				return ConversionHandler.convertToLua(state, message.edit(arg.toString()));
 			}
 		});
-		methods.rawset("getAuthor", new ZeroArgFunction() {
+		methods.rawset("delete", new ZeroArgFunction() {
 
 			@Override
 			public LuaValue call(LuaState state) throws LuaError {

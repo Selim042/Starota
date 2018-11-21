@@ -15,6 +15,7 @@ import org.squiddev.cobalt.function.ZeroArgFunction;
 import sx.blah.discord.handle.obj.ICategory;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
 import us.myles_selim.starota.lua.conversion.IConverter;
 
@@ -113,6 +114,17 @@ public class ChannelConverter implements IConverter {
 			public LuaValue call(LuaState state) throws LuaError {
 				channel.delete();
 				return Constants.TRUE;
+			}
+		});
+		methods.rawset("sendMessage", new OneArgFunction() {
+
+			@Override
+			public LuaValue call(LuaState state, LuaValue arg) throws LuaError {
+				if (arg == Constants.NIL || arg.toString().isEmpty())
+					return Constants.NIL;
+				return RequestBuffer.request(() -> {
+					return ConversionHandler.convertToLua(state, channel.sendMessage(arg.toString()));
+				}).get();
 			}
 		});
 		LuaTable mt = new LuaTable();

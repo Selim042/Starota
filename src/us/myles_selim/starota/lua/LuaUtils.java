@@ -39,6 +39,8 @@ import us.myles_selim.starota.lua.conversion.discord.RoleConverter;
 import us.myles_selim.starota.lua.conversion.discord.ServerConverter;
 import us.myles_selim.starota.lua.conversion.discord.UserConverter;
 import us.myles_selim.starota.lua.conversion.starota.PlayerProfileConverter;
+import us.myles_selim.starota.lua.libraries.DiscordLib;
+import us.myles_selim.starota.lua.libraries.StarotaLib;
 import us.myles_selim.starota.profiles.PlayerProfile;
 
 public class LuaUtils {
@@ -67,20 +69,12 @@ public class LuaUtils {
 			return STATES.get(server);
 		LuaState state = new LuaState(new AbstractResourceManipulator() {
 
-			// private boolean hasRun = false;
-
 			@Override
 			public InputStream findResource(String filename) {
-				// if (hasRun)
 				return null;
-				// hasRun = true;
-				// try {
-				// return new FileInputStream(new File(filename));
-				// } catch (FileNotFoundException e) {
-				// return null;
-				// }
 			}
 		});
+//		state.stdout = null;
 		LuaTable _G = new LuaTable();
 		state.setupThread(_G);
 		_G.load(state, new BaseLib());

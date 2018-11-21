@@ -52,7 +52,7 @@ public class JavaCommandHandler implements ICommandHandler {
 
 	@Override
 	public boolean executeCommand(String[] args, IMessage message, IGuild guild, IChannel channel) {
-		JavaCommand cmd = findCommand(args[0]);
+		ICommand cmd = findCommand(guild, args[0]);
 		if (cmd == null)
 			return false;
 		if (!ChannelCommandManager.isAllowedHere(guild, cmd.getCategory(), channel)
@@ -82,7 +82,8 @@ public class JavaCommandHandler implements ICommandHandler {
 		return Collections.unmodifiableList(cmds);
 	}
 
-	public static JavaCommand findCommand(String name) {
+	@Override
+	public ICommand findCommand(IGuild server, String name) {
 		for (JavaCommand c : COMMANDS) {
 			if (c != null && c.getName() != null && c.getName().equalsIgnoreCase(name))
 				return c;

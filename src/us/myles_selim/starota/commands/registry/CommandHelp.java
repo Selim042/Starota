@@ -10,7 +10,6 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
-import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 
 public class CommandHelp extends JavaCommand {
 
@@ -35,7 +34,7 @@ public class CommandHelp extends JavaCommand {
 		IUser author = message.getAuthor();
 
 		if (args.length >= 2) {
-			JavaCommand cmd = JavaCommandHandler.findCommand(args[1]);
+			ICommand cmd = PrimaryCommandHandler.findCommand(guild, args[1]);
 			if (cmd != null) {
 				EmbedBuilder builder = new EmbedBuilder();
 				builder.withTitle("Help: " + cmd.getName());

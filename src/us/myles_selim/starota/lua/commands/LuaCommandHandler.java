@@ -34,7 +34,8 @@ public class LuaCommandHandler implements ICommandHandler {
 		return Collections.unmodifiableList(ret);
 	}
 
-	private ICommand findCommand(IGuild server, String name) {
+	@Override
+	public ICommand findCommand(IGuild server, String name) {
 		for (ICommand c : getAllCommands(server))
 			if (c.getName().equalsIgnoreCase(name))
 				return c;
@@ -55,7 +56,7 @@ public class LuaCommandHandler implements ICommandHandler {
 
 		@Override
 		public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
-			ScriptManager.executeCommandScript(this.server, this.name, message, channel);
+			ScriptManager.executeCommandScript(this.server, this.name, message, channel, args);
 		}
 
 		@Override

@@ -87,6 +87,15 @@ public class PrimaryCommandHandler {
 		return ret;
 	}
 
+	public static ICommand findCommand(IGuild server, String name) {
+		for (ICommandHandler h : COMMAND_HANDLERS) {
+			ICommand c = h.findCommand(server, name);
+			if (c != null)
+				return c;
+		}
+		return null;
+	}
+
 	private static String[] getArgs(IMessage message, IGuild guild) {
 		String cmdS = message.getContent();
 		String prefix = getPrefix(guild);

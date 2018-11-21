@@ -1,10 +1,11 @@
-package us.myles_selim.starota.lua;
+package us.myles_selim.starota.lua.libraries;
 
 import org.squiddev.cobalt.Constants;
 import org.squiddev.cobalt.LuaError;
 import org.squiddev.cobalt.LuaNil;
 import org.squiddev.cobalt.LuaState;
 import org.squiddev.cobalt.LuaTable;
+import org.squiddev.cobalt.LuaUserdata;
 import org.squiddev.cobalt.LuaValue;
 import org.squiddev.cobalt.ValueFactory;
 import org.squiddev.cobalt.function.OneArgFunction;
@@ -12,9 +13,14 @@ import org.squiddev.cobalt.function.TwoArgFunction;
 import org.squiddev.cobalt.lib.LuaLibrary;
 
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IUser;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.ServerOptions;
 import us.myles_selim.starota.commands.CommandChangelogChannel;
+import us.myles_selim.starota.lua.LuaUtils;
+import us.myles_selim.starota.lua.conversion.ConversionHandler;
+import us.myles_selim.starota.profiles.PlayerProfile;
+import us.myles_selim.starota.profiles.ProfileManager;
 import us.myles_selim.starota.trading.Tradeboard;
 
 public class StarotaLib implements LuaLibrary {
@@ -29,6 +35,20 @@ public class StarotaLib implements LuaLibrary {
 	public LuaValue add(LuaState state, LuaTable env) {
 		env.rawset("options", storageToValue(ServerOptions.getOptions(server), Tradeboard.TRADE_ID_KEY,
 				CommandChangelogChannel.CHANGES_CHANNEL, "changesVersion"));
+		env.rawset("getProfile", new OneArgFunction() {
+
+			@Override
+			public LuaValue call(LuaState state, LuaValue arg) throws LuaError {
+				if (arg == Constants.NIL || !(arg instanceof LuaUserdata)
+						|| !(((LuaUserdata) arg).instance instanceof IUser))
+					throw new LuaError("arg must be a user");
+				PlayerProfile prof = ProfileManager.getProfile(server,
+						(IUser) ((LuaUserdata) arg).instance);
+				if (prof == null)
+					return Constants.NIL;
+				return ConversionHandler.convertToLua(state, prof);
+			}
+		});
 		return env;
 	}
 

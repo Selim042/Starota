@@ -76,7 +76,7 @@ public class ScriptManager {
 			IChannel channel, String[] args) {
 		File folder = new File(SCRIPT_FOLDER, server.getStringID());
 		LuaState state = LuaUtils.getState(server);
-		state.stdout = System.out;
+		// state.stdout = System.out;
 		LuaTable _G = state.getMainThread().getfenv();
 		try {
 			LuaValue[] argsA = new LuaValue[args.length + 2];
@@ -84,10 +84,11 @@ public class ScriptManager {
 			argsA[1] = ConversionHandler.convertToLua(state, channel);
 			for (int i = 0; i < args.length; i++)
 				argsA[i + 2] = ValueFactory.valueOf(args[i]);
-			LoadState.load(state,
-					new FileInputStream(
-							new File(folder, "commands" + File.separator + name + LUA_EXENSION)),
-					"@" + name, _G).invoke(state, ValueFactory.varargsOf(argsA));
+			FileInputStream scriptFile = new FileInputStream(
+					new File(folder, "commands" + File.separator + name + LUA_EXENSION));
+			LoadState.load(state, scriptFile, "@" + name, _G).invoke(state,
+					ValueFactory.varargsOf(argsA));
+			scriptFile.close();
 			return true;
 		} catch (LuaError | CompileException | IOException e) {
 			e.printStackTrace();
