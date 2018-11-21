@@ -23,7 +23,6 @@ public class DiscordEventLib extends DiscordLib {
 		super.add(state, env);
 		LuaTable eventHandler = new LuaTable();
 		env.rawset(KEY, eventHandler);
-		// eventHandler.rawset("test", new EmptyFunction());
 		return env;
 	}
 
@@ -31,18 +30,21 @@ public class DiscordEventLib extends DiscordLib {
 		IGuild server = event.getGuild();
 		LuaState state = LuaUtils.getState(server);
 		LuaTable _G = state.getMainThread().getfenv();
+		String functName = "on" + event.getClass().getSimpleName();
 		try {
 			LuaTable eventLib = _G.rawget(DiscordEventLib.KEY).checkTable();
-			String functName = "on" + event.getClass().getSimpleName();
 			LuaValue funcV = eventLib.get(state, functName);
-			for (LuaValue v : eventLib.keys()) {
-				System.out.println(v);
-			}
-			System.out.println(functName);
+			// for (LuaValue v : eventLib.keys()) {
+			// System.out.println("event handler: " + v);
+			// }
+			// System.out.println("event fired: " + functName);
 			if (funcV == null || !funcV.isFunction())
 				return;
 			((LuaFunction) funcV).call(state, eventLib, LuaUtils.getEvent(state, event));
-		} catch (LuaError e) {}
+		} catch (LuaError e) {
+			System.out.println("event fired: " + functName + " on server: " + server.getName());
+			e.printStackTrace();
+		}
 	}
 
 }

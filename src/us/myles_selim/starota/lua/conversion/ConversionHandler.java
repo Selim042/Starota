@@ -26,6 +26,8 @@ public class ConversionHandler {
 	}
 
 	public static LuaValue convertToLua(LuaState state, Object obj) {
+		if (obj == null)
+			return Constants.NIL;
 		Class<?> clazz = obj.getClass();
 		IConverter conv = CONVERTERS.get(clazz);
 		if (conv == null)
@@ -35,7 +37,8 @@ public class ConversionHandler {
 					break;
 				}
 		if (conv == null)
-			return null;
+			throw new IllegalArgumentException(
+					"converter not registered for " + obj + " (" + clazz + ")");
 		try {
 			LuaValue val = conv.toLua(state, obj);
 			LuaTable mt = val.getMetatable(state);

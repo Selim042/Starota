@@ -40,8 +40,8 @@ public class ServerConverter implements IConverter {
 			public LuaValue call(LuaState state) throws LuaError {
 				LuaTable usersT = new LuaTable();
 				List<IUser> users = server.getUsers();
-				for (int i = 0; i < users.size(); i++)
-					usersT.rawset(i, ConversionHandler.convertToLua(state, users.get(i)));
+				for (int i = 1; i <= users.size(); i++)
+					usersT.rawset(i, ConversionHandler.convertToLua(state, users.get(i - 1)));
 				return usersT;
 			}
 		});
@@ -51,8 +51,8 @@ public class ServerConverter implements IConverter {
 			public LuaValue call(LuaState state) throws LuaError {
 				LuaTable rolesT = new LuaTable();
 				List<IRole> roles = server.getRoles();
-				for (int i = 0; i < roles.size(); i++)
-					rolesT.rawset(i, ConversionHandler.convertToLua(state, roles.get(i)));
+				for (int i = 1; i <= roles.size(); i++)
+					rolesT.rawset(i, ConversionHandler.convertToLua(state, roles.get(i - 1)));
 				return rolesT;
 			}
 		});
@@ -62,8 +62,8 @@ public class ServerConverter implements IConverter {
 			public LuaValue call(LuaState state) throws LuaError {
 				LuaTable rolesT = new LuaTable();
 				List<IChannel> roles = server.getChannels();
-				for (int i = 0; i < roles.size(); i++)
-					rolesT.rawset(i, ConversionHandler.convertToLua(state, roles.get(i)));
+				for (int i = 1; i <= roles.size(); i++)
+					rolesT.rawset(i, ConversionHandler.convertToLua(state, roles.get(i - 1)));
 				return rolesT;
 			}
 		});
@@ -73,8 +73,8 @@ public class ServerConverter implements IConverter {
 			public LuaValue call(LuaState state, LuaValue arg) throws LuaError {
 				LuaTable table = new LuaTable();
 				List<IChannel> channels = server.getChannelsByName(arg.toString());
-				for (int i = 0; i < channels.size(); i++)
-					table.rawset(i, ConversionHandler.convertToLua(state, channels.get(i)));
+				for (int i = 1; i <= channels.size(); i++)
+					table.rawset(i, ConversionHandler.convertToLua(state, channels.get(i - 1)));
 				return table;
 			}
 		});

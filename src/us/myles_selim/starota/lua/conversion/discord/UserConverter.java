@@ -64,8 +64,8 @@ public class UserConverter implements IConverter {
 				IGuild target = (IGuild) ((LuaUserdata) arg).instance;
 				LuaTable rolesT = new LuaTable();
 				List<IRole> roles = user.getRolesForGuild(target);
-				for (int i = 0; i < roles.size(); i++)
-					rolesT.rawset(i, ConversionHandler.convertToLua(state, roles.get(i)));
+				for (int i = 1; i <= roles.size(); i++)
+					rolesT.rawset(i, ConversionHandler.convertToLua(state, roles.get(i - 1)));
 				return rolesT;
 			}
 		});

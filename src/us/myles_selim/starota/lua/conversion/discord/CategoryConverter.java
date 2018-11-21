@@ -31,8 +31,8 @@ public class CategoryConverter implements IConverter {
 			public LuaValue call(LuaState state) throws LuaError {
 				LuaTable ret = new LuaTable();
 				List<IChannel> channels = category.getChannels();
-				for (int i = 0; i < channels.size(); i++)
-					ret.rawset(i, ConversionHandler.convertToLua(state, channels.get(i)));
+				for (int i = 1; i <= channels.size(); i++)
+					ret.rawset(i, ConversionHandler.convertToLua(state, channels.get(i - 1)));
 				return ret;
 			}
 		});

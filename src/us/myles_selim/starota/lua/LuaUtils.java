@@ -38,10 +38,14 @@ import us.myles_selim.starota.lua.conversion.discord.MessageConverter;
 import us.myles_selim.starota.lua.conversion.discord.RoleConverter;
 import us.myles_selim.starota.lua.conversion.discord.ServerConverter;
 import us.myles_selim.starota.lua.conversion.discord.UserConverter;
+import us.myles_selim.starota.lua.conversion.starota.EnumPokemonConverter;
 import us.myles_selim.starota.lua.conversion.starota.PlayerProfileConverter;
+import us.myles_selim.starota.lua.conversion.starota.TradeboardPostConverter;
 import us.myles_selim.starota.lua.libraries.DiscordLib;
 import us.myles_selim.starota.lua.libraries.StarotaLib;
 import us.myles_selim.starota.profiles.PlayerProfile;
+import us.myles_selim.starota.trading.EnumPokemon;
+import us.myles_selim.starota.trading.TradeboardPost;
 
 public class LuaUtils {
 
@@ -55,6 +59,9 @@ public class LuaUtils {
 		registeredConverters = true;
 
 		ConversionHandler.registerConverter(PlayerProfile.class, new PlayerProfileConverter());
+		ConversionHandler.registerConverter(TradeboardPost.class, new TradeboardPostConverter());
+		ConversionHandler.registerConverter(EnumPokemon.class, new EnumPokemonConverter());
+		ConversionHandler.registerConverter(TradeboardPost.class, new TradeboardPostConverter());
 
 		ConversionHandler.registerConverter(ICategory.class, new CategoryConverter());
 		ConversionHandler.registerConverter(IChannel.class, new ChannelConverter());
@@ -74,7 +81,7 @@ public class LuaUtils {
 				return null;
 			}
 		});
-//		state.stdout = null;
+		// state.stdout = null;
 		LuaTable _G = new LuaTable();
 		state.setupThread(_G);
 		_G.load(state, new BaseLib());

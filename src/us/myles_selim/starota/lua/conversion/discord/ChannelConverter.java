@@ -93,8 +93,8 @@ public class ChannelConverter implements IConverter {
 			public LuaValue call(LuaState state) throws LuaError {
 				LuaTable ret = new LuaTable();
 				List<IUser> users = channel.getUsersHere();
-				for (int i = 0; i < users.size(); i++)
-					ret.rawset(i, ConversionHandler.convertToLua(state, users.get(i)));
+				for (int i = 1; i <= users.size(); i++)
+					ret.rawset(i, ConversionHandler.convertToLua(state, users.get(i - 1)));
 				return ret;
 			}
 		});

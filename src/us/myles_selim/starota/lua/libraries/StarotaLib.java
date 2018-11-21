@@ -21,6 +21,7 @@ import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.profiles.ProfileManager;
+import us.myles_selim.starota.trading.EnumPokemon;
 import us.myles_selim.starota.trading.Tradeboard;
 
 public class StarotaLib implements LuaLibrary {
@@ -47,6 +48,29 @@ public class StarotaLib implements LuaLibrary {
 				if (prof == null)
 					return Constants.NIL;
 				return ConversionHandler.convertToLua(state, prof);
+			}
+		});
+		env.rawset("getPokemon", new OneArgFunction() {
+
+			@Override
+			public LuaValue call(LuaState state, LuaValue arg) throws LuaError {
+				if (arg.isIntExact())
+					return ConversionHandler.convertToLua(state,
+							EnumPokemon.getPokemon(arg.checkInteger()));
+				return ConversionHandler.convertToLua(state, EnumPokemon.getPokemon(arg.toString()));
+			}
+		});
+		env.rawset("getTrade", new OneArgFunction() {
+
+			@Override
+			public LuaValue call(LuaState state, LuaValue arg) throws LuaError {
+				if (arg.isIntExact())
+					return ConversionHandler.convertToLua(state,
+							Tradeboard.getPost(server, arg.toInteger()));
+				// TODO: Finish this
+				throw new LuaError("can only get posts by id, WIP");
+				// return ConversionHandler.convertToLua(state,
+				// EnumPokemon.getPokemon(arg.toString()));
 			}
 		});
 		return env;
