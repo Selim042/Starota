@@ -51,7 +51,7 @@ public class JavaCommandHandler implements ICommandHandler {
 	}
 
 	@Override
-	public boolean executeCommand(String[] args, IMessage message, IGuild guild, IChannel channel) {
+	public boolean executeCommand(String[] args, IMessage message, IGuild guild, IChannel channel) throws Exception {
 		ICommand cmd = findCommand(guild, args[0]);
 		if (cmd == null)
 			return false;

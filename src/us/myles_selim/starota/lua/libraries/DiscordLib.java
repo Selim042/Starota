@@ -18,10 +18,14 @@ public class DiscordLib implements LuaLibrary {
 		this.server = server;
 	}
 
+	public IGuild getServer() {
+		return server;
+	}
+
 	@Override
 	public LuaValue add(LuaState state, LuaTable env) {
 		env.rawset("_STAROTA_VERSION", ValueFactory.valueOf(Starota.VERSION));
-		env.rawset("discord", ConversionHandler.convertToLua(state, server));
+		env.rawset("discord", ConversionHandler.convertToLua(state, getServer()));
 		return env;
 	}
 

@@ -8,7 +8,8 @@ import sx.blah.discord.handle.obj.IMessage;
 
 public interface ICommandHandler {
 
-	public boolean executeCommand(String[] args, IMessage message, IGuild guild, IChannel channel);
+	public boolean executeCommand(String[] args, IMessage message, IGuild guild, IChannel channel)
+			throws Exception;
 
 	public List<ICommand> getAllCommands(IGuild server);
 

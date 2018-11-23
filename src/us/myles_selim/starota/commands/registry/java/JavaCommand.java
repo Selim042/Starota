@@ -58,7 +58,8 @@ public class JavaCommand implements ICommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {}
+	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel)
+			throws Exception {}
 
 	@Override
 	public int compareTo(ICommand o) {

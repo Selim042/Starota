@@ -16,7 +16,7 @@ import us.myles_selim.starota.lua.ScriptManager;
 public class LuaCommandHandler implements ICommandHandler {
 
 	@Override
-	public boolean executeCommand(String[] args, IMessage message, IGuild guild, IChannel channel) {
+	public boolean executeCommand(String[] args, IMessage message, IGuild guild, IChannel channel) throws Exception {
 		if (args.length < 1)
 			return false;
 		ICommand cmd = findCommand(guild, args[0]);
@@ -55,7 +55,8 @@ public class LuaCommandHandler implements ICommandHandler {
 		}
 
 		@Override
-		public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
+		public void execute(String[] args, IMessage message, IGuild guild, IChannel channel)
+				throws Exception {
 			ScriptManager.executeCommandScript(this.server, this.name, message, channel, args);
 		}
 

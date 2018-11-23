@@ -21,6 +21,7 @@ import org.squiddev.cobalt.lib.platform.AbstractResourceManipulator;
 import sx.blah.discord.handle.impl.events.guild.GuildEvent;
 import sx.blah.discord.handle.impl.events.guild.category.CategoryEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.ChannelEvent;
+import sx.blah.discord.handle.impl.events.guild.channel.TypingEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageEvent;
 import sx.blah.discord.handle.impl.events.guild.member.GuildMemberEvent;
 import sx.blah.discord.handle.impl.events.guild.role.RoleEvent;
@@ -41,6 +42,7 @@ import us.myles_selim.starota.lua.conversion.discord.UserConverter;
 import us.myles_selim.starota.lua.conversion.starota.EnumPokemonConverter;
 import us.myles_selim.starota.lua.conversion.starota.PlayerProfileConverter;
 import us.myles_selim.starota.lua.conversion.starota.TradeboardPostConverter;
+import us.myles_selim.starota.lua.libraries.DiscordEventLib;
 import us.myles_selim.starota.lua.libraries.DiscordLib;
 import us.myles_selim.starota.lua.libraries.StarotaLib;
 import us.myles_selim.starota.profiles.PlayerProfile;
@@ -103,6 +105,16 @@ public class LuaUtils {
 		return state;
 	}
 
+	public static void clearEventHandlers(IGuild server) {
+		if (STATES.containsKey(server))
+			clearEventHandlers(getState(server));
+	}
+
+	public static void clearEventHandlers(LuaState state) {
+		LuaTable env = state.getMainThread().getfenv();
+		env.rawset("events", new LuaTable());
+	}
+
 	public static LuaValue objToValue(LuaState state, Object obj) {
 		if (obj == null)
 			return Constants.NIL;
@@ -163,6 +175,9 @@ public class LuaUtils {
 					ConversionHandler.convertToLua(state, ((GuildMemberEvent) event).getUser()));
 		if (event instanceof RoleEvent)
 			ret.rawset("role", ConversionHandler.convertToLua(state, ((RoleEvent) event).getRole()));
+
+		if (event instanceof TypingEvent)
+			ret.rawset("user", ConversionHandler.convertToLua(state, ((TypingEvent) event).getUser()));
 		return ret;
 	}
 

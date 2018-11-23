@@ -26,6 +26,7 @@ public interface ICommand extends Comparable<ICommand> {
 
 	public String getGeneralUsage();
 
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel);
+	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel)
+			throws Exception;
 
 }

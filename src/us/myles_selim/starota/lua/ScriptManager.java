@@ -48,6 +48,8 @@ public class ScriptManager {
 	};
 
 	public static boolean saveScript(IGuild server, String name, Attachment attach) {
+		if (attach == null)
+			return false;
 		String contents = getAttachmentContents(attach.getUrl());
 		File folder = new File(SCRIPT_FOLDER, server.getStringID());
 		long folderSize = folderSize(folder.toPath());
@@ -67,27 +69,57 @@ public class ScriptManager {
 		}
 	}
 
+	public static boolean removeScript(IGuild server, String name) {
+		File folder = new File(SCRIPT_FOLDER, server.getStringID());
+		File script = new File(folder, name);
+		if (script.exists() && !script.isDirectory())
+			return script.delete();
+		return false;
+	}
+
 	public static boolean executeCommandScript(IGuild server, String name, IMessage message,
-			IChannel channel) {
+			IChannel channel) throws LuaError, IOException, CompileException {
 		return executeCommandScript(server, name, message, channel, new String[0]);
 	}
 
 	public static boolean executeCommandScript(IGuild server, String name, IMessage message,
-			IChannel channel, String[] args) {
+			IChannel channel, String[] args) throws LuaError, IOException, CompileException {
 		File folder = new File(SCRIPT_FOLDER, server.getStringID());
 		LuaState state = LuaUtils.getState(server);
 		// state.stdout = System.out;
 		LuaTable _G = state.getMainThread().getfenv();
+		// try {
+		LuaValue[] argsA = new LuaValue[args.length + 2];
+		argsA[0] = ConversionHandler.convertToLua(state, message);
+		argsA[1] = ConversionHandler.convertToLua(state, channel);
+		for (int i = 0; i < args.length; i++)
+			argsA[i + 2] = ValueFactory.valueOf(args[i]);
+		FileInputStream scriptFile = new FileInputStream(
+				new File(folder, "commands" + File.separator + name + LUA_EXENSION));
+		LoadState.load(state, scriptFile, "@" + name, _G).invoke(state, ValueFactory.varargsOf(argsA));
+		scriptFile.close();
+		return true;
+		// } catch (LuaError e) {
+		// channel.sendMessage("An error was encountered when executing your )
+		// return true;
+		// } catch (CompileException | IOException e) {
+		// e.printStackTrace();
+		// return false;
+		// }
+	}
+
+	public static boolean executeEventScript(IGuild server) {
+		return executeEventScript(LuaUtils.getState(server), server);
+	}
+
+	public static boolean executeEventScript(LuaState state, IGuild server) {
+		File folder = new File(SCRIPT_FOLDER, server.getStringID());
+		// state.stdout = System.out;
+		LuaTable _G = state.getMainThread().getfenv();
 		try {
-			LuaValue[] argsA = new LuaValue[args.length + 2];
-			argsA[0] = ConversionHandler.convertToLua(state, message);
-			argsA[1] = ConversionHandler.convertToLua(state, channel);
-			for (int i = 0; i < args.length; i++)
-				argsA[i + 2] = ValueFactory.valueOf(args[i]);
 			FileInputStream scriptFile = new FileInputStream(
-					new File(folder, "commands" + File.separator + name + LUA_EXENSION));
-			LoadState.load(state, scriptFile, "@" + name, _G).invoke(state,
-					ValueFactory.varargsOf(argsA));
+					new File(folder, "eventHandler" + LUA_EXENSION));
+			LoadState.load(state, scriptFile, "@eventHandler", _G).call(state);
 			scriptFile.close();
 			return true;
 		} catch (LuaError | CompileException | IOException e) {
