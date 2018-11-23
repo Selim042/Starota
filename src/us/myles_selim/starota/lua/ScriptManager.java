@@ -72,9 +72,16 @@ public class ScriptManager {
 	public static boolean removeScript(IGuild server, String name) {
 		File folder = new File(SCRIPT_FOLDER, server.getStringID());
 		File script = new File(folder, name);
-		if (script.exists() && !script.isDirectory())
-			return script.delete();
-		return false;
+		// if (script.exists() && !script.isDirectory())
+		try {
+			Files.delete(script.toPath());
+			return true;
+		} catch (IOException e) {
+			System.out.println("Attempting to remove " + name + " script for " + server.getName());
+			e.printStackTrace();
+			return false;
+		}
+		// return false;
 	}
 
 	public static boolean executeCommandScript(IGuild server, String name, IMessage message,

@@ -7,6 +7,8 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IMessage.Attachment;
+import sx.blah.discord.handle.obj.IRole;
+import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
@@ -17,6 +19,18 @@ public class CommandUploadScript extends JavaCommand {
 
 	public CommandUploadScript() {
 		super("uploadScript", "Uploads a Lua script to Starota.");
+	}
+
+	@Override
+	public Permissions requiredPermission() {
+		return Permissions.ADMINISTRATOR;
+	}
+
+	@Override
+	public IRole requiredRole(IGuild guild) {
+		if (guild.getLongID() == 481646364716040202L) // test server
+			return guild.getRoleByID(489249119311888385L); // Starota test role
+		return super.requiredRole(guild);
 	}
 
 	@Override
@@ -72,14 +86,12 @@ public class CommandUploadScript extends JavaCommand {
 				scriptName = "eventHandler";
 				break;
 			default:
-				scriptName = args[2];
+				scriptName = "commands" + File.separator + args[2];
 				break;
 			}
-			scriptName += ScriptManager.LUA_EXENSION;
-			if (ScriptManager.removeScript(guild,
-					"commands" + File.separator + args[2] + ScriptManager.LUA_EXENSION)) {
+			if (ScriptManager.removeScript(guild, scriptName + ScriptManager.LUA_EXENSION)) {
 				channel.sendMessage("Successfully deleted script \"" + scriptName + "\"");
-				if (scriptName.equalsIgnoreCase("eventHandler" + ScriptManager.LUA_EXENSION))
+				if (scriptName.equalsIgnoreCase("eventHandler"))
 					LuaUtils.clearEventHandlers(guild);
 				return;
 			} else {
