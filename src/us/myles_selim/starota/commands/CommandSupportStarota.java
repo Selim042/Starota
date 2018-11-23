@@ -9,9 +9,9 @@ import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
 import sx.blah.discord.util.RequestBuffer.IVoidRequest;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.registry.Command;
+import us.myles_selim.starota.commands.registry.java.JavaCommand;
 
-public class CommandSupportStarota extends Command {
+public class CommandSupportStarota extends JavaCommand {
 
 	public CommandSupportStarota() {
 		super("supportStarota", "Information on how to help support Starota.");

@@ -5,11 +5,11 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.Permissions;
-import us.myles_selim.starota.commands.registry.Command;
-import us.myles_selim.starota.commands.registry.CommandRegistry;
+import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
+import us.myles_selim.starota.commands.registry.java.JavaCommand;
 import us.myles_selim.starota.role_management.GroupManager;
 
-public class CommandSetAsGroup extends Command {
+public class CommandSetAsGroup extends JavaCommand {
 
 	public CommandSetAsGroup() {
 		super("setAsGroup", "Sets if the target role is a group.");
@@ -23,7 +23,7 @@ public class CommandSetAsGroup extends Command {
 	@Override
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
 		if (args.length < 3) {
-			channel.sendMessage("**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName()
+			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName()
 					+ " [group] [isGroup]");
 			return;
 		}

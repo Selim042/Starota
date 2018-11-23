@@ -9,16 +9,16 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.Permissions;
 
-public class Command implements Comparable<Command> {
+public abstract class AbstractCommand implements ICommand {
 
 	private final String name;
 	private final String description;
 
-	public Command(String name) {
+	public AbstractCommand(String name) {
 		this(name, null);
 	}
 
-	public Command(String name, String description) {
+	public AbstractCommand(String name, String description) {
 		this.name = name;
 		this.description = description;
 	}
@@ -49,25 +49,28 @@ public class Command implements Comparable<Command> {
 		return null;
 	}
 
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {}
+	public abstract void execute(String[] args, IMessage message, IGuild guild, IChannel channel);
 
 	@Override
-	public int compareTo(Command o) {
-		if (this.category.equals(o.category))
-			return name.compareTo(o.name);
-		return this.category.compareTo(o.category);
+	public int compareTo(ICommand o) {
+		if (this.category.equals(o.getCategory()))
+			return name.compareTo(o.getName());
+		return this.category.compareTo(o.getCategory());
 	}
 
 	private String category;
 
-	protected final void setCategory(String category) {
+	@Override
+	public final void setCategory(String category) {
 		if (this.category == null)
 			this.category = category;
 	}
 
+	@Override
 	public final String getCategory() {
 		if (this.category == null)
-			return CommandRegistry.DEFAULT_CATEGORY;
+			return PrimaryCommandHandler.DEFAULT_CATEGORY;
 		return this.category;
 	}
+
 }

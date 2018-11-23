@@ -5,9 +5,9 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.registry.Command;
+import us.myles_selim.starota.commands.registry.java.JavaCommand;
 
-public class CommandCredits extends Command {
+public class CommandCredits extends JavaCommand {
 
 	public CommandCredits() {
 		super("credits", "Displays the credits for " + Starota.BOT_NAME + ".");

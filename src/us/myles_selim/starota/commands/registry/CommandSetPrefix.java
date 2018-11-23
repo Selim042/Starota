@@ -4,9 +4,9 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
-import us.myles_selim.starota.ServerOptions;
+import us.myles_selim.starota.commands.registry.java.JavaCommand;
 
-public class CommandSetPrefix extends Command {
+public class CommandSetPrefix extends JavaCommand {
 
 	public CommandSetPrefix() {
 		super("setPrefix", "Sets the command prefix.");
@@ -20,8 +20,8 @@ public class CommandSetPrefix extends Command {
 	@Override
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
 		if (args.length < 2) {
-			channel.sendMessage(
-					"**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName() + " <prefix>");
+			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName()
+					+ " <prefix>");
 			return;
 		}
 		String newPrefix = args[1];
@@ -29,8 +29,8 @@ public class CommandSetPrefix extends Command {
 			channel.sendMessage("Prefix \"" + newPrefix + "\" cannot be longer than 2 characters");
 			return;
 		}
-		String oldPrefix = CommandRegistry.getPrefix(guild);
-		ServerOptions.setValue(guild, CommandRegistry.PREFIX_KEY, newPrefix);
+		String oldPrefix = PrimaryCommandHandler.getPrefix(guild);
+		PrimaryCommandHandler.setPrefix(guild, newPrefix);
 		channel.sendMessage(
 				"Changed command prefix from \"" + oldPrefix + "\" to \"" + newPrefix + "\"");
 	}

@@ -9,8 +9,9 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
+import us.myles_selim.starota.commands.registry.java.JavaCommand;
 
-public class CommandHelp extends Command {
+public class CommandHelp extends JavaCommand {
 
 	public static final int CMDS_PER_PAGE = 10;
 
@@ -33,7 +34,7 @@ public class CommandHelp extends Command {
 		IUser author = message.getAuthor();
 
 		if (args.length >= 2) {
-			Command cmd = CommandRegistry.findCommand(args[1]);
+			ICommand cmd = PrimaryCommandHandler.findCommand(guild, args[1]);
 			if (cmd != null) {
 				EmbedBuilder builder = new EmbedBuilder();
 				builder.withTitle("Help: " + cmd.getName());
@@ -90,9 +91,9 @@ public class CommandHelp extends Command {
 			}
 		}
 
-		List<Command> cmds = CommandRegistry.getCommandsByCategory(category);
-		List<Command> disp = new LinkedList<>();
-		for (Command cmd : cmds)
+		List<ICommand> cmds = PrimaryCommandHandler.getCommandsByCategory(guild, category);
+		List<ICommand> disp = new LinkedList<>();
+		for (ICommand cmd : cmds)
 			if (guild != null
 					&& (author.getPermissionsForGuild(guild).contains(cmd.requiredPermission())
 							|| cmd.requiredPermission() == null)
@@ -110,9 +111,9 @@ public class CommandHelp extends Command {
 		else {
 			String prevCategory = null;
 			EmbedBuilder builder = new EmbedBuilder().appendDescription("**Available Commands:**\n\n");
-			String prefix = CommandRegistry.getPrefix(guild);
+			String prefix = PrimaryCommandHandler.getPrefix(guild);
 			for (int i = 0; i < CMDS_PER_PAGE && (CMDS_PER_PAGE * page) + i < disp.size(); i++) {
-				Command cmd = disp.get((CMDS_PER_PAGE * page) + i);
+				ICommand cmd = disp.get((CMDS_PER_PAGE * page) + i);
 				if (prevCategory == null || !prevCategory.equals(cmd.getCategory())) {
 					builder.appendDesc("**" + cmd.getCategory() + "**" + "\n");
 					prevCategory = cmd.getCategory();

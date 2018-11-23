@@ -8,12 +8,12 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.starota.EnumTeam;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.registry.Command;
-import us.myles_selim.starota.commands.registry.CommandRegistry;
+import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
+import us.myles_selim.starota.commands.registry.java.JavaCommand;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.profiles.ProfileManager;
 
-public class CommandRegister extends Command {
+public class CommandRegister extends JavaCommand {
 
 	public CommandRegister() {
 		super("register", "Registers the given user and assigns them a profile.");
@@ -39,7 +39,7 @@ public class CommandRegister extends Command {
 	@Override
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
 		if (args.length != 5) {
-			channel.sendMessage("**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName()
+			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName()
 					+ " [poGoName] [target] [team] [level]");
 			return;
 		}

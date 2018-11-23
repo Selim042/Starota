@@ -5,10 +5,10 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.registry.Command;
-import us.myles_selim.starota.commands.registry.CommandRegistry;
+import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
+import us.myles_selim.starota.commands.registry.java.JavaCommand;
 
-public class CommandSetResearchChannel extends Command {
+public class CommandSetResearchChannel extends JavaCommand {
 
 	public CommandSetResearchChannel() {
 		super("setResearchChannel", "Sets channels for research functionality.");
@@ -25,7 +25,7 @@ public class CommandSetResearchChannel extends Command {
 			String channelStrings = "";
 			for (EnumResearchChannel c : EnumResearchChannel.values())
 				channelStrings += c.getName() + "/";
-			channel.sendMessage("**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName() + " <"
+			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName() + " <"
 					+ channelStrings.substring(0, channelStrings.length() - 1) + "> <channel>");
 			return;
 		}

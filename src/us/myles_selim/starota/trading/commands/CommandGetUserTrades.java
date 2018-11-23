@@ -8,14 +8,14 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.registry.Command;
-import us.myles_selim.starota.commands.registry.CommandRegistry;
+import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
+import us.myles_selim.starota.commands.registry.java.JavaCommand;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.profiles.ProfileManager;
 import us.myles_selim.starota.trading.Tradeboard;
 import us.myles_selim.starota.trading.TradeboardPost;
 
-public class CommandGetUserTrades extends Command {
+public class CommandGetUserTrades extends JavaCommand {
 
 	public CommandGetUserTrades() {
 		super("getUserTrades", "Get trades either you posted or a specific user.");
@@ -34,7 +34,7 @@ public class CommandGetUserTrades extends Command {
 		else {
 			if (args.length != 2) {
 				channel.sendMessage(
-						"**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName() + " [target]");
+						"**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName() + " [target]");
 				return;
 			}
 			target = Starota.findUser(args[1]);

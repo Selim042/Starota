@@ -5,10 +5,11 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.registry.Command;
-import us.myles_selim.starota.commands.registry.CommandRegistry;
+import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
+import us.myles_selim.starota.commands.registry.java.JavaCommand;
+import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 
-public class CommandRemoveChannelWhitelist extends Command {
+public class CommandRemoveChannelWhitelist extends JavaCommand {
 
 	public CommandRemoveChannelWhitelist() {
 		super("removeChannelWhitelist");
@@ -22,13 +23,13 @@ public class CommandRemoveChannelWhitelist extends Command {
 	@Override
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
 		if (args.length < 3) {
-			channel.sendMessage("**Usage**: " + CommandRegistry.getPrefix(guild) + this.getName()
+			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName()
 					+ " <cmdCategory> <channel>");
 			return;
 		}
 		boolean found = false;
 		String cmdCategory = args[1];
-		for (String cat : CommandRegistry.getAllCategories()) {
+		for (String cat : JavaCommandHandler.getAllCategories()) {
 			if (cmdCategory.equalsIgnoreCase(cat)) {
 				cmdCategory = cat;
 				found = true;
