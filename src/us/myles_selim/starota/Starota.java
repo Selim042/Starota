@@ -52,6 +52,7 @@ import us.myles_selim.starota.trading.commands.CommandGetUserTrades;
 import us.myles_selim.starota.trading.commands.CommandLookingFor;
 import us.myles_selim.starota.trading.commands.CommandRemoveTrade;
 import us.myles_selim.starota.trading.commands.CommandTradeboardHelp;
+import us.myles_selim.starota.webserver.WebServer;
 
 public class Starota {
 
@@ -160,7 +161,7 @@ public class Starota {
 		ProfileManager.init();
 		Tradeboard.init();
 
-		// WebServer.init();
+		WebServer.init();
 
 		// Thread reportThread = new ThreadReport(TEST_SERVER);
 		// reportThread.start();
