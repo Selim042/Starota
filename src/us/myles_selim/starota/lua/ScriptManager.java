@@ -140,6 +140,8 @@ public class ScriptManager {
 	public static List<String> getCommandScripts(IGuild server) {
 		List<String> ret = new ArrayList<>();
 		File folder = new File(SCRIPT_FOLDER, server.getStringID() + File.separator + "commands");
+		if (folder.listFiles(LUA_FILTER) == null)
+			return Collections.emptyList();
 		for (File f : folder.listFiles(LUA_FILTER)) {
 			String name = f.getName();
 			ret.add(name.substring(0, name.length() - LUA_EXENSION.length()));
