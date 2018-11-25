@@ -29,7 +29,6 @@ public class SilphRoadUtils {
 			JsonObject root = PARSER.parse(json).getAsJsonObject();
 			return root.get("data") != null;
 		} catch (IOException e) {
-			Starota.submitError(e);
 			return false;
 		}
 	}
@@ -49,7 +48,6 @@ public class SilphRoadUtils {
 				return null;
 			return dataE.getAsJsonObject().get("avatar").getAsString();
 		} catch (IOException e) {
-			Starota.submitError(e);
 			return null;
 		}
 	}

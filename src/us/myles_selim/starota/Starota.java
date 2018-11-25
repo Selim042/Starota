@@ -363,7 +363,7 @@ public class Starota {
 		builder.withTitle("An " + e.getClass().getSimpleName() + " has been thrown");
 		String body = "";
 		for (StackTraceElement t : e.getStackTrace())
-			body += t;
+			body += t + "\n";
 		builder.appendDesc(body);
 		RequestBuffer.request(() -> reportChannel.sendMessage(builder.build()));
 	}
