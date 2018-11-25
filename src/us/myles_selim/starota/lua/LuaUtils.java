@@ -11,6 +11,7 @@ import org.squiddev.cobalt.LuaTable;
 import org.squiddev.cobalt.LuaValue;
 import org.squiddev.cobalt.ValueFactory;
 import org.squiddev.cobalt.compiler.LuaC;
+import org.squiddev.cobalt.function.VarArgFunction;
 import org.squiddev.cobalt.lib.BaseLib;
 import org.squiddev.cobalt.lib.CoroutineLib;
 import org.squiddev.cobalt.lib.MathLib;
@@ -32,6 +33,7 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import us.myles_selim.ebs.EBStorage;
+import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
 import us.myles_selim.starota.lua.conversion.discord.CategoryConverter;
 import us.myles_selim.starota.lua.conversion.discord.ChannelConverter;
@@ -100,9 +102,15 @@ public class LuaUtils {
 		_G.load(state, new DiscordEventLib(server));
 		_G.rawset("dofile", Constants.NIL);
 		_G.rawset("loadfile", Constants.NIL);
+		if (!Starota.IS_DEV)
+			_G.rawset("print", new VarArgFunction() {});
 		LuaC.install(state);
 		STATES.put(server, state);
 		return state;
+	}
+
+	public static boolean isInitialized(IGuild server) {
+		return STATES.containsKey(server);
 	}
 
 	public static void clearEventHandlers(IGuild server) {
