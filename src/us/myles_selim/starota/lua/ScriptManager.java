@@ -124,8 +124,10 @@ public class ScriptManager {
 		// state.stdout = System.out;
 		LuaTable _G = state.getMainThread().getfenv();
 		try {
-			FileInputStream scriptFile = new FileInputStream(
-					new File(folder, "eventHandler" + LUA_EXENSION));
+			File file = new File(folder, "eventHandler" + LUA_EXENSION);
+			if (file.isDirectory() || !file.exists())
+				return false;
+			FileInputStream scriptFile = new FileInputStream(file);
 			LoadState.load(state, scriptFile, "@eventHandler", _G).call(state);
 			scriptFile.close();
 			return true;
