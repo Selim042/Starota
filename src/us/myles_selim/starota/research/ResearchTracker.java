@@ -78,6 +78,7 @@ public class ResearchTracker {
 				} catch (NumberFormatException | IOException e) {
 					System.out.println("Encountered a " + e.getClass().getSimpleName()
 							+ " error while parsing file " + file.getName());
+					Starota.submitError(e);
 					continue;
 				}
 			}
@@ -97,6 +98,7 @@ public class ResearchTracker {
 					fileOut.write(r.getLongId() + ":" + r.getPosts() + '\n');
 				fileOut.close();
 			} catch (NumberFormatException | IOException e) {
+				Starota.submitError(e);
 				continue;
 			}
 		}

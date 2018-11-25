@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import us.myles_selim.starota.Starota;
+
 public class FormManager {
 
 	public static final int MAX_DEX = 386;
@@ -112,6 +114,7 @@ public class FormManager {
 				SHINYABLE.add(Integer.parseInt(p));
 			reader.close();
 		} catch (IOException e) {
+			Starota.submitError(e);
 			e.printStackTrace();
 		}
 	}
@@ -168,6 +171,7 @@ public class FormManager {
 				writer.append(p + ",");
 			writer.close();
 		} catch (IOException e) {
+			Starota.submitError(e);
 			e.printStackTrace();
 		}
 	}

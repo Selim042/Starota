@@ -31,6 +31,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IMessage.Attachment;
+import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
 
 public class ScriptManager {
@@ -65,6 +66,7 @@ public class ScriptManager {
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
+			Starota.submitError(e);
 			return false;
 		}
 	}
@@ -79,6 +81,7 @@ public class ScriptManager {
 		} catch (IOException e) {
 			System.out.println("Attempting to remove " + name + " script for " + server.getName());
 			e.printStackTrace();
+			Starota.submitError(e);
 			return false;
 		}
 		// return false;
@@ -124,13 +127,17 @@ public class ScriptManager {
 		// state.stdout = System.out;
 		LuaTable _G = state.getMainThread().getfenv();
 		try {
-			FileInputStream scriptFile = new FileInputStream(
-					new File(folder, "eventHandler" + LUA_EXENSION));
+			File file = new File(folder, "eventHandler" + LUA_EXENSION);
+			if (file.isDirectory() || !file.exists())
+				return false;
+			FileInputStream scriptFile = new FileInputStream(file);
 			LoadState.load(state, scriptFile, "@eventHandler", _G).call(state);
 			scriptFile.close();
 			return true;
 		} catch (LuaError | CompileException | IOException e) {
 			e.printStackTrace();
+			if (!(e instanceof LuaError))
+				Starota.submitError(e);
 			return false;
 		}
 	}
@@ -138,6 +145,8 @@ public class ScriptManager {
 	public static List<String> getCommandScripts(IGuild server) {
 		List<String> ret = new ArrayList<>();
 		File folder = new File(SCRIPT_FOLDER, server.getStringID() + File.separator + "commands");
+		if (folder.listFiles(LUA_FILTER) == null)
+			return Collections.emptyList();
 		for (File f : folder.listFiles(LUA_FILTER)) {
 			String name = f.getName();
 			ret.add(name.substring(0, name.length() - LUA_EXENSION.length()));
@@ -161,6 +170,7 @@ public class ScriptManager {
 			return response.toString();
 		} catch (IOException e) {
 			e.printStackTrace();
+			Starota.submitError(e);
 			return null;
 		}
 	}

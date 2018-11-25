@@ -8,7 +8,7 @@ import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
-import us.myles_selim.starota.webserver.WebServer;
+import us.myles_selim.starota.lua.LuaUtils;
 
 public class CommandStatus extends JavaCommand {
 
@@ -28,7 +28,9 @@ public class CommandStatus extends JavaCommand {
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.withTitle(Starota.getClient().getOurUser().getDisplayName(guild) + " Status");
 			builder.appendField("Discord:", Starota.getClient().isReady() ? "Online" : "Offline", true);
-			builder.appendField("Webserver:", WebServer.isRunning() ? "Online" : "Offline", true);
+			if (Starota.canUseLua(guild))
+				builder.appendField("Lua:",
+						LuaUtils.isInitialized(guild) ? "Initialized" : "Uninitalized", true);
 			channel.sendMessage(builder.build());
 		}
 	}
