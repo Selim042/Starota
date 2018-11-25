@@ -31,6 +31,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IMessage.Attachment;
+import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
 
 public class ScriptManager {
@@ -65,6 +66,7 @@ public class ScriptManager {
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
+			Starota.submitError(e);
 			return false;
 		}
 	}
@@ -79,6 +81,7 @@ public class ScriptManager {
 		} catch (IOException e) {
 			System.out.println("Attempting to remove " + name + " script for " + server.getName());
 			e.printStackTrace();
+			Starota.submitError(e);
 			return false;
 		}
 		// return false;
@@ -133,6 +136,8 @@ public class ScriptManager {
 			return true;
 		} catch (LuaError | CompileException | IOException e) {
 			e.printStackTrace();
+			if (!(e instanceof LuaError))
+				Starota.submitError(e);
 			return false;
 		}
 	}
@@ -165,6 +170,7 @@ public class ScriptManager {
 			return response.toString();
 		} catch (IOException e) {
 			e.printStackTrace();
+			Starota.submitError(e);
 			return null;
 		}
 	}

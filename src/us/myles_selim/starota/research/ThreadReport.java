@@ -34,6 +34,7 @@ public class ThreadReport extends Thread {
 			try {
 				Thread.sleep(3600000);
 			} catch (InterruptedException e) {
+				Starota.submitError(e);
 				e.printStackTrace();
 			}
 		}

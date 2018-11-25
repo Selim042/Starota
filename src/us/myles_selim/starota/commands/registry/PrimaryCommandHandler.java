@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.squiddev.cobalt.LuaError;
+
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.obj.ReactionEmoji;
@@ -63,6 +65,8 @@ public class PrimaryCommandHandler {
 			});
 			System.err.println("executed command: " + message.getContent());
 			e.printStackTrace();
+			if (!(e instanceof LuaError))
+				Starota.submitError(e);
 		}
 		RequestBuffer.request(() -> {
 			channel.setTypingStatus(false);

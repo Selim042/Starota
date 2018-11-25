@@ -10,6 +10,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import us.myles_selim.starota.Starota;
+
 public class SilphRoadUtils {
 
 	private static final String API_URL = "https://sil.ph/";
@@ -27,6 +29,7 @@ public class SilphRoadUtils {
 			JsonObject root = PARSER.parse(json).getAsJsonObject();
 			return root.get("data") != null;
 		} catch (IOException e) {
+			Starota.submitError(e);
 			return false;
 		}
 	}
@@ -46,6 +49,7 @@ public class SilphRoadUtils {
 				return null;
 			return dataE.getAsJsonObject().get("avatar").getAsString();
 		} catch (IOException e) {
+			Starota.submitError(e);
 			return null;
 		}
 	}

@@ -13,6 +13,7 @@ import org.squiddev.cobalt.ValueFactory;
 import org.squiddev.cobalt.function.OneArgFunction;
 import org.squiddev.cobalt.lib.platform.AbstractResourceManipulator;
 
+import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.lua.conversion.starota.PlayerProfileConverter;
 import us.myles_selim.starota.profiles.PlayerProfile;
 
@@ -55,7 +56,9 @@ public class ConversionHandler {
 			});
 			val.setMetatable(state, mt);
 			return val;
-		} catch (LuaError e) {}
+		} catch (LuaError e) {
+			Starota.submitError(e);
+		}
 		return null;
 	}
 
@@ -72,6 +75,7 @@ public class ConversionHandler {
 			IConverter conv = CONVERTERS.get(clazz);
 			return conv.toJava(state, val);
 		} catch (ClassNotFoundException | LuaError e) {
+			Starota.submitError(e);
 			return null;
 		}
 	}
