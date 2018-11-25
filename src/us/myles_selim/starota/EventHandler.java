@@ -24,6 +24,8 @@ public class EventHandler {
 
 	@EventSubscriber
 	public void onMessageRecieved(MessageReceivedEvent event) {
+		if (event.getGuild().getLongID() == Starota.SUPPORT_SERVER)
+			return;
 		if (Starota.DEBUG)
 			System.out.println("Channel: " + event.getChannel() + ", Author: " + event.getAuthor()
 					+ ", Message: " + event.getMessage());

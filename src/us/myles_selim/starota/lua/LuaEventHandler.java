@@ -12,6 +12,7 @@ import sx.blah.discord.handle.impl.events.guild.GuildEvent;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.util.RequestBuffer;
+import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.lua.libraries.DiscordEventLib;
 
 public class LuaEventHandler {
@@ -20,6 +21,8 @@ public class LuaEventHandler {
 
 	@EventSubscriber
 	public void onDiscordEvent(GuildEvent event) {
+		if (event.getGuild().getLongID() == Starota.SUPPORT_SERVER)
+			return;
 		// if (event instanceof MessageReceivedEvent)
 		// if (((MessageReceivedEvent)
 		// event).getMessage().getContent().equals("toggle"))

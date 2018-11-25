@@ -59,6 +59,7 @@ public class Starota {
 	private static final Properties PROPERTIES = new Properties();
 
 	public static final long SELIM_USER_ID = 134855940938661889L;
+	public static final long SUPPORT_SERVER = 436614503606779914L;
 	public static final String SUPPORT_SERVER_LINK = "https://discord.gg/NxverNw";
 
 	// public static final long TEST_SERVER = 481646364716040202L;
@@ -340,7 +341,7 @@ public class Starota {
 		if (server == null)
 			return false;
 		IUser owner = server.getOwner();
-		IGuild supportServer = getGuild(436614503606779914L); // support server
+		IGuild supportServer = getGuild(SUPPORT_SERVER); // support server
 		if (!supportServer.getUsers().contains(owner))
 			return false;
 		if (owner.getLongID() == supportServer.getOwnerLongID())
