@@ -48,6 +48,8 @@ import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.trading.Tradeboard;
 import us.myles_selim.starota.trading.commands.CommandFindTrade;
 import us.myles_selim.starota.trading.commands.CommandForTrade;
+import us.myles_selim.starota.trading.commands.CommandGetForms;
+import us.myles_selim.starota.trading.commands.CommandGetShinies;
 import us.myles_selim.starota.trading.commands.CommandGetTrade;
 import us.myles_selim.starota.trading.commands.CommandGetUserTrades;
 import us.myles_selim.starota.trading.commands.CommandLookingFor;
@@ -136,9 +138,10 @@ public class Starota {
 		JavaCommandHandler.registerCommand("Groups", new CommandSetAsGroup());
 
 		JavaCommandHandler.registerCommand("Tradeboard", new CommandTradeboardHelp());
-		// CommandRegistry.registerCommand("Tradeboard", new CommandGetForms());
-		// CommandRegistry.registerCommand("Tradeboard", new
-		// CommandGetShinies());
+		if (IS_DEV) {
+			JavaCommandHandler.registerCommand("Tradeboard", new CommandGetForms());
+			JavaCommandHandler.registerCommand("Tradeboard", new CommandGetShinies());
+		}
 		JavaCommandHandler.registerCommand("Tradeboard", new CommandForTrade());
 		JavaCommandHandler.registerCommand("Tradeboard", new CommandGetUserTrades());
 		JavaCommandHandler.registerCommand("Tradeboard", new CommandFindTrade());

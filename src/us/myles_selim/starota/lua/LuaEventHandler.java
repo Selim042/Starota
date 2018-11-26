@@ -21,7 +21,7 @@ public class LuaEventHandler {
 
 	@EventSubscriber
 	public void onDiscordEvent(GuildEvent event) {
-		if (event.getGuild().getLongID() == Starota.SUPPORT_SERVER)
+		if (event.getGuild() == null || event.getGuild().getLongID() == Starota.SUPPORT_SERVER)
 			return;
 		// if (event instanceof MessageReceivedEvent)
 		// if (((MessageReceivedEvent)

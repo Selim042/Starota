@@ -137,31 +137,40 @@ public class FormManager {
 		return SHINYABLE.contains(id);
 	}
 
-	public static void removeExcluded(EnumPokemon pokemon) {
-		removeExcluded(pokemon.getId());
+	public static boolean removeExcluded(EnumPokemon pokemon) {
+		return removeExcluded(pokemon.getId());
 	}
 
-	public static void removeExcluded(int id) {
+	public static boolean removeExcluded(int id) {
+		if (EXCLUDED.contains(id))
+			return false;
 		EXCLUDED.remove(new Integer(id));
 		writeListToFile(new File(MANAGER_FOLDER, "excluded.dat"), EXCLUDED);
+		return true;
 	}
 
-	public static void addForceEnable(EnumPokemon pokemon) {
-		addForceEnable(pokemon.getId());
+	public static boolean addForceEnable(EnumPokemon pokemon) {
+		return addForceEnable(pokemon.getId());
 	}
 
-	public static void addForceEnable(int id) {
+	public static boolean addForceEnable(int id) {
+		if (FORCE_ENABLE.contains(id))
+			return false;
 		FORCE_ENABLE.add(new Integer(id));
 		writeListToFile(new File(MANAGER_FOLDER, "forceEnable.dat"), FORCE_ENABLE);
+		return true;
 	}
 
-	public static void addShinyable(EnumPokemon pokemon) {
-		addShinyable(pokemon.getId());
+	public static boolean addShinyable(EnumPokemon pokemon) {
+		return addShinyable(pokemon.getId());
 	}
 
-	public static void addShinyable(int id) {
+	public static boolean addShinyable(int id) {
+		if (SHINYABLE.contains(id))
+			return false;
 		SHINYABLE.add(new Integer(id));
 		writeListToFile(new File(MANAGER_FOLDER, "shinyable.dat"), SHINYABLE);
+		return true;
 	}
 
 	private static void writeListToFile(File file, List<Integer> list) {
