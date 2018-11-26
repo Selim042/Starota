@@ -107,7 +107,6 @@ public class EventHandler {
 		EnumPokemon pokemon = EnumPokemon.getPokemon(args[1]);
 		if (pokemon == null)
 			pokemon = EnumPokemon.getPokemon(Integer.parseInt(args[1]));
-		System.out.println(pokemon);
 		switch (args[0].toLowerCase()) {
 		case ".removeexclude":
 			if (FormManager.removeExcluded(pokemon))

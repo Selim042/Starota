@@ -25,6 +25,7 @@ public class FormSetAlolan extends FormSet {
 		public boolean canBeShiny(EnumPokemon pokemon) {
 			switch (pokemon) {
 			case MAROWAK:
+			case RAICHU:
 				return true;
 			default:
 				return false;
