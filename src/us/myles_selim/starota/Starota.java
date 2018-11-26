@@ -361,7 +361,7 @@ public class Starota {
 	}
 
 	public static void submitError(Throwable e) {
-		if (CLIENT == null || !CLIENT.isReady())
+		if (IS_DEV || CLIENT == null || !CLIENT.isReady())
 			return;
 		long reportChannelId = 516301004434571313L;
 		IChannel reportChannel = CLIENT.getChannelByID(reportChannelId);
