@@ -1,4 +1,4 @@
-package us.myles_selim.starota.leaderboard;
+package us.myles_selim.starota.leaderboards;
 
 import sx.blah.discord.handle.obj.IUser;
 import us.myles_selim.starota.Starota;

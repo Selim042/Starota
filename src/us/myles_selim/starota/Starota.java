@@ -27,6 +27,8 @@ import us.myles_selim.starota.commands.CommandSupportStarota;
 import us.myles_selim.starota.commands.CommandTest;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
+import us.myles_selim.starota.leaderboards.commands.CommandEditLeaderboard;
+import us.myles_selim.starota.leaderboards.commands.CommandUpdateLeaderboard;
 import us.myles_selim.starota.lua.LuaEventHandler;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.commands.CommandUploadScript;
@@ -121,8 +123,8 @@ public class Starota {
 		JavaCommandHandler.registerCommand("Administrative", new CommandSetResearchChannel());
 		JavaCommandHandler.registerCommand("Administrative", new CommandChangelogChannel());
 		if (IS_DEV) {
-			JavaCommandHandler.registerCommand("Testing", new CommandGetTop());
-			JavaCommandHandler.registerCommand("Testing", new CommandTest());
+			JavaCommandHandler.registerCommand("Debug", new CommandGetTop());
+			JavaCommandHandler.registerCommand("Debug", new CommandTest());
 		}
 
 		JavaCommandHandler.registerCommand("Profiles", new CommandRegister());
@@ -139,8 +141,8 @@ public class Starota {
 
 		JavaCommandHandler.registerCommand("Tradeboard", new CommandTradeboardHelp());
 		if (IS_DEV) {
-			JavaCommandHandler.registerCommand("Tradeboard", new CommandGetForms());
-			JavaCommandHandler.registerCommand("Tradeboard", new CommandGetShinies());
+			JavaCommandHandler.registerCommand("Debug", new CommandGetForms());
+			JavaCommandHandler.registerCommand("Debug", new CommandGetShinies());
 		}
 		JavaCommandHandler.registerCommand("Tradeboard", new CommandForTrade());
 		JavaCommandHandler.registerCommand("Tradeboard", new CommandGetUserTrades());
@@ -150,6 +152,9 @@ public class Starota {
 		JavaCommandHandler.registerCommand("Tradeboard", new CommandRemoveTrade());
 
 		JavaCommandHandler.registerCommand("Lua", new CommandUploadScript());
+
+		JavaCommandHandler.registerCommand("Leaderboards", new CommandEditLeaderboard());
+		JavaCommandHandler.registerCommand("Leaderboards", new CommandUpdateLeaderboard());
 
 		try {
 			Thread.sleep(2500);

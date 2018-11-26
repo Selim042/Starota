@@ -1,4 +1,4 @@
-package us.myles_selim.starota.leaderboard;
+package us.myles_selim.starota.leaderboards;
 
 import java.text.NumberFormat;
 import java.util.Collections;
