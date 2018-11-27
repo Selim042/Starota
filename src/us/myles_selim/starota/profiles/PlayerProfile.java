@@ -5,18 +5,33 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.EnumTeam;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.embed_converter.annotations.EmbedAuthorIcon;
+import us.myles_selim.starota.embed_converter.annotations.EmbedAuthorName;
+import us.myles_selim.starota.embed_converter.annotations.EmbedColor;
+import us.myles_selim.starota.embed_converter.annotations.EmbedField;
+import us.myles_selim.starota.embed_converter.annotations.EmbedFooterText;
+import us.myles_selim.starota.embed_converter.annotations.EmbedThumbnail;
+import us.myles_selim.starota.embed_converter.annotations.EmbedTimestamp;
+import us.myles_selim.starota.embed_converter.annotations.EmbedTitle;
 
+@EmbedAuthorName("%poGoName%")
+@EmbedFooterText("Profile last updated")
+@EmbedTitle("Profile for %poGoName%:")
 public class PlayerProfile {
 
+	@EmbedField(value = "Real Name:", isInline = true, order = 2)
 	private String realName;
 	private String poGoName;
+	@EmbedField(value = "Trainer Level:", isInline = true, order = 0)
 	private int level;
 	private long trainerCode = -1;
+	@EmbedField(value = "Team:", isInline = true, order = 1)
 	private EnumTeam team;
 	private long discordId;
 	private Map<String, Long> alts;
@@ -72,7 +87,10 @@ public class PlayerProfile {
 		return this;
 	}
 
+	@EmbedField(value = "Trainer Code:", isInline = true, order = 3)
 	public String getTrainerCodeString() {
+		if (this.trainerCode == -1)
+			return null;
 		return ProfileManager.getTrainerCodeString(this.trainerCode);
 	}
 
@@ -110,6 +128,69 @@ public class PlayerProfile {
 		if (this.lastUpdated == 0)
 			this.lastUpdated = System.currentTimeMillis() / 1000;
 		return Instant.ofEpochSecond(this.lastUpdated);
+	}
+
+	@EmbedField(value = "Silph Road Card:", order = 5)
+	public String getSilphRoadCard() {
+		return SilphRoadUtils.getCard(this.poGoName);
+	}
+
+	// only for EmbedConverter
+	@EmbedField(value = "Alternate Accounts:", order = 4)
+	private String altAccounts() {
+		if (this.alts == null || this.alts.isEmpty())
+			return null;
+		String ret = "";
+		for (Entry<String, Long> e : this.alts.entrySet())
+			ret += "- **" + e.getKey() + "**: " + ProfileManager.getTrainerCodeString(e.getValue());
+		return ret;
+	}
+
+	// only for EmbedConverter
+	@EmbedField(value = "Discord User:", order = 6)
+	private String discordUser() {
+		IUser user = Starota.getUser(this.discordId);
+		// String nickname = user.getNicknameForGuild(server);
+		// if (nickname != null)
+		// return nickname + " (_" + user.getName() + "#" +
+		// user.getDiscriminator() + "_)";
+		// else
+		return user.getName() + "#" + user.getDiscriminator();
+	}
+
+	// only for EmbedConverter
+	@EmbedField(value = "Patron:", order = 7)
+	private String patron() {
+		IRole patronRole = Starota.getPatronRole(Starota.getUser(this.discordId));
+		if (patronRole != null)
+			return patronRole.getName();
+		return null;
+	}
+
+	// only for EmbedConverter
+	@EmbedColor
+	private int teamColor() {
+		return this.team.getColor();
+	}
+
+	// only for EmbedConverter
+	@EmbedAuthorIcon
+	private String authorIcon() {
+		return Starota.getUser(this.discordId).getAvatarURL();
+	}
+
+	// only for EmbedConverter
+	@EmbedThumbnail
+	private String thumbnail() {
+		if (SilphRoadUtils.hasCard(this.poGoName))
+			return SilphRoadUtils.getCardAvatar(this.poGoName);
+		return this.team.getIcon();
+	}
+
+	// only for EmbedConverter
+	@EmbedTimestamp
+	private long timestamp() {
+		return this.lastUpdated;
 	}
 
 	public static class DataTypePlayerProfile extends DataType<PlayerProfile> {

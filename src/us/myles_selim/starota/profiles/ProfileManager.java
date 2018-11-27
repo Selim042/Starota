@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.ebs.EBStorage;
@@ -161,6 +162,10 @@ public class ProfileManager {
 				builder.appendField("Discord User:", user.getName() + "#" + user.getDiscriminator(),
 						false);
 		}
+
+		IRole patronRole = Starota.getPatronRole(user);
+		if (patronRole != null)
+			builder.appendField("Patron:", patronRole.getName(), true);
 
 		builder.withFooterText("Profile last updated");
 		builder.withTimestamp(profile.getLastUpdated());

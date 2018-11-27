@@ -3,6 +3,7 @@ package us.myles_selim.starota;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -346,6 +347,10 @@ public class Starota {
 		return null;
 	}
 
+	public static IGuild getSupportServer() {
+		return getGuild(SUPPORT_SERVER);
+	}
+
 	public static boolean canUseLua(IGuild server) {
 		if (server == null)
 			return false;
@@ -358,6 +363,27 @@ public class Starota {
 		IRole requiredRole = supportServer.getRoleByID(436617921620606976L); // supporter
 																				// role
 		return owner.hasRole(requiredRole);
+	}
+
+	public static IRole getPatronRole(IUser user) {
+		IGuild supportServer = getSupportServer();
+		if (!supportServer.getUsers().contains(user))
+			return null;
+		List<IRole> supportRoles = supportServer.getRoles();
+		List<IRole> patronRoles = new ArrayList<>();
+		boolean inRange = false;
+		for (IRole r : supportRoles) {
+			if (r.getName().equals("MARKER")) {
+				inRange = !inRange;
+				continue;
+			}
+			if (inRange)
+				patronRoles.add(r);
+		}
+		patronRoles.retainAll(user.getRolesForGuild(supportServer));
+		if (patronRoles.size() > 0)
+			return patronRoles.get(0);
+		return null;
 	}
 
 	public static void submitError(Throwable e) {
