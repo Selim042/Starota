@@ -31,6 +31,7 @@ public class CommandSupportStarota extends JavaCommand {
 				+ "If you visit the Patreon below you can support " + Starota.BOT_NAME
 				+ " and its developers.\n"
 				+ "Every penny counts, but don't feel like you must donate if you use the bot.\n"
+				+ "Supporting Starota may allow access to additional features.  More information on Patreon.\n"
 				+ "https://patreon.com/Selim_042");
 		RequestBuffer.request((IVoidRequest) () -> {
 			channel.sendMessage(builder.build());
