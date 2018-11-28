@@ -137,7 +137,7 @@ public class EmbedConverter {
 				if (timestamp.value() == -1) {
 					Object val = getFieldValue(obj, f);
 					if (val instanceof Long)
-						builder.withTimestamp((long) val);
+						builder.withTimestamp((Long) val);
 				}
 			}
 			if (f.isAnnotationPresent(EmbedFooterText.class)) {
@@ -224,7 +224,7 @@ public class EmbedConverter {
 				if (timestamp.value() == -1) {
 					Object val = getMethodValue(obj, m);
 					if (val instanceof Long)
-						builder.withTimestamp((long) val);
+						builder.withTimestamp((Long) val);
 				}
 			}
 			if (m.isAnnotationPresent(EmbedFooterText.class)) {
@@ -284,18 +284,12 @@ public class EmbedConverter {
 			Object val = getFieldValue(obj, f);
 			if (val == null)
 				continue;
-			if (val instanceof Map)
-				name = name.replaceAll("\\%" + f.getName() + "\\%", mapToString((Map<?, ?>) val));
-			else
 				name = name.replaceAll("\\%" + f.getName() + "\\%", val.toString());
 		}
 		for (Method m : obj.getClass().getDeclaredMethods()) {
 			Object val = getMethodValue(obj, m);
 			if (val == null)
 				continue;
-			if (val instanceof Map)
-				name = name.replaceAll("\\%" + m.getName() + "\\%", mapToString((Map<?, ?>) val));
-			else
 				name = name.replaceAll("\\%" + m.getName() + "\\%", val.toString());
 		}
 		return name;
@@ -338,13 +332,6 @@ public class EmbedConverter {
 		}
 		method.setAccessible(accessible);
 		return val;
-	}
-
-	private static String mapToString(Map<?, ?> map) {
-		String ret = "";
-		for (Entry<?, ?> e : map.entrySet())
-			ret += " - **" + e.getKey() + "**: " + e.getValue();
-		return ret;
 	}
 
 }

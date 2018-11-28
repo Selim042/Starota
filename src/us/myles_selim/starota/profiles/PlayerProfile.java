@@ -20,7 +20,6 @@ import us.myles_selim.starota.embed_converter.annotations.EmbedThumbnail;
 import us.myles_selim.starota.embed_converter.annotations.EmbedTimestamp;
 import us.myles_selim.starota.embed_converter.annotations.EmbedTitle;
 
-@EmbedAuthorName("%poGoName%")
 @EmbedFooterText("Profile last updated")
 @EmbedTitle("Profile for %poGoName%:")
 public class PlayerProfile {
@@ -180,6 +179,12 @@ public class PlayerProfile {
 	}
 
 	// only for EmbedConverter
+	@EmbedAuthorName
+	private String authorText() {
+		return Starota.getUser(this.discordId).getName();
+	}
+
+	// only for EmbedConverter
 	@EmbedThumbnail
 	private String thumbnail() {
 		if (SilphRoadUtils.hasCard(this.poGoName))
@@ -190,7 +195,7 @@ public class PlayerProfile {
 	// only for EmbedConverter
 	@EmbedTimestamp
 	private long timestamp() {
-		return this.lastUpdated;
+		return this.lastUpdated * 1000;
 	}
 
 	public static class DataTypePlayerProfile extends DataType<PlayerProfile> {
