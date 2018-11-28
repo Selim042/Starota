@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import sx.blah.discord.handle.obj.IGuild;
 import us.myles_selim.ebs.IOHelper;
@@ -15,6 +16,7 @@ public class LeaderboardManager {
 
 	private static boolean inited = false;
 	private static final Map<Long, List<Leaderboard>> LEADERBOARDS = new HashMap<>();
+	private static final File LEADERBOARD_FOLDER = new File(Starota.DATA_FOLDER, "leaderboard");
 
 	public static void init() {
 		if (inited)
@@ -23,7 +25,7 @@ public class LeaderboardManager {
 
 		if (!Starota.DATA_FOLDER.exists())
 			Starota.DATA_FOLDER.mkdirs();
-		File[] files = new File(Starota.DATA_FOLDER, "leaderboard").listFiles(new FileFilter() {
+		File[] files = LEADERBOARD_FOLDER.listFiles(new FileFilter() {
 
 			@Override
 			public boolean accept(File pathname) {
@@ -38,8 +40,8 @@ public class LeaderboardManager {
 		});
 		if (files != null) {
 			for (File file : files) {
-				File[] nestFiles = file.listFiles(IOHelper.EBS_FILE_FILTER);
-				if (nestFiles == null)
+				File[] nestFiles = file.listFiles(IOHelper.EBS_LIST_FILE_FILTER);
+				if (nestFiles == null || nestFiles.length == 0)
 					continue;
 				long serverId = Long.parseLong(file.getName());
 				List<Leaderboard> boards = LEADERBOARDS.get(serverId);
@@ -55,11 +57,46 @@ public class LeaderboardManager {
 	}
 
 	public static void flush() {
-		// TODO: implement
+		if (!Starota.DATA_FOLDER.exists())
+			Starota.DATA_FOLDER.mkdirs();
+		for (Entry<Long, List<Leaderboard>> e : LEADERBOARDS.entrySet()) {
+			File serverFolder = new File(LEADERBOARD_FOLDER, Long.toString(e.getKey()));
+			if (!serverFolder.exists())
+				serverFolder.mkdirs();
+			for (Leaderboard b : e.getValue()) {
+				IOHelper.writeEBStorage(b.toStorage(),
+						new File(serverFolder, b.getDisplayName() + IOHelper.EBS_LIST_EXTENSION));
+			}
+		}
 	}
 
-	public static void newLeaderboard(IGuild guild, Leaderboard board) {
-		// TODO: implement
+	public static void flush(IGuild guild) {
+		if (!LEADERBOARDS.containsKey(guild.getLongID()))
+			return;
+		List<Leaderboard> boards = LEADERBOARDS.get(guild.getLongID());
+		File serverFolder = new File(LEADERBOARD_FOLDER, Long.toString(guild.getLongID()));
+		if (!serverFolder.exists())
+			serverFolder.mkdirs();
+		for (Leaderboard b : boards) {
+			IOHelper.writeEBStorage(b.toStorage(),
+					new File(serverFolder, b.getDisplayName() + IOHelper.EBS_LIST_EXTENSION));
+		}
+	}
+
+	public static Leaderboard newLeaderboard(IGuild guild, String name) {
+		Leaderboard testBoard = getLeaderboard(guild, name);
+		if (testBoard != null)
+			return null;
+		List<Leaderboard> boards = LEADERBOARDS.get(guild.getLongID());
+		if (boards == null) {
+			boards = new ArrayList<>();
+			LEADERBOARDS.put(guild.getLongID(), boards);
+		}
+		Leaderboard board = new Leaderboard(guild, name);
+		board.addAlias(name.replaceAll(" ", "_"));
+		boards.add(board);
+		flush();
+		return board;
 	}
 
 	public static Leaderboard getLeaderboard(IGuild guild, String name) {
@@ -75,6 +112,13 @@ public class LeaderboardManager {
 					return b;
 		}
 		return null;
+	}
+
+	public static Leaderboard getLeaderboardActive(IGuild guild, String name) {
+		Leaderboard board = getLeaderboard(guild, name);
+		if (!board.isActive())
+			return null;
+		return board;
 	}
 
 	private static boolean stringArrayContainsIgnoreCase(String[] arr, String val) {

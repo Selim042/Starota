@@ -12,3 +12,5 @@ starotaData/options/*
 starotaData/profiles/*
 starotaData/tradeboard/*
 starotaData/lua/*
+starotaData/leaderboard/*
+/target/

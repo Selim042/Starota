@@ -28,7 +28,10 @@ import us.myles_selim.starota.commands.CommandSupportStarota;
 import us.myles_selim.starota.commands.CommandTest;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
+import us.myles_selim.starota.leaderboards.LeaderboardManager;
 import us.myles_selim.starota.leaderboards.commands.CommandEditLeaderboard;
+import us.myles_selim.starota.leaderboards.commands.CommandGetLeaderboard;
+import us.myles_selim.starota.leaderboards.commands.CommandNewLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandUpdateLeaderboard;
 import us.myles_selim.starota.lua.LuaEventHandler;
 import us.myles_selim.starota.lua.LuaUtils;
@@ -154,8 +157,10 @@ public class Starota {
 
 		JavaCommandHandler.registerCommand("Lua", new CommandUploadScript());
 
-		JavaCommandHandler.registerCommand("Leaderboards", new CommandEditLeaderboard());
-		JavaCommandHandler.registerCommand("Leaderboards", new CommandUpdateLeaderboard());
+		JavaCommandHandler.registerCommand("Leaderboard", new CommandEditLeaderboard());
+		JavaCommandHandler.registerCommand("Leaderboard", new CommandUpdateLeaderboard());
+		JavaCommandHandler.registerCommand("Leaderboard", new CommandNewLeaderboard());
+		JavaCommandHandler.registerCommand("Leaderboard", new CommandGetLeaderboard());
 
 		try {
 			Thread.sleep(2500);
@@ -170,6 +175,7 @@ public class Starota {
 		ResearchTracker.init();
 		ProfileManager.init();
 		Tradeboard.init();
+		LeaderboardManager.init();
 
 		// WebServer.init();
 
