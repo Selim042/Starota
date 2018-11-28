@@ -1,5 +1,7 @@
 package us.myles_selim.starota.leaderboards.commands;
 
+import java.util.List;
+
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
@@ -17,6 +19,13 @@ public class CommandEditLeaderboard extends JavaCommand {
 	public CommandEditLeaderboard() {
 		super("editLeaderboard",
 				"Edits the properties of an existing leaderboard or creates a new one.");
+	}
+
+	@Override
+	public List<String> getAliases() {
+		List<String> aliases = super.getAliases();
+		aliases.add("editLb");
+		return aliases;
 	}
 
 	@Override

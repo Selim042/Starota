@@ -1,5 +1,7 @@
 package us.myles_selim.starota.leaderboards.commands;
 
+import java.util.List;
+
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
@@ -13,6 +15,13 @@ public class CommandNewLeaderboard extends JavaCommand {
 
 	public CommandNewLeaderboard() {
 		super("newLeaderboard", "Creates a new inactive leaderboard.");
+	}
+
+	@Override
+	public List<String> getAliases() {
+		List<String> aliases = super.getAliases();
+		aliases.add("newLb");
+		return aliases;
 	}
 
 	@Override

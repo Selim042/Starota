@@ -44,15 +44,20 @@ public class CommandUpdateLeaderboard extends JavaCommand {
 			return;
 		}
 		LeaderboardEntry entry = board.getEntry(user.getLongID());
-		if (entry != null) {
-			long oldStat = entry.getValue();
-			board.updateEntry(new LeaderboardEntry(user, Long.decode(args[2])));
-			channel.sendMessage(
-					"Updated your statistic on " + board.getDisplayName() + " from " + oldStat,
-					board.toEmbed());
-		} else {
-			board.updateEntry(new LeaderboardEntry(user, Long.decode(args[2])));
-			channel.sendMessage("Updated your statistic on " + board.getDisplayName(), board.toEmbed());
+		try {
+			if (entry != null) {
+				long oldStat = entry.getValue();
+				board.updateEntry(new LeaderboardEntry(user, Long.decode(args[2])));
+				channel.sendMessage(
+						"Updated your statistic on " + board.getDisplayName() + " from " + oldStat,
+						board.toEmbed());
+			} else {
+				board.updateEntry(new LeaderboardEntry(user, Long.decode(args[2])));
+				channel.sendMessage("Updated your statistic on " + board.getDisplayName(),
+						board.toEmbed());
+			}
+		} catch (NumberFormatException e) {
+			channel.sendMessage("Invalid input, please try again");
 		}
 	}
 

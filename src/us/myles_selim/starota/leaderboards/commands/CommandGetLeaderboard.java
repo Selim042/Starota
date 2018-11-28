@@ -21,6 +21,7 @@ public class CommandGetLeaderboard extends JavaCommand {
 	public List<String> getAliases() {
 		List<String> aliases = super.getAliases();
 		aliases.add("lb");
+		aliases.add("getLb");
 		return aliases;
 	}
 

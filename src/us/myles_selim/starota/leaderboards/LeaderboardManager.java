@@ -3,6 +3,7 @@ package us.myles_selim.starota.leaderboards;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,6 +98,22 @@ public class LeaderboardManager {
 		boards.add(board);
 		flush();
 		return board;
+	}
+
+	public static List<Leaderboard> getLeaderboards(IGuild guild) {
+		if (!LEADERBOARDS.containsKey(guild.getLongID()))
+			return Collections.emptyList();
+		return Collections.unmodifiableList(LEADERBOARDS.get(guild.getLongID()));
+	}
+
+	public static List<Leaderboard> getLeaderboardsActive(IGuild guild) {
+		if (!LEADERBOARDS.containsKey(guild.getLongID()))
+			return Collections.emptyList();
+		List<Leaderboard> boards = new ArrayList<>();
+		for (Leaderboard b : LEADERBOARDS.get(guild.getLongID()))
+			if (b.isActive())
+				boards.add(b);
+		return Collections.unmodifiableList(boards);
 	}
 
 	public static Leaderboard getLeaderboard(IGuild guild, String name) {

@@ -31,6 +31,7 @@ import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 import us.myles_selim.starota.leaderboards.LeaderboardManager;
 import us.myles_selim.starota.leaderboards.commands.CommandEditLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandGetLeaderboard;
+import us.myles_selim.starota.leaderboards.commands.CommandListLeaderboards;
 import us.myles_selim.starota.leaderboards.commands.CommandNewLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandUpdateLeaderboard;
 import us.myles_selim.starota.lua.LuaEventHandler;
@@ -161,6 +162,7 @@ public class Starota {
 		JavaCommandHandler.registerCommand("Leaderboard", new CommandUpdateLeaderboard());
 		JavaCommandHandler.registerCommand("Leaderboard", new CommandNewLeaderboard());
 		JavaCommandHandler.registerCommand("Leaderboard", new CommandGetLeaderboard());
+		JavaCommandHandler.registerCommand("Leaderboard", new CommandListLeaderboards());
 
 		try {
 			Thread.sleep(2500);

@@ -33,6 +33,7 @@ public class Leaderboard {
 		this.entries = new LinkedList<>(ebs.get("entries", EBList.class).values());
 		this.aliases = new LinkedList<>(ebs.get("aliases", EBList.class).values());
 		this.decending = ebs.get("decending", Boolean.class);
+		this.color = ebs.get("color", Integer.class);
 	}
 
 	protected EBStorage toStorage() {
@@ -47,6 +48,7 @@ public class Leaderboard {
 			aliases.addWrapped(a);
 		stor.set("aliases", aliases);
 		stor.set("decending", this.decending);
+		stor.set("color", this.color);
 		return stor;
 	}
 
