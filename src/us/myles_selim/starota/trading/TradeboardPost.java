@@ -4,8 +4,12 @@ import java.time.Instant;
 
 import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.Storage;
+import us.myles_selim.starota.embed_converter.annotations.EmbedFooterText;
+import us.myles_selim.starota.embed_converter.annotations.EmbedTitle;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 
+@EmbedFooterText("Trade posted")
+@EmbedTitle("Profile for %getIdString%:")
 public class TradeboardPost extends DataType<TradeboardPost> {
 
 	private int id;
@@ -68,6 +72,10 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 
 	public int getId() {
 		return this.id;
+	}
+
+	public String getIdString() {
+		return String.format("%04d", this.id);
 	}
 
 	public boolean isLookingFor() {
