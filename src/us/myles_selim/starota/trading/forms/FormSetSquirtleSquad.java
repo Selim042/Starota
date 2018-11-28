@@ -6,8 +6,6 @@ public class FormSetSquirtleSquad extends FormSet {
 	public static final FormSetSquirtleSquad FORM_SET = new FormSetSquirtleSquad();
 
 	private FormSetSquirtleSquad() {
-		if (NO_GLASSES == null)
-			System.out.println("NO_GLASSES IS NULL");
 		this.addForm(NO_GLASSES);
 		this.addForm(new FormString("Glasses"));
 	}
