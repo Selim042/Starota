@@ -110,6 +110,10 @@ public class Leaderboard {
 		return this;
 	}
 
+	public boolean isDecending() {
+		return this.decending;
+	}
+
 	public Leaderboard setDecending(boolean decending) {
 		this.decending = decending;
 		return this;
