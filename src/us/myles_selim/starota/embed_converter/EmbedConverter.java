@@ -3,8 +3,6 @@ package us.myles_selim.starota.embed_converter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
@@ -23,9 +21,6 @@ import us.myles_selim.starota.embed_converter.annotations.EmbedTitle;
 import us.myles_selim.starota.embed_converter.annotations.EmbedURL;
 
 public class EmbedConverter {
-
-	// private static final Pattern KEY_PATTERN =
-	// Pattern.compile("\\%(.*?)\\%");
 
 	public static EmbedObject toEmbed(Object obj) {
 		EmbedBuilder builder = new EmbedBuilder();
@@ -284,27 +279,16 @@ public class EmbedConverter {
 			Object val = getFieldValue(obj, f);
 			if (val == null)
 				continue;
-				name = name.replaceAll("\\%" + f.getName() + "\\%", val.toString());
+			name = name.replaceAll("\\%" + f.getName() + "\\%", val.toString());
 		}
 		for (Method m : obj.getClass().getDeclaredMethods()) {
 			Object val = getMethodValue(obj, m);
 			if (val == null)
 				continue;
-				name = name.replaceAll("\\%" + m.getName() + "\\%", val.toString());
+			name = name.replaceAll("\\%" + m.getName() + "\\%", val.toString());
 		}
 		return name;
 	}
-
-	// private static Object getValue(Object obj, String name) {
-	// Class<?> clazz = obj.getClass();
-	// try {
-	// return getFieldValue(obj, clazz.getDeclaredField(name));
-	// } catch (NoSuchFieldException | SecurityException e) {}
-	// try {
-	// return getMethodValue(obj, clazz.getDeclaredMethod(name));
-	// } catch (SecurityException | NoSuchMethodException e) {}
-	// return null;
-	// }
 
 	private static Object getFieldValue(Object obj, Field field) {
 		boolean accessible = field.isAccessible();

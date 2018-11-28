@@ -72,17 +72,7 @@ public class Starota {
 	public static final long SUPPORT_SERVER = 436614503606779914L;
 	public static final String SUPPORT_SERVER_LINK = "https://discord.gg/NxverNw";
 
-	// public static final long TEST_SERVER = 481646364716040202L;
-	// public static final long TEST_MONITOR = 489249695571509249L;
-	// public static final long TEST_REPORT = 489249345485537301L;
-
 	public static final long PVILLE_SERVER = 314733127027130379L;
-	// public static final long PVILLE_MONITOR = 430353385716187146L;
-	// public static final long PVILLE_REPORT = 336237827149004800L;
-	// public static final long PVILLE_ADMIN_CHAT = 336237827149004800L;
-	// public static final long PVILLE_LOCAL_UPDATES = 314784664944377856L;
-	// public static final long PVILLE_CHAT_ROOM = 314733127027130379L;
-	// public static final long PVILLE_MANUAL_CALLOUTS = 314736446915215360L;
 
 	public final static boolean DEBUG = false;
 	public static boolean IS_DEV;

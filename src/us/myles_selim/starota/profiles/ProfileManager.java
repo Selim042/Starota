@@ -114,65 +114,6 @@ public class ProfileManager {
 		return storage.containsKey(user.getStringID()) && storage.get(user.getStringID()) != null;
 	}
 
-	// public static EmbedObject getProfileEmbed(IGuild server, PlayerProfile
-	// profile) {
-	// if (profile == null)
-	// return null;
-	// EmbedBuilder builder = new EmbedBuilder();
-	// builder.withColor(profile.getTeam().getColor());
-	// builder.withTitle("Profile for " + profile.getPoGoName() + ":");
-	// // builder.appendDesc("**Profile for " + profile.getPoGoName() + "**");
-	// IUser user = Starota.getUser(profile.getDiscordId());
-	// builder.withAuthorIcon(user.getAvatarURL());
-	// builder.withAuthorName(user.getDisplayName(server));
-	// builder.appendField("Trainer Level:", "" + profile.getLevel(), true);
-	// EnumTeam team = profile.getTeam();
-	// builder.appendField("Team:", team.getName(), true);
-	//
-	// String silphAvatar = SilphRoadUtils.getCardAvatar(profile.getPoGoName());
-	// if (silphAvatar != null)
-	// builder.withThumbnail(silphAvatar);
-	// else if (team != EnumTeam.NO_TEAM)
-	// builder.withThumbnail(team.getIcon());
-	// // builder.withImage(team.getIcon());
-	// if (profile.getRealName() != null)
-	// builder.appendField("Real Name: ", profile.getRealName(), true);
-	// if (profile.getTrainerCode() != -1)
-	// builder.appendField("Trainer Code: ", profile.getTrainerCodeString(),
-	// true);
-	//
-	// Map<String, Long> alts = profile.getAlts();
-	// if (alts == null || !alts.isEmpty()) {
-	// String altsS = "";
-	// for (Entry<String, Long> e : alts.entrySet())
-	// altsS += "- **" + e.getKey() + "**: " +
-	// getTrainerCodeString(e.getValue()) + "\n";
-	// builder.appendField("Alternate Accounts:", altsS, false);
-	// }
-	// String silphCard = SilphRoadUtils.getCard(profile.getPoGoName());
-	// if (silphCard != null)
-	// builder.appendField("Silph Road Card:", silphCard, false);
-	// if (user != null) {
-	// String nickname = user.getNicknameForGuild(server);
-	// if (nickname != null)
-	// builder.appendField("Discord User:",
-	// nickname + " (_" + user.getName() + "#" + user.getDiscriminator() + "_)",
-	// false);
-	// else
-	// builder.appendField("Discord User:", user.getName() + "#" +
-	// user.getDiscriminator(),
-	// false);
-	// }
-	//
-	// IRole patronRole = Starota.getPatronRole(user);
-	// if (patronRole != null)
-	// builder.appendField("Patron:", patronRole.getName(), true);
-	//
-	// builder.withFooterText("Profile last updated");
-	// builder.withTimestamp(profile.getLastUpdated());
-	// return builder.build();
-	// }
-
 	public static String getTrainerCodeString(long code) {
 		String codeS = String.format("%012d", code);
 		return codeS.substring(0, 4) + " " + codeS.substring(4, 8) + " " + codeS.substring(8, 12);
