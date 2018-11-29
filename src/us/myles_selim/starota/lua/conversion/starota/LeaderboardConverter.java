@@ -49,7 +49,7 @@ public class LeaderboardConverter implements IConverter {
 					LeaderboardEntry entry = entries.get(i);
 					tbl.rawset("user", ConversionHandler.convertToLua(state, entry.getDiscordUser()));
 					tbl.rawset("value", ValueFactory.valueOf(entry.getValue()));
-					ret.rawset(i, tbl);
+					ret.rawset(i + 1, tbl);
 				}
 				return ret;
 			}

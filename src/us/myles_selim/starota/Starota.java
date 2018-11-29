@@ -77,9 +77,9 @@ public class Starota {
 	public final static boolean DEBUG = false;
 	public static boolean IS_DEV;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "2.0.2";
+	public final static String VERSION = "2.1.0";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n"
-			+ "Public facing changes:\n * Make Alolan Raichu shinyable";
+			+ "Public facing changes:\n + Add leaderboards";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static void main(String[] args) {

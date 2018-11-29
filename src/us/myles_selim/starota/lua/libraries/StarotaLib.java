@@ -1,5 +1,7 @@
 package us.myles_selim.starota.lua.libraries;
 
+import java.util.List;
+
 import org.squiddev.cobalt.Constants;
 import org.squiddev.cobalt.LuaError;
 import org.squiddev.cobalt.LuaNil;
@@ -10,6 +12,7 @@ import org.squiddev.cobalt.LuaValue;
 import org.squiddev.cobalt.ValueFactory;
 import org.squiddev.cobalt.function.OneArgFunction;
 import org.squiddev.cobalt.function.TwoArgFunction;
+import org.squiddev.cobalt.function.ZeroArgFunction;
 import org.squiddev.cobalt.lib.LuaLibrary;
 
 import sx.blah.discord.handle.obj.IGuild;
@@ -83,6 +86,17 @@ public class StarotaLib implements LuaLibrary {
 				if (board == null)
 					return Constants.NIL;
 				return ConversionHandler.convertToLua(state, board);
+			}
+		});
+		env.rawset("getAllLeaderboards", new ZeroArgFunction() {
+
+			@Override
+			public LuaValue call(LuaState state) throws LuaError {
+				LuaTable ret = new LuaTable();
+				List<Leaderboard> boards = LeaderboardManager.getLeaderboards(server);
+				for (int i = 0; i < boards.size(); i++)
+					ret.rawset(i, ConversionHandler.convertToLua(state, boards.get(i)));
+				return ret;
 			}
 		});
 		return env;
