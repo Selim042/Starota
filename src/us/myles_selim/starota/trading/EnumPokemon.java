@@ -524,7 +524,7 @@ public enum EnumPokemon {
 	DARKRAI(EnumPokemonType.DARK, EnumGender.UNKNOWN),
 	SHAYMIN(EnumPokemonType.GRASS, EnumGender.UNKNOWN),
 	ARCEUS(EnumPokemonType.NORMAL, FormSetArceus.FORM_SET, EnumGender.UNKNOWN),
-	// GEN 5 TODO: genders, forms
+	// TODO: GEN 5 genders, forms
 	VICTINI(EnumPokemonType.PSYCHIC, EnumPokemonType.FIRE),
 	SNIVY(EnumPokemonType.GRASS),
 	SERVINE(EnumPokemonType.GRASS),

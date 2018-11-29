@@ -3,6 +3,9 @@ package us.myles_selim.starota;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -27,6 +30,12 @@ import us.myles_selim.starota.commands.CommandSupportStarota;
 import us.myles_selim.starota.commands.CommandTest;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
+import us.myles_selim.starota.leaderboards.LeaderboardManager;
+import us.myles_selim.starota.leaderboards.commands.CommandEditLeaderboard;
+import us.myles_selim.starota.leaderboards.commands.CommandGetLeaderboard;
+import us.myles_selim.starota.leaderboards.commands.CommandListLeaderboards;
+import us.myles_selim.starota.leaderboards.commands.CommandNewLeaderboard;
+import us.myles_selim.starota.leaderboards.commands.CommandUpdateLeaderboard;
 import us.myles_selim.starota.lua.LuaEventHandler;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.commands.CommandUploadScript;
@@ -65,24 +74,14 @@ public class Starota {
 	public static final long SUPPORT_SERVER = 436614503606779914L;
 	public static final String SUPPORT_SERVER_LINK = "https://discord.gg/NxverNw";
 
-	// public static final long TEST_SERVER = 481646364716040202L;
-	// public static final long TEST_MONITOR = 489249695571509249L;
-	// public static final long TEST_REPORT = 489249345485537301L;
-
 	public static final long PVILLE_SERVER = 314733127027130379L;
-	// public static final long PVILLE_MONITOR = 430353385716187146L;
-	// public static final long PVILLE_REPORT = 336237827149004800L;
-	// public static final long PVILLE_ADMIN_CHAT = 336237827149004800L;
-	// public static final long PVILLE_LOCAL_UPDATES = 314784664944377856L;
-	// public static final long PVILLE_CHAT_ROOM = 314733127027130379L;
-	// public static final long PVILLE_MANUAL_CALLOUTS = 314736446915215360L;
 
 	public final static boolean DEBUG = false;
 	public static boolean IS_DEV;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "2.0.2";
+	public final static String VERSION = "2.1.0";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n"
-			+ "Public facing changes:\n * Make Alolan Raichu shinyable";
+			+ "Public facing changes:\n + Add leaderboards";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static void main(String[] args) {
@@ -111,6 +110,9 @@ public class Starota {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		DebugServer debug = new DebugServer();
+		debug.start();
+
 		CLIENT.changePresence(StatusType.ONLINE, ActivityType.PLAYING, "registering commands...");
 
 		JavaCommandHandler.registerCommand(new CommandChangelog());
@@ -121,8 +123,8 @@ public class Starota {
 		JavaCommandHandler.registerCommand("Administrative", new CommandSetResearchChannel());
 		JavaCommandHandler.registerCommand("Administrative", new CommandChangelogChannel());
 		if (IS_DEV) {
-			JavaCommandHandler.registerCommand("Testing", new CommandGetTop());
-			JavaCommandHandler.registerCommand("Testing", new CommandTest());
+			JavaCommandHandler.registerCommand("Debug", new CommandGetTop());
+			JavaCommandHandler.registerCommand("Debug", new CommandTest());
 		}
 
 		JavaCommandHandler.registerCommand("Profiles", new CommandRegister());
@@ -139,8 +141,8 @@ public class Starota {
 
 		JavaCommandHandler.registerCommand("Tradeboard", new CommandTradeboardHelp());
 		if (IS_DEV) {
-			JavaCommandHandler.registerCommand("Tradeboard", new CommandGetForms());
-			JavaCommandHandler.registerCommand("Tradeboard", new CommandGetShinies());
+			JavaCommandHandler.registerCommand("Debug", new CommandGetForms());
+			JavaCommandHandler.registerCommand("Debug", new CommandGetShinies());
 		}
 		JavaCommandHandler.registerCommand("Tradeboard", new CommandForTrade());
 		JavaCommandHandler.registerCommand("Tradeboard", new CommandGetUserTrades());
@@ -150,6 +152,12 @@ public class Starota {
 		JavaCommandHandler.registerCommand("Tradeboard", new CommandRemoveTrade());
 
 		JavaCommandHandler.registerCommand("Lua", new CommandUploadScript());
+
+		JavaCommandHandler.registerCommand("Leaderboard", new CommandEditLeaderboard());
+		JavaCommandHandler.registerCommand("Leaderboard", new CommandUpdateLeaderboard());
+		JavaCommandHandler.registerCommand("Leaderboard", new CommandNewLeaderboard());
+		JavaCommandHandler.registerCommand("Leaderboard", new CommandGetLeaderboard());
+		JavaCommandHandler.registerCommand("Leaderboard", new CommandListLeaderboards());
 
 		try {
 			Thread.sleep(2500);
@@ -164,6 +172,7 @@ public class Starota {
 		ResearchTracker.init();
 		ProfileManager.init();
 		Tradeboard.init();
+		LeaderboardManager.init();
 
 		// WebServer.init();
 
@@ -341,6 +350,10 @@ public class Starota {
 		return null;
 	}
 
+	public static IGuild getSupportServer() {
+		return getGuild(SUPPORT_SERVER);
+	}
+
 	public static boolean canUseLua(IGuild server) {
 		if (server == null)
 			return false;
@@ -353,6 +366,67 @@ public class Starota {
 		IRole requiredRole = supportServer.getRoleByID(436617921620606976L); // supporter
 																				// role
 		return owner.hasRole(requiredRole);
+	}
+
+	public static int getMaxLeaderboards(IGuild server) {
+		int max = 3;
+		for (EnumPatreonPerm p : getPatreonPerms(server)) {
+			switch (p) {
+			case LEADERBOARD_5:
+				max = 5;
+				break;
+			case LEADERBOARD_10:
+				max = 10;
+				break;
+			case LEADERBOARD_20:
+				max = 20;
+				break;
+			case LEADERBOARD_100:
+				max = 100;
+				break;
+			default:
+				break;
+			}
+		}
+		return max;
+	}
+
+	public static IRole getPatronRole(IUser user) {
+		IGuild supportServer = getSupportServer();
+		if (!supportServer.getUsers().contains(user))
+			return null;
+		List<IRole> supportRoles = supportServer.getRoles();
+		List<IRole> patronRoles = new ArrayList<>();
+		boolean inRange = false;
+		for (IRole r : supportRoles) {
+			if (r.getName().equals("MARKER")) {
+				inRange = !inRange;
+				continue;
+			}
+			if (inRange)
+				patronRoles.add(r);
+		}
+		patronRoles.retainAll(user.getRolesForGuild(supportServer));
+		if (patronRoles.size() > 0)
+			return patronRoles.get(0);
+		return null;
+	}
+
+	public static List<EnumPatreonPerm> getPatreonPerms(IGuild server) {
+		if (server == null)
+			return Collections.emptyList();
+		IUser owner = server.getOwner();
+		IGuild supportServer = getGuild(SUPPORT_SERVER); // support server
+		if (!supportServer.getUsers().contains(owner))
+			return Collections.emptyList();
+		if (owner.getLongID() == supportServer.getOwnerLongID())
+			return Arrays.asList(EnumPatreonPerm.values());
+		List<EnumPatreonPerm> perms = new ArrayList<>();
+		List<IRole> roles = owner.getRolesForGuild(supportServer);
+		for (EnumPatreonPerm p : EnumPatreonPerm.values())
+			if (roles.contains(p.getRole()))
+				perms.add(p);
+		return Collections.unmodifiableList(perms);
 	}
 
 	public static void submitError(Throwable e) {

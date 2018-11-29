@@ -1,5 +1,7 @@
 package us.myles_selim.starota.lua.libraries;
 
+import java.util.List;
+
 import org.squiddev.cobalt.Constants;
 import org.squiddev.cobalt.LuaError;
 import org.squiddev.cobalt.LuaNil;
@@ -10,6 +12,7 @@ import org.squiddev.cobalt.LuaValue;
 import org.squiddev.cobalt.ValueFactory;
 import org.squiddev.cobalt.function.OneArgFunction;
 import org.squiddev.cobalt.function.TwoArgFunction;
+import org.squiddev.cobalt.function.ZeroArgFunction;
 import org.squiddev.cobalt.lib.LuaLibrary;
 
 import sx.blah.discord.handle.obj.IGuild;
@@ -17,6 +20,8 @@ import sx.blah.discord.handle.obj.IUser;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.ServerOptions;
 import us.myles_selim.starota.commands.CommandChangelogChannel;
+import us.myles_selim.starota.leaderboards.Leaderboard;
+import us.myles_selim.starota.leaderboards.LeaderboardManager;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
 import us.myles_selim.starota.profiles.PlayerProfile;
@@ -71,6 +76,27 @@ public class StarotaLib implements LuaLibrary {
 				throw new LuaError("can only get posts by id, WIP");
 				// return ConversionHandler.convertToLua(state,
 				// EnumPokemon.getPokemon(arg.toString()));
+			}
+		});
+		env.rawset("getLeaderboard", new OneArgFunction() {
+
+			@Override
+			public LuaValue call(LuaState state, LuaValue arg) throws LuaError {
+				Leaderboard board = LeaderboardManager.getLeaderboard(server, arg.toString());
+				if (board == null)
+					return Constants.NIL;
+				return ConversionHandler.convertToLua(state, board);
+			}
+		});
+		env.rawset("getAllLeaderboards", new ZeroArgFunction() {
+
+			@Override
+			public LuaValue call(LuaState state) throws LuaError {
+				LuaTable ret = new LuaTable();
+				List<Leaderboard> boards = LeaderboardManager.getLeaderboards(server);
+				for (int i = 0; i < boards.size(); i++)
+					ret.rawset(i, ConversionHandler.convertToLua(state, boards.get(i)));
+				return ret;
 			}
 		});
 		return env;

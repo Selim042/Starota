@@ -120,7 +120,8 @@ public class UserConverter implements IConverter {
 
 	@Override
 	public Object toJava(LuaState state, LuaValue val) throws LuaError {
-		// TODO Auto-generated method stub
+		if (val instanceof LuaUserdata)
+			return ((LuaUserdata) val).instance;
 		return null;
 	}
 

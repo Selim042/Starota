@@ -7,6 +7,7 @@ import sx.blah.discord.handle.obj.IUser;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
+import us.myles_selim.starota.embed_converter.EmbedConverter;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.profiles.ProfileManager;
 
@@ -28,8 +29,8 @@ public class CommandProfile extends JavaCommand {
 			target = message.getAuthor();
 		else {
 			if (args.length != 2) {
-				channel.sendMessage(
-						"**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName() + " <target>");
+				channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild)
+						+ this.getName() + " <target>");
 				return;
 			}
 			target = Starota.findUser(args[1]);
@@ -38,15 +39,14 @@ public class CommandProfile extends JavaCommand {
 				if (profile == null)
 					channel.sendMessage("User \"" + args[1] + "\" not found");
 				else {
-					channel.sendMessage(ProfileManager.getProfileEmbed(guild, profile));
+					channel.sendMessage(EmbedConverter.toEmbed(profile));
 					return;
 				}
 				return;
 			}
 		}
 		if (ProfileManager.hasProfile(guild, target)) {
-			channel.sendMessage(
-					ProfileManager.getProfileEmbed(guild, ProfileManager.getProfile(guild, target)));
+			channel.sendMessage(EmbedConverter.toEmbed(ProfileManager.getProfile(guild, target)));
 			return;
 		}
 		channel.sendMessage("User " + target.getName() + " does not have a profile");
