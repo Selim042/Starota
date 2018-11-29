@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -108,6 +110,9 @@ public class Starota {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		DebugServer debug = new DebugServer();
+		debug.start();
+
 		CLIENT.changePresence(StatusType.ONLINE, ActivityType.PLAYING, "registering commands...");
 
 		JavaCommandHandler.registerCommand(new CommandChangelog());
@@ -363,6 +368,29 @@ public class Starota {
 		return owner.hasRole(requiredRole);
 	}
 
+	public static int getMaxLeaderboards(IGuild server) {
+		int max = 3;
+		for (EnumPatreonPerm p : getPatreonPerms(server)) {
+			switch (p) {
+			case LEADERBOARD_5:
+				max = 5;
+				break;
+			case LEADERBOARD_10:
+				max = 10;
+				break;
+			case LEADERBOARD_20:
+				max = 20;
+				break;
+			case LEADERBOARD_100:
+				max = 100;
+				break;
+			default:
+				break;
+			}
+		}
+		return max;
+	}
+
 	public static IRole getPatronRole(IUser user) {
 		IGuild supportServer = getSupportServer();
 		if (!supportServer.getUsers().contains(user))
@@ -382,6 +410,23 @@ public class Starota {
 		if (patronRoles.size() > 0)
 			return patronRoles.get(0);
 		return null;
+	}
+
+	public static List<EnumPatreonPerm> getPatreonPerms(IGuild server) {
+		if (server == null)
+			return Collections.emptyList();
+		IUser owner = server.getOwner();
+		IGuild supportServer = getGuild(SUPPORT_SERVER); // support server
+		if (!supportServer.getUsers().contains(owner))
+			return Collections.emptyList();
+		if (owner.getLongID() == supportServer.getOwnerLongID())
+			return Arrays.asList(EnumPatreonPerm.values());
+		List<EnumPatreonPerm> perms = new ArrayList<>();
+		List<IRole> roles = owner.getRolesForGuild(supportServer);
+		for (EnumPatreonPerm p : EnumPatreonPerm.values())
+			if (roles.contains(p.getRole()))
+				perms.add(p);
+		return Collections.unmodifiableList(perms);
 	}
 
 	public static void submitError(Throwable e) {

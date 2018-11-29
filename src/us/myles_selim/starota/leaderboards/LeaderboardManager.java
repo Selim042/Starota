@@ -93,11 +93,19 @@ public class LeaderboardManager {
 			boards = new ArrayList<>();
 			LEADERBOARDS.put(guild.getLongID(), boards);
 		}
+		if (boards.size() >= Starota.getMaxLeaderboards(guild))
+			return null;
 		Leaderboard board = new Leaderboard(guild, name);
 		board.addAlias(name.replaceAll(" ", "_"));
 		boards.add(board);
 		flush();
 		return board;
+	}
+
+	public static int getLeaderboardCount(IGuild guild) {
+		if (!LEADERBOARDS.containsKey(guild.getLongID()))
+			return 0;
+		return LEADERBOARDS.get(guild.getLongID()).size();
 	}
 
 	public static List<Leaderboard> getLeaderboards(IGuild guild) {

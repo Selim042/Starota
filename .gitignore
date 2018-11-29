@@ -6,6 +6,8 @@ bin/*
 libs/*
 target/*
 
+src/us/myles_selim/starota/DebugServer.java
+
 starota.properties
 starotaData/data/*
 starotaData/options/*

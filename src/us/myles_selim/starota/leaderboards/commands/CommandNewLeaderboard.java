@@ -6,6 +6,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
+import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
 import us.myles_selim.starota.leaderboards.Leaderboard;
@@ -39,6 +40,12 @@ public class CommandNewLeaderboard extends JavaCommand {
 		if (args.length < 2) {
 			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + getName() + " "
 					+ getGeneralUsage());
+			return;
+		}
+		int maxBoards = Starota.getMaxLeaderboards(guild);
+		if (LeaderboardManager.getLeaderboardCount(guild) > maxBoards) {
+			channel.sendMessage("You have reached your leaderboard limit of " + maxBoards
+					+ ".  To upgrade your maximum please visit https://patreon.com/Selim_042.");
 			return;
 		}
 		Leaderboard board = LeaderboardManager.newLeaderboard(guild, args[1]);
