@@ -25,6 +25,8 @@ public class PokemonInstance {
 	}
 
 	public Form getForm() {
+		if (this.pokemon == null)
+			return null;
 		if (this.form == null)
 			return this.pokemon.getDefaultForm();
 		return this.form;

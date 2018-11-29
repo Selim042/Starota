@@ -1,15 +1,12 @@
 package us.myles_selim.starota.commands;
 
-import org.squiddev.cobalt.LuaError;
-import org.squiddev.cobalt.LuaState;
-import org.squiddev.cobalt.LuaValue;
-
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
-import us.myles_selim.starota.lua.LuaUtils;
-import us.myles_selim.starota.lua.conversion.ConversionHandler;
+import us.myles_selim.starota.leaderboards.Leaderboard;
+import us.myles_selim.starota.leaderboards.LeaderboardEntry;
+import us.myles_selim.starota.leaderboards.LeaderboardManager;
 
 public class CommandTest extends JavaCommand {
 
@@ -19,27 +16,26 @@ public class CommandTest extends JavaCommand {
 
 	@Override
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
-		LuaState state = LuaUtils.getState(guild);
-		LuaValue msgL = ConversionHandler.convertToLua(state, message);
-		channel.sendMessage("" + msgL);
-		try {
-			System.out.println(msgL.get(state, "getAuthor").checkFunction().call(state));
-		} catch (LuaError e) {
-			e.printStackTrace();
-		}
-		// state.stdout = System.out;
-		// String script = "test.lua";
-		// LuaTable _G = state.getMainThread().getfenv();
-		// try {
-		// LoadState.load(state, new FileInputStream(new File(script)), "@" +
-		// script, _G).call(state);
-		// } catch (LuaError | CompileException e) {
-		// channel.sendMessage("lua error: " + e.getLocalizedMessage());
-		// e.printStackTrace();
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
-		// state.stdout = null;
+		int page = 0;
+		if (args.length > 1)
+			try {
+				page = Integer.parseInt(args[1]) - 1;
+			} catch (NumberFormatException e) {}
+		// Leaderboard testBoard = new Leaderboard(guild, "Total XP", true);
+		Leaderboard testBoard = LeaderboardManager.newLeaderboard(guild, "Total XP");
+		testBoard.updateEntry(new LeaderboardEntry(134855940938661889L, 12728524L));
+		testBoard.updateEntry(new LeaderboardEntry(279266090494722049L, 1234567L));
+		testBoard.updateEntry(new LeaderboardEntry(95509102796480512L, 5678L));
+		testBoard.updateEntry(new LeaderboardEntry(504088307148521475L, 999999999L));
+		testBoard.updateEntry(new LeaderboardEntry(292678063324659732L, 56399923L));
+		testBoard.updateEntry(new LeaderboardEntry(286292930640216064L, 53L));
+		channel.sendMessage(testBoard.toEmbed(page));
+		// int tradeId = 24;
+		// if (args.length != 1)
+		// tradeId = Integer.parseInt(args[1]);
+		// TradeboardPost post = Tradeboard.getPost(guild, tradeId);
+		// channel.sendMessage(EmbedConverter.toEmbed(post));
+		// channel.sendMessage(Tradeboard.getPostEmbed(guild, post));
 	}
 
 }

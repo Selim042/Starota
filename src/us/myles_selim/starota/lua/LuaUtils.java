@@ -34,6 +34,7 @@ import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.leaderboards.Leaderboard;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
 import us.myles_selim.starota.lua.conversion.discord.CategoryConverter;
 import us.myles_selim.starota.lua.conversion.discord.ChannelConverter;
@@ -42,6 +43,7 @@ import us.myles_selim.starota.lua.conversion.discord.RoleConverter;
 import us.myles_selim.starota.lua.conversion.discord.ServerConverter;
 import us.myles_selim.starota.lua.conversion.discord.UserConverter;
 import us.myles_selim.starota.lua.conversion.starota.EnumPokemonConverter;
+import us.myles_selim.starota.lua.conversion.starota.LeaderboardConverter;
 import us.myles_selim.starota.lua.conversion.starota.PlayerProfileConverter;
 import us.myles_selim.starota.lua.conversion.starota.TradeboardPostConverter;
 import us.myles_selim.starota.lua.libraries.DiscordEventLib;
@@ -65,7 +67,7 @@ public class LuaUtils {
 		ConversionHandler.registerConverter(PlayerProfile.class, new PlayerProfileConverter());
 		ConversionHandler.registerConverter(TradeboardPost.class, new TradeboardPostConverter());
 		ConversionHandler.registerConverter(EnumPokemon.class, new EnumPokemonConverter());
-		ConversionHandler.registerConverter(TradeboardPost.class, new TradeboardPostConverter());
+		ConversionHandler.registerConverter(Leaderboard.class, new LeaderboardConverter());
 
 		ConversionHandler.registerConverter(ICategory.class, new CategoryConverter());
 		ConversionHandler.registerConverter(IChannel.class, new ChannelConverter());

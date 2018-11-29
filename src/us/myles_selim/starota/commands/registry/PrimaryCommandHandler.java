@@ -42,6 +42,8 @@ public class PrimaryCommandHandler {
 	@EventSubscriber
 	public void onMessageEvent(MessageReceivedEvent event) {
 		IGuild server = event.getGuild();
+		if (server == null)
+			return;
 		IChannel channel = event.getChannel();
 		IMessage message = event.getMessage();
 		String cmdS = message.getContent();

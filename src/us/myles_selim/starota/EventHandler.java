@@ -24,7 +24,7 @@ public class EventHandler {
 
 	@EventSubscriber
 	public void onMessageRecieved(MessageReceivedEvent event) {
-		if (event.getGuild().getLongID() == Starota.SUPPORT_SERVER)
+		if (event.getGuild() == null || event.getGuild().getLongID() == Starota.SUPPORT_SERVER)
 			return;
 		if (Starota.DEBUG)
 			System.out.println("Channel: " + event.getChannel() + ", Author: " + event.getAuthor()
@@ -108,19 +108,26 @@ public class EventHandler {
 		if (pokemon == null)
 			pokemon = EnumPokemon.getPokemon(Integer.parseInt(args[1]));
 		switch (args[0].toLowerCase()) {
-		case ".removeExclude":
-			FormManager.removeExcluded(pokemon);
-			channel.sendMessage("Removed " + pokemon + " from exclusion");
+		case ".removeexclude":
+			if (FormManager.removeExcluded(pokemon))
+				channel.sendMessage("Removed " + pokemon + " from exclusion");
+			else
+				channel.sendMessage(pokemon + " is already not excluded");
 			break;
-		case ".forceEnable":
-			FormManager.addForceEnable(pokemon);
-			channel.sendMessage("Forced enabled " + pokemon);
+		case ".forceenable":
+			if (FormManager.addForceEnable(pokemon))
+				channel.sendMessage("Forced enabled " + pokemon);
+			else
+				channel.sendMessage(pokemon + " is already enabled");
 			break;
-		case ".addShinyable":
-			FormManager.addShinyable(pokemon);
-			channel.sendMessage("Added " + pokemon + " as shinyable");
+		case ".addshinyable":
+			if (FormManager.addShinyable(pokemon))
+				channel.sendMessage("Added " + pokemon + " as shinyable");
+			else
+				channel.sendMessage(pokemon + " is already shinyable");
 			break;
 		default:
+			channel.sendMessage("Unknown command");
 			break;
 		}
 	}
