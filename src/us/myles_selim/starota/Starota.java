@@ -40,6 +40,7 @@ import us.myles_selim.starota.lua.LuaEventHandler;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.commands.CommandUploadScript;
 import us.myles_selim.starota.lua.commands.LuaCommandHandler;
+import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.profiles.ProfileManager;
 import us.myles_selim.starota.profiles.commands.CommandGetProfilelessPlayers;
 import us.myles_selim.starota.profiles.commands.CommandProfile;
@@ -110,6 +111,7 @@ public class Starota {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		BaseModules.registerModules();
 		DebugServer debug = new DebugServer();
 		debug.start();
 
@@ -231,6 +233,16 @@ public class Starota {
 		LuaUtils.registerConverters();
 		dispatcher.registerListener(new LuaEventHandler());
 		PrimaryCommandHandler.registerCommandHandler(new LuaCommandHandler());
+	}
+
+	public static class BaseModules {
+
+		public static final StarotaModule LUA = new StarotaModule("Lua", "Lua");
+
+		private static void registerModules() {
+			StarotaModule.registerModule(LUA);
+		}
+
 	}
 
 	public static IDiscordClient getClient() {
