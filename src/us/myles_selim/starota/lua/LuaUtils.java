@@ -34,6 +34,7 @@ import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.Starota.BaseModules;
 import us.myles_selim.starota.leaderboards.Leaderboard;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
 import us.myles_selim.starota.lua.conversion.discord.CategoryConverter;
@@ -49,6 +50,7 @@ import us.myles_selim.starota.lua.conversion.starota.TradeboardPostConverter;
 import us.myles_selim.starota.lua.libraries.DiscordEventLib;
 import us.myles_selim.starota.lua.libraries.DiscordLib;
 import us.myles_selim.starota.lua.libraries.StarotaLib;
+import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.trading.EnumPokemon;
 import us.myles_selim.starota.trading.TradeboardPost;
@@ -78,6 +80,8 @@ public class LuaUtils {
 	}
 
 	public static LuaState getState(IGuild server) {
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.LUA))
+			return null;
 		if (STATES.containsKey(server))
 			return STATES.get(server);
 		LuaState state = new LuaState(new AbstractResourceManipulator() {
