@@ -37,10 +37,7 @@ public class StarotaModule {
 	}
 
 	public static boolean isModuleEnabled(IGuild server, StarotaModule module) {
-		if (!DISABLED_MODULES.containsKey(server))
-			return true;
-		List<StarotaModule> modules = DISABLED_MODULES.get(server);
-		return !modules.contains(module);
+		return isModuleEnabledShallow(server, module) && areDepsEnabled(server, module);
 	}
 
 	public static List<StarotaModule> getEnabledModules(IGuild server) {
@@ -67,17 +64,46 @@ public class StarotaModule {
 		return true;
 	}
 
+	private static boolean areDepsEnabled(IGuild server, StarotaModule module) {
+		for (StarotaModule d : getNestedDeps(server, module))
+			if (!isModuleEnabledShallow(server, d))
+				return false;
+		return true;
+	}
+
+	private static boolean isModuleEnabledShallow(IGuild server, StarotaModule module) {
+		if (!DISABLED_MODULES.containsKey(server))
+			return true;
+		List<StarotaModule> modules = DISABLED_MODULES.get(server);
+		return !modules.contains(module);
+	}
+
+	private static List<StarotaModule> getNestedDeps(IGuild server, StarotaModule module) {
+		List<StarotaModule> deps = new ArrayList<>();
+		for (StarotaModule d : module.dependencies) {
+			if (deps.contains(d))
+				continue;
+			deps.add(d);
+		}
+		return deps;
+	}
+
 	private final String name;
 	private final String commandCategory;
-	
+	private final StarotaModule[] dependencies;
 
 	public StarotaModule(String name) {
 		this(name, null);
 	}
 
 	public StarotaModule(String name, String commandCategory) {
+		this(name, commandCategory, new StarotaModule[] {});
+	}
+
+	public StarotaModule(String name, String commandCategory, StarotaModule... dependencies) {
 		this.name = name;
 		this.commandCategory = commandCategory;
+		this.dependencies = dependencies;
 	}
 
 	public String getName() {
@@ -86,6 +112,10 @@ public class StarotaModule {
 
 	public String getCommandCategory() {
 		return this.commandCategory;
+	}
+
+	public StarotaModule[] getDependencies() {
+		return this.dependencies;
 	}
 
 }

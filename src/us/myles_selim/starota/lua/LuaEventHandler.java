@@ -13,7 +13,9 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.Starota.BaseModules;
 import us.myles_selim.starota.lua.libraries.DiscordEventLib;
+import us.myles_selim.starota.modules.StarotaModule;
 
 public class LuaEventHandler {
 
@@ -35,6 +37,8 @@ public class LuaEventHandler {
 
 	private static void handleEvent(GuildEvent event) {
 		IGuild server = event.getGuild();
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.LUA))
+			return;
 		LuaState state = LuaUtils.getState(server);
 		LuaTable _G = state.getMainThread().getfenv();
 		String functName = "on" + event.getClass().getSimpleName();
