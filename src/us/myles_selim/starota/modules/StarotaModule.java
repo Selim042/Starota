@@ -64,6 +64,18 @@ public class StarotaModule {
 		return true;
 	}
 
+	public static StarotaModule getModule(String name) {
+		for (StarotaModule m : MODULES)
+			if (m.name.equalsIgnoreCase(name)
+					|| (m.commandCategory != null && m.commandCategory.equalsIgnoreCase(name)))
+				return m;
+		return null;
+	}
+
+	public static List<StarotaModule> getAllModules() {
+		return Collections.unmodifiableList(MODULES);
+	}
+
 	private static boolean areDepsEnabled(IGuild server, StarotaModule module) {
 		for (StarotaModule d : getNestedDeps(server, module))
 			if (!isModuleEnabledShallow(server, d))

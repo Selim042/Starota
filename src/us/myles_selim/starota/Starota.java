@@ -40,6 +40,7 @@ import us.myles_selim.starota.lua.LuaEventHandler;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.commands.CommandUploadScript;
 import us.myles_selim.starota.lua.commands.LuaCommandHandler;
+import us.myles_selim.starota.modules.CommandModules;
 import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.profiles.ProfileManager;
 import us.myles_selim.starota.profiles.commands.CommandGetProfilelessPlayers;
@@ -160,6 +161,8 @@ public class Starota {
 		JavaCommandHandler.registerCommand("Leaderboard", new CommandNewLeaderboard());
 		JavaCommandHandler.registerCommand("Leaderboard", new CommandGetLeaderboard());
 		JavaCommandHandler.registerCommand("Leaderboard", new CommandListLeaderboards());
+
+		JavaCommandHandler.registerCommand("Modules", new CommandModules());
 
 		try {
 			Thread.sleep(2500);
