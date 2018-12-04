@@ -33,20 +33,20 @@ public class CommandGetLeaderboard extends JavaCommand {
 	@Override
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel)
 			throws Exception {
-		if (args.length < 1) {
+		if (args.length < 2) {
 			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + getName() + " "
 					+ getGeneralUsage());
 			return;
 		}
 		int page = 0;
-		if (args.length > 2)
+		if (args.length > 3)
 			try {
 				page = Integer.parseInt(args[1]) - 1;
 			} catch (NumberFormatException e) {}
 		Leaderboard board;
 		if (message.getAuthor().getPermissionsForGuild(guild).contains(Permissions.ADMINISTRATOR)) {
 			board = LeaderboardManager.getLeaderboard(guild, args[1]);
-			if (!board.isActive())
+			if (board != null && !board.isActive())
 				channel.sendMessage("**NOTE**: This board is inactive");
 		} else
 			board = LeaderboardManager.getLeaderboardActive(guild, args[1]);
