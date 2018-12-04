@@ -41,10 +41,10 @@ public class StarotaModule {
 	}
 
 	public static List<StarotaModule> getEnabledModules(IGuild server) {
-		if (!DISABLED_MODULES.containsKey(server))
-			return Collections.unmodifiableList(MODULES);
-		List<StarotaModule> modules = new ArrayList<>(MODULES);
-		modules.removeAll(DISABLED_MODULES.get(server));
+		List<StarotaModule> modules = new ArrayList<>();
+		for (StarotaModule m : MODULES)
+			if (isModuleEnabled(server, m))
+				modules.add(m);
 		return Collections.unmodifiableList(modules);
 	}
 

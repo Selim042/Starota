@@ -238,10 +238,12 @@ public class Starota {
 	public static class BaseModules {
 
 		public static final StarotaModule PROFILES = new StarotaModule("Player Profiles", "Profiles");
+		public static final StarotaModule GROUPS = new StarotaModule("Groups", "Groups");
 		public static final StarotaModule LUA = new StarotaModule("Lua", "Lua");
 
 		private static void registerModules() {
 			StarotaModule.registerModule(PROFILES);
+			StarotaModule.registerModule(GROUPS);
 			StarotaModule.registerModule(LUA);
 		}
 
