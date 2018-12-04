@@ -19,11 +19,13 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.ServerOptions;
+import us.myles_selim.starota.Starota.BaseModules;
 import us.myles_selim.starota.commands.CommandChangelogChannel;
 import us.myles_selim.starota.leaderboards.Leaderboard;
 import us.myles_selim.starota.leaderboards.LeaderboardManager;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
+import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.profiles.ProfileManager;
 import us.myles_selim.starota.trading.EnumPokemon;
@@ -41,20 +43,22 @@ public class StarotaLib implements LuaLibrary {
 	public LuaValue add(LuaState state, LuaTable env) {
 		env.rawset("options", storageToValue(ServerOptions.getOptions(server), Tradeboard.TRADE_ID_KEY,
 				CommandChangelogChannel.CHANGES_CHANNEL, "changesVersion"));
-		env.rawset("getProfile", new OneArgFunction() {
+		if (StarotaModule.isModuleEnabled(server, BaseModules.PROFILES)) {
+			env.rawset("getProfile", new OneArgFunction() {
 
-			@Override
-			public LuaValue call(LuaState state, LuaValue arg) throws LuaError {
-				if (arg == Constants.NIL || !(arg instanceof LuaUserdata)
-						|| !(((LuaUserdata) arg).instance instanceof IUser))
-					throw new LuaError("arg must be a user");
-				PlayerProfile prof = ProfileManager.getProfile(server,
-						(IUser) ((LuaUserdata) arg).instance);
-				if (prof == null)
-					return Constants.NIL;
-				return ConversionHandler.convertToLua(state, prof);
-			}
-		});
+				@Override
+				public LuaValue call(LuaState state, LuaValue arg) throws LuaError {
+					if (arg == Constants.NIL || !(arg instanceof LuaUserdata)
+							|| !(((LuaUserdata) arg).instance instanceof IUser))
+						throw new LuaError("arg must be a user");
+					PlayerProfile prof = ProfileManager.getProfile(server,
+							(IUser) ((LuaUserdata) arg).instance);
+					if (prof == null)
+						return Constants.NIL;
+					return ConversionHandler.convertToLua(state, prof);
+				}
+			});
+		}
 		env.rawset("getPokemon", new OneArgFunction() {
 
 			@Override
