@@ -12,6 +12,8 @@ import java.util.Map.Entry;
 import sx.blah.discord.handle.obj.IGuild;
 import us.myles_selim.ebs.IOHelper;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.Starota.BaseModules;
+import us.myles_selim.starota.modules.StarotaModule;
 
 public class LeaderboardManager {
 
@@ -85,6 +87,8 @@ public class LeaderboardManager {
 	}
 
 	public static Leaderboard newLeaderboard(IGuild guild, String name) {
+		if (!StarotaModule.isModuleEnabled(guild, BaseModules.LEADERBOARDS))
+			return null;
 		Leaderboard testBoard = getLeaderboard(guild, name);
 		if (testBoard != null)
 			return null;
@@ -103,18 +107,23 @@ public class LeaderboardManager {
 	}
 
 	public static int getLeaderboardCount(IGuild guild) {
-		if (!LEADERBOARDS.containsKey(guild.getLongID()))
+		if (!StarotaModule.isModuleEnabled(guild, BaseModules.LEADERBOARDS)
+				|| !LEADERBOARDS.containsKey(guild.getLongID()))
 			return 0;
 		return LEADERBOARDS.get(guild.getLongID()).size();
 	}
 
 	public static List<Leaderboard> getLeaderboards(IGuild guild) {
+		if (!StarotaModule.isModuleEnabled(guild, BaseModules.LEADERBOARDS))
+			return null;
 		if (!LEADERBOARDS.containsKey(guild.getLongID()))
 			return Collections.emptyList();
 		return Collections.unmodifiableList(LEADERBOARDS.get(guild.getLongID()));
 	}
 
 	public static List<Leaderboard> getLeaderboardsActive(IGuild guild) {
+		if (!StarotaModule.isModuleEnabled(guild, BaseModules.LEADERBOARDS))
+			return null;
 		if (!LEADERBOARDS.containsKey(guild.getLongID()))
 			return Collections.emptyList();
 		List<Leaderboard> boards = new ArrayList<>();
@@ -125,6 +134,8 @@ public class LeaderboardManager {
 	}
 
 	public static Leaderboard getLeaderboard(IGuild guild, String name) {
+		if (!StarotaModule.isModuleEnabled(guild, BaseModules.LEADERBOARDS))
+			return null;
 		if (!LEADERBOARDS.containsKey(guild.getLongID()))
 			return null;
 		String[] names = new String[] { name, name.replaceAll(" ", "_"), name.replaceAll(" ", "-"),
@@ -140,6 +151,8 @@ public class LeaderboardManager {
 	}
 
 	public static Leaderboard getLeaderboardActive(IGuild guild, String name) {
+		if (!StarotaModule.isModuleEnabled(guild, BaseModules.LEADERBOARDS))
+			return null;
 		Leaderboard board = getLeaderboard(guild, name);
 		if (!board.isActive())
 			return null;

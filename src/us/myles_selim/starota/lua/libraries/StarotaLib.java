@@ -69,40 +69,44 @@ public class StarotaLib implements LuaLibrary {
 				return ConversionHandler.convertToLua(state, EnumPokemon.getPokemon(arg.toString()));
 			}
 		});
-		env.rawset("getTrade", new OneArgFunction() {
+		if (StarotaModule.isModuleEnabled(server, BaseModules.TRADEBOARD)) {
+			env.rawset("getTrade", new OneArgFunction() {
 
-			@Override
-			public LuaValue call(LuaState state, LuaValue arg) throws LuaError {
-				if (arg.isIntExact())
-					return ConversionHandler.convertToLua(state,
-							Tradeboard.getPost(server, arg.toInteger()));
-				// TODO: Finish this
-				throw new LuaError("can only get posts by id, WIP");
-				// return ConversionHandler.convertToLua(state,
-				// EnumPokemon.getPokemon(arg.toString()));
-			}
-		});
-		env.rawset("getLeaderboard", new OneArgFunction() {
+				@Override
+				public LuaValue call(LuaState state, LuaValue arg) throws LuaError {
+					if (arg.isIntExact())
+						return ConversionHandler.convertToLua(state,
+								Tradeboard.getPost(server, arg.toInteger()));
+					// TODO: Finish this
+					throw new LuaError("can only get posts by id, WIP");
+					// return ConversionHandler.convertToLua(state,
+					// EnumPokemon.getPokemon(arg.toString()));
+				}
+			});
+		}
+		if (StarotaModule.isModuleEnabled(server, BaseModules.LEADERBOARDS)) {
+			env.rawset("getLeaderboard", new OneArgFunction() {
 
-			@Override
-			public LuaValue call(LuaState state, LuaValue arg) throws LuaError {
-				Leaderboard board = LeaderboardManager.getLeaderboard(server, arg.toString());
-				if (board == null)
-					return Constants.NIL;
-				return ConversionHandler.convertToLua(state, board);
-			}
-		});
-		env.rawset("getAllLeaderboards", new ZeroArgFunction() {
+				@Override
+				public LuaValue call(LuaState state, LuaValue arg) throws LuaError {
+					Leaderboard board = LeaderboardManager.getLeaderboard(server, arg.toString());
+					if (board == null)
+						return Constants.NIL;
+					return ConversionHandler.convertToLua(state, board);
+				}
+			});
+			env.rawset("getAllLeaderboards", new ZeroArgFunction() {
 
-			@Override
-			public LuaValue call(LuaState state) throws LuaError {
-				LuaTable ret = new LuaTable();
-				List<Leaderboard> boards = LeaderboardManager.getLeaderboards(server);
-				for (int i = 0; i < boards.size(); i++)
-					ret.rawset(i, ConversionHandler.convertToLua(state, boards.get(i)));
-				return ret;
-			}
-		});
+				@Override
+				public LuaValue call(LuaState state) throws LuaError {
+					LuaTable ret = new LuaTable();
+					List<Leaderboard> boards = LeaderboardManager.getLeaderboards(server);
+					for (int i = 0; i < boards.size(); i++)
+						ret.rawset(i, ConversionHandler.convertToLua(state, boards.get(i)));
+					return ret;
+				}
+			});
+		}
 		return env;
 	}
 

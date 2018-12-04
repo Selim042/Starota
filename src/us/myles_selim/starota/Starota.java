@@ -239,12 +239,18 @@ public class Starota {
 
 		public static final StarotaModule PROFILES = new StarotaModule("Player Profiles", "Profiles");
 		public static final StarotaModule GROUPS = new StarotaModule("Groups", "Groups");
+		public static final StarotaModule TRADEBOARD = new StarotaModule("Tradeboard", "Tradeboard",
+				PROFILES);
 		public static final StarotaModule LUA = new StarotaModule("Lua", "Lua");
+		public static final StarotaModule LEADERBOARDS = new StarotaModule("Leaderboards", "Leaderboard",
+				PROFILES);
 
 		private static void registerModules() {
 			StarotaModule.registerModule(PROFILES);
 			StarotaModule.registerModule(GROUPS);
+			StarotaModule.registerModule(TRADEBOARD);
 			StarotaModule.registerModule(LUA);
+			StarotaModule.registerModule(LEADERBOARDS);
 		}
 
 	}

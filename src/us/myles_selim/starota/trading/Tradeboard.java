@@ -17,6 +17,8 @@ import us.myles_selim.ebs.EBList;
 import us.myles_selim.ebs.IOHelper;
 import us.myles_selim.starota.ServerOptions;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.Starota.BaseModules;
+import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.profiles.ProfileManager;
 import us.myles_selim.starota.trading.forms.FormSet;
@@ -74,6 +76,8 @@ public class Tradeboard {
 	}
 
 	public static void addPost(IGuild server, PlayerProfile profile, TradeboardPost post) {
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.TRADEBOARD))
+			return;
 		if (!DATA.containsKey(server.getLongID()))
 			DATA.put(server.getLongID(), new EBList<>(new TradeboardPost()));
 		EBList<TradeboardPost> posts = DATA.get(server.getLongID());
@@ -82,7 +86,8 @@ public class Tradeboard {
 	}
 
 	public static List<TradeboardPost> getPosts(IGuild server) {
-		if (!DATA.containsKey(server.getLongID()))
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.TRADEBOARD)
+				|| !DATA.containsKey(server.getLongID()))
 			return null;
 		return DATA.get(server.getLongID()).values();
 	}
@@ -106,6 +111,8 @@ public class Tradeboard {
 
 	public static List<TradeboardPost> findPosts(boolean lookingFor, IGuild server, EnumPokemon pokemon,
 			Form form, boolean shiny, EnumGender gender, boolean legacy) {
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.TRADEBOARD))
+			return null;
 		List<TradeboardPost> allPosts = getPosts(server);
 		if (allPosts == null)
 			return Collections.emptyList();
@@ -137,6 +144,8 @@ public class Tradeboard {
 
 	public static List<TradeboardPost> findPosts(IGuild server, EnumPokemon pokemon, Form form,
 			boolean shiny, EnumGender gender, boolean legacy) {
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.TRADEBOARD))
+			return null;
 		List<TradeboardPost> allPosts = getPosts(server);
 		List<TradeboardPost> matching = new LinkedList<>();
 		for (TradeboardPost p : allPosts)
@@ -165,6 +174,8 @@ public class Tradeboard {
 
 	public static TradeboardPost newPost(IGuild server, boolean lookingFor, long owner,
 			EnumPokemon pokemon, Form form, boolean shiny, EnumGender gender, boolean legacy) {
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.TRADEBOARD))
+			return null;
 		int nextPostId = 1;
 		if (ServerOptions.hasKey(server, TRADE_ID_KEY))
 			nextPostId = (int) ServerOptions.getValue(server, TRADE_ID_KEY);
@@ -185,6 +196,8 @@ public class Tradeboard {
 	}
 
 	public static TradeboardPost getPost(IGuild server, int id) {
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.TRADEBOARD))
+			return null;
 		if (!DATA.containsKey(server.getLongID()) || id == -1)
 			return null;
 		for (TradeboardPost t : DATA.get(server.getLongID()).values())
@@ -194,6 +207,8 @@ public class Tradeboard {
 	}
 
 	public static List<TradeboardPost> getPosts(IGuild server, IUser user) {
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.TRADEBOARD))
+			return null;
 		if (!DATA.containsKey(server.getLongID()))
 			return Collections.emptyList();
 		List<TradeboardPost> posts = new LinkedList<>();
@@ -204,6 +219,8 @@ public class Tradeboard {
 	}
 
 	public static TradeboardPost removePost(IGuild server, int id) {
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.TRADEBOARD))
+			return null;
 		if (!DATA.containsKey(server.getLongID()))
 			return null;
 		TradeboardPost post = null;
