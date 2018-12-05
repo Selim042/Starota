@@ -2,16 +2,43 @@ package us.myles_selim.starota.modules;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import sx.blah.discord.handle.obj.IGuild;
+import us.myles_selim.ebs.EBList;
+import us.myles_selim.ebs.data_types.DataTypeString;
+import us.myles_selim.starota.ServerOptions;
 
 public class StarotaModule {
 
+	public static final String MODULE_KEY = "disabledModules";
+
 	private static final List<StarotaModule> MODULES = new ArrayList<>();
-	private static final Map<IGuild, List<StarotaModule>> DISABLED_MODULES = new HashMap<>();
+
+	@SuppressWarnings("unchecked")
+	private static List<StarotaModule> getDisabledModulesRaw(IGuild server) {
+		if (!ServerOptions.hasKey(server, MODULE_KEY, EBList.class))
+			return new ArrayList<>(MODULES);
+		List<StarotaModule> modules = new ArrayList<>();
+		for (String name : ((EBList<String>) ServerOptions.getValue(server, MODULE_KEY)).values()) {
+			StarotaModule module = getModule(name);
+			if (module != null)
+				modules.add(module);
+		}
+		return modules;
+	}
+
+	private static boolean disableModuleRaw(IGuild server, StarotaModule module) {
+		if (!ServerOptions.hasKey(server, MODULE_KEY, EBList.class))
+			ServerOptions.setValue(server, MODULE_KEY, new EBList<>(new DataTypeString()));
+		@SuppressWarnings("unchecked")
+		EBList<String> modules = (EBList<String>) ServerOptions.getValue(server, MODULE_KEY);
+		if (modules.containsWrapped(module.name))
+			return false;
+		modules.addWrapped(module.name);
+		ServerOptions.setValue(server, MODULE_KEY, modules);
+		return true;
+	}
 
 	public static void registerModule(StarotaModule module) {
 		if (!MODULES.contains(module))
@@ -19,21 +46,16 @@ public class StarotaModule {
 	}
 
 	public static boolean enableModule(IGuild server, StarotaModule module) {
-		if (!DISABLED_MODULES.containsKey(server))
+		if (!ServerOptions.hasKey(server, MODULE_KEY))
 			return false;
-		List<StarotaModule> modules = DISABLED_MODULES.get(server);
+		List<StarotaModule> modules = getDisabledModulesRaw(server);
 		if (!modules.contains(module))
 			return false;
 		return modules.remove(module);
 	}
 
 	public static boolean disableModule(IGuild server, StarotaModule module) {
-		if (!DISABLED_MODULES.containsKey(server))
-			DISABLED_MODULES.put(server, new ArrayList<>());
-		List<StarotaModule> modules = DISABLED_MODULES.get(server);
-		if (modules.contains(module))
-			return false;
-		return modules.add(module);
+		return disableModuleRaw(server, module);
 	}
 
 	public static boolean isModuleEnabled(IGuild server, StarotaModule module) {
@@ -49,15 +71,13 @@ public class StarotaModule {
 	}
 
 	public static List<StarotaModule> getDisabledModules(IGuild server) {
-		if (!DISABLED_MODULES.containsKey(server))
-			return Collections.emptyList();
-		return Collections.unmodifiableList(DISABLED_MODULES.get(server));
+		return Collections.unmodifiableList(getDisabledModulesRaw(server));
 	}
 
 	public static boolean isCategoryEnabled(IGuild server, String category) {
-		if (!DISABLED_MODULES.containsKey(server))
+		if (!ServerOptions.hasKey(server, MODULE_KEY, EBList.class))
 			return true;
-		List<StarotaModule> modules = DISABLED_MODULES.get(server);
+		List<StarotaModule> modules = getDisabledModulesRaw(server);
 		for (StarotaModule m : modules)
 			if (category.equalsIgnoreCase(m.commandCategory))
 				return false;
@@ -84,9 +104,9 @@ public class StarotaModule {
 	}
 
 	private static boolean isModuleEnabledShallow(IGuild server, StarotaModule module) {
-		if (!DISABLED_MODULES.containsKey(server))
+		if (!ServerOptions.hasKey(server, MODULE_KEY, EBList.class))
 			return true;
-		List<StarotaModule> modules = DISABLED_MODULES.get(server);
+		List<StarotaModule> modules = getDisabledModulesRaw(server);
 		return !modules.contains(module);
 	}
 

@@ -42,7 +42,7 @@ public class StarotaLib implements LuaLibrary {
 	@Override
 	public LuaValue add(LuaState state, LuaTable env) {
 		env.rawset("options", storageToValue(ServerOptions.getOptions(server), Tradeboard.TRADE_ID_KEY,
-				CommandChangelogChannel.CHANGES_CHANNEL, "changesVersion"));
+				CommandChangelogChannel.CHANGES_CHANNEL, "changesVersion", StarotaModule.MODULE_KEY));
 		if (StarotaModule.isModuleEnabled(server, BaseModules.PROFILES)) {
 			env.rawset("getProfile", new OneArgFunction() {
 
