@@ -17,6 +17,7 @@ import us.myles_selim.starota.commands.registry.channel_management.ChannelComman
 import us.myles_selim.starota.commands.registry.channel_management.CommandAddChannelWhitelist;
 import us.myles_selim.starota.commands.registry.channel_management.CommandGetWhitelist;
 import us.myles_selim.starota.commands.registry.channel_management.CommandRemoveChannelWhitelist;
+import us.myles_selim.starota.modules.StarotaModule;
 
 public class JavaCommandHandler implements ICommandHandler {
 
@@ -51,7 +52,8 @@ public class JavaCommandHandler implements ICommandHandler {
 	}
 
 	@Override
-	public boolean executeCommand(String[] args, IMessage message, IGuild guild, IChannel channel) throws Exception {
+	public boolean executeCommand(String[] args, IMessage message, IGuild guild, IChannel channel)
+			throws Exception {
 		ICommand cmd = findCommand(guild, args[0]);
 		if (cmd == null)
 			return false;
@@ -65,16 +67,25 @@ public class JavaCommandHandler implements ICommandHandler {
 
 	@Override
 	public List<ICommand> getAllCommands(IGuild server) {
-		return Collections.unmodifiableList(COMMANDS);
+		List<ICommand> toRemove = new ArrayList<>();
+		for (ICommand c : COMMANDS)
+			if (!StarotaModule.isCategoryEnabled(server, c.getCategory()))
+				toRemove.add(c);
+		List<ICommand> ret = new ArrayList<>(COMMANDS);
+		ret.removeAll(toRemove);
+		return Collections.unmodifiableList(ret);
 	}
 
 	public static List<String> getAllCategories() {
 		return Collections.unmodifiableList(CATEGORIES);
 	}
 
-	public List<ICommand> getCommandsByCategory(String category) {
+	@Override
+	public List<ICommand> getCommandsByCategory(IGuild guild, String category) {
 		if (category == null)
 			return getAllCommands(null);
+		if (!StarotaModule.isCategoryEnabled(guild, category))
+			return Collections.emptyList();
 		List<JavaCommand> cmds = new ArrayList<>();
 		for (JavaCommand c : COMMANDS)
 			if (category.equalsIgnoreCase(c.getCategory()))
@@ -85,6 +96,8 @@ public class JavaCommandHandler implements ICommandHandler {
 	@Override
 	public ICommand findCommand(IGuild server, String name) {
 		for (JavaCommand c : COMMANDS) {
+			if (!StarotaModule.isCategoryEnabled(server, c.getCategory()))
+				continue;
 			if (c != null && c.getName() != null && c.getName().equalsIgnoreCase(name))
 				return c;
 			for (String a : c.getAliases())

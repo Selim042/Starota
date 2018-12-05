@@ -8,6 +8,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
 
@@ -95,10 +96,11 @@ public class CommandHelp extends JavaCommand {
 		List<ICommand> disp = new LinkedList<>();
 		for (ICommand cmd : cmds)
 			if (guild != null
-					&& (author.getPermissionsForGuild(guild).contains(cmd.requiredPermission())
-							|| cmd.requiredPermission() == null)
-					&& (author.getRolesForGuild(guild).contains(cmd.requiredRole(guild))
-							|| cmd.requiredRole(guild) == null))
+					&& (author.getPermissionsForGuild(guild).contains(Permissions.ADMINISTRATOR)
+							|| ((author.getPermissionsForGuild(guild).contains(cmd.requiredPermission())
+									|| cmd.requiredPermission() == null)
+									&& (author.getRolesForGuild(guild).contains(cmd.requiredRole(guild))
+											|| cmd.requiredRole(guild) == null))))
 				disp.add(cmd);
 		disp.sort(null);
 		if (page > disp.size() / CMDS_PER_PAGE)

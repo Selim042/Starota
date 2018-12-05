@@ -32,7 +32,9 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IMessage.Attachment;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.Starota.BaseModules;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
+import us.myles_selim.starota.modules.StarotaModule;
 
 public class ScriptManager {
 
@@ -49,7 +51,7 @@ public class ScriptManager {
 	};
 
 	public static boolean saveScript(IGuild server, String name, Attachment attach) {
-		if (attach == null)
+		if (attach == null || !StarotaModule.isModuleEnabled(server, BaseModules.LUA))
 			return false;
 		String contents = getAttachmentContents(attach.getUrl());
 		File folder = new File(SCRIPT_FOLDER, server.getStringID());
@@ -94,6 +96,8 @@ public class ScriptManager {
 
 	public static boolean executeCommandScript(IGuild server, String name, IMessage message,
 			IChannel channel, String[] args) throws LuaError, IOException, CompileException {
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.LUA))
+			return false;
 		File folder = new File(SCRIPT_FOLDER, server.getStringID());
 		LuaState state = LuaUtils.getState(server);
 		// state.stdout = System.out;
@@ -123,6 +127,8 @@ public class ScriptManager {
 	}
 
 	public static boolean executeEventScript(LuaState state, IGuild server) {
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.LUA))
+			return false;
 		File folder = new File(SCRIPT_FOLDER, server.getStringID());
 		// state.stdout = System.out;
 		LuaTable _G = state.getMainThread().getfenv();
@@ -143,6 +149,8 @@ public class ScriptManager {
 	}
 
 	public static List<String> getCommandScripts(IGuild server) {
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.LUA))
+			return Collections.emptyList();
 		List<String> ret = new ArrayList<>();
 		File folder = new File(SCRIPT_FOLDER, server.getStringID() + File.separator + "commands");
 		if (folder.listFiles(LUA_FILTER) == null)

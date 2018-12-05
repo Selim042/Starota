@@ -14,6 +14,8 @@ import sx.blah.discord.handle.obj.IUser;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.ebs.IOHelper;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.Starota.BaseModules;
+import us.myles_selim.starota.modules.StarotaModule;
 
 public class ProfileManager {
 
@@ -57,6 +59,8 @@ public class ProfileManager {
 	}
 
 	public static void setProfile(IGuild server, IUser user, PlayerProfile profile) {
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.PROFILES))
+			return;
 		if (!DATA.containsKey(server.getLongID()))
 			DATA.put(server.getLongID(), new EBStorage().registerPrimitives()
 					.registerType(new PlayerProfile.DataTypePlayerProfile()));
@@ -66,6 +70,8 @@ public class ProfileManager {
 	}
 
 	public static List<PlayerProfile> getProfiles(IGuild server) {
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.PROFILES))
+			return null;
 		if (!DATA.containsKey(server.getLongID()))
 			return null;
 		EBStorage storage = DATA.get(server.getLongID());
@@ -76,6 +82,8 @@ public class ProfileManager {
 	}
 
 	public static PlayerProfile getProfile(IGuild server, String pogoName) {
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.PROFILES))
+			return null;
 		if (!DATA.containsKey(server.getLongID()))
 			return null;
 		EBStorage storage = DATA.get(server.getLongID());
@@ -88,6 +96,8 @@ public class ProfileManager {
 	}
 
 	public static PlayerProfile getProfile(long server, long user) {
+		if (!StarotaModule.isModuleEnabled(Starota.getGuild(server), BaseModules.PROFILES))
+			return null;
 		if (!DATA.containsKey(server))
 			return null;
 		EBStorage storage = DATA.get(server);
@@ -97,6 +107,8 @@ public class ProfileManager {
 	}
 
 	public static PlayerProfile getProfile(IGuild server, IUser user) {
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.PROFILES))
+			return null;
 		if (!DATA.containsKey(server.getLongID()))
 			return null;
 		EBStorage storage = DATA.get(server.getLongID());
@@ -106,6 +118,8 @@ public class ProfileManager {
 	}
 
 	public static boolean hasProfile(IGuild server, IUser user) {
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.PROFILES))
+			return false;
 		if (user == null)
 			return false;
 		if (!DATA.containsKey(server.getLongID()))

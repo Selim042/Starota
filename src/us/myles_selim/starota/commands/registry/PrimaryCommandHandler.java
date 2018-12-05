@@ -1,6 +1,7 @@
 package us.myles_selim.starota.commands.registry;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -15,6 +16,7 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.ServerOptions;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.modules.StarotaModule;
 
 public class PrimaryCommandHandler {
 
@@ -78,12 +80,14 @@ public class PrimaryCommandHandler {
 	public static List<ICommand> getCommandsByCategory(IGuild server, String category) {
 		if (category == null || category.isEmpty())
 			return getAllCommands(server);
+		if (!StarotaModule.isCategoryEnabled(server, category))
+			return Collections.emptyList();
 		List<ICommand> ret = new ArrayList<>();
 		for (ICommandHandler h : COMMAND_HANDLERS)
-			for (ICommand c : h.getAllCommands(server))
+			for (ICommand c : h.getCommandsByCategory(server, category))
 				if (category.equalsIgnoreCase(c.getCategory()))
 					ret.add(c);
-		return ret;
+		return Collections.unmodifiableList(ret);
 	}
 
 	public static List<ICommand> getAllCommands(IGuild server) {

@@ -40,6 +40,8 @@ import us.myles_selim.starota.lua.LuaEventHandler;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.commands.CommandUploadScript;
 import us.myles_selim.starota.lua.commands.LuaCommandHandler;
+import us.myles_selim.starota.modules.CommandModules;
+import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.profiles.ProfileManager;
 import us.myles_selim.starota.profiles.commands.CommandGetProfilelessPlayers;
 import us.myles_selim.starota.profiles.commands.CommandProfile;
@@ -110,6 +112,7 @@ public class Starota {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		BaseModules.registerModules();
 		DebugServer debug = new DebugServer();
 		debug.start();
 
@@ -158,6 +161,8 @@ public class Starota {
 		JavaCommandHandler.registerCommand("Leaderboard", new CommandNewLeaderboard());
 		JavaCommandHandler.registerCommand("Leaderboard", new CommandGetLeaderboard());
 		JavaCommandHandler.registerCommand("Leaderboard", new CommandListLeaderboards());
+
+		JavaCommandHandler.registerCommand("Modules", new CommandModules());
 
 		try {
 			Thread.sleep(2500);
@@ -231,6 +236,26 @@ public class Starota {
 		LuaUtils.registerConverters();
 		dispatcher.registerListener(new LuaEventHandler());
 		PrimaryCommandHandler.registerCommandHandler(new LuaCommandHandler());
+	}
+
+	public static class BaseModules {
+
+		public static final StarotaModule PROFILES = new StarotaModule("Player Profiles", "Profiles");
+		public static final StarotaModule GROUPS = new StarotaModule("Groups", "Groups");
+		public static final StarotaModule TRADEBOARD = new StarotaModule("Tradeboard", "Tradeboard",
+				PROFILES);
+		public static final StarotaModule LUA = new StarotaModule("Lua", "Lua");
+		public static final StarotaModule LEADERBOARDS = new StarotaModule("Leaderboards", "Leaderboard",
+				PROFILES);
+
+		private static void registerModules() {
+			StarotaModule.registerModule(PROFILES);
+			StarotaModule.registerModule(GROUPS);
+			StarotaModule.registerModule(TRADEBOARD);
+			StarotaModule.registerModule(LUA);
+			StarotaModule.registerModule(LEADERBOARDS);
+		}
+
 	}
 
 	public static IDiscordClient getClient() {
