@@ -40,18 +40,25 @@ public class StarotaModule {
 		return true;
 	}
 
+	private static boolean enableModuleRaw(IGuild server, StarotaModule module) {
+		if (!ServerOptions.hasKey(server, MODULE_KEY))
+			return false;
+		@SuppressWarnings("unchecked")
+		EBList<String> modules = (EBList<String>) ServerOptions.getValue(server, MODULE_KEY);
+		if (!modules.containsWrapped(module.name))
+			return false;
+		modules.removeWrapped(module.name);
+		ServerOptions.setValue(server, MODULE_KEY, modules);
+		return true;
+	}
+
 	public static void registerModule(StarotaModule module) {
 		if (!MODULES.contains(module))
 			MODULES.add(module);
 	}
 
 	public static boolean enableModule(IGuild server, StarotaModule module) {
-		if (!ServerOptions.hasKey(server, MODULE_KEY))
-			return false;
-		List<StarotaModule> modules = getDisabledModulesRaw(server);
-		if (!modules.contains(module))
-			return false;
-		return modules.remove(module);
+		return enableModuleRaw(server, module);
 	}
 
 	public static boolean disableModule(IGuild server, StarotaModule module) {
