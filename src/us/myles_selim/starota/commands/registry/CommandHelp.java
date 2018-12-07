@@ -126,6 +126,9 @@ public class CommandHelp extends JavaCommand {
 							+ (desciption == null ? "" : ", _" + cmd.getDescription() + "_") + "\n");
 				}
 			}
+			if (page < disp.size() / CMDS_PER_PAGE)
+				builder.appendDesc("\nTo view the next page, use `"
+						+ PrimaryCommandHandler.getPrefix(guild) + getName() + " " + (page + 2) + "`");
 			builder.appendDesc("\n**Page**: " + (page + 1) + "/" + ((disp.size() / CMDS_PER_PAGE) + 1));
 			// helpMessage =
 			channel.sendMessage(builder.build());
