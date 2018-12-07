@@ -209,7 +209,7 @@ public enum EnumPokemon {
 	HOPPIP(EnumPokemonType.GRASS, EnumPokemonType.FLYING),
 	SKIPLOOM(EnumPokemonType.GRASS, EnumPokemonType.FLYING),
 	JUMPLUFF(EnumPokemonType.GRASS, EnumPokemonType.FLYING),
-	APIOM(EnumPokemonType.NORMAL),
+	AIPOM(EnumPokemonType.NORMAL),
 	SUNKERN(EnumPokemonType.GRASS),
 	SUNFLORA(EnumPokemonType.GRASS),
 	YANMA(EnumPokemonType.BUG, EnumPokemonType.FLYING),
