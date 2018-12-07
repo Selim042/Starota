@@ -5,12 +5,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.squiddev.cobalt.Constants;
+import org.squiddev.cobalt.LuaError;
 import org.squiddev.cobalt.LuaNil;
 import org.squiddev.cobalt.LuaState;
 import org.squiddev.cobalt.LuaTable;
+import org.squiddev.cobalt.LuaUserdata;
 import org.squiddev.cobalt.LuaValue;
 import org.squiddev.cobalt.ValueFactory;
 import org.squiddev.cobalt.compiler.LuaC;
+import org.squiddev.cobalt.function.LuaFunction;
 import org.squiddev.cobalt.function.VarArgFunction;
 import org.squiddev.cobalt.lib.BaseLib;
 import org.squiddev.cobalt.lib.CoroutineLib;
@@ -32,6 +35,7 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.Starota.BaseModules;
@@ -47,6 +51,7 @@ import us.myles_selim.starota.lua.conversion.starota.EnumPokemonConverter;
 import us.myles_selim.starota.lua.conversion.starota.LeaderboardConverter;
 import us.myles_selim.starota.lua.conversion.starota.PlayerProfileConverter;
 import us.myles_selim.starota.lua.conversion.starota.TradeboardPostConverter;
+import us.myles_selim.starota.lua.events.LuaEvent;
 import us.myles_selim.starota.lua.libraries.DiscordEventLib;
 import us.myles_selim.starota.lua.libraries.DiscordLib;
 import us.myles_selim.starota.lua.libraries.StarotaLib;
@@ -161,8 +166,16 @@ public class LuaUtils {
 		return ConversionHandler.convertToJava(state, val);
 	}
 
-	public static LuaValue getEvent(LuaState state, GuildEvent event) {
-		// IGuild server = event.getGuild();
+	public static LuaValue getEvent(LuaState state, Object event) {
+		if (event instanceof GuildEvent)
+			return getEvent(state, (GuildEvent) event);
+		if (event instanceof LuaEvent)
+			return ((LuaEvent) event).toLua(state);
+		throw new RuntimeException(
+				"event must be a LuaEvent or GuildEvent, got " + event.getClass().getName());
+	}
+
+	private static LuaValue getEvent(LuaState state, GuildEvent event) {
 		LuaTable ret = new LuaTable();
 		ret.rawset("server", ConversionHandler.convertToLua(state, event.getGuild()));
 		if (event instanceof ChannelEvent)
@@ -193,6 +206,52 @@ public class LuaUtils {
 		if (event instanceof TypingEvent)
 			ret.rawset("user", ConversionHandler.convertToLua(state, ((TypingEvent) event).getUser()));
 		return ret;
+	}
+
+	public static void handleEvent(Object event) {
+		IGuild server = null;
+		LuaValue eventL = null;
+		LuaState state = null;
+		if (event instanceof GuildEvent) {
+			server = ((GuildEvent) event).getGuild();
+			state = getState(server);
+			eventL = getEvent(state, (GuildEvent) event);
+		} else if (event instanceof LuaEvent) {
+			server = ((LuaEvent) event).getServer();
+			state = getState(server);
+			eventL = getEvent(state, (LuaEvent) event);
+		}
+		if (state == null || !StarotaModule.isModuleEnabled(server, BaseModules.LUA))
+			return;
+		handleEvent(server, event, state, eventL);
+	}
+
+	private static void handleEvent(IGuild server, Object event, LuaState state, LuaValue eventL) {
+		LuaTable _G = state.getMainThread().getfenv();
+		String functName = "on" + event.getClass().getSimpleName();
+		IChannel errorChannel;
+		if (eventL.isTable() && ((LuaTable) eventL).rawget("channel") instanceof LuaUserdata)
+			errorChannel = (IChannel) ((LuaUserdata) ((LuaTable) eventL).rawget("channel")).instance;
+		else
+			errorChannel = null;
+		try {
+			LuaTable eventLib = _G.rawget(DiscordEventLib.KEY).checkTable();
+			LuaValue funcV = eventLib.get(state, functName);
+			// for (LuaValue v : eventLib.keys()) {
+			// System.out.println("event handler: " + v);
+			// }
+			// System.out.println("event fired: " + functName);
+			if (funcV == null || !funcV.isFunction())
+				return;
+			((LuaFunction) funcV).call(state, eventLib, eventL);
+		} catch (LuaError e) {
+			System.out.println("event fired: " + functName + " on server: " + server.getName());
+			if (errorChannel != null)
+				RequestBuffer
+						.request(() -> errorChannel.sendMessage("There was an error when processing a "
+								+ functName + " event: " + e.getLocalizedMessage()));
+			e.printStackTrace();
+		}
 	}
 
 	// protected static LuaValue getRole(IGuild server, IRole role) {

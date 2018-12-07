@@ -5,7 +5,6 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
-import us.myles_selim.starota.embed_converter.EmbedConverter;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.profiles.ProfileManager;
 
@@ -90,7 +89,7 @@ public class CommandUpdateProfile extends JavaCommand {
 		if (executed) {
 			ProfileManager.setProfile(guild, message.getAuthor(), profile);
 			channel.sendMessage("Updated \"" + args[1] + "\" to \"" + args[2] + "\"",
-					EmbedConverter.toEmbed(profile));
+					profile.toEmbed(guild));
 		} else
 			channel.sendMessage("Invalid option " + args[1]);
 	}

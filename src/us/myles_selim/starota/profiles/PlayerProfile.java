@@ -5,12 +5,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import sx.blah.discord.api.internal.json.objects.EmbedObject;
+import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.EnumTeam;
+import us.myles_selim.starota.EventFactory;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.embed_converter.ExtraField;
 import us.myles_selim.starota.embed_converter.annotations.EmbedAuthorIcon;
 import us.myles_selim.starota.embed_converter.annotations.EmbedAuthorName;
 import us.myles_selim.starota.embed_converter.annotations.EmbedColor;
@@ -19,6 +24,7 @@ import us.myles_selim.starota.embed_converter.annotations.EmbedFooterText;
 import us.myles_selim.starota.embed_converter.annotations.EmbedThumbnail;
 import us.myles_selim.starota.embed_converter.annotations.EmbedTimestamp;
 import us.myles_selim.starota.embed_converter.annotations.EmbedTitle;
+import us.myles_selim.starota.lua.events.GetProfileEvent;
 
 @EmbedFooterText("Profile last updated")
 @EmbedTitle("Profile for %poGoName%:")
@@ -129,6 +135,29 @@ public class PlayerProfile {
 		return Instant.ofEpochSecond(this.lastUpdated);
 	}
 
+	public EmbedObject toEmbed(IGuild guild) {
+		return toEmbed(EventFactory.fireProfileEvent(guild, this));
+	}
+
+	private EmbedObject toEmbed(GetProfileEvent event) {
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.withAuthorIcon(this.authorIcon());
+		builder.withAuthorName(this.authorText());
+		builder.withTitle("Profile for " + this.poGoName + ":");
+		for (ExtraField f : event.getFields()) {
+			if (f == null)
+				continue;
+			builder.appendField(f.title, f.value, f.inline);
+		}
+
+		builder.withColor(event.getColor());
+		builder.withThumbnail(event.getThumbnail());
+
+		builder.withFooterText("Profile last updated");
+		builder.withTimestamp(getLastUpdated());
+		return builder.build();
+	}
+
 	@EmbedField(value = "Silph Road Card:", order = 5)
 	public String getSilphRoadCard() {
 		return SilphRoadUtils.getCard(this.poGoName);
@@ -159,7 +188,7 @@ public class PlayerProfile {
 
 	// only for EmbedConverter
 	@EmbedField(value = "Patron:", order = 7)
-	private String patron() {
+	public String getPatronRoleName() {
 		IRole patronRole = Starota.getPatronRole(Starota.getUser(this.discordId));
 		if (patronRole != null)
 			return patronRole.getName();

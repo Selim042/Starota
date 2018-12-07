@@ -8,7 +8,6 @@ import sx.blah.discord.handle.obj.IUser;
 import us.myles_selim.starota.EnumTeam;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
-import us.myles_selim.starota.embed_converter.EmbedConverter;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.profiles.ProfileManager;
 
@@ -84,8 +83,7 @@ public class CommandSelfRegister extends JavaCommand {
 		PlayerProfile profile = new PlayerProfile().setPoGoName(args[1]).setDiscordId(target.getLongID())
 				.setLevel(level).setTeam(team);
 		ProfileManager.setProfile(guild, target, profile);
-		channel.sendMessage("Sucessfully registered " + target.getName(),
-				EmbedConverter.toEmbed(profile));
+		channel.sendMessage("Sucessfully registered " + target.getName(), profile.toEmbed(guild));
 	}
 
 	private static boolean hasTeamRoles(IGuild server) {

@@ -10,7 +10,6 @@ import us.myles_selim.starota.EnumTeam;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
-import us.myles_selim.starota.embed_converter.EmbedConverter;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.profiles.ProfileManager;
 
@@ -80,8 +79,7 @@ public class CommandRegister extends JavaCommand {
 		PlayerProfile profile = new PlayerProfile().setPoGoName(args[1]).setDiscordId(target.getLongID())
 				.setLevel(level).setTeam(team);
 		ProfileManager.setProfile(guild, target, profile);
-		channel.sendMessage("Sucessfully registered " + target.getName(),
-				EmbedConverter.toEmbed(profile));
+		channel.sendMessage("Sucessfully registered " + target.getName(), profile.toEmbed(guild));
 
 		// Role updates (pville only)
 		IRole roleLost = guild.getRoleByID(ROLE_LOST);

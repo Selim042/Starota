@@ -46,7 +46,7 @@ public class CommandProfile extends JavaCommand {
 			}
 		}
 		if (ProfileManager.hasProfile(guild, target)) {
-			channel.sendMessage(EmbedConverter.toEmbed(ProfileManager.getProfile(guild, target)));
+			channel.sendMessage(ProfileManager.getProfile(guild, target).toEmbed(guild));
 			return;
 		}
 		channel.sendMessage("User " + target.getName() + " does not have a profile");
