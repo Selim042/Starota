@@ -80,10 +80,13 @@ public class Starota {
 
 	public final static boolean DEBUG = false;
 	public static boolean IS_DEV;
+	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "2.1.0";
+	public final static String VERSION = "2.2.1";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n"
-			+ "Public facing changes:\n + Add leaderboards";
+			+ "Public changes:\n * Fixed spelling of \"Aipom\"\n"
+			+ " + Add line at the bottom of the help command showing how to get the next pages\n\n"
+			+ "Admistrative changes:\n + Add a Starota specific event for getting profiles";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static void main(String[] args) {
@@ -236,6 +239,8 @@ public class Starota {
 		LuaUtils.registerConverters();
 		dispatcher.registerListener(new LuaEventHandler());
 		PrimaryCommandHandler.registerCommandHandler(new LuaCommandHandler());
+
+		FULLY_STARTED = true;
 	}
 
 	public static class BaseModules {
