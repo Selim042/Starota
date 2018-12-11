@@ -15,6 +15,7 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.ebs.EBList;
 import us.myles_selim.ebs.IOHelper;
+import us.myles_selim.starota.DebugServer;
 import us.myles_selim.starota.ServerOptions;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.Starota.BaseModules;
@@ -65,6 +66,7 @@ public class Tradeboard {
 		for (Entry<Long, EBList<TradeboardPost>> entry : DATA.entrySet())
 			IOHelper.writeEBList(entry.getValue(),
 					new File(profiles, entry.getKey() + IOHelper.EBS_LIST_EXTENSION));
+		DebugServer.update();
 	}
 
 	public static void flush(IGuild server) {

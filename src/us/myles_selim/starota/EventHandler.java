@@ -6,6 +6,7 @@ import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;
 import sx.blah.discord.handle.impl.events.guild.GuildLeaveEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
+import sx.blah.discord.handle.impl.events.guild.role.RoleUpdateEvent;
 import sx.blah.discord.handle.obj.IEmbed;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
@@ -130,6 +131,12 @@ public class EventHandler {
 			channel.sendMessage("Unknown command");
 			break;
 		}
+	}
+
+	@EventSubscriber
+	public void roleChange(RoleUpdateEvent event) {
+		if (event.getGuild().getLongID() == Starota.SUPPORT_SERVER)
+			DebugServer.update();
 	}
 
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import sx.blah.discord.handle.obj.IGuild;
 import us.myles_selim.ebs.EBList;
 import us.myles_selim.ebs.data_types.DataTypeString;
+import us.myles_selim.starota.DebugServer;
 import us.myles_selim.starota.ServerOptions;
 
 public class StarotaModule {
@@ -37,6 +38,7 @@ public class StarotaModule {
 			return false;
 		modules.addWrapped(module.name);
 		ServerOptions.setValue(server, MODULE_KEY, modules);
+		DebugServer.update();
 		return true;
 	}
 
@@ -49,6 +51,7 @@ public class StarotaModule {
 			return false;
 		modules.removeWrapped(module.name);
 		ServerOptions.setValue(server, MODULE_KEY, modules);
+		DebugServer.update();
 		return true;
 	}
 

@@ -21,15 +21,19 @@ public class EventFactory {
 		event.setThumbnail(profile.getTeam().getIcon());
 
 		List<ExtraField> fields = event.getFields();
-		fields.add(new ExtraField("Trainer Level:", Integer.toString(38), true));
+		fields.add(new ExtraField("Trainer Level:", Integer.toString(profile.getLevel()), true));
 		fields.add(new ExtraField("Team:", profile.getTeam().getName(), true));
-		fields.add(new ExtraField("Real Name:", "Myles", true));
-		fields.add(new ExtraField("Trainer Code:", profile.getTrainerCodeString(), true));
-		String alts = "";
-		for (Entry<String, Long> e : profile.getAlts().entrySet())
-			alts += "- **" + e.getKey() + "**: " + ProfileManager.getTrainerCodeString(e.getValue())
-					+ "\n";
-		fields.add(new ExtraField("Alternate Accounts:", alts, false));
+		if (profile.getRealName() != null)
+			fields.add(new ExtraField("Real Name:", profile.getRealName(), true));
+		if (profile.getTrainerCode() != -1)
+			fields.add(new ExtraField("Trainer Code:", profile.getTrainerCodeString(), true));
+		if (!profile.getAlts().isEmpty()) {
+			String alts = "";
+			for (Entry<String, Long> e : profile.getAlts().entrySet())
+				alts += "- **" + e.getKey() + "**: " + ProfileManager.getTrainerCodeString(e.getValue())
+						+ "\n";
+			fields.add(new ExtraField("Alternate Accounts:", alts, false));
+		}
 		if (SilphRoadUtils.hasCard(profile.getPoGoName())) {
 			fields.add(new ExtraField("Silph Road Card:", SilphRoadUtils.getCard(profile.getPoGoName()),
 					false));

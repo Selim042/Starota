@@ -7,7 +7,6 @@ import sx.blah.discord.handle.obj.IUser;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
-import us.myles_selim.starota.embed_converter.EmbedConverter;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.profiles.ProfileManager;
 
@@ -33,13 +32,13 @@ public class CommandProfile extends JavaCommand {
 						+ this.getName() + " <target>");
 				return;
 			}
-			target = Starota.findUser(args[1]);
+			target = Starota.findUser(guild.getLongID(), args[1]);
 			if (target == null) {
 				PlayerProfile profile = ProfileManager.getProfile(guild, args[1]);
 				if (profile == null)
 					channel.sendMessage("User \"" + args[1] + "\" not found");
 				else {
-					channel.sendMessage(EmbedConverter.toEmbed(profile));
+					channel.sendMessage(profile.toEmbed(guild));
 					return;
 				}
 				return;

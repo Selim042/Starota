@@ -82,11 +82,9 @@ public class Starota {
 	public static boolean IS_DEV;
 	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "2.2.1";
+	public final static String VERSION = "2.2.2";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n"
-			+ "Public changes:\n * Fixed spelling of \"Aipom\"\n"
-			+ " + Add line at the bottom of the help command showing how to get the next pages\n\n"
-			+ "Admistrative changes:\n + Add a Starota specific event for getting profiles";
+			+ "Public changes:\n * Fix issue with profile command";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static void main(String[] args) {
