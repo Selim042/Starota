@@ -1,4 +1,6 @@
 # Starota
+[![](https://img.shields.io/discord/102860784329052160.svg)](https://discord.gg/NxverNw)
+
 Starota is a Discord bot designed for use on Pokemon Go oriented servers.
 
 If you want to add Starota to your own server, you can use [this](https://discordapp.com/oauth2/authorize?client_id=489245655710040099&scope=bot&permissions=268445776) link.  If you want to join the support server, you can join [here](https://discord.gg/NxverNw).
