@@ -117,7 +117,7 @@ public class Starota {
 		DebugServer debug = new DebugServer();
 		debug.start();
 
-		CLIENT.changePresence(StatusType.ONLINE, ActivityType.PLAYING, "registering commands...");
+		CLIENT.changePresence(StatusType.DND, ActivityType.PLAYING, "registering commands...");
 
 		JavaCommandHandler.registerCommand(new CommandChangelog());
 		JavaCommandHandler.registerCommand(new CommandCredits());
@@ -206,7 +206,7 @@ public class Starota {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		CLIENT.changePresence(StatusType.DND, ActivityType.PLAYING,
+		CLIENT.changePresence(StatusType.ONLINE, ActivityType.PLAYING,
 				"v" + VERSION + (DEBUG || IS_DEV ? "d" : ""));
 
 		Thread changesThread = new Thread() {
@@ -458,14 +458,19 @@ public class Starota {
 	}
 
 	public static void submitError(Throwable e) {
+		submitError(null, e);
+	}
+
+	public static void submitError(String message, Throwable e) {
 		if (IS_DEV || CLIENT == null || !CLIENT.isReady())
 			return;
-		long reportChannelId = 516301004434571313L;
+		long reportChannelId = 522805019326677002L;
 		IChannel reportChannel = CLIENT.getChannelByID(reportChannelId);
 		if (reportChannel == null)
 			return;
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.withTitle("An " + e.getClass().getSimpleName() + " has been thrown");
+		builder.withTitle("An " + e.getClass().getSimpleName() + " has been thrown"
+				+ (message == null ? "" : ": " + message));
 		String body = "";
 		for (StackTraceElement t : e.getStackTrace())
 			body += t + "\n";
