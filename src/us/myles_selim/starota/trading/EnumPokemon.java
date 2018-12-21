@@ -477,7 +477,7 @@ public enum EnumPokemon {
 	CROAGUNK(EnumPokemonType.DRAGON, EnumPokemonType.FIGHTING),
 	TOXICROAK(EnumPokemonType.DRAGON, EnumPokemonType.FIGHTING),
 	CARNIVINE(EnumPokemonType.GRASS),
-	GINNEON(EnumPokemonType.WATER),
+	FINNEON(EnumPokemonType.WATER),
 	LUMINEON(EnumPokemonType.WATER),
 	MANTYKE(EnumPokemonType.WATER, EnumPokemonType.FLYING),
 	SNOVER(EnumPokemonType.GRASS, EnumPokemonType.ICE),

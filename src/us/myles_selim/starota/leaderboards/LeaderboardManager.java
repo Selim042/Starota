@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 
 import sx.blah.discord.handle.obj.IGuild;
 import us.myles_selim.ebs.IOHelper;
+import us.myles_selim.starota.DebugServer;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.Starota.BaseModules;
 import us.myles_selim.starota.modules.StarotaModule;
@@ -43,7 +44,7 @@ public class LeaderboardManager {
 		});
 		if (files != null) {
 			for (File file : files) {
-				File[] nestFiles = file.listFiles(IOHelper.EBS_LIST_FILE_FILTER);
+				File[] nestFiles = file.listFiles(IOHelper.EBS_FILE_FILTER);
 				if (nestFiles == null || nestFiles.length == 0)
 					continue;
 				long serverId = Long.parseLong(file.getName());
@@ -71,6 +72,7 @@ public class LeaderboardManager {
 						new File(serverFolder, b.getDisplayName() + IOHelper.EBS_LIST_EXTENSION));
 			}
 		}
+		DebugServer.update();
 	}
 
 	public static void flush(IGuild guild) {

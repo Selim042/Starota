@@ -15,4 +15,6 @@ starotaData/profiles/*
 starotaData/tradeboard/*
 starotaData/lua/*
 starotaData/leaderboard/*
+starota_dump*
+
 /target/

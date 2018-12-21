@@ -129,6 +129,7 @@ public class Starota {
 		if (IS_DEV) {
 			JavaCommandHandler.registerCommand("Debug", new CommandGetTop());
 			JavaCommandHandler.registerCommand("Debug", new CommandTest());
+			JavaCommandHandler.registerCommand("Debug", new CommandGenerateCommandWiki());
 		}
 
 		JavaCommandHandler.registerCommand("Profiles", new CommandRegister());
@@ -239,6 +240,7 @@ public class Starota {
 		PrimaryCommandHandler.registerCommandHandler(new LuaCommandHandler());
 
 		FULLY_STARTED = true;
+		DebugServer.update();
 	}
 
 	public static class BaseModules {
@@ -309,6 +311,12 @@ public class Starota {
 				return user;
 		} catch (NumberFormatException e) {}
 		String user = name.replaceAll("@", "").replaceAll("#\\d{4}", "");
+		if (user.matches("<\\d{18}>")) {
+			long userId = Long.parseLong(user.substring(1, 19));
+			IUser userD = Starota.getClient().getGuildByID(serverId).getUserByID(userId);
+			if (userD != null)
+				return userD;
+		}
 		String discrim = null;
 		if (name.matches(".*#\\d{4}")) {
 			int hash = name.indexOf("#");

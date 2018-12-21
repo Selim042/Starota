@@ -27,7 +27,7 @@ public class Leaderboard {
 	private int color;
 
 	@SuppressWarnings("unchecked")
-	protected Leaderboard(IGuild server, EBStorage ebs) {
+	public Leaderboard(IGuild server, EBStorage ebs) {
 		this.server = server;
 		this.displayName = ebs.get("displayName", String.class);
 		this.entries = new LinkedList<>(ebs.get("entries", EBList.class).values());
