@@ -32,6 +32,9 @@ import us.myles_selim.starota.commands.CommandGetTop;
 import us.myles_selim.starota.commands.CommandStatus;
 import us.myles_selim.starota.commands.CommandSupportStarota;
 import us.myles_selim.starota.commands.CommandTest;
+import us.myles_selim.starota.commands.pvp.CommandBattleReady;
+import us.myles_selim.starota.commands.pvp.CommandFindBattles;
+import us.myles_selim.starota.commands.pvp.CommandNotReady;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 import us.myles_selim.starota.leaderboards.commands.CommandEditLeaderboard;
@@ -176,6 +179,10 @@ public class Starota {
 		JavaCommandHandler.registerCommand("Leaderboard", new CommandListLeaderboards());
 
 		JavaCommandHandler.registerCommand("Modules", new CommandModules());
+
+		JavaCommandHandler.registerCommand("PvP", new CommandBattleReady());
+		JavaCommandHandler.registerCommand("PvP", new CommandNotReady());
+		JavaCommandHandler.registerCommand("PvP", new CommandFindBattles());
 
 		try {
 			Thread.sleep(2500);
