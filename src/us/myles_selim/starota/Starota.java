@@ -242,6 +242,23 @@ public class Starota {
 
 		FULLY_STARTED = true;
 		DebugServer.update();
+
+		Thread discord4JWatchdog = new Thread() {
+
+			private boolean isReady = CLIENT.isReady();
+
+			@Override
+			public void run() {
+				boolean inReady = CLIENT.isReady();
+				if (!isReady && !inReady)
+					System.exit(1);
+				isReady = inReady;
+				try {
+					Thread.sleep(60000); // 1 min
+				} catch (InterruptedException e) {}
+			}
+		};
+		discord4JWatchdog.start();
 	}
 
 	public static class BaseModules {
