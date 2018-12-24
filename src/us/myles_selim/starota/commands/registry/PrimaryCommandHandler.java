@@ -14,9 +14,9 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.util.RequestBuffer;
-import us.myles_selim.starota.ServerOptions;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.modules.StarotaModule;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class PrimaryCommandHandler {
 
@@ -26,14 +26,16 @@ public class PrimaryCommandHandler {
 	public static final String PREFIX_KEY = "cmd_prefix";
 	public static final String DEFAULT_CATEGORY = "Uncategorized";
 
-	public static String getPrefix(IGuild server) {
-		if (ServerOptions.hasKey(server, PREFIX_KEY))
-			return String.valueOf(ServerOptions.getValue(server, PREFIX_KEY));
+	public static String getPrefix(IGuild guild) {
+		StarotaServer server = StarotaServer.getServer(guild);
+		if (server.hasKey(PREFIX_KEY))
+			return String.valueOf(server.getValue(PREFIX_KEY));
 		return DEFAULT_PREFIX;
 	}
 
-	public static void setPrefix(IGuild server, String prefix) {
-		ServerOptions.setValue(server, PREFIX_KEY, prefix);
+	public static void setPrefix(IGuild guild, String prefix) {
+		StarotaServer server = StarotaServer.getServer(guild);
+		server.setValue(PREFIX_KEY, prefix);
 	}
 
 	public static void registerCommandHandler(ICommandHandler handler) {
@@ -65,7 +67,8 @@ public class PrimaryCommandHandler {
 		} catch (Throwable e) {
 			RequestBuffer.request(() -> {
 				message.reply("There was an error encountered while executing your command: "
-						+ e.getStackTrace()[0] + e.getLocalizedMessage());
+						+ e.getClass().getName() + ": " + e.getLocalizedMessage() + "\n"
+						+ e.getStackTrace()[0]);
 			});
 			System.err.println("executed command: " + message.getContent());
 			e.printStackTrace();
@@ -80,7 +83,7 @@ public class PrimaryCommandHandler {
 	public static List<ICommand> getCommandsByCategory(IGuild server, String category) {
 		if (category == null || category.isEmpty())
 			return getAllCommands(server);
-		if (!StarotaModule.isCategoryEnabled(server, category))
+		if (!StarotaModule.isCategoryEnabled(StarotaServer.getServer(server), category))
 			return Collections.emptyList();
 		List<ICommand> ret = new ArrayList<>();
 		for (ICommandHandler h : COMMAND_HANDLERS)

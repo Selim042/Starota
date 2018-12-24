@@ -18,6 +18,7 @@ import us.myles_selim.starota.commands.registry.channel_management.CommandAddCha
 import us.myles_selim.starota.commands.registry.channel_management.CommandGetWhitelist;
 import us.myles_selim.starota.commands.registry.channel_management.CommandRemoveChannelWhitelist;
 import us.myles_selim.starota.modules.StarotaModule;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class JavaCommandHandler implements ICommandHandler {
 
@@ -57,7 +58,8 @@ public class JavaCommandHandler implements ICommandHandler {
 		ICommand cmd = findCommand(guild, args[0]);
 		if (cmd == null)
 			return false;
-		if (!ChannelCommandManager.isAllowedHere(guild, cmd.getCategory(), channel)
+		if (!ChannelCommandManager.isAllowedHere(StarotaServer.getServer(guild), cmd.getCategory(),
+				channel)
 				|| (cmd.requiredPermission() != null && guild != null && !message.getAuthor()
 						.getPermissionsForGuild(guild).contains(cmd.requiredPermission())))
 			return false;
@@ -69,7 +71,7 @@ public class JavaCommandHandler implements ICommandHandler {
 	public List<ICommand> getAllCommands(IGuild server) {
 		List<ICommand> toRemove = new ArrayList<>();
 		for (ICommand c : COMMANDS)
-			if (!StarotaModule.isCategoryEnabled(server, c.getCategory()))
+			if (!StarotaModule.isCategoryEnabled(StarotaServer.getServer(server), c.getCategory()))
 				toRemove.add(c);
 		List<ICommand> ret = new ArrayList<>(COMMANDS);
 		ret.removeAll(toRemove);
@@ -84,7 +86,7 @@ public class JavaCommandHandler implements ICommandHandler {
 	public List<ICommand> getCommandsByCategory(IGuild guild, String category) {
 		if (category == null)
 			return getAllCommands(null);
-		if (!StarotaModule.isCategoryEnabled(guild, category))
+		if (!StarotaModule.isCategoryEnabled(StarotaServer.getServer(guild), category))
 			return Collections.emptyList();
 		List<JavaCommand> cmds = new ArrayList<>();
 		for (JavaCommand c : COMMANDS)
@@ -96,7 +98,7 @@ public class JavaCommandHandler implements ICommandHandler {
 	@Override
 	public ICommand findCommand(IGuild server, String name) {
 		for (JavaCommand c : COMMANDS) {
-			if (!StarotaModule.isCategoryEnabled(server, c.getCategory()))
+			if (!StarotaModule.isCategoryEnabled(StarotaServer.getServer(server), c.getCategory()))
 				continue;
 			if (c != null && c.getName() != null && c.getName().equalsIgnoreCase(name))
 				return c;

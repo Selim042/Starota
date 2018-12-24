@@ -176,11 +176,11 @@ public class Starota {
 				"starting threads and loading settings...");
 
 		FormManager.init();
-		ServerOptions.init();
+		// ServerOptions.init();
 		ResearchTracker.init();
-		ProfileManager.init();
-		Tradeboard.init();
-		LeaderboardManager.init();
+		// ProfileManager.init();
+		// Tradeboard.init();
+		// LeaderboardManager.init();
 
 		// WebServer.init();
 
@@ -215,19 +215,19 @@ public class Starota {
 
 			@Override
 			public void run() {
-				for (IGuild s : CLIENT.getGuilds()) {
-					if (!ServerOptions.hasKey(s, CommandChangelogChannel.CHANGES_CHANNEL))
+				for (IGuild g : CLIENT.getGuilds()) {
+					StarotaServer server = StarotaServer.getServer(g);
+					if (!server.hasKey(CommandChangelogChannel.CHANGES_CHANNEL))
 						continue;
 					IChannel changesChannel = CLIENT.getChannelByID(
-							(long) ServerOptions.getValue(s, CommandChangelogChannel.CHANGES_CHANNEL));
+							(long) server.getValue(CommandChangelogChannel.CHANGES_CHANNEL));
 					if (changesChannel == null)
 						continue;
-					String latestChangelog = (String) ServerOptions.getValue(s, "changesVersion");
+					String latestChangelog = (String) server.getValue("changesVersion");
 					if (!VERSION.equalsIgnoreCase(latestChangelog)) {
-						RequestBuffer.request(() -> {
-							changesChannel.sendMessage("```" + CHANGELOG + "```");
-						});
-						ServerOptions.setValue(s, "changesVersion", VERSION);
+						RequestBuffer
+								.request(() -> changesChannel.sendMessage("```" + CHANGELOG + "```"));
+						server.setValue("changesVersion", VERSION);
 					}
 				}
 			}

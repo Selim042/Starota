@@ -6,12 +6,11 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import us.myles_selim.starota.EnumTeam;
-import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
-import us.myles_selim.starota.commands.registry.java.JavaCommand;
+import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.profiles.PlayerProfile;
-import us.myles_selim.starota.profiles.ProfileManager;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandSelfRegister extends JavaCommand {
+public class CommandSelfRegister extends StarotaCommand {
 
 	public CommandSelfRegister() {
 		super("sregister", "Registers your own profile and assigns you a profile.");
@@ -23,20 +22,20 @@ public class CommandSelfRegister extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
+	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
 		if (args.length < 3) {
-			if (!hasTeamRoles(guild)) {
-				channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild)
-						+ this.getName() + " [poGoName] [level] [team]");
+			if (!hasTeamRoles(server.getDiscordGuild())) {
+				channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName()
+						+ " [poGoName] [level] [team]");
 				return;
 			}
-			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName()
-					+ " [username] [level]");
+			channel.sendMessage(
+					"**Usage**: " + server.getPrefix() + this.getName() + " [username] [level]");
 			return;
 		}
 
 		IUser target = message.getAuthor();
-		if (ProfileManager.hasProfile(guild, target)) {
+		if (server.hasProfile(target)) {
 			channel.sendMessage("User \"" + args[1] + "\" already has a profile");
 			return;
 		}
@@ -50,7 +49,7 @@ public class CommandSelfRegister extends JavaCommand {
 			}
 		}
 		try {
-			for (IRole role : target.getRolesForGuild(guild)) {
+			for (IRole role : target.getRolesForGuild(server.getDiscordGuild())) {
 				String name = role.getName().replaceAll(" ", "_");
 				for (EnumTeam t : EnumTeam.values()) {
 					if (t.name().equalsIgnoreCase(name)) {
@@ -82,8 +81,8 @@ public class CommandSelfRegister extends JavaCommand {
 
 		PlayerProfile profile = new PlayerProfile().setPoGoName(args[1]).setDiscordId(target.getLongID())
 				.setLevel(level).setTeam(team);
-		ProfileManager.setProfile(guild, target, profile);
-		channel.sendMessage("Sucessfully registered " + target.getName(), profile.toEmbed(guild));
+		server.setProfile(target, profile);
+		channel.sendMessage("Sucessfully registered " + target.getName(), profile.toEmbed(server));
 	}
 
 	private static boolean hasTeamRoles(IGuild server) {

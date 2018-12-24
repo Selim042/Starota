@@ -15,33 +15,29 @@ import org.squiddev.cobalt.function.TwoArgFunction;
 import org.squiddev.cobalt.function.ZeroArgFunction;
 import org.squiddev.cobalt.lib.LuaLibrary;
 
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 import us.myles_selim.ebs.EBStorage;
-import us.myles_selim.starota.ServerOptions;
 import us.myles_selim.starota.Starota.BaseModules;
 import us.myles_selim.starota.commands.CommandChangelogChannel;
 import us.myles_selim.starota.leaderboards.Leaderboard;
-import us.myles_selim.starota.leaderboards.LeaderboardManager;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
 import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.profiles.PlayerProfile;
-import us.myles_selim.starota.profiles.ProfileManager;
 import us.myles_selim.starota.trading.EnumPokemon;
-import us.myles_selim.starota.trading.Tradeboard;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class StarotaLib implements LuaLibrary {
 
-	private final IGuild server;
+	private final StarotaServer server;
 
-	public StarotaLib(IGuild server) {
+	public StarotaLib(StarotaServer server) {
 		this.server = server;
 	}
 
 	@Override
 	public LuaValue add(LuaState state, LuaTable env) {
-		env.rawset("options", storageToValue(ServerOptions.getOptions(server), Tradeboard.TRADE_ID_KEY,
+		env.rawset("options", storageToValue(server.getOptions(), StarotaServer.TRADE_ID_KEY,
 				CommandChangelogChannel.CHANGES_CHANNEL, "changesVersion", StarotaModule.MODULE_KEY));
 		if (StarotaModule.isModuleEnabled(server, BaseModules.PROFILES)) {
 			env.rawset("getProfile", new OneArgFunction() {
@@ -51,8 +47,7 @@ public class StarotaLib implements LuaLibrary {
 					if (arg == Constants.NIL || !(arg instanceof LuaUserdata)
 							|| !(((LuaUserdata) arg).instance instanceof IUser))
 						throw new LuaError("arg must be a user");
-					PlayerProfile prof = ProfileManager.getProfile(server,
-							(IUser) ((LuaUserdata) arg).instance);
+					PlayerProfile prof = server.getProfile((IUser) ((LuaUserdata) arg).instance);
 					if (prof == null)
 						return Constants.NIL;
 					return ConversionHandler.convertToLua(state, prof);
@@ -75,8 +70,7 @@ public class StarotaLib implements LuaLibrary {
 				@Override
 				public LuaValue call(LuaState state, LuaValue arg) throws LuaError {
 					if (arg.isIntExact())
-						return ConversionHandler.convertToLua(state,
-								Tradeboard.getPost(server, arg.toInteger()));
+						return ConversionHandler.convertToLua(state, server.getPost(arg.toInteger()));
 					// TODO: Finish this
 					throw new LuaError("can only get posts by id, WIP");
 					// return ConversionHandler.convertToLua(state,
@@ -89,7 +83,7 @@ public class StarotaLib implements LuaLibrary {
 
 				@Override
 				public LuaValue call(LuaState state, LuaValue arg) throws LuaError {
-					Leaderboard board = LeaderboardManager.getLeaderboard(server, arg.toString());
+					Leaderboard board = server.getLeaderboard(arg.toString());
 					if (board == null)
 						return Constants.NIL;
 					return ConversionHandler.convertToLua(state, board);
@@ -100,7 +94,7 @@ public class StarotaLib implements LuaLibrary {
 				@Override
 				public LuaValue call(LuaState state) throws LuaError {
 					LuaTable ret = new LuaTable();
-					List<Leaderboard> boards = LeaderboardManager.getLeaderboards(server);
+					List<Leaderboard> boards = server.getLeaderboards();
 					for (int i = 0; i < boards.size(); i++)
 						ret.rawset(i, ConversionHandler.convertToLua(state, boards.get(i)));
 					return ret;

@@ -8,6 +8,7 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.research.CommandSetResearchChannel.EnumResearchChannel;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class ThreadReport extends Thread {
 
@@ -52,7 +53,8 @@ public class ThreadReport extends Thread {
 		System.out.println("REPORTING");
 		for (IGuild s : Starota.getClient().getGuilds()) {
 			long serverId = s.getLongID();
-			IChannel reportChannel = ResearchTracker.getResearchChannel(s, EnumResearchChannel.REPORT);
+			IChannel reportChannel = ResearchTracker.getResearchChannel(StarotaServer.getServer(s),
+					EnumResearchChannel.REPORT);
 			reportChannel.sendMessage("Today is " + dayS + ", the day for reports.");
 			List<Researcher> top = ResearchTracker.getTopPosters(serverId);
 			EmbedBuilder builder = new EmbedBuilder();

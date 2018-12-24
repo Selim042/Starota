@@ -2,11 +2,17 @@ package us.myles_selim.starota.trading;
 
 import java.time.Instant;
 
+import sx.blah.discord.api.internal.json.objects.EmbedObject;
+import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.Storage;
+import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.embed_converter.annotations.EmbedFooterText;
 import us.myles_selim.starota.embed_converter.annotations.EmbedTitle;
+import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
 @EmbedFooterText("Trade posted")
 @EmbedTitle("Profile for %getIdString%:")
@@ -52,12 +58,12 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 		this(id, lookingFor, owner, pokemon, form, false, EnumGender.EITHER, false);
 	}
 
-	protected TradeboardPost(int id, boolean lookingFor, long owner, EnumPokemon pokemon, Form form,
+	public TradeboardPost(int id, boolean lookingFor, long owner, EnumPokemon pokemon, Form form,
 			EnumGender gender) {
 		this(id, lookingFor, owner, pokemon, form, false, gender, false);
 	}
 
-	protected TradeboardPost(int id, boolean lookingFor, long owner, EnumPokemon pokemon, Form form,
+	public TradeboardPost(int id, boolean lookingFor, long owner, EnumPokemon pokemon, Form form,
 			boolean shiny, EnumGender gender, boolean legacy) {
 		this.id = id;
 		this.lookingFor = lookingFor;
@@ -111,6 +117,62 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 
 	public boolean isLegacy() {
 		return this.legacy;
+	}
+
+	public EmbedObject getPostEmbed(StarotaServer server) {
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.withTitle("Tradeboard Post #" + String.format("%04d", this.getId()) + "\n\n");
+		builder.appendField("Trade Type:",
+				"Poster " + (this.isLookingFor() ? "is looking for" : "currently has"), false);
+		IUser user = Starota.getUser(this.getOwner());
+		if (user != null) {
+			String nickname = user.getNicknameForGuild(server.getDiscordGuild());
+			if (nickname != null)
+				builder.appendField("Discord User:",
+						nickname + " (_" + user.getName() + "#" + user.getDiscriminator() + "_)", true);
+			else
+				builder.appendField("Discord User:", user.getName() + "#" + user.getDiscriminator(),
+						true);
+		}
+		PlayerProfile profile = server.getProfile(user);
+		if (profile != null && profile.getTrainerCode() != -1)
+			builder.appendField("Trainer Code:", profile.getTrainerCodeString(), true);
+
+		EnumPokemon pokemon = this.getPokemon();
+		Form form = this.getForm();
+		if (form == null && pokemon.getFormSet() != null)
+			form = pokemon.getDefaultForm();
+		String formName = form == null ? "" : form.getSpritePostfix(pokemon);
+		if (formName == null)
+			formName = "";
+		if (!formName.isEmpty())
+			formName = '-' + formName;
+		builder.withThumbnail("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/"
+				+ (this.isShiny() ? "shiny/" : "") + pokemon.getId() + formName + ".png");
+
+		builder.withAuthorIcon(user.getAvatarURL());
+		builder.withAuthorName(user.getDisplayName(server.getDiscordGuild()));
+		if (form != null)
+			builder.withColor(form.getType1(pokemon).getColor());
+		else
+			builder.withColor(pokemon.getType1().getColor());
+
+		builder.appendField("Pokemon:", pokemon.getName(), false);
+		if (form != null)
+			builder.appendField("Form:", form.toString(), true);
+		if (FormManager.isShinyable(pokemon) || (form != null && form.canBeShiny(pokemon))) {
+			String isShinyS = Boolean.toString(this.isShiny());
+			builder.appendField("Shiny:",
+					Character.toUpperCase(isShinyS.charAt(0)) + isShinyS.substring(1), true);
+		}
+		builder.appendField("Gender:", this.getGender().toString(), true);
+		String isLegacyS = Boolean.toString(this.isLegacy());
+		builder.appendField("Legacy:",
+				Character.toUpperCase(isLegacyS.charAt(0)) + isLegacyS.substring(1), true);
+
+		builder.withFooterText("Trade thised");
+		builder.withTimestamp(this.getTimePosted());
+		return builder.build();
 	}
 
 	@Override

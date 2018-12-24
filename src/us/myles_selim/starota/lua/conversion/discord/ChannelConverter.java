@@ -127,6 +127,13 @@ public class ChannelConverter implements IConverter {
 				}).get();
 			}
 		});
+		methods.rawset("getId", new ZeroArgFunction() {
+
+			@Override
+			public LuaValue call(LuaState state) throws LuaError {
+				return ValueFactory.valueOf(channel.getStringID());
+			}
+		});
 		LuaTable mt = new LuaTable();
 		mt.rawset("__index", methods);
 		return new LuaUserdata(channel, mt);

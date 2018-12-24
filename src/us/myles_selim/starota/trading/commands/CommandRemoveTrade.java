@@ -1,14 +1,12 @@
 package us.myles_selim.starota.trading.commands;
 
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
-import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
-import us.myles_selim.starota.commands.registry.java.JavaCommand;
-import us.myles_selim.starota.trading.Tradeboard;
+import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.trading.TradeboardPost;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandRemoveTrade extends JavaCommand {
+public class CommandRemoveTrade extends StarotaCommand {
 
 	public CommandRemoveTrade() {
 		super("removeTrade", "Removes a given trade posted by yourself from the tradeboard.");
@@ -20,25 +18,23 @@ public class CommandRemoveTrade extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
+	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
 		if (args.length < 2) {
-			channel.sendMessage(
-					"**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName() + " [postId]");
+			channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName() + " [postId]");
 			return;
 		}
 		int id;
 		try {
 			id = Integer.parseInt(args[1]);
 		} catch (NumberFormatException e) {
-			channel.sendMessage(
-					"**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName() + " [postId]");
+			channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName() + " [postId]");
 			return;
 		}
-		TradeboardPost post = Tradeboard.getPost(guild, id);
+		TradeboardPost post = server.getPost(id);
 		if (post != null && post.getOwner() == message.getAuthor().getLongID()) {
-			Tradeboard.removePost(guild, id);
+			server.removePost(id);
 			channel.sendMessage("Trade #" + String.format("%04d", id) + " removed",
-					Tradeboard.getPostEmbed(guild, post));
+					post.getPostEmbed(server));
 		} else
 			channel.sendMessage("Trade #" + String.format("%04d", id) + " not found");
 	}

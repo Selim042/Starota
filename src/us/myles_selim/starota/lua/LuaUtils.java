@@ -59,10 +59,11 @@ import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.trading.EnumPokemon;
 import us.myles_selim.starota.trading.TradeboardPost;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class LuaUtils {
 
-	private static final Map<IGuild, LuaState> STATES = new HashMap<>();
+	private static final Map<Long, LuaState> STATES = new HashMap<>();
 
 	private static boolean registeredConverters = false;
 
@@ -84,11 +85,11 @@ public class LuaUtils {
 		ConversionHandler.registerConverter(IUser.class, new UserConverter());
 	}
 
-	public static LuaState getState(IGuild server) {
+	public static LuaState getState(StarotaServer server) {
 		if (!StarotaModule.isModuleEnabled(server, BaseModules.LUA))
 			return null;
-		if (STATES.containsKey(server))
-			return STATES.get(server);
+		if (STATES.containsKey(server.getDiscordGuild().getLongID()))
+			return STATES.get(server.getDiscordGuild().getLongID());
 		LuaState state = new LuaState(new AbstractResourceManipulator() {
 
 			@Override
@@ -116,16 +117,16 @@ public class LuaUtils {
 		if (!Starota.IS_DEV)
 			_G.rawset("print", new VarArgFunction() {});
 		LuaC.install(state);
-		STATES.put(server, state);
+		STATES.put(server.getDiscordGuild().getLongID(), state);
 		return state;
 	}
 
-	public static boolean isInitialized(IGuild server) {
-		return STATES.containsKey(server);
+	public static boolean isInitialized(StarotaServer server) {
+		return STATES.containsKey(server.getDiscordGuild().getLongID());
 	}
 
-	public static void clearEventHandlers(IGuild server) {
-		if (STATES.containsKey(server))
+	public static void clearEventHandlers(StarotaServer server) {
+		if (STATES.containsKey(server.getDiscordGuild().getLongID()))
 			clearEventHandlers(getState(server));
 	}
 
@@ -209,11 +210,11 @@ public class LuaUtils {
 	}
 
 	public static void handleEvent(Object event) {
-		IGuild server = null;
+		StarotaServer server = null;
 		LuaValue eventL = null;
 		LuaState state = null;
 		if (event instanceof GuildEvent) {
-			server = ((GuildEvent) event).getGuild();
+			server = StarotaServer.getServer(((GuildEvent) event).getGuild());
 			state = getState(server);
 			eventL = getEvent(state, (GuildEvent) event);
 		} else if (event instanceof LuaEvent) {
@@ -226,7 +227,8 @@ public class LuaUtils {
 		handleEvent(server, event, state, eventL);
 	}
 
-	private static void handleEvent(IGuild server, Object event, LuaState state, LuaValue eventL) {
+	private static void handleEvent(StarotaServer server, Object event, LuaState state,
+			LuaValue eventL) {
 		LuaTable _G = state.getMainThread().getfenv();
 		String functName = "on" + event.getClass().getSimpleName();
 		IChannel errorChannel;
@@ -245,7 +247,8 @@ public class LuaUtils {
 				return;
 			((LuaFunction) funcV).call(state, eventLib, eventL);
 		} catch (LuaError e) {
-			System.out.println("event fired: " + functName + " on server: " + server.getName());
+			System.out.println(
+					"event fired: " + functName + " on server: " + server.getDiscordGuild().getName());
 			if (errorChannel != null)
 				RequestBuffer
 						.request(() -> errorChannel.sendMessage("There was an error when processing a "

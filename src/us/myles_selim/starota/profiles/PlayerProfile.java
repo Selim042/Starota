@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
@@ -14,6 +13,7 @@ import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.EnumTeam;
 import us.myles_selim.starota.EventFactory;
+import us.myles_selim.starota.MiscUtils;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.embed_converter.ExtraField;
 import us.myles_selim.starota.embed_converter.annotations.EmbedAuthorIcon;
@@ -25,6 +25,7 @@ import us.myles_selim.starota.embed_converter.annotations.EmbedThumbnail;
 import us.myles_selim.starota.embed_converter.annotations.EmbedTimestamp;
 import us.myles_selim.starota.embed_converter.annotations.EmbedTitle;
 import us.myles_selim.starota.lua.events.GetProfileEvent;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
 @EmbedFooterText("Profile last updated")
 @EmbedTitle("Profile for %poGoName%:")
@@ -96,7 +97,7 @@ public class PlayerProfile {
 	public String getTrainerCodeString() {
 		if (this.trainerCode == -1)
 			return null;
-		return ProfileManager.getTrainerCodeString(this.trainerCode);
+		return MiscUtils.getTrainerCodeString(this.trainerCode);
 	}
 
 	public EnumTeam getTeam() {
@@ -135,8 +136,8 @@ public class PlayerProfile {
 		return Instant.ofEpochSecond(this.lastUpdated);
 	}
 
-	public EmbedObject toEmbed(IGuild guild) {
-		return toEmbed(EventFactory.fireProfileEvent(guild, this));
+	public EmbedObject toEmbed(StarotaServer server) {
+		return toEmbed(EventFactory.fireProfileEvent(server, this));
 	}
 
 	private EmbedObject toEmbed(GetProfileEvent event) {
@@ -170,7 +171,7 @@ public class PlayerProfile {
 			return null;
 		String ret = "";
 		for (Entry<String, Long> e : this.alts.entrySet())
-			ret += "- **" + e.getKey() + "**: " + ProfileManager.getTrainerCodeString(e.getValue());
+			ret += "- **" + e.getKey() + "**: " + MiscUtils.getTrainerCodeString(e.getValue());
 		return ret;
 	}
 

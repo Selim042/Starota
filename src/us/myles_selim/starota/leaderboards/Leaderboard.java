@@ -36,7 +36,19 @@ public class Leaderboard {
 		this.color = ebs.get("color", Integer.class);
 	}
 
-	protected EBStorage toStorage() {
+	public Leaderboard(IGuild server, String displayName) {
+		this(server, displayName, true);
+	}
+
+	public Leaderboard(IGuild server, String displayName, boolean decending) {
+		this.server = server;
+		this.displayName = displayName;
+		this.entries = new LinkedList<>();
+		this.aliases = new LinkedList<>();
+		this.decending = decending;
+	}
+
+	public EBStorage toStorage() {
 		EBStorage stor = new EBStorage().registerPrimitives();
 		stor.set("displayName", this.displayName);
 		EBList<LeaderboardEntry> entries = new EBList<>(new DataTypeLeaderboardEntry());
@@ -50,18 +62,6 @@ public class Leaderboard {
 		stor.set("decending", this.decending);
 		stor.set("color", this.color);
 		return stor;
-	}
-
-	public Leaderboard(IGuild server, String displayName) {
-		this(server, displayName, true);
-	}
-
-	public Leaderboard(IGuild server, String displayName, boolean decending) {
-		this.server = server;
-		this.displayName = displayName;
-		this.entries = new LinkedList<>();
-		this.aliases = new LinkedList<>();
-		this.decending = decending;
 	}
 
 	public String getDisplayName() {
@@ -79,7 +79,6 @@ public class Leaderboard {
 		else
 			eEntry.setValue(entry.getValue());
 		this.sort();
-		LeaderboardManager.flush(this.server);
 		return this;
 	}
 

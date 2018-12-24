@@ -3,13 +3,12 @@ package us.myles_selim.starota.trading.commands;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
-import us.myles_selim.starota.commands.registry.java.JavaCommand;
+import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandTradeboardHelp extends JavaCommand {
+public class CommandTradeboardHelp extends StarotaCommand {
 
 	public CommandTradeboardHelp() {
 		super("tradeboardHelp", "Displays tradeboard help information.");
@@ -23,10 +22,10 @@ public class CommandTradeboardHelp extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
+	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withTitle("Tradeboard Help");
-		String prefix = PrimaryCommandHandler.getPrefix(guild);
+		String prefix = server.getPrefix();
 		builder.appendDesc(
 				" - To look for a Pokemon that is on the tradeboard, you can use the command \"**"
 						+ prefix

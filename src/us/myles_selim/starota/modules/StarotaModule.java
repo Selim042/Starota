@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IGuild;
 import us.myles_selim.ebs.EBList;
 import us.myles_selim.ebs.data_types.DataTypeString;
 import us.myles_selim.starota.DebugServer;
-import us.myles_selim.starota.ServerOptions;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class StarotaModule {
 
@@ -17,11 +16,11 @@ public class StarotaModule {
 	private static final List<StarotaModule> MODULES = new ArrayList<>();
 
 	@SuppressWarnings("unchecked")
-	private static List<StarotaModule> getDisabledModulesRaw(IGuild server) {
-		if (!ServerOptions.hasKey(server, MODULE_KEY, EBList.class))
+	private static List<StarotaModule> getDisabledModulesRaw(StarotaServer server) {
+		if (!server.hasKey(MODULE_KEY, EBList.class))
 			return new ArrayList<>(MODULES);
 		List<StarotaModule> modules = new ArrayList<>();
-		for (String name : ((EBList<String>) ServerOptions.getValue(server, MODULE_KEY)).values()) {
+		for (String name : ((EBList<String>) server.getValue(MODULE_KEY)).values()) {
 			StarotaModule module = getModule(name);
 			if (module != null)
 				modules.add(module);
@@ -29,28 +28,28 @@ public class StarotaModule {
 		return modules;
 	}
 
-	private static boolean disableModuleRaw(IGuild server, StarotaModule module) {
-		if (!ServerOptions.hasKey(server, MODULE_KEY, EBList.class))
-			ServerOptions.setValue(server, MODULE_KEY, new EBList<>(new DataTypeString()));
+	private static boolean disableModuleRaw(StarotaServer server, StarotaModule module) {
+		if (!server.hasKey(MODULE_KEY, EBList.class))
+			server.setValue(MODULE_KEY, new EBList<>(new DataTypeString()));
 		@SuppressWarnings("unchecked")
-		EBList<String> modules = (EBList<String>) ServerOptions.getValue(server, MODULE_KEY);
+		EBList<String> modules = (EBList<String>) server.getValue(MODULE_KEY);
 		if (modules.containsWrapped(module.name))
 			return false;
 		modules.addWrapped(module.name);
-		ServerOptions.setValue(server, MODULE_KEY, modules);
+		server.setValue(MODULE_KEY, modules);
 		DebugServer.update();
 		return true;
 	}
 
-	private static boolean enableModuleRaw(IGuild server, StarotaModule module) {
-		if (!ServerOptions.hasKey(server, MODULE_KEY))
+	private static boolean enableModuleRaw(StarotaServer server, StarotaModule module) {
+		if (!server.hasKey(MODULE_KEY))
 			return false;
 		@SuppressWarnings("unchecked")
-		EBList<String> modules = (EBList<String>) ServerOptions.getValue(server, MODULE_KEY);
+		EBList<String> modules = (EBList<String>) server.getValue(MODULE_KEY);
 		if (!modules.containsWrapped(module.name))
 			return false;
 		modules.removeWrapped(module.name);
-		ServerOptions.setValue(server, MODULE_KEY, modules);
+		server.setValue(MODULE_KEY, modules);
 		DebugServer.update();
 		return true;
 	}
@@ -60,19 +59,19 @@ public class StarotaModule {
 			MODULES.add(module);
 	}
 
-	public static boolean enableModule(IGuild server, StarotaModule module) {
+	public static boolean enableModule(StarotaServer server, StarotaModule module) {
 		return enableModuleRaw(server, module);
 	}
 
-	public static boolean disableModule(IGuild server, StarotaModule module) {
+	public static boolean disableModule(StarotaServer server, StarotaModule module) {
 		return disableModuleRaw(server, module);
 	}
 
-	public static boolean isModuleEnabled(IGuild server, StarotaModule module) {
+	public static boolean isModuleEnabled(StarotaServer server, StarotaModule module) {
 		return isModuleEnabledShallow(server, module) && areDepsEnabled(server, module);
 	}
 
-	public static List<StarotaModule> getEnabledModules(IGuild server) {
+	public static List<StarotaModule> getEnabledModules(StarotaServer server) {
 		List<StarotaModule> modules = new ArrayList<>();
 		for (StarotaModule m : MODULES)
 			if (isModuleEnabled(server, m))
@@ -80,12 +79,12 @@ public class StarotaModule {
 		return Collections.unmodifiableList(modules);
 	}
 
-	public static List<StarotaModule> getDisabledModules(IGuild server) {
+	public static List<StarotaModule> getDisabledModules(StarotaServer server) {
 		return Collections.unmodifiableList(getDisabledModulesRaw(server));
 	}
 
-	public static boolean isCategoryEnabled(IGuild server, String category) {
-		if (!ServerOptions.hasKey(server, MODULE_KEY, EBList.class))
+	public static boolean isCategoryEnabled(StarotaServer server, String category) {
+		if (!server.hasKey(MODULE_KEY, EBList.class))
 			return true;
 		List<StarotaModule> modules = getDisabledModulesRaw(server);
 		for (StarotaModule m : modules)
@@ -106,21 +105,21 @@ public class StarotaModule {
 		return Collections.unmodifiableList(MODULES);
 	}
 
-	private static boolean areDepsEnabled(IGuild server, StarotaModule module) {
+	private static boolean areDepsEnabled(StarotaServer server, StarotaModule module) {
 		for (StarotaModule d : getNestedDeps(server, module))
 			if (!isModuleEnabledShallow(server, d))
 				return false;
 		return true;
 	}
 
-	private static boolean isModuleEnabledShallow(IGuild server, StarotaModule module) {
-		if (!ServerOptions.hasKey(server, MODULE_KEY, EBList.class))
+	private static boolean isModuleEnabledShallow(StarotaServer server, StarotaModule module) {
+		if (!server.hasKey(MODULE_KEY, EBList.class))
 			return true;
 		List<StarotaModule> modules = getDisabledModulesRaw(server);
 		return !modules.contains(module);
 	}
 
-	private static List<StarotaModule> getNestedDeps(IGuild server, StarotaModule module) {
+	private static List<StarotaModule> getNestedDeps(StarotaServer server, StarotaModule module) {
 		List<StarotaModule> deps = new ArrayList<>();
 		for (StarotaModule d : module.dependencies) {
 			if (deps.contains(d))

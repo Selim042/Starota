@@ -3,19 +3,16 @@ package us.myles_selim.starota.trading.commands;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
-import us.myles_selim.starota.commands.registry.java.JavaCommand;
+import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.profiles.PlayerProfile;
-import us.myles_selim.starota.profiles.ProfileManager;
-import us.myles_selim.starota.trading.Tradeboard;
 import us.myles_selim.starota.trading.TradeboardPost;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandGetUserTrades extends JavaCommand {
+public class CommandGetUserTrades extends StarotaCommand {
 
 	public CommandGetUserTrades() {
 		super("getUserTrades", "Get trades either you posted or a specific user.");
@@ -27,19 +24,18 @@ public class CommandGetUserTrades extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
+	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
 		IUser target;
 		if (args.length == 1)
 			target = message.getAuthor();
 		else {
 			if (args.length != 2) {
-				channel.sendMessage(
-						"**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName() + " [target]");
+				channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName() + " [target]");
 				return;
 			}
 			target = Starota.findUser(args[1]);
 			if (target == null) {
-				PlayerProfile profile = ProfileManager.getProfile(guild, args[1]);
+				PlayerProfile profile = server.getProfile(args[1]);
 				if (profile == null) {
 					channel.sendMessage("User \"" + args[1] + "\" not found");
 					return;
@@ -51,13 +47,11 @@ public class CommandGetUserTrades extends JavaCommand {
 			channel.sendMessage("User \"" + args[1] + "\" not found");
 			return;
 		}
-		List<TradeboardPost> posts = Tradeboard.getPosts(guild, target);
-		channel.sendMessage(
-				target.getDisplayName(guild) + " has " + posts.size() + " active trade posts");
+		List<TradeboardPost> posts = server.getPosts(target);
+		channel.sendMessage(target.getDisplayName(server.getDiscordGuild()) + " has " + posts.size()
+				+ " active trade posts");
 		for (TradeboardPost p : posts)
-			RequestBuffer.request(() -> {
-				channel.sendMessage(Tradeboard.getPostEmbed(guild, p));
-			});
+			RequestBuffer.request(() -> channel.sendMessage(p.getPostEmbed(server)));
 	}
 
 }

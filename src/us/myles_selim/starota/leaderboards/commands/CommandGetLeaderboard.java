@@ -3,15 +3,13 @@ package us.myles_selim.starota.leaderboards.commands;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
-import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
-import us.myles_selim.starota.commands.registry.java.JavaCommand;
+import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.leaderboards.Leaderboard;
-import us.myles_selim.starota.leaderboards.LeaderboardManager;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandGetLeaderboard extends JavaCommand {
+public class CommandGetLeaderboard extends StarotaCommand {
 
 	public CommandGetLeaderboard() {
 		super("getLeaderboard", "Displays the specified leaderboard.");
@@ -31,11 +29,11 @@ public class CommandGetLeaderboard extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel)
+	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
 			throws Exception {
 		if (args.length < 2) {
-			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + getName() + " "
-					+ getGeneralUsage());
+			channel.sendMessage(
+					"**Usage**: " + server.getPrefix() + getName() + " " + getGeneralUsage());
 			return;
 		}
 		int page = 0;
@@ -44,12 +42,13 @@ public class CommandGetLeaderboard extends JavaCommand {
 				page = Integer.parseInt(args[1]) - 1;
 			} catch (NumberFormatException e) {}
 		Leaderboard board;
-		if (message.getAuthor().getPermissionsForGuild(guild).contains(Permissions.ADMINISTRATOR)) {
-			board = LeaderboardManager.getLeaderboard(guild, args[1]);
+		if (message.getAuthor().getPermissionsForGuild(server.getDiscordGuild())
+				.contains(Permissions.ADMINISTRATOR)) {
+			board = server.getLeaderboard(args[1]);
 			if (board != null && !board.isActive())
 				channel.sendMessage("**NOTE**: This board is inactive");
 		} else
-			board = LeaderboardManager.getLeaderboardActive(guild, args[1]);
+			board = server.getLeaderboardActive(args[1]);
 		if (board != null)
 			channel.sendMessage(board.toEmbed(page));
 		else

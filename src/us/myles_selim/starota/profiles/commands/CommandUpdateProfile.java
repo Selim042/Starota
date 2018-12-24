@@ -1,14 +1,12 @@
 package us.myles_selim.starota.profiles.commands;
 
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
-import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
-import us.myles_selim.starota.commands.registry.java.JavaCommand;
+import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.profiles.PlayerProfile;
-import us.myles_selim.starota.profiles.ProfileManager;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandUpdateProfile extends JavaCommand {
+public class CommandUpdateProfile extends StarotaCommand {
 
 	public CommandUpdateProfile() {
 		super("updateProfile", "Update parts of your profile.");
@@ -20,18 +18,18 @@ public class CommandUpdateProfile extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
-		if (!ProfileManager.hasProfile(guild, message.getAuthor())) {
+	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
+		if (!server.hasProfile(message.getAuthor())) {
 			channel.sendMessage("You do not yet have a profile.  Please contact an admin of \""
-					+ guild.getName() + "\".");
+					+ server.getDiscordGuild().getName() + "\".");
 			return;
 		}
 		if (args.length < 3) {
-			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName()
+			channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName()
 					+ " [level/trainerCode/realName/alt] [value]");
 			return;
 		}
-		PlayerProfile profile = ProfileManager.getProfile(guild, message.getAuthor());
+		PlayerProfile profile = server.getProfile(message.getAuthor());
 		boolean executed = false;
 		switch (args[1].toLowerCase()) {
 		case "level":
@@ -87,9 +85,9 @@ public class CommandUpdateProfile extends JavaCommand {
 			break;
 		}
 		if (executed) {
-			ProfileManager.setProfile(guild, message.getAuthor(), profile);
+			server.setProfile(message.getAuthor(), profile);
 			channel.sendMessage("Updated \"" + args[1] + "\" to \"" + args[2] + "\"",
-					profile.toEmbed(guild));
+					profile.toEmbed(server));
 		} else
 			channel.sendMessage("Invalid option " + args[1]);
 	}

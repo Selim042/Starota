@@ -3,14 +3,13 @@ package us.myles_selim.starota.modules;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
-import us.myles_selim.starota.commands.registry.java.JavaCommand;
+import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandModules extends JavaCommand {
+public class CommandModules extends StarotaCommand {
 
 	public CommandModules() {
 		super("modules", "Manage your enabled modules.");
@@ -34,7 +33,7 @@ public class CommandModules extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel)
+	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
 			throws Exception {
 		if (args.length == 2 && args[1].equalsIgnoreCase("info")) {
 			EmbedBuilder builder = new EmbedBuilder();
@@ -57,8 +56,8 @@ public class CommandModules extends JavaCommand {
 			return;
 		}
 		if (args.length < 3) {
-			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + getName() + " "
-					+ getGeneralUsage());
+			channel.sendMessage(
+					"**Usage**: " + server.getDiscordGuild() + getName() + " " + getGeneralUsage());
 			return;
 		}
 		StarotaModule module = StarotaModule.getModule(args[2]);
@@ -70,7 +69,7 @@ public class CommandModules extends JavaCommand {
 		switch (args[1].toLowerCase()) {
 		case "enable":
 		case "on":
-			status = StarotaModule.enableModule(guild, module);
+			status = StarotaModule.enableModule(server, module);
 			if (status)
 				channel.sendMessage("Enabled the \"" + module.getName() + "\" module.");
 			else
@@ -78,15 +77,15 @@ public class CommandModules extends JavaCommand {
 			break;
 		case "disable":
 		case "off":
-			status = StarotaModule.disableModule(guild, module);
+			status = StarotaModule.disableModule(server, module);
 			if (status)
 				channel.sendMessage("Disabled the \"" + module.getName() + "\" module.");
 			else
 				channel.sendMessage("The \"" + module.getName() + "\" module is already disabled.");
 			break;
 		default:
-			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + getName() + " "
-					+ getGeneralUsage());
+			channel.sendMessage(
+					"**Usage**: " + server.getPrefix() + getName() + " " + getGeneralUsage());
 			break;
 		}
 	}

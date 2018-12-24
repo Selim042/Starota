@@ -3,17 +3,17 @@ package us.myles_selim.starota.lua.events;
 import org.squiddev.cobalt.LuaState;
 import org.squiddev.cobalt.LuaValue;
 
-import sx.blah.discord.handle.obj.IGuild;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
 public abstract class LuaEvent {
 
-	private final IGuild server;
+	private final StarotaServer server;
 
-	public LuaEvent(IGuild server) {
+	public LuaEvent(StarotaServer server) {
 		this.server = server;
 	}
 
-	public IGuild getServer() {
+	public StarotaServer getServer() {
 		return this.server;
 	}
 

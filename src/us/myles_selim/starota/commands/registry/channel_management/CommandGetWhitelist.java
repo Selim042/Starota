@@ -3,15 +3,14 @@ package us.myles_selim.starota.commands.registry.channel_management;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
-import us.myles_selim.starota.commands.registry.java.JavaCommand;
+import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandGetWhitelist extends JavaCommand {
+public class CommandGetWhitelist extends StarotaCommand {
 
 	public CommandGetWhitelist() {
 		super("getWhitelist");
@@ -23,10 +22,9 @@ public class CommandGetWhitelist extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
+	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
 		if (args.length < 2) {
-			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName()
-					+ " <cmdCategory>");
+			channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName() + " <cmdCategory>");
 			return;
 		}
 		boolean found = false;
@@ -42,7 +40,7 @@ public class CommandGetWhitelist extends JavaCommand {
 			channel.sendMessage("Unknown category \"" + args[1] + "\"");
 			return;
 		}
-		List<IChannel> whitelist = ChannelCommandManager.getWhitelist(guild, cmdCategory);
+		List<IChannel> whitelist = ChannelCommandManager.getWhitelist(server, cmdCategory);
 		if (whitelist == null || whitelist.isEmpty())
 			channel.sendMessage("The whitelist for \"" + cmdCategory + "\" is empty");
 		else {

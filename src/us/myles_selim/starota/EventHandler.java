@@ -12,11 +12,13 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IPrivateChannel;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.research.ResearchTracker;
 import us.myles_selim.starota.trading.EnumPokemon;
 import us.myles_selim.starota.trading.FormManager;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class EventHandler {
 
@@ -82,11 +84,17 @@ public class EventHandler {
 					+ Starota.SUPPORT_SERVER_LINK);
 			ownerPm.sendMessage(builder.build());
 		});
+		if (!Starota.getOurUser().getPermissionsForGuild(server).contains(Permissions.SEND_MESSAGES)) {
+			IUser serverOwner = server.getOwner();
+			IPrivateChannel ownerPm = serverOwner.getOrCreatePMChannel();
+			ownerPm.sendMessage(Starota.getOurName(server)
+					+ " requires the `SEND_MESSAGES` permission for all command functionality.");
+		}
 	}
 
 	@EventSubscriber
 	public void onServerLeave(GuildLeaveEvent event) {
-		ServerOptions.clearOptions(event.getGuild());
+		StarotaServer.getServer(event.getGuild()).clearOptions();
 	}
 
 	@EventSubscriber

@@ -3,16 +3,14 @@ package us.myles_selim.starota.leaderboards.commands;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
-import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
-import us.myles_selim.starota.commands.registry.java.JavaCommand;
+import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.leaderboards.Leaderboard;
 import us.myles_selim.starota.leaderboards.LeaderboardEntry;
-import us.myles_selim.starota.leaderboards.LeaderboardManager;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandUpdateLeaderboard extends JavaCommand {
+public class CommandUpdateLeaderboard extends StarotaCommand {
 
 	public CommandUpdateLeaderboard() {
 		super("updateLeaderboard", "Updates your leaderboard statistic.");
@@ -31,14 +29,14 @@ public class CommandUpdateLeaderboard extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
+	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
 		if (args.length < 3) {
-			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + getName() + " "
-					+ getGeneralUsage());
+			channel.sendMessage(
+					"**Usage**: " + server.getPrefix() + getName() + " " + getGeneralUsage());
 			return;
 		}
 		IUser user = message.getAuthor();
-		Leaderboard board = LeaderboardManager.getLeaderboardActive(guild, args[1]);
+		Leaderboard board = server.getLeaderboardActive(args[1]);
 		if (board == null) {
 			channel.sendMessage("Leaderboard \"" + args[1] + "\" not found");
 			return;

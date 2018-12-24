@@ -14,10 +14,10 @@ import org.squiddev.cobalt.function.OneArgFunction;
 import org.squiddev.cobalt.function.ThreeArgFunction;
 import org.squiddev.cobalt.function.ZeroArgFunction;
 
-import sx.blah.discord.handle.obj.IGuild;
 import us.myles_selim.starota.embed_converter.ExtraField;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
 import us.myles_selim.starota.profiles.PlayerProfile;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class GetProfileEvent extends LuaEvent {
 
@@ -26,8 +26,8 @@ public class GetProfileEvent extends LuaEvent {
 	private int color;
 	private String thumbnail;
 
-	public GetProfileEvent(IGuild guild, PlayerProfile profile) {
-		super(guild);
+	public GetProfileEvent(StarotaServer server, PlayerProfile profile) {
+		super(server);
 		this.profile = profile;
 	}
 
@@ -65,7 +65,8 @@ public class GetProfileEvent extends LuaEvent {
 				return ConversionHandler.convertToLua(state, profile);
 			}
 		});
-		methods.rawset("server", ConversionHandler.convertToLua(state, this.getServer()));
+		methods.rawset("server",
+				ConversionHandler.convertToLua(state, this.getServer().getDiscordGuild()));
 
 		methods.rawset("getFields", new ZeroArgFunction() {
 
