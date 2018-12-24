@@ -34,6 +34,12 @@
 			<artifactId>Cobalt</artifactId>
 			<version>master</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.discordbots</groupId>
+			<artifactId>DBL-Java-Library</artifactId>
+			<version>2.0.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>

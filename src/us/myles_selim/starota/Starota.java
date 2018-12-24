@@ -9,8 +9,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import org.discordbots.api.client.DiscordBotListAPI;
+
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
+import sx.blah.discord.api.IShard;
 import sx.blah.discord.api.events.EventDispatcher;
 import sx.blah.discord.handle.obj.ActivityType;
 import sx.blah.discord.handle.obj.IChannel;
@@ -31,7 +34,6 @@ import us.myles_selim.starota.commands.CommandSupportStarota;
 import us.myles_selim.starota.commands.CommandTest;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
-import us.myles_selim.starota.leaderboards.LeaderboardManager;
 import us.myles_selim.starota.leaderboards.commands.CommandEditLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandGetLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandListLeaderboards;
@@ -43,7 +45,6 @@ import us.myles_selim.starota.lua.commands.CommandUploadScript;
 import us.myles_selim.starota.lua.commands.LuaCommandHandler;
 import us.myles_selim.starota.modules.CommandModules;
 import us.myles_selim.starota.modules.StarotaModule;
-import us.myles_selim.starota.profiles.ProfileManager;
 import us.myles_selim.starota.profiles.commands.CommandGetProfilelessPlayers;
 import us.myles_selim.starota.profiles.commands.CommandProfile;
 import us.myles_selim.starota.profiles.commands.CommandProfileHelp;
@@ -57,7 +58,6 @@ import us.myles_selim.starota.role_management.commands.CommandGetGroups;
 import us.myles_selim.starota.role_management.commands.CommandRemoveGroup;
 import us.myles_selim.starota.role_management.commands.CommandSetAsGroup;
 import us.myles_selim.starota.trading.FormManager;
-import us.myles_selim.starota.trading.Tradeboard;
 import us.myles_selim.starota.trading.commands.CommandFindTrade;
 import us.myles_selim.starota.trading.commands.CommandForTrade;
 import us.myles_selim.starota.trading.commands.CommandGetForms;
@@ -67,10 +67,12 @@ import us.myles_selim.starota.trading.commands.CommandGetUserTrades;
 import us.myles_selim.starota.trading.commands.CommandLookingFor;
 import us.myles_selim.starota.trading.commands.CommandRemoveTrade;
 import us.myles_selim.starota.trading.commands.CommandTradeboardHelp;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class Starota {
 
 	private static IDiscordClient CLIENT;
+	private static DiscordBotListAPI BOT_LIST;
 	private static final Properties PROPERTIES = new Properties();
 
 	public static final long SELIM_USER_ID = 134855940938661889L;
@@ -107,6 +109,14 @@ public class Starota {
 			return;
 		}
 		IS_DEV = Boolean.parseBoolean(PROPERTIES.getProperty("is_dev"));
+		if (!IS_DEV) {
+			BOT_LIST = new DiscordBotListAPI.Builder().token(PROPERTIES.getProperty("bot_list_token"))
+					.botId(CLIENT.getOurUser().getStringID()).build();
+			List<Integer> shards = new ArrayList<>();
+			for (IShard s : CLIENT.getShards())
+				shards.add(s.getGuilds().size());
+			BOT_LIST.setStats(shards);
+		}
 		EventDispatcher dispatcher = CLIENT.getDispatcher();
 		try {
 			while (!CLIENT.isReady())
