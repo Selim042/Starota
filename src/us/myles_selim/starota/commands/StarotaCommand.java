@@ -19,7 +19,11 @@ public class StarotaCommand extends JavaCommand {
 	@Override
 	public final void execute(String[] args, IMessage message, IGuild guild, IChannel channel)
 			throws Exception {
-		execute(args, message, StarotaServer.getServer(guild), channel);
+		try {
+			execute(args, message, StarotaServer.getServer(guild), channel);
+		} catch (Exception e) {
+			throw e;
+		}
 	}
 
 	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
