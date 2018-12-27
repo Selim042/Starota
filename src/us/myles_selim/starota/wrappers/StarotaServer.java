@@ -42,7 +42,7 @@ public class StarotaServer {
 	public EBStorage profiles;
 	private EBStorage options;
 	private EBList<TradeboardPost> tradeboard;
-	private List<EBStorage> leaderboards;
+	private EBStorage leaderboards;
 	private Map<String, Long> battleTimers = new HashMap<>();
 
 	private StarotaServer(IGuild server) {
@@ -280,26 +280,30 @@ public class StarotaServer {
 		Leaderboard testBoard = getLeaderboard(name);
 		if (testBoard != null)
 			return null;
-		if (leaderboards.size() >= Starota.getMaxLeaderboards(guild))
+		if (leaderboards.getKeys().size() >= Starota.getMaxLeaderboards(guild))
 			return null;
 		Leaderboard board = new Leaderboard(guild, name);
 		board.addAlias(name.replaceAll(" ", "_"));
-		leaderboards.add(board.toStorage());
+		leaderboards.set(name, board);
 		return board;
+	}
+
+	public void setLeaderboard(String name, Leaderboard board) {
+		leaderboards.set(name, board);
 	}
 
 	public int getLeaderboardCount() {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.LEADERBOARDS))
 			return 0;
-		return leaderboards.size();
+		return leaderboards.getKeys().size();
 	}
 
 	public List<Leaderboard> getLeaderboards() {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.LEADERBOARDS))
 			return null;
 		List<Leaderboard> boards = new ArrayList<>();
-		for (EBStorage ebs : leaderboards)
-			boards.add(new Leaderboard(guild, ebs));
+		for (String key : leaderboards.getKeys())
+			boards.add(leaderboards.get(key, Leaderboard.class));
 		return Collections.unmodifiableList(boards);
 	}
 
@@ -307,8 +311,8 @@ public class StarotaServer {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.LEADERBOARDS))
 			return null;
 		List<Leaderboard> boards = new ArrayList<>();
-		for (EBStorage ebs : leaderboards) {
-			Leaderboard board = new Leaderboard(guild, ebs);
+		for (String key : leaderboards.getKeys()) {
+			Leaderboard board = leaderboards.get(key, Leaderboard.class);
 			if (board.isActive())
 				boards.add(board);
 		}
@@ -320,8 +324,10 @@ public class StarotaServer {
 			return null;
 		String[] names = new String[] { name, name.replaceAll(" ", "_"), name.replaceAll(" ", "-"),
 				name.replaceAll(" ", "") };
-		for (EBStorage ebs : leaderboards) {
-			Leaderboard board = new Leaderboard(guild, ebs);
+		if (leaderboards.containsKey(name))
+			return leaderboards.get(name, Leaderboard.class);
+		for (String key : leaderboards.getKeys()) {
+			Leaderboard board = leaderboards.get(key, Leaderboard.class);
 			if (stringArrayContainsIgnoreCase(names, board.getDisplayName()))
 				return board;
 			for (String alias : board.getAliases())
@@ -392,8 +398,8 @@ public class StarotaServer {
 		server.options = ServerDataHelper.getEBSFromFolder(guild, OPTIONS);
 		server.tradeboard = ServerDataHelper.getEBListFromFolder(guild, TRADEBOARD,
 				new TradeboardPost());
-		server.leaderboards = new LinkedList<>();
-		server.leaderboards.addAll(ServerDataHelper.getEBSsFromFolder(guild, LEADERBOARDS));
+		server.leaderboards = ServerDataHelper.getEBSFromFolder(guild, LEADERBOARDS)
+				.registerType(new Leaderboard());
 
 		SERVERS.put(guild.getLongID(), server);
 		return server;

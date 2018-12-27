@@ -10,21 +10,25 @@ import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
+import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.EBList;
 import us.myles_selim.ebs.EBStorage;
+import us.myles_selim.ebs.Storage;
 import us.myles_selim.ebs.data_types.DataTypeString;
 import us.myles_selim.starota.leaderboards.LeaderboardEntry.DataTypeLeaderboardEntry;
 
-public class Leaderboard {
+public class Leaderboard extends DataType<Leaderboard> {
 
 	public static final int PER_PAGE = 10;
 
-	private final IGuild server;
-	private final String displayName;
-	private final List<LeaderboardEntry> entries;
-	private final List<String> aliases;
+	private IGuild server;
+	private String displayName;
+	private List<LeaderboardEntry> entries;
+	private List<String> aliases;
 	private boolean decending;
 	private int color;
+
+	public Leaderboard() {}
 
 	@SuppressWarnings("unchecked")
 	public Leaderboard(IGuild server, EBStorage ebs) {
@@ -48,21 +52,21 @@ public class Leaderboard {
 		this.decending = decending;
 	}
 
-	public EBStorage toStorage() {
-		EBStorage stor = new EBStorage().registerPrimitives();
-		stor.set("displayName", this.displayName);
-		EBList<LeaderboardEntry> entries = new EBList<>(new DataTypeLeaderboardEntry());
-		for (LeaderboardEntry te : this.entries)
-			entries.addWrapped(te);
-		stor.set("entries", entries);
-		EBList<String> aliases = new EBList<>(new DataTypeString());
-		for (String a : this.aliases)
-			aliases.addWrapped(a);
-		stor.set("aliases", aliases);
-		stor.set("decending", this.decending);
-		stor.set("color", this.color);
-		return stor;
-	}
+//	public EBStorage toStorage() {
+//		EBStorage stor = new EBStorage().registerPrimitives();
+//		stor.set("displayName", this.displayName);
+//		EBList<LeaderboardEntry> entries = new EBList<>(new DataTypeLeaderboardEntry());
+//		for (LeaderboardEntry te : this.entries)
+//			entries.addWrapped(te);
+//		stor.set("entries", entries);
+//		EBList<String> aliases = new EBList<>(new DataTypeString());
+//		for (String a : this.aliases)
+//			aliases.addWrapped(a);
+//		stor.set("aliases", aliases);
+//		stor.set("decending", this.decending);
+//		stor.set("color", this.color);
+//		return stor;
+//	}
 
 	public String getDisplayName() {
 		return this.displayName;
@@ -183,6 +187,70 @@ public class Leaderboard {
 			this.entries.sort(Collections.reverseOrder());
 		else
 			this.entries.sort(null);
+	}
+
+	@Override
+	public Leaderboard getValue() {
+		return this;
+	}
+
+	@Override
+	public void setValue(Leaderboard value) {
+		this.aliases = new LinkedList<>(value.aliases);
+		this.color = value.color;
+		this.decending = value.decending;
+		this.displayName = value.displayName;
+		this.entries = new LinkedList<>(value.entries);
+		this.server = value.server;
+	}
+
+	@Override
+	protected void setValueObject(Object value) {
+		if (value instanceof Leaderboard)
+			setValue((Leaderboard) value);
+	}
+
+	@Override
+	public Class<?>[] accepts() {
+		return new Class[] { Leaderboard.class };
+	}
+
+	@Override
+	public void toBytes(Storage stor) {
+		stor.writeString(this.displayName);
+		if (this.entries == null || this.entries.isEmpty())
+			stor.writeInt(0);
+		else {
+			stor.writeInt(this.entries.size());
+			for (LeaderboardEntry e : this.entries) {
+				stor.writeLong(e.getDiscordId());
+				stor.writeLong(e.getValue());
+			}
+		}
+		if (this.aliases == null || this.aliases.isEmpty())
+			stor.writeInt(0);
+		else {
+			stor.writeInt(this.aliases.size());
+			for (String a : this.aliases)
+				stor.writeString(a);
+		}
+		stor.writeBoolean(this.decending);
+		stor.writeInt(this.color);
+	}
+
+	@Override
+	public void fromBytes(Storage stor) {
+		this.displayName = stor.readString();
+		this.entries = new LinkedList<>();
+		int entries = stor.readInt();
+		for (int i = 0; i < entries; i++)
+			this.entries.add(new LeaderboardEntry(stor.readLong(), stor.readLong()));
+		this.aliases = new LinkedList<>();
+		int aliases = stor.readInt();
+		for (int i = 0; i < aliases; i++)
+			this.aliases.add(stor.readString());
+		this.decending = stor.readBoolean();
+		this.color = stor.readInt();
 	}
 
 }

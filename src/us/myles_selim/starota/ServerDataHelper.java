@@ -1,9 +1,6 @@
 package us.myles_selim.starota;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import sx.blah.discord.handle.obj.IGuild;
 import us.myles_selim.ebs.DataType;
@@ -11,21 +8,23 @@ import us.myles_selim.ebs.EBList;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.ebs.IOHelper;
 import us.myles_selim.ebs.callbacks.OnWriteCallback;
+import us.myles_selim.ebs.data_types.DataTypeEBStorage;
 
 public class ServerDataHelper {
 
-	public static List<EBStorage> getEBSsFromFolder(IGuild server, File folder) {
+	public static EBList<EBStorage> getEBSsFromFolder(IGuild server, File folder) {
 		if (!folder.exists() || !folder.isDirectory())
-			return Collections.emptyList();
-		List<EBStorage> ebss = new ArrayList<>();
+			return new EBList<>(new DataTypeEBStorage());
+		EBList<EBStorage> ebss = new EBList<>(new DataTypeEBStorage());
 		File sFolder = new File(folder, server.getStringID());
 		if (!sFolder.exists())
-			return Collections.emptyList();
+			return new EBList<>(new DataTypeEBStorage());
 		File[] nestFiles = sFolder.listFiles(IOHelper.EBS_FILE_FILTER);
 		if (nestFiles == null || nestFiles.length == 0)
-			return Collections.emptyList();
+			return new EBList<>(new DataTypeEBStorage());
 		for (File nFile : nestFiles)
-			ebss.add(IOHelper.readEBStorage(nFile).setOnWriteCallback(new FileWriteCallback(nFile)));
+			ebss.addWrapped(
+					IOHelper.readEBStorage(nFile).setOnWriteCallback(new FileWriteCallback(nFile)));
 		return ebss;
 	}
 
@@ -42,7 +41,7 @@ public class ServerDataHelper {
 			DataType<T> type) {
 		File eblFile = new File(folder, server.getStringID() + IOHelper.EBS_LIST_EXTENSION);
 		if (!eblFile.exists() || !folder.exists() || !folder.isDirectory())
-			return new EBList<>(type);
+			return new EBList<>(type).setOnWriteCallback(new FileWriteCallback(eblFile));
 		return (EBList<T>) IOHelper.readEBList(eblFile)
 				.setOnWriteCallback(new FileWriteCallback(eblFile));
 	}

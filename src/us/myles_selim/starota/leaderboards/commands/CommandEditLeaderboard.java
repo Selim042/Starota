@@ -89,6 +89,7 @@ public class CommandEditLeaderboard extends StarotaCommand {
 			return;
 		}
 		channel.sendMessage("Updated options for " + board.getDisplayName(), board.toEmbedOptions());
+		server.setLeaderboard(board.getDisplayName(), board);
 	}
 
 }
