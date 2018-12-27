@@ -88,13 +88,9 @@ public class Starota {
 	public static boolean IS_DEV;
 	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "2.3.0";
+	public final static String VERSION = "2.3.1";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n"
-			+ "Public changes:\n + Add PvP coordination commands\n" + "\nAdministrative changes:\n"
-			+ " * Wrap guild instances and store their data with them for faster access\n"
-			+ " * Add a Discord4J watcher to hopefully fully crash when it disconnects\n"
-			+ "\nWARNING: All leaderboards will be removed and will need to be recreated.\n"
-			+ "Contact Selim#0042 to have them recovered.";
+			+ "Administrative changes:\n" + " * Add module to deactivate PvP commands";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static void main(String[] args) {
@@ -291,6 +287,7 @@ public class Starota {
 		public static final StarotaModule LUA = new StarotaModule("Lua", "Lua");
 		public static final StarotaModule LEADERBOARDS = new StarotaModule("Leaderboards", "Leaderboard",
 				PROFILES);
+		public static final StarotaModule PVP = new StarotaModule("PvP", "PvP", PROFILES);
 
 		private static void registerModules() {
 			StarotaModule.registerModule(PROFILES);
@@ -298,6 +295,7 @@ public class Starota {
 			StarotaModule.registerModule(TRADEBOARD);
 			StarotaModule.registerModule(LUA);
 			StarotaModule.registerModule(LEADERBOARDS);
+			StarotaModule.registerModule(PVP);
 		}
 
 	}
