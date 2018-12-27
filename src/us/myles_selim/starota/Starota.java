@@ -509,9 +509,13 @@ public class Starota {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withTitle("An " + e.getClass().getSimpleName() + " has been thrown"
 				+ (message == null ? "" : ": " + message));
-		String body = "";
-		for (StackTraceElement t : e.getStackTrace())
-			body += t + "\n";
+		String body = e.getClass().getName() + ": " + e.getLocalizedMessage();
+		for (StackTraceElement t : e.getStackTrace()) {
+			String line = t.toString();
+			if (body.length() + line.length() > 2048)
+				break;
+			body += line + "\n";
+		}
 		builder.appendDesc(body);
 		RequestBuffer.request(() -> reportChannel.sendMessage(builder.build()));
 	}

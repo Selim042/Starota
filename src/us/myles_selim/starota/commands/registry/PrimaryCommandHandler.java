@@ -73,7 +73,7 @@ public class PrimaryCommandHandler {
 			System.err.println("executed command: " + message.getContent());
 			e.printStackTrace();
 			if (!(e instanceof LuaError))
-				Starota.submitError(e);
+				Starota.submitError(" on server " + server.getName(), e);
 		}
 		RequestBuffer.request(() -> {
 			channel.setTypingStatus(false);
