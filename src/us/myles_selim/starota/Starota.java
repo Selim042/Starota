@@ -112,14 +112,6 @@ public class Starota {
 			return;
 		}
 		IS_DEV = Boolean.parseBoolean(PROPERTIES.getProperty("is_dev"));
-		if (!IS_DEV) {
-//			BOT_LIST = new DiscordBotListAPI.Builder().token(PROPERTIES.getProperty("bot_list_token"))
-//					.botId(CLIENT.getOurUser().getStringID()).build();
-//			List<Integer> shards = new ArrayList<>();
-//			for (IShard s : CLIENT.getShards())
-//				shards.add(s.getGuilds().size());
-//			BOT_LIST.setStats(shards);
-		}
 		EventDispatcher dispatcher = CLIENT.getDispatcher();
 		try {
 			while (!CLIENT.isReady())
@@ -127,6 +119,7 @@ public class Starota {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		submitStats();
 		BaseModules.registerModules();
 		DebugServer debug = new DebugServer();
 		debug.start();
@@ -521,6 +514,24 @@ public class Starota {
 			body += t + "\n";
 		builder.appendDesc(body);
 		RequestBuffer.request(() -> reportChannel.sendMessage(builder.build()));
+	}
+
+	public static void submitStats() {
+		if (!IS_DEV && PROPERTIES.containsKey("bot_list_token")) {
+			System.out.println("Submitting shard info to the bot list");
+			BOT_LIST = new DiscordBotListAPI.Builder().token(PROPERTIES.getProperty("bot_list_token"))
+					.botId(CLIENT.getOurUser().getStringID()).build();
+			List<Integer> shards = new ArrayList<>();
+			for (IShard s : CLIENT.getShards())
+				shards.add(s.getGuilds().size());
+			BOT_LIST.setStats(shards).whenComplete((v, e) -> {
+				if (e != null)
+					e.printStackTrace();
+				else
+					System.out.println("Submitted");
+			});
+		} else
+			System.out.println("BOT LIST TOKEN NOT FOUND");
 	}
 
 	// public static void sendTestMessage(String message) {
