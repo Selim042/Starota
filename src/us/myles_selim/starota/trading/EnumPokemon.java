@@ -869,6 +869,7 @@ public enum EnumPokemon {
 
 	EnumPokemon(EnumPokemonType type1, String name, FormSet formSet, EnumGender gender) {
 		this(type1, (EnumPokemonType) null, name, formSet);
+		this.gender = gender;
 	}
 
 	EnumPokemon(EnumPokemonType type1, EnumGender gender) {
