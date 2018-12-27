@@ -14,8 +14,6 @@ import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.EBList;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.ebs.Storage;
-import us.myles_selim.ebs.data_types.DataTypeString;
-import us.myles_selim.starota.leaderboards.LeaderboardEntry.DataTypeLeaderboardEntry;
 
 public class Leaderboard extends DataType<Leaderboard> {
 
