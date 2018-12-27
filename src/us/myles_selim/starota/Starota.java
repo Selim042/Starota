@@ -88,9 +88,13 @@ public class Starota {
 	public static boolean IS_DEV;
 	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "2.2.3";
+	public final static String VERSION = "2.3.0";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n"
-			+ "Public changes:\n * Fix typo in naming of Finneon\n + Cache Silph Road info";
+			+ "Public changes:\n + Add PvP coordination commands\n" + "\nAdministrative changes:\n"
+			+ " * Wrap guild instances and store their data with them for faster access\n"
+			+ " * Add a Discord4J watcher to hopefully fully crash when it disconnects\n"
+			+ "\nWARNING: All leaderboards will be removed and will need to be recreated.\n"
+			+ "Contact Selim#0042 to have them recovered.";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static void main(String[] args) {
@@ -113,12 +117,12 @@ public class Starota {
 		}
 		IS_DEV = Boolean.parseBoolean(PROPERTIES.getProperty("is_dev"));
 		if (!IS_DEV) {
-			BOT_LIST = new DiscordBotListAPI.Builder().token(PROPERTIES.getProperty("bot_list_token"))
-					.botId(CLIENT.getOurUser().getStringID()).build();
-			List<Integer> shards = new ArrayList<>();
-			for (IShard s : CLIENT.getShards())
-				shards.add(s.getGuilds().size());
-			BOT_LIST.setStats(shards);
+//			BOT_LIST = new DiscordBotListAPI.Builder().token(PROPERTIES.getProperty("bot_list_token"))
+//					.botId(CLIENT.getOurUser().getStringID()).build();
+//			List<Integer> shards = new ArrayList<>();
+//			for (IShard s : CLIENT.getShards())
+//				shards.add(s.getGuilds().size());
+//			BOT_LIST.setStats(shards);
 		}
 		EventDispatcher dispatcher = CLIENT.getDispatcher();
 		try {
