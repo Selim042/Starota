@@ -11,7 +11,7 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 public class CommandSetAsGroup extends StarotaCommand {
 
 	public CommandSetAsGroup() {
-		super("setAsGroup", "Sets if the target role is a group.");
+		super("setAsGroup", "Sets the target role to a group.");
 	}
 
 	@Override
