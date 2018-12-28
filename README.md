@@ -1,4 +1,6 @@
 # Starota
+[![](https://discordbots.org/api/widget/489245655710040099.svg)](https://discordbots.org/bot/489245655710040099)
+
 [![](https://img.shields.io/discord/436614503606779914.svg)](https://discord.gg/NxverNw)
 [![](https://discordbots.org/api/widget/status/489245655710040099.svg)](https://discordbots.org/bot/489245655710040099)
 
