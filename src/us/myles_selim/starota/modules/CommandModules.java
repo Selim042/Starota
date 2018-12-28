@@ -57,7 +57,7 @@ public class CommandModules extends StarotaCommand {
 		}
 		if (args.length < 3) {
 			channel.sendMessage(
-					"**Usage**: " + server.getDiscordGuild() + getName() + " " + getGeneralUsage());
+					"**Usage**: " + server.getPrefix() + getName() + " " + getGeneralUsage());
 			return;
 		}
 		StarotaModule module = StarotaModule.getModule(args[2]);
