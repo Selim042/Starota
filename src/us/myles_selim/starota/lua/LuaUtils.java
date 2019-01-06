@@ -41,16 +41,6 @@ import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.Starota.BaseModules;
 import us.myles_selim.starota.leaderboards.Leaderboard;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
-import us.myles_selim.starota.lua.conversion.discord.CategoryConverter;
-import us.myles_selim.starota.lua.conversion.discord.ChannelConverter;
-import us.myles_selim.starota.lua.conversion.discord.MessageConverter;
-import us.myles_selim.starota.lua.conversion.discord.RoleConverter;
-import us.myles_selim.starota.lua.conversion.discord.ServerConverter;
-import us.myles_selim.starota.lua.conversion.discord.UserConverter;
-import us.myles_selim.starota.lua.conversion.starota.EnumPokemonConverter;
-import us.myles_selim.starota.lua.conversion.starota.LeaderboardConverter;
-import us.myles_selim.starota.lua.conversion.starota.PlayerProfileConverter;
-import us.myles_selim.starota.lua.conversion.starota.TradeboardPostConverter;
 import us.myles_selim.starota.lua.events.LuaEvent;
 import us.myles_selim.starota.lua.libraries.DiscordEventLib;
 import us.myles_selim.starota.lua.libraries.DiscordLib;
@@ -72,17 +62,30 @@ public class LuaUtils {
 			return;
 		registeredConverters = true;
 
-		ConversionHandler.registerConverter(PlayerProfile.class, new PlayerProfileConverter());
-		ConversionHandler.registerConverter(TradeboardPost.class, new TradeboardPostConverter());
-		ConversionHandler.registerConverter(EnumPokemon.class, new EnumPokemonConverter());
-		ConversionHandler.registerConverter(Leaderboard.class, new LeaderboardConverter());
+		// ConversionHandler.registerConverter(PlayerProfile.class, new PlayerProfileConverter());
+		// ConversionHandler.registerConverter(TradeboardPost.class, new TradeboardPostConverter());
+		// ConversionHandler.registerConverter(EnumPokemon.class, new EnumPokemonConverter());
+		// ConversionHandler.registerConverter(Leaderboard.class, new LeaderboardConverter());
+		//
+		// ConversionHandler.registerConverter(ICategory.class, new CategoryConverter());
+		// ConversionHandler.registerConverter(IChannel.class, new ChannelConverter());
+		// ConversionHandler.registerConverter(IMessage.class, new MessageConverter());
+		// ConversionHandler.registerConverter(IRole.class, new RoleConverter());
+		// ConversionHandler.registerConverter(IGuild.class, new ServerConverter());
+		// ConversionHandler.registerConverter(IUser.class, new UserConverter());
 
-		ConversionHandler.registerConverter(ICategory.class, new CategoryConverter());
-		ConversionHandler.registerConverter(IChannel.class, new ChannelConverter());
-		ConversionHandler.registerConverter(IMessage.class, new MessageConverter());
-		ConversionHandler.registerConverter(IRole.class, new RoleConverter());
-		ConversionHandler.registerConverter(IGuild.class, new ServerConverter());
-		ConversionHandler.registerConverter(IUser.class, new UserConverter());
+		ConversionHandler.registerAutoConverter(PlayerProfile.class);
+		ConversionHandler.registerAutoConverter(TradeboardPost.class);
+		ConversionHandler.registerAutoConverter(EnumPokemon.class);
+		ConversionHandler.registerAutoConverter(Leaderboard.class);
+		ConversionHandler.registerAutoConverter(StarotaServer.class);
+
+		ConversionHandler.registerAutoConverter(ICategory.class);
+		ConversionHandler.registerAutoConverter(IChannel.class);
+		ConversionHandler.registerAutoConverter(IMessage.class);
+		ConversionHandler.registerAutoConverter(IRole.class);
+		ConversionHandler.registerAutoConverter(IGuild.class);
+		ConversionHandler.registerAutoConverter(IUser.class);
 	}
 
 	public static LuaState getState(StarotaServer server) {
