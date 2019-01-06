@@ -67,6 +67,7 @@ public class EventHandler {
 
 	@EventSubscriber
 	public void onServerCreate(GuildCreateEvent event) {
+		Starota.submitStats();
 		IGuild server = event.getGuild();
 		IUser selimUser = Starota.getUser(Starota.SELIM_USER_ID);
 		RequestBuffer.request(() -> {
