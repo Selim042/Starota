@@ -500,6 +500,8 @@ public class Starota {
 	}
 
 	public static void submitError(String message, Throwable e) {
+		if (IS_DEV)
+			e.printStackTrace();
 		if (IS_DEV || CLIENT == null || !CLIENT.isReady())
 			return;
 		long reportChannelId = 522805019326677002L;
