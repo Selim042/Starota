@@ -75,7 +75,7 @@ public class ConversionHandler {
 				if (mt == null)
 					mt = new LuaTable();
 				mt.set(state, "javaType", ValueFactory.valueOf(clazz.getName()));
-				// mt.set(state, "__metatable", new LuaTable());
+				mt.set(state, "__metatable", new LuaTable());
 				mt.set(state, "__tostring", new OneArgFunction() {
 
 					@Override
