@@ -3,6 +3,11 @@ package us.myles_selim.starota.lua.conversion;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.squiddev.cobalt.Constants;
 import org.squiddev.cobalt.LuaError;
@@ -33,12 +38,17 @@ public class AutoConverter implements IConverter {
 		LuaTable methods = new LuaTable();
 		Class<?> clazz = val.getClass();
 
-		for (Method m : clazz.getMethods())
-			if (
-			// m.isAccessible() &&
-			hasNecessaryConverters(m) && !isHiddenMethod(m))
-				methods.rawset(m.getName(), getJavaFunction(state, val, m));
+		Map<String, List<Method>> mm = new HashMap<>();
+		for (Method m : clazz.getMethods()) {
+			if (hasNecessaryConverters(m) && !isHiddenMethod(m)) {
+				if (!mm.containsKey(m.getName()))
+					mm.put(m.getName(), new ArrayList<>());
+				mm.get(m.getName()).add(m);
+			}
+		}
 
+		for (Entry<String, List<Method>> e : mm.entrySet())
+			methods.rawset(e.getKey(), getJavaFunction(state, val, e.getValue()));
 		LuaTable mt = new LuaTable();
 		mt.rawset("__index", methods);
 		return new LuaUserdata(val, mt);
@@ -67,23 +77,30 @@ public class AutoConverter implements IConverter {
 
 	private static boolean isHiddenMethod(Method m) {
 		return m.getDeclaringClass().equals(Object.class);
-		// for (Method m1 : OBJECT_METHODS)
-		// if (m1.equals(m))
-		// return true;
-		// return false;
 	}
 
-	private LuaValue getJavaFunction(LuaState state, Object obj, Method m) {
+	private LuaValue getJavaFunction(LuaState state, Object obj, List<Method> ml) {
 		LuaUserdata data = new LuaUserdata(null);
-		JavaFunction func = new JavaFunction(obj, m);
+		JavaFunction func = new JavaFunction(obj, ml);
 		LuaTable mt = new LuaTable();
 		LuaTable helpMethod = new LuaTable();
 		helpMethod.rawset("help", new ZeroArgFunction() {
 
 			@Override
 			public LuaValue call(LuaState state) throws LuaError {
-				String help = "returnType: " + m.getReturnType();
-				return ValueFactory.valueOf(help);
+				LuaTable help = new LuaTable();
+				int index = 1;
+				LuaTable op = new LuaTable();
+				for (Method m : ml) {
+					LuaTable p = new LuaTable();
+					Class<?>[] types = m.getParameterTypes();
+					for (int i = 0; i < types.length; i++)
+						p.rawset(i + 1, ConversionHandler.convertToLua(state, types[i].getName()));
+					op.rawset(index++, p);
+				}
+				help.rawset("params", op);
+				help.rawset("returnType", ValueFactory.valueOf(ml.get(0).getReturnType().getName()));
+				return help;
 			}
 		});
 		mt.rawset("__index", helpMethod);
@@ -94,33 +111,56 @@ public class AutoConverter implements IConverter {
 
 	private class JavaFunction extends VarArgFunction {
 
-		private final Object obj;
-		private final Method m;
+		private final Object inst;
+		private final List<Method> methods;
 
-		public JavaFunction(Object obj, Method m) {
-			this.obj = obj;
-			this.m = m;
+		public JavaFunction(Object inst, List<Method> methods) {
+			this.inst = inst;
+			this.methods = methods;
 		}
 
 		@Override
 		public Varargs invoke(LuaState state, Varargs args) throws LuaError {
-			Object[] params = new Object[args.count()];
-			if (args.count() != 0) {
-				for (int i = 1; i <= args.count(); i++) {
-					Class<?> type = m.getParameterTypes()[i - 1];
-					Object obj = ConversionHandler.convertToJava(state, args.arg(i));
-					if (!type.isInstance(obj))
-						throw new LuaError("arg" + i + " must be a " + type.getName() + ", got "
-								+ (obj == null ? "nil" : obj.getClass().getName()));
+			args = args.subargs(2);
+			int luaArgCount = args.count();
+			if (luaArgCount >= 1 && (args.first().isNil())
+					|| (args instanceof LuaUserdata && ((LuaUserdata) args).instance == null))
+				luaArgCount--;
+			Object[] params;
+			if (luaArgCount != 0) {
+				params = new Object[args.count()];
+				for (int i = 1; i <= args.count(); i++)
 					params[i - 1] = ConversionHandler.convertToJava(state, args.arg(i));
-				}
-			}
+			} else
+				params = new Object[0];
+			Method m = findMethod(params);
+			if (m == null)
+				throw new LuaError("invalid number of arguments, " + luaArgCount);
 			try {
-				return ConversionHandler.convertToLua(state, m.invoke(obj, params));
+				return ConversionHandler.convertToLua(state, m.invoke(inst, params));
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				e.printStackTrace();
 				return Constants.NIL;
 			}
+		}
+
+		private Method findMethod(Object[] params) {
+			for (Method m : methods) {
+				Class<?>[] types = m.getParameterTypes();
+				if (params.length != types.length)
+					continue;
+				if (params.length == 0)
+					return m;
+				boolean found = true;
+				for (int i = 0; i < types.length && i < params.length; i++)
+					if (!types[i].isInstance(params[i])) {
+						found = false;
+						break;
+					}
+				if (found)
+					return m;
+			}
+			return null;
 		}
 	}
 
