@@ -17,6 +17,7 @@ import org.squiddev.cobalt.lib.LuaLibrary;
 
 import sx.blah.discord.handle.obj.IUser;
 import us.myles_selim.ebs.EBStorage;
+import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.Starota.BaseModules;
 import us.myles_selim.starota.commands.CommandChangelogChannel;
 import us.myles_selim.starota.leaderboards.Leaderboard;
@@ -37,6 +38,7 @@ public class StarotaLib implements LuaLibrary {
 
 	@Override
 	public LuaValue add(LuaState state, LuaTable env) {
+		env.rawset("_STAROTA_VERSION", ValueFactory.valueOf(Starota.VERSION));
 		env.rawset("options", storageToValue(server.getOptions(), StarotaServer.TRADE_ID_KEY,
 				CommandChangelogChannel.CHANGES_CHANNEL, "changesVersion", StarotaModule.MODULE_KEY));
 		if (StarotaModule.isModuleEnabled(server, BaseModules.PROFILES)) {
