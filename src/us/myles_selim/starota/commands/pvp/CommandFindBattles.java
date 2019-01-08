@@ -45,13 +45,13 @@ public class CommandFindBattles extends StarotaCommand {
 			String nickname = user.getNicknameForGuild(server.getDiscordGuild());
 			builder.appendDesc(" - **Discord**: "
 					+ (nickname == null ? user.getName() + "#" + user.getDiscriminator()
-							: nickname + " (__" + user.getName() + "#" + user.getDiscriminator() + "__)")
+							: nickname + " (_" + user.getName() + "#" + user.getDiscriminator() + "_)")
 					+ "\n");
 			if (profile.getTrainerCode() != -1)
 				builder.appendDesc(" - **Trainer Code**: " + profile.getTrainerCodeString() + "\n");
 			int hours = (int) ((battler.right / 3600000) % 24);
 			int minutes = (int) ((battler.right / 60000) % 60);
-			builder.appendDesc(String.format("- **Time Remaining**: %01d:%02d\n", hours, minutes));
+			builder.appendDesc(String.format(" - **Time Remaining**: %01d:%02d\n", hours, minutes));
 		}
 		builder.appendDesc("\nFrom this list, find any trainers that you are ultra/best friends with "
 				+ "and contact them directly to arrange a battle!\n");

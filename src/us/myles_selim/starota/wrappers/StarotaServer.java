@@ -3,7 +3,6 @@ package us.myles_selim.starota.wrappers;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +42,7 @@ public class StarotaServer {
 	private EBStorage options;
 	private EBList<TradeboardPost> tradeboard;
 	private EBStorage leaderboards;
-	private Map<String, Long> battleTimers = new HashMap<>();
+	private Map<String, Long> battleTimers = new ConcurrentHashMap<>();
 
 	private StarotaServer(IGuild server) {
 		this.guild = server;
