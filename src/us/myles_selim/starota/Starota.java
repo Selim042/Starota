@@ -91,11 +91,9 @@ public class Starota {
 	public static boolean IS_DEV;
 	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "2.4.1";
+	public final static String VERSION = "2.5.0";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n" + "Public changes:\n"
-			+ " + Now suggests possible commands when a command is not found\n"
-			+ " * Fix for error in findBattles command\n\n" + "Administrative changes:\n"
-			+ " * Major overhaul for Lua, much more access to methods\n";
+			+ " + New Pokedex command\n" + " * Fix tradeboard post serialization";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static void main(String[] args) {
