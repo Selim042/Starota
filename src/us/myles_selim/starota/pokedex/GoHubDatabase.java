@@ -64,6 +64,8 @@ public class GoHubDatabase {
 			@Override
 			public EnumWeather deserialize(JsonElement json, Type typeOfT,
 					JsonDeserializationContext context) throws JsonParseException {
+				if (json.getAsString().toLowerCase().equals("sunny"))
+					return EnumWeather.CLEAR_SUNNY;
 				return EnumWeather.valueOf(json.getAsString().toUpperCase());
 			}
 		});
