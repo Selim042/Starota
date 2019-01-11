@@ -23,8 +23,8 @@ import org.squiddev.cobalt.function.ZeroArgFunction;
 import org.squiddev.cobalt.lib.jse.JsePlatform;
 import org.squiddev.cobalt.lib.platform.AbstractResourceManipulator;
 
-import us.myles_selim.starota.EnumTeam;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.profiles.PlayerProfile;
 
 public class AutoConverter implements IConverter {

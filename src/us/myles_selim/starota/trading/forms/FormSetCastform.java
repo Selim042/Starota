@@ -1,7 +1,7 @@
 package us.myles_selim.starota.trading.forms;
 
-import us.myles_selim.starota.trading.EnumPokemon;
-import us.myles_selim.starota.trading.EnumPokemonType;
+import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.enums.EnumPokemonType;
 
 public class FormSetCastform extends FormSet {
 

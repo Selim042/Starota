@@ -10,6 +10,8 @@ import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.embed_converter.annotations.EmbedFooterText;
 import us.myles_selim.starota.embed_converter.annotations.EmbedTitle;
+import us.myles_selim.starota.enums.EnumGender;
+import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 import us.myles_selim.starota.wrappers.StarotaServer;

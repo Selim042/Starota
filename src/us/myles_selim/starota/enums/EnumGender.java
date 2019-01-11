@@ -1,4 +1,4 @@
-package us.myles_selim.starota.trading;
+package us.myles_selim.starota.enums;
 
 public enum EnumGender {
 	UNKNOWN("Unknown"),

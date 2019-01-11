@@ -11,10 +11,10 @@ import org.squiddev.cobalt.LuaValue;
 import org.squiddev.cobalt.ValueFactory;
 import org.squiddev.cobalt.function.ZeroArgFunction;
 
+import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.enums.EnumPokemonType;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
 import us.myles_selim.starota.lua.conversion.IConverter;
-import us.myles_selim.starota.trading.EnumPokemon;
-import us.myles_selim.starota.trading.EnumPokemonType;
 import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.trading.forms.FormSet;
 import us.myles_selim.starota.trading.forms.FormSet.Form;

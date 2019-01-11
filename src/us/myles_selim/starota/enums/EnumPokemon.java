@@ -1,5 +1,6 @@
-package us.myles_selim.starota.trading;
+package us.myles_selim.starota.enums;
 
+import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.trading.forms.FormSet;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 import us.myles_selim.starota.trading.forms.FormSetAlolan;

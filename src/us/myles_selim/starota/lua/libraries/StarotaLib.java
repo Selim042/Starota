@@ -20,12 +20,12 @@ import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.Starota.BaseModules;
 import us.myles_selim.starota.commands.CommandChangelogChannel;
+import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.leaderboards.Leaderboard;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
 import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.profiles.PlayerProfile;
-import us.myles_selim.starota.trading.EnumPokemon;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class StarotaLib implements LuaLibrary {

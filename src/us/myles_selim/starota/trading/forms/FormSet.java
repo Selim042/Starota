@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import us.myles_selim.starota.trading.EnumPokemon;
-import us.myles_selim.starota.trading.EnumPokemonType;
+import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.enums.EnumPokemonType;
 import us.myles_selim.starota.trading.FormManager;
 
 public abstract class FormSet {

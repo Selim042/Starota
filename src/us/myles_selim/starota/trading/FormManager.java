@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.enums.EnumPokemon;
 
 public class FormManager {
 

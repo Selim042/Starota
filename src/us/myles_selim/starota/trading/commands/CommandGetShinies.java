@@ -7,7 +7,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.commands.StarotaCommand;
-import us.myles_selim.starota.trading.EnumPokemon;
+import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 import us.myles_selim.starota.wrappers.StarotaServer;

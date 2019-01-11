@@ -11,7 +11,6 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.Storage;
-import us.myles_selim.starota.EnumTeam;
 import us.myles_selim.starota.EventFactory;
 import us.myles_selim.starota.MiscUtils;
 import us.myles_selim.starota.Starota;
@@ -24,6 +23,7 @@ import us.myles_selim.starota.embed_converter.annotations.EmbedFooterText;
 import us.myles_selim.starota.embed_converter.annotations.EmbedThumbnail;
 import us.myles_selim.starota.embed_converter.annotations.EmbedTimestamp;
 import us.myles_selim.starota.embed_converter.annotations.EmbedTitle;
+import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.lua.events.GetProfileEvent;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
