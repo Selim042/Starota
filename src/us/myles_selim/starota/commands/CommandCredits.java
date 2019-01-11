@@ -20,7 +20,8 @@ public class CommandCredits extends JavaCommand {
 
 		builder.appendDesc("**General Development**: Selim_042 (http://github.com/Selim042)\n");
 		builder.appendDesc("**Discord4J**: austinv11 (https://github.com/austinv11)\n");
-//		builder.appendDesc("**Tradeboard Sprites**: The Artificial (https://theartificial.com)\n");
+		builder.appendDesc("**Pokemon Sprites**: PokeAPI (https://github.com/PokeAPI/sprites)\n");
+		builder.appendDesc("**Pokemon Go Database**: Pokemon Go Hub (https://pokemongohub.net/)\n");
 
 		channel.sendMessage(builder.build());
 	}

@@ -13,6 +13,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import us.myles_selim.starota.CachedData;
+import us.myles_selim.starota.Starota;
 
 public class SilphRoadUtils {
 
@@ -30,6 +31,7 @@ public class SilphRoadUtils {
 		try {
 			URL url = new URL(API_URL + pogoName + ".json");
 			URLConnection conn = url.openConnection();
+			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
 			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			String json = "";
 			String line = null;
@@ -48,6 +50,7 @@ public class SilphRoadUtils {
 		try {
 			URL url = new URL(API_URL + pogoName + ".json");
 			URLConnection conn = url.openConnection();
+			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
 			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			String json = "";
 			String line = null;

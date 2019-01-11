@@ -48,6 +48,7 @@ import us.myles_selim.starota.lua.commands.CommandUploadScript;
 import us.myles_selim.starota.lua.commands.LuaCommandHandler;
 import us.myles_selim.starota.modules.CommandModules;
 import us.myles_selim.starota.modules.StarotaModule;
+import us.myles_selim.starota.pokedex.CommandPokedex;
 import us.myles_selim.starota.profiles.commands.CommandGetProfilelessPlayers;
 import us.myles_selim.starota.profiles.commands.CommandProfile;
 import us.myles_selim.starota.profiles.commands.CommandProfileHelp;
@@ -81,6 +82,7 @@ public class Starota {
 	public static final long SELIM_USER_ID = 134855940938661889L;
 	public static final long SUPPORT_SERVER = 436614503606779914L;
 	public static final String SUPPORT_SERVER_LINK = "https://discord.gg/NxverNw";
+	public static final String HTTP_USER_AGENT = "Mozilla/5.0; Starota/" + Starota.VERSION;
 
 	public static final long PVILLE_SERVER = 314733127027130379L;
 
@@ -178,6 +180,8 @@ public class Starota {
 		JavaCommandHandler.registerCommand("PvP", new CommandBattleReady());
 		JavaCommandHandler.registerCommand("PvP", new CommandNotReady());
 		JavaCommandHandler.registerCommand("PvP", new CommandFindBattles());
+
+		JavaCommandHandler.registerCommand("Pokedex", new CommandPokedex());
 
 		try {
 			Thread.sleep(2500);
