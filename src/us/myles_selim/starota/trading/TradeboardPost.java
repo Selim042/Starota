@@ -219,7 +219,10 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 			stor.writeInt(-1);
 		stor.writeBoolean(this.shiny);
 		stor.writeLong(this.timePosted);
-		stor.writeInt(this.gender.ordinal());
+		if (this.gender != null)
+			stor.writeInt(this.gender.ordinal());
+		else
+			stor.writeInt(-1);
 		stor.writeBoolean(this.legacy);
 	}
 
@@ -236,7 +239,9 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 		this.timePosted = stor.readLong();
 		if (this.timePosted <= 0 || this.timePosted >= System.currentTimeMillis() / 1000)
 			this.timePosted = System.currentTimeMillis() / 1000;
-		this.gender = EnumGender.values()[stor.readInt()];
+		int genderOrdinal = stor.readInt();
+		if (genderOrdinal != -1)
+			this.gender = EnumGender.values()[genderOrdinal];
 		this.legacy = stor.readBoolean();
 	}
 
