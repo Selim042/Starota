@@ -7,7 +7,7 @@ import us.myles_selim.starota.Starota;
 public enum EnumWeather {
 	EXTREME,
 	CLEAR_SUNNY("clear", EnumPokemonType.FIRE, EnumPokemonType.GRASS, EnumPokemonType.GROUND),
-	PARTY_CLOUDY("partycloudy", EnumPokemonType.NORMAL, EnumPokemonType.ROCK),
+	PARTY_CLOUDY("partlycloudy", EnumPokemonType.NORMAL, EnumPokemonType.ROCK),
 	CLOUDY(EnumPokemonType.FAIRY, EnumPokemonType.FIGHTING, EnumPokemonType.POISON),
 	RAIN(EnumPokemonType.WATER, EnumPokemonType.ELECTRIC, EnumPokemonType.BUG),
 	SNOW(EnumPokemonType.ICE, EnumPokemonType.STEEL),
