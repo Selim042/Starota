@@ -4,6 +4,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.trading.TradeboardPost;
+import us.myles_selim.starota.trading.TradeboardReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandGetTrade extends StarotaCommand {
@@ -32,7 +33,8 @@ public class CommandGetTrade extends StarotaCommand {
 			channel.sendMessage("Trade \"" + args[1] + "\" not found.");
 			return;
 		}
-		channel.sendMessage(post.getPostEmbed(server));
+		// channel.sendMessage(post.getPostEmbed(server));
+		new TradeboardReactionMessage(server, post).sendMessage(channel);
 	}
 
 }

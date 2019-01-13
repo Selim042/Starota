@@ -17,7 +17,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
+import sx.blah.discord.api.internal.json.objects.EmbedObject;
+import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.CachedData;
+import us.myles_selim.starota.EmojiServerHelper;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
@@ -27,6 +30,14 @@ import us.myles_selim.starota.pokedex.PokedexEntry.Moveset;
 
 public class GoHubDatabase {
 
+	public static final EmbedObject LOADING_EMBED;
+
+	static {
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.withTitle("Loading Pokémon Go Hub Database... " + EmojiServerHelper.getEmoji("loading"));
+		LOADING_EMBED = builder.build();
+	}
+
 	private static final String POKEMON_API = "https://db.pokemongohub.net/api/pokemon/";
 	private static final String POKEMON_MOVES_API = "https://db.pokemongohub.net/api/moves/with-pokemon/";
 	private static final String MOVES_API = "https://db.pokemongohub.net/api/moves/";
@@ -35,13 +46,13 @@ public class GoHubDatabase {
 	private static final Gson GSON;
 	private static final JsonParser PARSER = new JsonParser();
 
-	private static final Map<Integer, CachedData<PokedexEntry>> POKEMON_CACHE = new HashMap<>();
-	private static final Map<Integer, CachedData<Move[]>> POKEMON_MOVES_CACHE = new HashMap<>();
+	private static final Map<String, CachedData<PokedexEntry>> POKEMON_CACHE = new HashMap<>();
+	private static final Map<String, CachedData<Move[]>> POKEMON_MOVES_CACHE = new HashMap<>();
 	private static final Map<Integer, CachedData<Move>> MOVE_CACHE = new HashMap<>();
-	private static final Map<Integer, CachedData<Moveset[]>> MOVESET_CACHE = new HashMap<>();
-	private static final Map<Integer, CachedData<Counter[]>> COUNTER_CACHE = new HashMap<>();
+	private static final Map<String, CachedData<Moveset[]>> MOVESET_CACHE = new HashMap<>();
+	private static final Map<String, CachedData<Counter[]>> COUNTER_CACHE = new HashMap<>();
 
-	private static <V> boolean isCached(Map<Integer, CachedData<V>> cache, int key) {
+	private static <K, V> boolean isCached(Map<K, CachedData<V>> cache, K key) {
 		if (!cache.containsKey(key))
 			return false;
 		if (!cache.get(key).hasPassed(360000)) // 60 mins
@@ -64,9 +75,12 @@ public class GoHubDatabase {
 			@Override
 			public EnumWeather deserialize(JsonElement json, Type typeOfT,
 					JsonDeserializationContext context) throws JsonParseException {
-				if (json.getAsString().toLowerCase().equals("sunny"))
+				String asString = json.getAsString().toUpperCase();
+				if (asString.equals("SUNNY"))
 					return EnumWeather.CLEAR_SUNNY;
-				return EnumWeather.valueOf(json.getAsString().toUpperCase());
+				if (asString.equals("PARTLYCLOUDY"))
+					return EnumWeather.PARTY_CLOUDY;
+				return EnumWeather.valueOf(asString);
 			}
 		});
 		builder.registerTypeAdapter(Counter.class, new JsonDeserializer<Counter>() {
@@ -93,16 +107,29 @@ public class GoHubDatabase {
 		GSON = builder.create();
 	}
 
+	public static boolean isEntryLoaded(EnumPokemon pokemon) {
+		return POKEMON_CACHE.containsKey(pokemon.toString().toLowerCase() + "Normal");
+	}
+
 	public static PokedexEntry getEntry(EnumPokemon pokemon) {
-		if (isCached(POKEMON_CACHE, pokemon.getId()))
-			return POKEMON_CACHE.get(pokemon.getId()).getValue();
+		return getEntry(pokemon, "Normal");
+	}
+
+	public static PokedexEntry getEntry(EnumPokemon pokemon, String form) {
+		String key = pokemon.toString().toLowerCase() + form;
+		if (isCached(POKEMON_CACHE, key))
+			return POKEMON_CACHE.get(key).getValue();
 		try {
-			URL url = new URL(POKEMON_API + pokemon.getId());
+			URL url;
+			if (form == null || form.equals("Normal"))
+				url = new URL(POKEMON_API + pokemon.getId());
+			else
+				url = new URL(POKEMON_API + pokemon.getId() + "?form=" + form);
 			URLConnection conn = url.openConnection();
 			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
 			PokedexEntry entry = GSON.fromJson(
 					PARSER.parse(new InputStreamReader(conn.getInputStream())), PokedexEntry.class);
-			POKEMON_CACHE.put(pokemon.getId(), new CachedData<>(entry));
+			POKEMON_CACHE.put(key, new CachedData<>(entry));
 			return entry;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -111,15 +138,24 @@ public class GoHubDatabase {
 	}
 
 	public static Move[] getMoves(EnumPokemon pokemon) {
-		if (isCached(POKEMON_MOVES_CACHE, pokemon.getId()))
-			return POKEMON_MOVES_CACHE.get(pokemon.getId()).getValue();
+		return getMoves(pokemon, "Normal");
+	}
+
+	public static Move[] getMoves(EnumPokemon pokemon, String form) {
+		String key = pokemon.toString().toLowerCase() + form;
+		if (isCached(POKEMON_MOVES_CACHE, key))
+			return POKEMON_MOVES_CACHE.get(key).getValue();
 		try {
-			URL url = new URL(POKEMON_MOVES_API + pokemon.getId());
+			URL url;
+			if (form == null || form.equals("Normal"))
+				url = new URL(POKEMON_MOVES_API + pokemon.getId());
+			else
+				url = new URL(POKEMON_MOVES_API + pokemon.getId() + "?form=" + form);
 			URLConnection conn = url.openConnection();
 			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
 			Move[] moves = GSON.fromJson(PARSER.parse(new InputStreamReader(conn.getInputStream())),
 					Move[].class);
-			POKEMON_MOVES_CACHE.put(pokemon.getId(), new CachedData<>(moves));
+			POKEMON_MOVES_CACHE.put(key, new CachedData<>(moves));
 			return moves;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -145,15 +181,24 @@ public class GoHubDatabase {
 	}
 
 	public static Moveset[] getMovesets(EnumPokemon pokemon) {
-		if (isCached(MOVESET_CACHE, pokemon.getId()))
-			return MOVESET_CACHE.get(pokemon.getId()).getValue();
+		return getMovesets(pokemon, "Normal");
+	}
+
+	public static Moveset[] getMovesets(EnumPokemon pokemon, String form) {
+		String key = pokemon.toString().toLowerCase() + form;
+		if (isCached(MOVESET_CACHE, key))
+			return MOVESET_CACHE.get(key).getValue();
 		try {
-			URL url = new URL(MOVESETS_API + pokemon.getId());
+			URL url;
+			if (form == null || form.equals("Normal"))
+				url = new URL(MOVESETS_API + pokemon.getId());
+			else
+				url = new URL(MOVESETS_API + pokemon.getId() + "?form=" + form);
 			URLConnection conn = url.openConnection();
 			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
 			Moveset[] movesets = GSON.fromJson(
 					PARSER.parse(new InputStreamReader(conn.getInputStream())), Moveset[].class);
-			MOVESET_CACHE.put(pokemon.getId(), new CachedData<>(movesets));
+			MOVESET_CACHE.put(key, new CachedData<>(movesets));
 			return movesets;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -162,15 +207,24 @@ public class GoHubDatabase {
 	}
 
 	public static Counter[] getCounters(EnumPokemon pokemon) {
-		if (isCached(COUNTER_CACHE, pokemon.getId()))
-			return COUNTER_CACHE.get(pokemon.getId()).getValue();
+		return getCounters(pokemon, "Normal");
+	}
+
+	public static Counter[] getCounters(EnumPokemon pokemon, String form) {
+		String key = pokemon.toString().toLowerCase() + form;
+		if (isCached(COUNTER_CACHE, key))
+			return COUNTER_CACHE.get(key).getValue();
 		try {
-			URL url = new URL(COUNTERS_API + pokemon.getId());
+			URL url;
+			if (form == null || form.equals("Normal"))
+				url = new URL(COUNTERS_API + pokemon.getId());
+			else
+				url = new URL(COUNTERS_API + pokemon.getId() + "?form=" + form);
 			URLConnection conn = url.openConnection();
 			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
 			Counter[] counters = GSON.fromJson(
 					PARSER.parse(new InputStreamReader(conn.getInputStream())), Counter[].class);
-			COUNTER_CACHE.put(pokemon.getId(), new CachedData<>(counters));
+			COUNTER_CACHE.put(key, new CachedData<>(counters));
 			return counters;
 		} catch (IOException e) {
 			e.printStackTrace();

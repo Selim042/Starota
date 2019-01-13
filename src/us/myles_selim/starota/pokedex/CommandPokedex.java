@@ -44,7 +44,12 @@ public class CommandPokedex extends StarotaCommand {
 			channel.sendMessage("Pokemon \"" + args[1] + "\" not found");
 			return;
 		}
-		channel.sendMessage(GoHubDatabase.getEntry(pokemon).toEmbed());
+		IMessage oldMessage = null;
+		if (!GoHubDatabase.isEntryLoaded(pokemon))
+			oldMessage = channel.sendMessage(GoHubDatabase.LOADING_EMBED);
+		PokedexEntry entry = GoHubDatabase.getEntry(pokemon);
+		PokedexReactionMessage pokedexMessage = new PokedexReactionMessage(entry);
+		pokedexMessage.editMessage(channel, oldMessage);
 	}
 
 }

@@ -122,6 +122,10 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 	}
 
 	public EmbedObject getPostEmbed(StarotaServer server) {
+		return getPostEmbed(server, true);
+	}
+
+	public EmbedObject getPostEmbed(StarotaServer server, boolean includeUsage) {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withTitle("Tradeboard Post #" + String.format("%04d", this.getId()) + "\n\n");
 		builder.appendField("Trade Type:",
@@ -172,7 +176,13 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 		builder.appendField("Legacy:",
 				Character.toUpperCase(isLegacyS.charAt(0)) + isLegacyS.substring(1), true);
 
-		builder.withFooterText("Trade thised");
+		if (includeUsage)
+			builder.appendField("Reaction Usage:",
+					"To let the poster know you are interested, press ✅.\n"
+							+ "If you are the poster, press ❌ to remove the post.",
+					false);
+
+		builder.withFooterText("Trade posted");
 		builder.withTimestamp(this.getTimePosted());
 		return builder.build();
 	}

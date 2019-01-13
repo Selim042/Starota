@@ -4,14 +4,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
 import us.myles_selim.starota.enums.EnumWeather;
+import us.myles_selim.starota.reaction_messages.ReactionMessage;
 
-public class PokedexEntry {
+public class PokedexEntry extends ReactionMessage {
 
 	// private static final float[] LVL_MULT = { 0.094f, 0.135137432f,
 	// 0.16639787f, 0.192650919f,
@@ -106,6 +109,19 @@ public class PokedexEntry {
 		return weak;
 	}
 
+	// form handling
+	private Map<String, PokedexEntry> formData = new ConcurrentHashMap<>();
+
+	public PokedexEntry getFormData(String form) {
+		if (form.equals("Normal"))
+			return this;
+		if (formData.containsKey(form))
+			return formData.get(form);
+		PokedexEntry entry = GoHubDatabase.getEntry(getPokemon(), form);
+		formData.put(form, entry);
+		return entry;
+	}
+
 	// moves
 	/**
 	 * @deprecated Do not use directly, for internal use only
@@ -115,10 +131,10 @@ public class PokedexEntry {
 	private Move[] fast;
 	private Move[] charged;
 
-	public Move[] getMoves() {
+	public Move[] getMoves(String form) {
 		if (moves != null)
 			return moves;
-		moves = GoHubDatabase.getMoves(getPokemon());
+		moves = GoHubDatabase.getMoves(getPokemon(), form);
 		return moves;
 	}
 
@@ -126,7 +142,7 @@ public class PokedexEntry {
 		if (fast != null)
 			return fast;
 		List<Move> temp = new ArrayList<>();
-		for (Move m : getMoves())
+		for (Move m : getMoves(form))
 			if (m.isQuickMove == 1)
 				temp.add(m);
 		fast = temp.toArray(new Move[0]);
@@ -137,7 +153,7 @@ public class PokedexEntry {
 		if (charged != null)
 			return charged;
 		List<Move> temp = new ArrayList<>();
-		for (Move m : getMoves())
+		for (Move m : getMoves(form))
 			if (m.isQuickMove != 1)
 				temp.add(m);
 		charged = temp.toArray(new Move[0]);
@@ -155,7 +171,7 @@ public class PokedexEntry {
 	public Moveset[] getMovesets() {
 		if (movesets != null)
 			return movesets;
-		movesets = GoHubDatabase.getMovesets(getPokemon());
+		movesets = GoHubDatabase.getMovesets(getPokemon(), form);
 		return movesets;
 	}
 
@@ -188,7 +204,7 @@ public class PokedexEntry {
 	public Counter[] getCounters() {
 		if (counters != null)
 			return counters;
-		counters = GoHubDatabase.getCounters(getPokemon());
+		counters = GoHubDatabase.getCounters(getPokemon(), form);
 		return counters;
 	}
 
@@ -196,6 +212,8 @@ public class PokedexEntry {
 		if (topCounters != null)
 			return topCounters;
 		int length = 6;
+		if (getCounters() == null)
+			return new Counter[0];
 		if (length > getCounters().length)
 			length = getCounters().length;
 		topCounters = new Counter[length];
@@ -208,77 +226,129 @@ public class PokedexEntry {
 		return EnumPokemon.getPokemon(id);
 	}
 
+	// embeds
+	private final Map<String, EmbedObject> embeds = new ConcurrentHashMap<>();
+
+	public boolean hasEmbedPrepared(String form) {
+		if (form == null)
+			form = "Normal";
+		return embeds.containsKey(form);
+	}
+
 	public EmbedObject toEmbed() {
+		return toEmbed("Normal");
+	}
+
+	public EmbedObject toEmbed(String form) {
+		if (form == null)
+			form = "Normal";
+		if (embeds.containsKey(form))
+			return embeds.get(form);
+		int formId = getFormId(form);
+		PokedexEntry entry = getFormData(form);
+
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.withColor(this.type1.getColor());
+		builder.withColor(entry.type1.getColor());
 		builder.withAuthorName("Pokémon Go Hub Database");
 		builder.withAuthorIcon("https://db.pokemongohub.net/images/icons/favicon-32x32.png");
 		builder.withAuthorUrl("https://db.pokemongohub.net/");
-		builder.withTitle(String.format("%s #%d", this.name, this.id));
-		builder.withUrl(String.format("https://db.pokemongohub.net/pokemon/%d", this.id));
-		builder.withThumbnail(
-				String.format("https://db.pokemongohub.net/images/official/full/%03d.png", this.id));
-		builder.appendDesc(this.getDescription());
+		String pokeName = entry.name;
+		// if (entry.form == null && entry.forms.length > 1)
+		// entry.form = forms[0].value;
+		String embForm = entry.form;
+		if (entry.form == null)
+			embForm = "Normal";
+		if (entry.forms.length > 1)
+			pokeName += String.format(" (%s)", embForm);
+		builder.withTitle(String.format("%s #%d", pokeName, entry.id));
+		builder.withUrl(String.format("https://db.pokemongohub.net/pokemon/%d", entry.id));
+		builder.withThumbnail(String.format("https://db.pokemongohub.net/images/official/full/%03d"
+				+ (formId != 0 ? "_f" + (formId + 1) : "") + ".png", entry.id));
+		builder.appendDesc(entry.getDescription());
 
+		// stats
 		builder.appendField("Type:",
-				(this.type2 != null ? this.type1.getEmoji() + "/" + this.type2.getEmoji()
-						: this.type1.getEmoji() + ""),
+				(entry.type2 != null ? entry.type1.getEmoji() + "/" + entry.type2.getEmoji()
+						: entry.type1.getEmoji() + ""),
 				true);
 		String weatherString = "";
-		for (EnumWeather w : this.weatherInfluences)
+		for (EnumWeather w : entry.weatherInfluences)
 			weatherString += w.getEmoji();
 		builder.appendField("Weather Boosts:", weatherString, true);
-		if (this.forms.length != 1) {
+		if (entry.forms.length != 1) {
 			String formString = "";
-			for (Form f : this.forms)
+			for (int i = 0; i < entry.forms.length; i++) {
+				Form f = entry.forms[i];
 				formString += f.name + ", ";
+			}
 			builder.appendField("Forms:", formString.substring(0, formString.length() - 2), false);
 		}
 		builder.appendField("Details:",
 				String.format("Generation: %d\nCatch Rate: %d%%\nFlee Rate: %d%%\nBuddy Distance: %dkm",
-						this.generation, (int) (this.baseCaptureRate * 100),
-						(int) (this.baseFleeRate * 100), this.kmBuddyDistance),
+						entry.generation, (int) (entry.baseCaptureRate * 100),
+						(int) (entry.baseFleeRate * 100), entry.kmBuddyDistance),
 				true);
 		builder.appendField("Stats:", String.format("Max CP: %d\nAttack: %d\nDefense: %d\nStamina: %d",
-				this.maxcp, this.atk, this.def, this.sta), true);
+				entry.maxcp, entry.atk, entry.def, entry.sta), true);
 
+		// types
 		String resistString = "";
-		for (TypeEffectiveness te : this.getResistances())
+		for (TypeEffectiveness te : entry.getResistances())
 			resistString += te + "\n";
 		builder.appendField("Type Resistances:", resistString, true);
 		String weakString = "";
-		for (TypeEffectiveness te : this.getWeaknesses())
+		for (TypeEffectiveness te : entry.getWeaknesses())
 			weakString += te + "\n";
 		builder.appendField("Type Weaknesses:", weakString, true);
 
+		// moves
 		String fastString = "";
-		for (Move m : this.getFastMoves())
-			fastString += m + "\n";
+		for (Move m : entry.getFastMoves())
+			fastString += m.toString(entry) + "\n";
 		if (!fastString.isEmpty())
 			builder.appendField("Fast Moves:", fastString, true);
 		String chargedString = "";
-		for (Move m : this.getChargedMoves())
-			chargedString += m + "\n";
+		for (Move m : entry.getChargedMoves())
+			chargedString += m.toString(entry) + "\n";
 		if (!chargedString.isEmpty())
 			builder.appendField("Charged Moves:", chargedString, true);
 
+		// movesets
 		String movesetString = "";
-		for (Moveset ms : this.getTopMovesets())
-			movesetString += ms + "\n";
+		for (Moveset ms : entry.getTopMovesets())
+			movesetString += ms.toString(entry) + "\n";
 		if (!movesetString.isEmpty())
 			builder.appendField("Best Movesets:", movesetString, false);
 
+		// counters
 		String counterString = "";
 		int rank = 1;
-		for (Counter c : this.getTopCounters())
+		for (Counter c : entry.getTopCounters())
 			counterString += String.format("#%d %s", rank++, c);
 		if (!counterString.isEmpty())
 			builder.appendField("Counters:", counterString, false);
 
-		builder.withFooterText(Move.STAB_MARKER + " denotes a STAB move, " + Move.LEGACY_MARKER
-				+ " for legacy moves, and " + Move.EXCLUSIVE_MARKER + " for exclusive moves");
+		builder.withFooterText(Move.STAB_MARKER.replaceAll("\\\\", "") + " denotes a STAB move, "
+				+ Move.LEGACY_MARKER.replaceAll("\\\\", "") + " for legacy moves, and "
+				+ Move.EXCLUSIVE_MARKER.replaceAll("\\\\", "") + " for exclusive moves");
 
-		return builder.build();
+		if (entry.forms.length > 1)
+			builder.appendField("Reaction Usage:",
+					"React with a form of the Pokemon shown to get information about the given form.",
+					false);
+
+		EmbedObject embed = builder.build();
+		embeds.put(form, embed);
+		return embed;
+	}
+
+	private int getFormId(String form) {
+		if (form == null || this.forms.length == 1)
+			return 0;
+		for (int i = 0; i < this.forms.length; i++)
+			if (form.equals(this.forms[i].name))
+				return i;
+		return 0;
 	}
 
 	// classes
@@ -322,7 +392,7 @@ public class PokedexEntry {
 		public int pvpDuration;
 		public int pokemonId;
 		public int moveId;
-		public Form form;
+		public String form;
 		public int isLegacy;
 		public String isLegacySince;
 		public int isExclusive;
@@ -330,27 +400,43 @@ public class PokedexEntry {
 		public TypeEffectiveness[] typeChart;
 		public String[] weather;
 
-		public boolean isSTAB() {
-			EnumPokemon pokemon = EnumPokemon.getPokemon(pokemonId);
-			if (pokemon == null)
-				return false;
-			return type.equals(pokemon.getType1()) || type.equals(pokemon.getType2());
+		public boolean isSTAB(PokedexEntry entry) {
+			return type.equals(entry.type1) || type.equals(entry.type2);
 		}
 
-		public static final String STAB_MARKER = "*";
+		public static final String STAB_MARKER = "\\*";
 		public static final String LEGACY_MARKER = "†";
-		public static final String EXCLUSIVE_MARKER = "‡";
+		public static final String EXCLUSIVE_MARKER = "‡"; // §
 
-		@Override
-		public String toString() {
+		public String toString(PokedexEntry entry) {
 			boolean marked = false;
 			String out = name;
-			if (isSTAB()) {
+			if (isSTAB(entry)) {
 				if (marked)
 					out += " ";
 				out += STAB_MARKER;
 				marked = true;
 			}
+			if (isLegacy == 1) {
+				if (marked)
+					out += " ";
+				out += LEGACY_MARKER;
+				marked = true;
+			}
+			if (isExclusive == 1) {
+				if (marked)
+					out += " ";
+				out += EXCLUSIVE_MARKER;
+				marked = true;
+			}
+			out += type.getEmoji();
+			return out;
+		}
+
+		@Override
+		public String toString() {
+			boolean marked = false;
+			String out = name;
 			if (isLegacy == 1) {
 				if (marked)
 					out += " ";
@@ -375,6 +461,10 @@ public class PokedexEntry {
 		public Move chargeMove;
 		public float weaveDPS;
 		public float tdo;
+
+		public String toString(PokedexEntry entry) {
+			return quickMove.toString(entry) + "/" + chargeMove.toString(entry);
+		}
 
 		@Override
 		public String toString() {
