@@ -23,6 +23,10 @@ public class ThreadReport extends Thread {
 	// this.serverId = serverId;
 	// }
 
+	public ThreadReport() {
+		super("reportThred");
+	}
+
 	@SuppressWarnings("deprecation")
 	@Override
 	public void run() {

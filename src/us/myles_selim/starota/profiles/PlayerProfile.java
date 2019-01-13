@@ -25,6 +25,7 @@ import us.myles_selim.starota.embed_converter.annotations.EmbedTimestamp;
 import us.myles_selim.starota.embed_converter.annotations.EmbedTitle;
 import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.lua.events.GetProfileEvent;
+import us.myles_selim.starota.silph_road.SilphRoadUtils;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 @EmbedFooterText("Profile last updated")
@@ -161,7 +162,7 @@ public class PlayerProfile {
 
 	@EmbedField(value = "Silph Road Card:", order = 5)
 	public String getSilphRoadCard() {
-		return SilphRoadUtils.getCard(this.poGoName);
+		return SilphRoadUtils.getCardURL(this.poGoName);
 	}
 
 	// only for EmbedConverter

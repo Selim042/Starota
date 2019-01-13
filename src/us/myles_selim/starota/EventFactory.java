@@ -8,7 +8,7 @@ import us.myles_selim.starota.embed_converter.ExtraField;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.events.GetProfileEvent;
 import us.myles_selim.starota.profiles.PlayerProfile;
-import us.myles_selim.starota.profiles.SilphRoadUtils;
+import us.myles_selim.starota.silph_road.SilphRoadUtils;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class EventFactory {
@@ -41,7 +41,7 @@ public class EventFactory {
 			fields.add(new ExtraField("Alternate Accounts:", alts, false));
 		}
 		if (SilphRoadUtils.hasCard(profile.getPoGoName())) {
-			fields.add(new ExtraField("Silph Road Card:", SilphRoadUtils.getCard(profile.getPoGoName()),
+			fields.add(new ExtraField("Silph Road Card:", SilphRoadUtils.getCardURL(profile.getPoGoName()),
 					false));
 			event.setThumbnail(SilphRoadUtils.getCardAvatar(profile.getPoGoName()));
 		}

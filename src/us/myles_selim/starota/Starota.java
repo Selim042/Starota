@@ -56,6 +56,7 @@ import us.myles_selim.starota.profiles.commands.CommandProfileHelp;
 import us.myles_selim.starota.profiles.commands.CommandRegister;
 import us.myles_selim.starota.profiles.commands.CommandSelfRegister;
 import us.myles_selim.starota.profiles.commands.CommandUpdateProfile;
+import us.myles_selim.starota.reaction_messages.ReactionMessageRegistry;
 import us.myles_selim.starota.research.CommandSetResearchChannel;
 import us.myles_selim.starota.research.ResearchTracker;
 import us.myles_selim.starota.role_management.commands.CommandAddGroup;
@@ -204,7 +205,9 @@ public class Starota {
 		// Thread reportThread2 = new ThreadReport(PVILLE_SERVER);
 		// reportThread2.start();
 
-		Thread saveThread = new Thread() {
+		dispatcher.registerListener(new ReactionMessageRegistry());
+
+		Thread saveThread = new Thread("ResearchFlusher") {
 
 			@Override
 			public void run() {
@@ -226,7 +229,7 @@ public class Starota {
 		CLIENT.changePresence(StatusType.ONLINE, ActivityType.PLAYING,
 				"v" + VERSION + (DEBUG || IS_DEV ? "d" : ""));
 
-		Thread changesThread = new Thread() {
+		Thread changesThread = new Thread("ChangelogThread") {
 
 			@Override
 			public void run() {
@@ -255,22 +258,43 @@ public class Starota {
 		dispatcher.registerListener(new LuaEventHandler());
 		PrimaryCommandHandler.registerCommandHandler(new LuaCommandHandler());
 
+		// Thread clearReactMessages = new Thread() {
+		//
+		// @Override
+		// public void run() {
+		// for (IGuild g : CLIENT.getGuilds()) {
+		// for (IChannel c : g.getChannels()) {
+		// EnumSet<Permissions> perms = c.getModifiedPermissions(getOurUser());
+		// if (!perms.contains(Permissions.READ_MESSAGES)
+		// || !perms.contains(Permissions.READ_MESSAGE_HISTORY))
+		// continue;
+		// // List<IMessage> msg = new LinkedList<>();
+		// for (IMessage m : c.getFullMessageHistory()) {
+		// IReaction react = m.getReactionByID(509767492122705930L);
+		// if (react != null && react.getUserReacted(Starota.getOurUser())) {
+		// EmbedObject emb = new EmbedObject(m.getEmbeds().get(0));
+		// emb.color = Color.RED.getRGB();
+		// emb.title = "No longer reactive";
+		// // msg.add(m);
+		// RequestBuffer.request(() -> m.edit(emb));
+		// }
+		// }
+		// // RequestBuffer.request(() -> c.bulkDelete(msg));
+		// }
+		// }
+		// }
+		// };
+		// clearReactMessages.start();
+
 		FULLY_STARTED = true;
 		DebugServer.update();
 
-		Thread discord4JWatchdog = new Thread() {
+		Thread discord4JWatchdog = new Thread("D4JWatchdog") {
 
 			private boolean isReady = CLIENT.isReady();
 
 			@Override
 			public void run() {
-				boolean inReady = CLIENT.isReady();
-				if (!isReady && !inReady)
-					System.exit(1);
-				isReady = inReady;
-				try {
-					Thread.sleep(60000); // 1 min
-				} catch (InterruptedException e) {}
 				while (true) {
 					boolean inReady = CLIENT.isReady();
 					if (!isReady && !inReady)
