@@ -14,6 +14,7 @@ import sx.blah.discord.handle.impl.obj.ReactionEmoji;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.Starota;
@@ -73,11 +74,12 @@ public class PrimaryCommandHandler {
 				}
 		} catch (Throwable e) {
 			cmdFound = true;
-			RequestBuffer.request(() -> {
-				message.reply("There was an error encountered while executing your command: "
-						+ e.getClass().getName() + ": " + e.getLocalizedMessage() + "\n"
-						+ e.getStackTrace()[0]);
-			});
+			if (channel.getModifiedPermissions(Starota.getOurUser()).contains(Permissions.SEND_MESSAGES))
+				RequestBuffer.request(() -> {
+					message.reply("There was an error encountered while executing your command: "
+							+ e.getClass().getName() + ": " + e.getLocalizedMessage() + "\n"
+							+ e.getStackTrace()[0]);
+				});
 			System.err.println("executed command: " + message.getContent());
 			e.printStackTrace();
 			if (!(e instanceof LuaError))
