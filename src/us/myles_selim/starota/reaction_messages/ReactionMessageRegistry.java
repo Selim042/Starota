@@ -26,7 +26,7 @@ public class ReactionMessageRegistry {
 
 	@EventSubscriber
 	public void onReactAdd(ReactionAddEvent event) {
-		if (event.getUser().equals(Starota.getOurUser()))
+		if (event.getUser().isBot())
 			return;
 		IMessage msg = event.getMessage();
 		if (!MESSAGES.containsKey(msg.getStringID()))
@@ -38,7 +38,7 @@ public class ReactionMessageRegistry {
 
 	@EventSubscriber
 	public void onReactRemove(ReactionRemoveEvent event) {
-		if (event.getUser().equals(Starota.getOurUser()))
+		if (event.getUser().isBot())
 			return;
 		IMessage msg = event.getMessage();
 		if (!MESSAGES.containsKey(msg.getStringID()))

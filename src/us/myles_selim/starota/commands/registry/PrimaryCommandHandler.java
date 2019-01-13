@@ -50,6 +50,8 @@ public class PrimaryCommandHandler {
 
 	@EventSubscriber
 	public void onMessageEvent(MessageReceivedEvent event) {
+		if (event.getAuthor().isBot())
+			return;
 		IGuild server = event.getGuild();
 		if (server == null)
 			return;
