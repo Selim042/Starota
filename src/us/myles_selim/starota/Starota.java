@@ -271,6 +271,15 @@ public class Starota {
 				try {
 					Thread.sleep(60000); // 1 min
 				} catch (InterruptedException e) {}
+				while (true) {
+					boolean inReady = CLIENT.isReady();
+					if (!isReady && !inReady)
+						System.exit(1);
+					isReady = inReady;
+					try {
+						Thread.sleep(60000); // 1 min
+					} catch (InterruptedException e) {}
+				}
 			}
 		};
 		discord4JWatchdog.start();
