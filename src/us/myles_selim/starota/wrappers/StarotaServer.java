@@ -388,6 +388,8 @@ public class StarotaServer {
 	private static final Map<Long, StarotaServer> SERVERS = new ConcurrentHashMap<>();
 
 	public static StarotaServer getServer(IGuild guild) {
+		if (guild == null)
+			return null;
 		if (SERVERS.containsKey(guild.getLongID()))
 			return SERVERS.get(guild.getLongID());
 		StarotaServer server = new StarotaServer(guild);

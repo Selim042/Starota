@@ -241,7 +241,8 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 		this.id = stor.readInt();
 		this.lookingFor = stor.readBoolean();
 		this.owner = stor.readLong();
-		this.pokemon = EnumPokemon.getPokemon(stor.readInt());
+		int pokemonId = stor.readInt();
+		this.pokemon = EnumPokemon.getPokemon(pokemonId);
 		int form = stor.readInt();
 		if (form != -1 && this.pokemon.getFormSet() != null)
 			this.form = this.pokemon.getFormSet().getForms().get(form);

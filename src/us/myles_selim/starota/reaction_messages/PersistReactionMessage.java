@@ -45,8 +45,7 @@ public abstract class PersistReactionMessage extends ReactionMessage {
 
 		@Override
 		public void fromBytes(Storage stor) {
-			boolean isNull = stor.readBoolean();
-			if (!isNull) {
+			if (!stor.readBoolean()) {
 				try {
 					Object obj = Class.forName(stor.readString()).newInstance();
 					if (!(obj instanceof PersistReactionMessage)) {

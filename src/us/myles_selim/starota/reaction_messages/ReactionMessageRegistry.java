@@ -16,10 +16,16 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class ReactionMessageRegistry {
 
+	public static final String PERSIST_KEY = "persistReactions";
+	
 	protected static final HashMap<String, ReactionMessage> MESSAGES = new HashMap<>();
-	private static final String PERSIST_KEY = "persistReactions";
+	private static boolean inited = false;
 
-	static {
+	public static void init() {
+		if (inited)
+			return;
+		inited = true;
+
 		for (IGuild g : Starota.getClient().getGuilds())
 			deserializeAll(StarotaServer.getServer(g));
 	}

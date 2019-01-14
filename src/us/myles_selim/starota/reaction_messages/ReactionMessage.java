@@ -38,12 +38,12 @@ public class ReactionMessage {
 
 	public void onReactionAdded(StarotaServer server, IChannel channel, IMessage msg, IUser user,
 			IReaction react) {
-		channel.sendMessage("+ " + react.getEmoji());
+		// channel.sendMessage("+ " + react.getEmoji());
 	}
 
 	public void onReactionRemoved(StarotaServer server, IChannel channel, IMessage msg, IUser user,
 			IReaction react) {
-		channel.sendMessage("- " + react.getEmoji());
+		// channel.sendMessage("- " + react.getEmoji());
 	}
 
 	protected EmbedObject getEmbed() {

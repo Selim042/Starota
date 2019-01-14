@@ -50,7 +50,7 @@ public class PrimaryCommandHandler {
 
 	@EventSubscriber
 	public void onMessageEvent(MessageReceivedEvent event) {
-		if (event.getAuthor().isBot())
+		if (event.getAuthor().isBot() || !Starota.FULLY_STARTED)
 			return;
 		IGuild server = event.getGuild();
 		if (server == null)

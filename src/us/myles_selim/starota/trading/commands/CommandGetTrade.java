@@ -34,7 +34,7 @@ public class CommandGetTrade extends StarotaCommand {
 			return;
 		}
 		// channel.sendMessage(post.getPostEmbed(server));
-		new TradeboardReactionMessage(server, post).sendMessage(channel);
+		new TradeboardReactionMessage(server.getDiscordGuild(), post).sendMessage(channel);
 	}
 
 }

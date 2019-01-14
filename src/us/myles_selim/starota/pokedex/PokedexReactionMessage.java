@@ -39,6 +39,9 @@ public class PokedexReactionMessage extends ReactionMessage {
 					String.format("https://db.pokemongohub.net/images/official/full/%03d"
 							+ (i2 != 0 ? "_f" + (i2 + 1) : "") + ".png", entry.id));
 			RequestBuffer.request(() -> msg.addReaction(emoji));
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {}
 		}
 	}
 
