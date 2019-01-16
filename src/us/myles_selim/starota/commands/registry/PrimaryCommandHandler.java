@@ -17,6 +17,7 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
+import us.myles_selim.starota.MiscUtils;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.channel_management.ChannelCommandManager;
 import us.myles_selim.starota.modules.StarotaModule;
@@ -52,16 +53,16 @@ public class PrimaryCommandHandler {
 	public void onMessageEvent(MessageReceivedEvent event) {
 		if (event.getAuthor().isBot() || !Starota.FULLY_STARTED)
 			return;
-		IGuild server = event.getGuild();
-		if (server == null)
+		IGuild guild = event.getGuild();
+		if (guild == null)
 			return;
 		IChannel channel = event.getChannel();
 		IMessage message = event.getMessage();
 		String cmdS = message.getContent();
-		String prefix = getPrefix(server);
+		String prefix = getPrefix(guild);
 		if (!cmdS.startsWith(prefix))
 			return;
-		String[] args = getArgs(message, server);
+		String[] args = getArgs(message, guild);
 		RequestBuffer.request(() -> {
 			channel.setTypingStatus(true);
 		});
@@ -69,28 +70,36 @@ public class PrimaryCommandHandler {
 			message.addReaction(ReactionEmoji.of("�?"));
 		boolean cmdFound = false;
 		try {
-			for (ICommandHandler h : COMMAND_HANDLERS)
-				if (h.executeCommand(args, message, server, channel)) {
+			for (ICommandHandler h : COMMAND_HANDLERS) {
+				ICommand cmd = h.findCommand(guild, args[0]);
+				if (cmd != null) {
+					new Thread(cmd.getName() + "Thread-" + guild.getName()) {
+
+						@Override
+						public void run() {
+							try {
+								cmd.execute(args, message, guild, channel);
+							} catch (Exception e) {
+								handleException(e, guild, channel, message);
+							}
+						}
+					}.start();
 					cmdFound = true;
 					continue;
 				}
+				// if (h.executeCommand(args, message, server, channel)) {
+				// cmdFound = true;
+				// continue;
+				// }
+			}
 		} catch (Throwable e) {
 			cmdFound = true;
-			if (channel.getModifiedPermissions(Starota.getOurUser()).contains(Permissions.SEND_MESSAGES))
-				RequestBuffer.request(() -> {
-					message.reply("There was an error encountered while executing your command: "
-							+ e.getClass().getName() + ": " + e.getLocalizedMessage() + "\n"
-							+ e.getStackTrace()[0]);
-				});
-			System.err.println("executed command: " + message.getContent());
-			e.printStackTrace();
-			if (!(e instanceof LuaError))
-				Starota.submitError(" on server " + server.getName(), e);
+			handleException(e, guild, channel, message);
 		}
 		if (!cmdFound) {
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.withTitle("Did you mean...?");
-			for (ICommand cmd : getSuggestions(server, channel, args[0], 5)) {
+			for (ICommand cmd : getSuggestions(guild, channel, args[0], 5)) {
 				if (cmd != null) {
 					String desciption = cmd.getDescription();
 					builder.appendDesc("- " + prefix + cmd.getName()
@@ -102,6 +111,19 @@ public class PrimaryCommandHandler {
 		RequestBuffer.request(() -> {
 			channel.setTypingStatus(false);
 		});
+	}
+
+	private static void handleException(Throwable th, IGuild guild, IChannel channel, IMessage message) {
+		if (channel.getModifiedPermissions(Starota.getOurUser()).contains(Permissions.SEND_MESSAGES))
+			RequestBuffer.request(() -> {
+				message.reply("There was an error encountered while executing your command: "
+						+ th.getClass().getName() + ": " + th.getLocalizedMessage() + "\n"
+						+ th.getStackTrace()[0]);
+			});
+		System.err.println("executed command: " + message.getContent());
+		th.printStackTrace();
+		if (!(th instanceof LuaError))
+			Starota.submitError(" on server " + guild.getName(), th);
 	}
 
 	public static List<ICommand> getCommandsByCategory(IGuild server, String category) {
@@ -154,15 +176,20 @@ public class PrimaryCommandHandler {
 					continue;
 				for (String a : cmd.getAliases()) {
 					DistancedCommand dc = new DistancedCommand(calculateDistance(a, input), cmd);
-					if (!suggestions.contains(dc))
-						suggestions.add(dc);
+					suggestions.add(dc);
 				}
 			}
 		}
 		suggestions.sort(null);
 		ICommand[] out = new ICommand[count];
-		for (int i = 0; i < count; i++)
-			out[i] = suggestions.get(i).cmd;
+		int index = 0;
+		for (DistancedCommand cmd : suggestions) {
+			if (index >= count)
+				break;
+			ICommand sug = cmd.cmd;
+			if (!MiscUtils.arrContains(out, sug))
+				out[index++] = sug;
+		}
 		return out;
 	}
 
