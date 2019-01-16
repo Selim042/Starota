@@ -16,8 +16,9 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class TradeboardReactionMessage extends PersistReactionMessage {
 
-	private static final String CONFIRM_EMOJI = "✅";
-	private static final String DELETE_EMOJI = "❌";
+	public static final String CONFIRM_EMOJI = "✅";
+	public static final String DELETE_EMOJI = "❌";
+
 	private static final EmbedObject DELETED_EMBED;
 
 	static {
@@ -79,7 +80,7 @@ public class TradeboardReactionMessage extends PersistReactionMessage {
 	}
 
 	@Override
-	protected EmbedObject getEmbed() {
+	protected EmbedObject getEmbed(StarotaServer server) {
 		StarotaServer sserver = StarotaServer.getServer(this.guild);
 		return sserver.getPost(this.postId).getPostEmbed(sserver);
 	}

@@ -1,14 +1,14 @@
 package us.myles_selim.starota.pokedex;
 
-import us.myles_selim.starota.pokedex.PokedexEntry.Move;
+import us.myles_selim.starota.pokedex.PokedexEntry.DexMove;
 
 public class Counter {
 
 	public int pokemonId;
 	public String name;
 	public String formName;
-	public Move quickMove;
-	public Move chargedMove;
+	public DexMove quickMove;
+	public DexMove chargedMove;
 	public int deaths;
 	public float ttw;
 	public float score;

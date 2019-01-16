@@ -22,6 +22,10 @@ public class EmojiServerHelper {
 			533816836609802240L, // Emoji Server #3
 	};
 
+	public static boolean isEmojiServer(IGuild guild) {
+		return arrCont(EMOJI_SERVERS, guild.getLongID());
+	}
+
 	public static IEmoji getEmoji(String name) {
 		name = name.replaceAll("-", "_");
 		for (long id : EMOJI_SERVERS) {

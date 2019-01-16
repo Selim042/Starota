@@ -197,20 +197,12 @@ public class Starota {
 				"starting threads and loading settings...");
 
 		FormManager.init();
-		// ServerOptions.init();
 		ResearchTracker.init();
-		// ProfileManager.init();
-		// Tradeboard.init();
-		// LeaderboardManager.init();
-
-		// WebServer.init();
-
-		// Thread reportThread = new ThreadReport(TEST_SERVER);
-		// reportThread.start();
-		// Thread reportThread2 = new ThreadReport(PVILLE_SERVER);
-		// reportThread2.start();
 
 		dispatcher.registerListener(new ReactionMessageRegistry());
+		dispatcher.registerListener(new PrimaryCommandHandler());
+		dispatcher.registerListener(new EventHandler());
+		ReactionMessageRegistry.init();
 
 		Thread saveThread = new Thread("ResearchFlusher") {
 
@@ -238,6 +230,7 @@ public class Starota {
 
 			@Override
 			public void run() {
+				boolean sentToAll = true;
 				for (IGuild g : CLIENT.getGuilds()) {
 					StarotaServer server = StarotaServer.getServer(g);
 					if (!server.hasKey(CommandChangelogChannel.CHANGES_CHANNEL))
@@ -251,47 +244,21 @@ public class Starota {
 						RequestBuffer
 								.request(() -> changesChannel.sendMessage("```" + CHANGELOG + "```"));
 						server.setValue("changesVersion", VERSION);
-					}
+					} else
+						sentToAll = false;
 				}
+				if (!IS_DEV && sentToAll)
+					TwitterHelper.sendTweet(CHANGELOG);
 			}
 		};
 		changesThread.start();
-		dispatcher.registerListener(new PrimaryCommandHandler());
-		dispatcher.registerListener(new EventHandler());
 
 		LuaUtils.registerConverters();
 		dispatcher.registerListener(new LuaEventHandler());
 		PrimaryCommandHandler.registerCommandHandler(new LuaCommandHandler());
 
-		// Thread clearReactMessages = new Thread() {
-		//
-		// @Override
-		// public void run() {
-		// for (IGuild g : CLIENT.getGuilds()) {
-		// for (IChannel c : g.getChannels()) {
-		// EnumSet<Permissions> perms = c.getModifiedPermissions(getOurUser());
-		// if (!perms.contains(Permissions.READ_MESSAGES)
-		// || !perms.contains(Permissions.READ_MESSAGE_HISTORY))
-		// continue;
-		// // List<IMessage> msg = new LinkedList<>();
-		// for (IMessage m : c.getFullMessageHistory()) {
-		// IReaction react = m.getReactionByID(509767492122705930L);
-		// if (react != null && react.getUserReacted(Starota.getOurUser())) {
-		// EmbedObject emb = new EmbedObject(m.getEmbeds().get(0));
-		// emb.color = Color.RED.getRGB();
-		// emb.title = "No longer reactive";
-		// // msg.add(m);
-		// RequestBuffer.request(() -> m.edit(emb));
-		// }
-		// }
-		// // RequestBuffer.request(() -> c.bulkDelete(msg));
-		// }
-		// }
-		// }
-		// };
-		// clearReactMessages.start();
-
 		FULLY_STARTED = true;
+		// STATUS = EnumBotStatus.ONLINE;
 		DebugServer.update();
 
 		Thread discord4JWatchdog = new Thread("D4JWatchdog") {
@@ -316,7 +283,7 @@ public class Starota {
 
 	public static class BaseModules {
 
-		public static final StarotaModule PROFILES = new StarotaModule("Player Profiles", "Profiles");
+		public static final StarotaModule PROFILES = new StarotaModule("PlayerProfiles", "Profiles");
 		public static final StarotaModule GROUPS = new StarotaModule("Groups", "Groups");
 		public static final StarotaModule TRADEBOARD = new StarotaModule("Tradeboard", "Tradeboard",
 				PROFILES);
@@ -324,6 +291,8 @@ public class Starota {
 		public static final StarotaModule LEADERBOARDS = new StarotaModule("Leaderboards", "Leaderboard",
 				PROFILES);
 		public static final StarotaModule PVP = new StarotaModule("PvP", "PvP", PROFILES);
+		public static final StarotaModule POKEDEX = new StarotaModule("Pokedex", "Pokedex");
+		public static final StarotaModule SILPH_ROAD = new StarotaModule("SilphRoad", "Silph Road");
 
 		private static void registerModules() {
 			StarotaModule.registerModule(PROFILES);
@@ -332,6 +301,8 @@ public class Starota {
 			StarotaModule.registerModule(LUA);
 			StarotaModule.registerModule(LEADERBOARDS);
 			StarotaModule.registerModule(PVP);
+			StarotaModule.registerModule(POKEDEX);
+			StarotaModule.registerModule(SILPH_ROAD);
 		}
 
 	}
@@ -582,10 +553,5 @@ public class Starota {
 		} else
 			System.out.println("BOT LIST TOKEN NOT FOUND");
 	}
-
-	// public static void sendTestMessage(String message) {
-	// if (CLIENT != null && CLIENT.isReady())
-	// getChannel(SELIM_MODDING, TEST_TEXT).sendMessage(message);
-	// }
 
 }

@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
+import us.myles_selim.starota.ImageHelper;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
 import us.myles_selim.starota.enums.EnumWeather;
@@ -46,7 +47,7 @@ public class PokedexEntry extends ReactionMessage {
 	public int id;
 	public String name;
 	public String form;
-	public Form[] forms;
+	public DexForm[] forms;
 	public EnumPokemonType type1;
 	public EnumPokemonType type2;
 	public int maxcp;
@@ -82,30 +83,32 @@ public class PokedexEntry extends ReactionMessage {
 	public float female;
 	public int genderless;
 
-	// types
-	public TypeEffectiveness[] typeChart;
-	private TypeEffectiveness[] resist;
-	private TypeEffectiveness[] weak;
+	public DexCPs CPs;
 
-	public TypeEffectiveness[] getResistances() {
+	// types
+	public DexTypeEffectiveness[] typeChart;
+	private DexTypeEffectiveness[] resist;
+	private DexTypeEffectiveness[] weak;
+
+	public DexTypeEffectiveness[] getResistances() {
 		if (resist != null)
 			return resist;
-		List<TypeEffectiveness> temp = new ArrayList<>();
-		for (TypeEffectiveness te : typeChart)
+		List<DexTypeEffectiveness> temp = new ArrayList<>();
+		for (DexTypeEffectiveness te : typeChart)
 			if (te.status.equals("adv"))
 				temp.add(te);
-		resist = temp.toArray(new TypeEffectiveness[0]);
+		resist = temp.toArray(new DexTypeEffectiveness[0]);
 		return resist;
 	}
 
-	public TypeEffectiveness[] getWeaknesses() {
+	public DexTypeEffectiveness[] getWeaknesses() {
 		if (weak != null)
 			return weak;
-		List<TypeEffectiveness> temp = new ArrayList<>();
-		for (TypeEffectiveness te : typeChart)
+		List<DexTypeEffectiveness> temp = new ArrayList<>();
+		for (DexTypeEffectiveness te : typeChart)
 			if (te.status.equals("dis"))
 				temp.add(te);
-		weak = temp.toArray(new TypeEffectiveness[0]);
+		weak = temp.toArray(new DexTypeEffectiveness[0]);
 		return weak;
 	}
 
@@ -127,36 +130,36 @@ public class PokedexEntry extends ReactionMessage {
 	 * @deprecated Do not use directly, for internal use only
 	 */
 	@Deprecated
-	private Move[] moves;
-	private Move[] fast;
-	private Move[] charged;
+	private DexMove[] moves;
+	private DexMove[] fast;
+	private DexMove[] charged;
 
-	public Move[] getMoves(String form) {
+	public DexMove[] getMoves(String form) {
 		if (moves != null)
 			return moves;
 		moves = GoHubDatabase.getMoves(getPokemon(), form);
 		return moves;
 	}
 
-	public Move[] getFastMoves() {
+	public DexMove[] getFastMoves() {
 		if (fast != null)
 			return fast;
-		List<Move> temp = new ArrayList<>();
-		for (Move m : getMoves(form))
+		List<DexMove> temp = new ArrayList<>();
+		for (DexMove m : getMoves(form))
 			if (m.isQuickMove == 1)
 				temp.add(m);
-		fast = temp.toArray(new Move[0]);
+		fast = temp.toArray(new DexMove[0]);
 		return fast;
 	}
 
-	public Move[] getChargedMoves() {
+	public DexMove[] getChargedMoves() {
 		if (charged != null)
 			return charged;
-		List<Move> temp = new ArrayList<>();
-		for (Move m : getMoves(form))
+		List<DexMove> temp = new ArrayList<>();
+		for (DexMove m : getMoves(form))
 			if (m.isQuickMove != 1)
 				temp.add(m);
-		charged = temp.toArray(new Move[0]);
+		charged = temp.toArray(new DexMove[0]);
 		return charged;
 	}
 
@@ -165,31 +168,31 @@ public class PokedexEntry extends ReactionMessage {
 	 * @deprecated Do not use directly, for internal use only
 	 */
 	@Deprecated
-	private Moveset[] movesets;
-	private Moveset[] topMovesets;
+	private DexMoveset[] movesets;
+	private DexMoveset[] topMovesets;
 
-	public Moveset[] getMovesets() {
+	public DexMoveset[] getMovesets() {
 		if (movesets != null)
 			return movesets;
 		movesets = GoHubDatabase.getMovesets(getPokemon(), form);
 		return movesets;
 	}
 
-	public Moveset[] getTopMovesets() {
+	public DexMoveset[] getTopMovesets() {
 		if (topMovesets != null)
 			return topMovesets;
-		List<Moveset> setsL = Arrays.asList(getMovesets());
-		setsL.sort(new Comparator<Moveset>() {
+		List<DexMoveset> setsL = Arrays.asList(getMovesets());
+		setsL.sort(new Comparator<DexMoveset>() {
 
 			@Override
-			public int compare(Moveset o1, Moveset o2) {
+			public int compare(DexMoveset o1, DexMoveset o2) {
 				return -Float.compare(o1.weaveDPS, o2.weaveDPS);
 			}
 		});
 		int max = 6;
 		if (max > setsL.size())
 			max = setsL.size();
-		topMovesets = setsL.subList(0, max).toArray(new Moveset[0]);
+		topMovesets = setsL.subList(0, max).toArray(new DexMoveset[0]);
 		return topMovesets;
 	}
 
@@ -262,8 +265,7 @@ public class PokedexEntry extends ReactionMessage {
 			pokeName += String.format(" (%s)", embForm);
 		builder.withTitle(String.format("%s #%d", pokeName, entry.id));
 		builder.withUrl(String.format("https://db.pokemongohub.net/pokemon/%d", entry.id));
-		builder.withThumbnail(String.format("https://db.pokemongohub.net/images/official/full/%03d"
-				+ (formId != 0 ? "_f" + (formId + 1) : "") + ".png", entry.id));
+		builder.withThumbnail(ImageHelper.getOfficalArtwork(entry.getPokemon(), formId));
 		builder.appendDesc(entry.getDescription());
 
 		// stats
@@ -278,7 +280,7 @@ public class PokedexEntry extends ReactionMessage {
 		if (entry.forms.length != 1) {
 			String formString = "";
 			for (int i = 0; i < entry.forms.length; i++) {
-				Form f = entry.forms[i];
+				DexForm f = entry.forms[i];
 				formString += f.name + ", ";
 			}
 			builder.appendField("Forms:", formString.substring(0, formString.length() - 2), false);
@@ -293,29 +295,29 @@ public class PokedexEntry extends ReactionMessage {
 
 		// types
 		String resistString = "";
-		for (TypeEffectiveness te : entry.getResistances())
+		for (DexTypeEffectiveness te : entry.getResistances())
 			resistString += te + "\n";
 		builder.appendField("Type Resistances:", resistString, true);
 		String weakString = "";
-		for (TypeEffectiveness te : entry.getWeaknesses())
+		for (DexTypeEffectiveness te : entry.getWeaknesses())
 			weakString += te + "\n";
 		builder.appendField("Type Weaknesses:", weakString, true);
 
 		// moves
 		String fastString = "";
-		for (Move m : entry.getFastMoves())
+		for (DexMove m : entry.getFastMoves())
 			fastString += m.toString(entry) + "\n";
 		if (!fastString.isEmpty())
 			builder.appendField("Fast Moves:", fastString, true);
 		String chargedString = "";
-		for (Move m : entry.getChargedMoves())
+		for (DexMove m : entry.getChargedMoves())
 			chargedString += m.toString(entry) + "\n";
 		if (!chargedString.isEmpty())
 			builder.appendField("Charged Moves:", chargedString, true);
 
 		// movesets
 		String movesetString = "";
-		for (Moveset ms : entry.getTopMovesets())
+		for (DexMoveset ms : entry.getTopMovesets())
 			movesetString += ms.toString(entry) + "\n";
 		if (!movesetString.isEmpty())
 			builder.appendField("Best Movesets:", movesetString, false);
@@ -328,9 +330,9 @@ public class PokedexEntry extends ReactionMessage {
 		if (!counterString.isEmpty())
 			builder.appendField("Counters:", counterString, false);
 
-		builder.withFooterText(Move.STAB_MARKER.replaceAll("\\\\", "") + " denotes a STAB move, "
-				+ Move.LEGACY_MARKER.replaceAll("\\\\", "") + " for legacy moves, and "
-				+ Move.EXCLUSIVE_MARKER.replaceAll("\\\\", "") + " for exclusive moves");
+		builder.withFooterText(DexMove.STAB_MARKER.replaceAll("\\\\", "") + " denotes a STAB move, "
+				+ DexMove.LEGACY_MARKER.replaceAll("\\\\", "") + " for legacy moves, and "
+				+ DexMove.EXCLUSIVE_MARKER.replaceAll("\\\\", "") + " for exclusive moves");
 
 		if (entry.forms.length > 1)
 			builder.appendField("Reaction Usage:",
@@ -352,14 +354,14 @@ public class PokedexEntry extends ReactionMessage {
 	}
 
 	// classes
-	public static class Form {
+	public static class DexForm {
 
 		public String name;
 		public String value;
 
 	}
 
-	public static class TypeEffectiveness {
+	public static class DexTypeEffectiveness {
 
 		public EnumPokemonType type;
 		public String status;
@@ -373,7 +375,7 @@ public class PokedexEntry extends ReactionMessage {
 
 	}
 
-	public static class Move {
+	public static class DexMove {
 
 		public int id;
 		public String name;
@@ -397,7 +399,7 @@ public class PokedexEntry extends ReactionMessage {
 		public String isLegacySince;
 		public int isExclusive;
 		public String isExclusiveSince;
-		public TypeEffectiveness[] typeChart;
+		public DexTypeEffectiveness[] typeChart;
 		public String[] weather;
 
 		public boolean isSTAB(PokedexEntry entry) {
@@ -455,10 +457,10 @@ public class PokedexEntry extends ReactionMessage {
 
 	}
 
-	public static class Moveset {
+	public static class DexMoveset {
 
-		public Move quickMove;
-		public Move chargeMove;
+		public DexMove quickMove;
+		public DexMove chargeMove;
 		public float weaveDPS;
 		public float tdo;
 
@@ -470,6 +472,30 @@ public class PokedexEntry extends ReactionMessage {
 		public String toString() {
 			return quickMove + "/" + chargeMove;
 		}
+
+	}
+
+	public static class DexCPs {
+
+		public int max;
+		public int wildMax;
+		public int wildMin;
+		public int weatherMax;
+		public int weatherMin;
+		public int raidBossTier1;
+		public int raidBossTier2;
+		public int raidBossTier3;
+		public int raidBossTier4;
+		public int raidBossTier5;
+		public int raidBossTier6;
+		public int raidCaptureMax;
+		public int raidCaptureMin;
+		public int raidCaptureBoostMax;
+		public int raidCaptureBoostMin;
+		public int eggMax;
+		public int eggMin;
+		public int questMax;
+		public int questMin;
 
 	}
 

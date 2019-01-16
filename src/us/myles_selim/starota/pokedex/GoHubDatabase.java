@@ -25,8 +25,8 @@ import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
 import us.myles_selim.starota.enums.EnumWeather;
-import us.myles_selim.starota.pokedex.PokedexEntry.Move;
-import us.myles_selim.starota.pokedex.PokedexEntry.Moveset;
+import us.myles_selim.starota.pokedex.PokedexEntry.DexMove;
+import us.myles_selim.starota.pokedex.PokedexEntry.DexMoveset;
 
 public class GoHubDatabase {
 
@@ -47,9 +47,9 @@ public class GoHubDatabase {
 	private static final JsonParser PARSER = new JsonParser();
 
 	private static final Map<String, CachedData<PokedexEntry>> POKEMON_CACHE = new HashMap<>();
-	private static final Map<String, CachedData<Move[]>> POKEMON_MOVES_CACHE = new HashMap<>();
-	private static final Map<Integer, CachedData<Move>> MOVE_CACHE = new HashMap<>();
-	private static final Map<String, CachedData<Moveset[]>> MOVESET_CACHE = new HashMap<>();
+	private static final Map<String, CachedData<DexMove[]>> POKEMON_MOVES_CACHE = new HashMap<>();
+	private static final Map<Integer, CachedData<DexMove>> MOVE_CACHE = new HashMap<>();
+	private static final Map<String, CachedData<DexMoveset[]>> MOVESET_CACHE = new HashMap<>();
 	private static final Map<String, CachedData<Counter[]>> COUNTER_CACHE = new HashMap<>();
 
 	private static <K, V> boolean isCached(Map<K, CachedData<V>> cache, K key) {
@@ -137,11 +137,11 @@ public class GoHubDatabase {
 		}
 	}
 
-	public static Move[] getMoves(EnumPokemon pokemon) {
+	public static DexMove[] getMoves(EnumPokemon pokemon) {
 		return getMoves(pokemon, "Normal");
 	}
 
-	public static Move[] getMoves(EnumPokemon pokemon, String form) {
+	public static DexMove[] getMoves(EnumPokemon pokemon, String form) {
 		String key = pokemon.toString().toLowerCase() + form;
 		if (isCached(POKEMON_MOVES_CACHE, key))
 			return POKEMON_MOVES_CACHE.get(key).getValue();
@@ -153,8 +153,8 @@ public class GoHubDatabase {
 				url = new URL(POKEMON_MOVES_API + pokemon.getId() + "?form=" + form);
 			URLConnection conn = url.openConnection();
 			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
-			Move[] moves = GSON.fromJson(PARSER.parse(new InputStreamReader(conn.getInputStream())),
-					Move[].class);
+			DexMove[] moves = GSON.fromJson(PARSER.parse(new InputStreamReader(conn.getInputStream())),
+					DexMove[].class);
 			POKEMON_MOVES_CACHE.put(key, new CachedData<>(moves));
 			return moves;
 		} catch (IOException e) {
@@ -163,15 +163,15 @@ public class GoHubDatabase {
 		}
 	}
 
-	public static Move getMove(int moveId) {
+	public static DexMove getMove(int moveId) {
 		if (isCached(MOVE_CACHE, moveId))
 			return MOVE_CACHE.get(moveId).getValue();
 		try {
 			URL url = new URL(MOVES_API + moveId);
 			URLConnection conn = url.openConnection();
 			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
-			Move move = GSON.fromJson(PARSER.parse(new InputStreamReader(conn.getInputStream())),
-					Move.class);
+			DexMove move = GSON.fromJson(PARSER.parse(new InputStreamReader(conn.getInputStream())),
+					DexMove.class);
 			MOVE_CACHE.put(moveId, new CachedData<>(move));
 			return move;
 		} catch (IOException e) {
@@ -180,11 +180,11 @@ public class GoHubDatabase {
 		}
 	}
 
-	public static Moveset[] getMovesets(EnumPokemon pokemon) {
+	public static DexMoveset[] getMovesets(EnumPokemon pokemon) {
 		return getMovesets(pokemon, "Normal");
 	}
 
-	public static Moveset[] getMovesets(EnumPokemon pokemon, String form) {
+	public static DexMoveset[] getMovesets(EnumPokemon pokemon, String form) {
 		String key = pokemon.toString().toLowerCase() + form;
 		if (isCached(MOVESET_CACHE, key))
 			return MOVESET_CACHE.get(key).getValue();
@@ -196,8 +196,8 @@ public class GoHubDatabase {
 				url = new URL(MOVESETS_API + pokemon.getId() + "?form=" + form);
 			URLConnection conn = url.openConnection();
 			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
-			Moveset[] movesets = GSON.fromJson(
-					PARSER.parse(new InputStreamReader(conn.getInputStream())), Moveset[].class);
+			DexMoveset[] movesets = GSON.fromJson(
+					PARSER.parse(new InputStreamReader(conn.getInputStream())), DexMoveset[].class);
 			MOVESET_CACHE.put(key, new CachedData<>(movesets));
 			return movesets;
 		} catch (IOException e) {

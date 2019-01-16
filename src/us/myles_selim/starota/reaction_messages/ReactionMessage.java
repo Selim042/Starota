@@ -11,7 +11,7 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 public class ReactionMessage {
 
 	public final EmbedObject sendMessage(IChannel channel) {
-		EmbedObject emb = getEmbed();
+		EmbedObject emb = getEmbed(StarotaServer.getServer(channel.getGuild()));
 		IMessage msg = channel.sendMessage(emb);
 		ReactionMessageRegistry.MESSAGES.put(msg.getStringID(), this);
 		StarotaServer sserver = StarotaServer.getServer(channel.getGuild());
@@ -24,7 +24,7 @@ public class ReactionMessage {
 	public final EmbedObject editMessage(IChannel channel, IMessage msg) {
 		if (msg == null)
 			return sendMessage(channel);
-		EmbedObject emb = getEmbed();
+		EmbedObject emb = getEmbed(StarotaServer.getServer(channel.getGuild()));
 		msg.edit(emb);
 		ReactionMessageRegistry.MESSAGES.put(msg.getStringID(), this);
 		StarotaServer sserver = StarotaServer.getServer(channel.getGuild());
@@ -46,7 +46,7 @@ public class ReactionMessage {
 		// channel.sendMessage("- " + react.getEmoji());
 	}
 
-	protected EmbedObject getEmbed() {
+	protected EmbedObject getEmbed(StarotaServer server) {
 		return new EmbedBuilder().setLenient(true).build();
 	}
 

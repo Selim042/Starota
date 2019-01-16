@@ -340,7 +340,7 @@ public enum EnumPokemon {
 	GULPIN(EnumPokemonType.POISON),
 	SWALOT(EnumPokemonType.POISON),
 	CARVANHA(EnumPokemonType.WATER, EnumPokemonType.DARK),
-	SHARKPADE(EnumPokemonType.WATER, EnumPokemonType.DARK),
+	SHARPEDO(EnumPokemonType.WATER, EnumPokemonType.DARK),
 	WAILMER(EnumPokemonType.WATER),
 	WAILORD(EnumPokemonType.WATER),
 	NUMEL(EnumPokemonType.ROCK, EnumPokemonType.GROUND),
