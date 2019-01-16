@@ -16,7 +16,7 @@ import com.google.gson.JsonParser;
 import us.myles_selim.starota.CachedData;
 import us.myles_selim.starota.Starota;
 
-public class SilphRoadUtils {
+public class SilphRoadCardUtils {
 
 	private static final String API_URL = "https://sil.ph/";
 	private static final JsonParser PARSER = new JsonParser();
