@@ -29,6 +29,7 @@ import us.myles_selim.starota.commands.CommandChangelogChannel;
 import us.myles_selim.starota.commands.CommandCredits;
 import us.myles_selim.starota.commands.CommandGenerateCommandWiki;
 import us.myles_selim.starota.commands.CommandGetTop;
+import us.myles_selim.starota.commands.CommandInvite;
 import us.myles_selim.starota.commands.CommandStatus;
 import us.myles_selim.starota.commands.CommandSupportStarota;
 import us.myles_selim.starota.commands.CommandTest;
@@ -63,6 +64,7 @@ import us.myles_selim.starota.role_management.commands.CommandAddGroup;
 import us.myles_selim.starota.role_management.commands.CommandGetGroups;
 import us.myles_selim.starota.role_management.commands.CommandRemoveGroup;
 import us.myles_selim.starota.role_management.commands.CommandSetAsGroup;
+import us.myles_selim.starota.silph_road.CommandSilphCard;
 import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.trading.commands.CommandFindTrade;
 import us.myles_selim.starota.trading.commands.CommandForTrade;
@@ -133,6 +135,7 @@ public class Starota {
 		JavaCommandHandler.registerCommand(new CommandChangelog());
 		JavaCommandHandler.registerCommand(new CommandCredits());
 		JavaCommandHandler.registerCommand(new CommandSupportStarota());
+		JavaCommandHandler.registerCommand(new CommandInvite());
 
 		JavaCommandHandler.registerCommand("Administrative", new CommandStatus());
 		JavaCommandHandler.registerCommand("Administrative", new CommandSetResearchChannel());
@@ -182,6 +185,8 @@ public class Starota {
 		JavaCommandHandler.registerCommand("PvP", new CommandFindBattles());
 
 		JavaCommandHandler.registerCommand("Pokedex", new CommandPokedex());
+
+		JavaCommandHandler.registerCommand("Silph Road", new CommandSilphCard());
 
 		try {
 			Thread.sleep(2500);
