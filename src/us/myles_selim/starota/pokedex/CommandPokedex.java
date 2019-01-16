@@ -4,6 +4,8 @@ import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.util.EmbedBuilder;
+import us.myles_selim.starota.MiscUtils;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -41,7 +43,13 @@ public class CommandPokedex extends StarotaCommand {
 			pokemon = EnumPokemon.getPokemon(args[1]);
 		}
 		if (pokemon == null) {
-			channel.sendMessage("Pokemon \"" + args[1] + "\" not found");
+			EmbedBuilder builder = new EmbedBuilder();
+			builder.withTitle("Did you mean...?");
+			for (EnumPokemon poke : MiscUtils.getSuggestionsEnum(EnumPokemon.class, args[1], 6)) {
+				if (poke != null)
+					builder.appendDesc("- " + poke + "\n");
+			}
+			channel.sendMessage("Pokemon \"" + args[1] + "\" not found", builder.build());
 			return;
 		}
 		IMessage oldMessage = null;
