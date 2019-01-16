@@ -5,12 +5,12 @@ import us.myles_selim.starota.enums.EnumPokemonType;
 
 public class FormSetCastform extends FormSet {
 
-	private static final FormString NORMAL = new FormString("Normal");
+	private static final FormString NORMAL = new FormString(-1, "Normal");
 	public static final FormSetCastform FORM_SET = new FormSetCastform();
 
 	private FormSetCastform() {
 		this.addForm(NORMAL);
-		this.addForm(new FormString("Sunny") {
+		this.addForm(new FormString(-1, "Sunny") {
 
 			@Override
 			public EnumPokemonType getType1(EnumPokemon pokemon) {
@@ -22,7 +22,7 @@ public class FormSetCastform extends FormSet {
 				return "sunny";
 			}
 		});
-		this.addForm(new FormString("Rainy") {
+		this.addForm(new FormString(-1, "Rainy") {
 
 			@Override
 			public EnumPokemonType getType1(EnumPokemon pokemon) {
@@ -34,7 +34,7 @@ public class FormSetCastform extends FormSet {
 				return "rainy";
 			}
 		});
-		this.addForm(new FormString("Snowy") {
+		this.addForm(new FormString(-1, "Snowy") {
 
 			@Override
 			public EnumPokemonType getType1(EnumPokemon pokemon) {

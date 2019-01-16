@@ -21,6 +21,10 @@ public class FormSetAlolan extends FormSet {
 
 	private static class FormAlolan extends Form {
 
+		public FormAlolan() {
+			super(1);
+		}
+
 		@Override
 		public boolean canBeShiny(EnumPokemon pokemon) {
 			switch (pokemon) {
@@ -99,6 +103,10 @@ public class FormSetAlolan extends FormSet {
 	}
 
 	private static class FormKantonian extends Form {
+
+		public FormKantonian() {
+			super(0);
+		}
 
 		@Override
 		public String toString() {

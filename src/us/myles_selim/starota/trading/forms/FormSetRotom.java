@@ -5,12 +5,12 @@ import us.myles_selim.starota.enums.EnumPokemonType;
 
 public class FormSetRotom extends FormSet {
 
-	private static final FormString NORMAL = new FormString("Normal");
+	private static final FormString NORMAL = new FormString(0, "Normal");
 	public static final FormSetRotom FORM_SET = new FormSetRotom();
 
 	private FormSetRotom() {
 		this.addForm(NORMAL);
-		this.addForm(new FormString("Heat") {
+		this.addForm(new FormString(3, "Heat") {
 
 			@Override
 			public EnumPokemonType getType2(EnumPokemon pokemon) {
@@ -22,7 +22,7 @@ public class FormSetRotom extends FormSet {
 				return "heat";
 			}
 		});
-		this.addForm(new FormString("Wash") {
+		this.addForm(new FormString(5, "Wash") {
 
 			@Override
 			public EnumPokemonType getType2(EnumPokemon pokemon) {
@@ -34,7 +34,7 @@ public class FormSetRotom extends FormSet {
 				return "wash";
 			}
 		});
-		this.addForm(new FormString("Frost") {
+		this.addForm(new FormString(2, "Frost") {
 
 			@Override
 			public EnumPokemonType getType2(EnumPokemon pokemon) {
@@ -46,7 +46,7 @@ public class FormSetRotom extends FormSet {
 				return "frost";
 			}
 		});
-		this.addForm(new FormString("Fan") {
+		this.addForm(new FormString(1, "Fan") {
 
 			@Override
 			public EnumPokemonType getType2(EnumPokemon pokemon) {
@@ -58,7 +58,7 @@ public class FormSetRotom extends FormSet {
 				return "fan";
 			}
 		});
-		this.addForm(new FormString("Mow") {
+		this.addForm(new FormString(4, "Mow") {
 
 			@Override
 			public EnumPokemonType getType2(EnumPokemon pokemon) {

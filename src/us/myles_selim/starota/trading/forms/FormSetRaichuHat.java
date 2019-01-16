@@ -8,7 +8,7 @@ public class FormSetRaichuHat extends FormSetPikachuHat {
 
 	private FormSetRaichuHat() {
 		super();
-		this.addForm(new FormString("Alolan") {
+		this.addForm(new FormString(1, "Alolan") {
 
 			@Override
 			public boolean canBeShiny(EnumPokemon pokemon) {

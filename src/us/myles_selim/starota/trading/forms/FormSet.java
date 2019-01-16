@@ -39,6 +39,16 @@ public abstract class FormSet {
 
 	public static abstract class Form {
 
+		private int goHubId;
+
+		public Form(int goHubId) {
+			this.goHubId = goHubId;
+		}
+
+		public int getGoHubId(EnumPokemon pokemon) {
+			return this.goHubId;
+		}
+
 		public boolean canBeShiny(EnumPokemon pokemon) {
 			return FormManager.isShinyable(pokemon.getId());
 		}

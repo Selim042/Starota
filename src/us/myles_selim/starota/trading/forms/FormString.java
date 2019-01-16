@@ -6,7 +6,8 @@ public class FormString extends Form {
 
 	private final String name;
 
-	public FormString(String name) {
+	public FormString(int goHubId, String name) {
+		super(goHubId);
 		this.name = name;
 	}
 

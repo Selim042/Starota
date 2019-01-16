@@ -8,7 +8,8 @@ import sx.blah.discord.handle.obj.IReaction;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.EmojiServerHelper;
-import us.myles_selim.starota.pokedex.PokedexEntry.Form;
+import us.myles_selim.starota.ImageHelper;
+import us.myles_selim.starota.pokedex.PokedexEntry.DexForm;
 import us.myles_selim.starota.reaction_messages.ReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -33,11 +34,9 @@ public class PokedexReactionMessage extends ReactionMessage {
 		if (entry.forms.length <= 1)
 			return;
 		for (int i = 0; i < entry.forms.length; i++) {
-			final int i2 = i;
-			Form f = entry.forms[i];
+			DexForm f = entry.forms[i];
 			IEmoji emoji = EmojiServerHelper.getEmoji(entry.name + "_" + f.name,
-					String.format("https://db.pokemongohub.net/images/official/full/%03d"
-							+ (i2 != 0 ? "_f" + (i2 + 1) : "") + ".png", entry.id));
+					ImageHelper.getOfficalArtwork(entry.getPokemon(), i));
 			RequestBuffer.request(() -> msg.addReaction(emoji));
 			try {
 				Thread.sleep(100);
@@ -57,7 +56,7 @@ public class PokedexReactionMessage extends ReactionMessage {
 			form = formName;
 			if (!entry.hasEmbedPrepared(formName))
 				RequestBuffer.request(() -> msg.edit(GoHubDatabase.LOADING_EMBED));
-			EmbedObject newEmbed = getEmbed();
+			EmbedObject newEmbed = getEmbed(server);
 			RequestBuffer.request(() -> msg.edit(newEmbed));
 		}
 	}
@@ -67,12 +66,12 @@ public class PokedexReactionMessage extends ReactionMessage {
 			IReaction react) {}
 
 	@Override
-	protected EmbedObject getEmbed() {
+	protected EmbedObject getEmbed(StarotaServer server) {
 		return entry.toEmbed(form);
 	}
 
 	private boolean isFormValid(String form) {
-		for (Form f : entry.forms)
+		for (DexForm f : entry.forms)
 			if (form.equals(f.name))
 				return true;
 		return false;

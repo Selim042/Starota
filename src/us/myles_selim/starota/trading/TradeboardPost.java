@@ -7,6 +7,7 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.Storage;
+import us.myles_selim.starota.ImageHelper;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.embed_converter.annotations.EmbedFooterText;
 import us.myles_selim.starota.embed_converter.annotations.EmbedTitle;
@@ -148,13 +149,9 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 		Form form = this.getForm();
 		if (form == null && pokemon.getFormSet() != null)
 			form = pokemon.getDefaultForm();
-		String formName = form == null ? "" : form.getSpritePostfix(pokemon);
-		if (formName == null)
-			formName = "";
-		if (!formName.isEmpty())
-			formName = '-' + formName;
-		builder.withThumbnail("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/"
-				+ (this.isShiny() ? "shiny/" : "") + pokemon.getId() + formName + ".png");
+		// builder.withThumbnail(ImageHelper.getPokeAPISprite(pokemon, form,
+		// isShiny()));
+		builder.withThumbnail(ImageHelper.getOfficalArtwork(pokemon, form));
 
 		builder.withAuthorIcon(user.getAvatarURL());
 		builder.withAuthorName(user.getDisplayName(server.getDiscordGuild()));
@@ -177,10 +174,9 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 				Character.toUpperCase(isLegacyS.charAt(0)) + isLegacyS.substring(1), true);
 
 		if (includeUsage)
-			builder.appendField("Reaction Usage:",
-					"To let the poster know you are interested, press ✅.\n"
-							+ "If you are the poster, press ❌ to remove the post.",
-					false);
+			builder.appendField("Reaction Usage:", "To let the poster know you are interested, press "
+					+ TradeboardReactionMessage.CONFIRM_EMOJI + ".\n" + "If you are the poster, press "
+					+ TradeboardReactionMessage.DELETE_EMOJI + " to remove the post.", false);
 
 		builder.withFooterText("Trade posted");
 		builder.withTimestamp(this.getTimePosted());

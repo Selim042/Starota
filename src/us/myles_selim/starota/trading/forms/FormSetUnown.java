@@ -39,6 +39,7 @@ public class FormSetUnown extends FormSet {
 		private final char letter;
 
 		public FormUnown(char letter) {
+			super(-1);
 			if (Character.isAlphabetic(letter) || letter == '!' || letter == '?')
 				this.letter = letter;
 			else
