@@ -12,12 +12,23 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import sx.blah.discord.api.internal.json.objects.EmbedObject;
+import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.CachedData;
+import us.myles_selim.starota.EmojiServerHelper;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 
 public class SilphRoadData {
+
+	public static final EmbedObject LOADING_EMBED;
+
+	static {
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.appendDesc("Loading Silph Road... " + EmojiServerHelper.getEmoji("loading"));
+		LOADING_EMBED = builder.build();
+	}
 
 	private static final String BOSSES_URL = "https://thesilphroad.com/raid-bosses";
 
@@ -93,6 +104,12 @@ public class SilphRoadData {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	public static boolean areBossesLoaded(int tier) {
+		if (BOSSES != null && !BOSSES.hasPassed(86400000L)) // 1 day
+			return TIERED_BOSSES[tier - 1] != null;
+		return false;
 	}
 
 	public static List<RaidBoss> getBosses(int tier) {
