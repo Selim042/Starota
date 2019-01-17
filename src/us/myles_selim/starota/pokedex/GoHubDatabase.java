@@ -34,7 +34,8 @@ public class GoHubDatabase {
 
 	static {
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.withTitle("Loading Pokémon Go Hub Database... " + EmojiServerHelper.getEmoji("loading"));
+		builder.appendDesc(
+				"Loading Pokémon Go Hub Database... " + EmojiServerHelper.getEmoji("loading"));
 		LOADING_EMBED = builder.build();
 	}
 
