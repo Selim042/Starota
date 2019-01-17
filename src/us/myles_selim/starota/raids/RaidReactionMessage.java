@@ -136,6 +136,14 @@ public class RaidReactionMessage extends ReactionMessage {
 			builder.appendField("Here:", hereString, false);
 
 		if (entry != null) {
+			String cpsString = "";
+			cpsString += "**Max CP**: " + entry.CPs.max + "\n";
+			cpsString += "**Catch CP**: " + entry.CPs.raidCaptureMin + "-" + entry.CPs.raidCaptureMax
+					+ "\n";
+			cpsString += "**Boosted Catch CP**: " + entry.CPs.raidCaptureBoostMin + "-"
+					+ entry.CPs.raidCaptureBoostMax;
+			builder.appendField("Important CPs:", cpsString, false);
+
 			String counterString = "";
 			int rank = 1;
 			for (Counter c : entry.getTopCounters())
@@ -158,7 +166,7 @@ public class RaidReactionMessage extends ReactionMessage {
 	@Override
 	public void onSend(StarotaServer server, IChannel channel, IMessage msg) {
 		for (RaidBoss b : SilphRoadData.getBosses(tier)) {
-			String postfix = b.getForm() == null ? "" : "-" + b.getForm();
+			String postfix = b.getForm() == null ? "" : "_" + b.getForm();
 			RequestBuffer
 					.request(() -> msg.addReaction(EmojiServerHelper.getEmoji(b.getPokemon() + postfix,
 							ImageHelper.getOfficalArtwork(b.getPokemon(), b.getForm()))));
