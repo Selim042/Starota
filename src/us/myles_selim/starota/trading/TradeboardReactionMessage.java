@@ -41,10 +41,7 @@ public class TradeboardReactionMessage extends PersistReactionMessage {
 	public void onSend(StarotaServer server, IChannel channel, IMessage msg) {
 		this.guild = server.getDiscordGuild();
 
-		RequestBuffer.request(() -> msg.addReaction(ReactionEmoji.of(CONFIRM_EMOJI)));
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {}
+		RequestBuffer.request(() -> msg.addReaction(ReactionEmoji.of(CONFIRM_EMOJI))).get();
 		RequestBuffer.request(() -> msg.addReaction(ReactionEmoji.of(DELETE_EMOJI)));
 	}
 
