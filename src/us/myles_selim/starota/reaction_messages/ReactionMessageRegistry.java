@@ -17,7 +17,7 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 public class ReactionMessageRegistry {
 
 	public static final String PERSIST_KEY = "persistReactions";
-	
+
 	protected static final HashMap<String, ReactionMessage> MESSAGES = new HashMap<>();
 	private static boolean inited = false;
 
@@ -56,7 +56,7 @@ public class ReactionMessageRegistry {
 
 	@EventSubscriber
 	public void onDelete(MessageDeleteEvent event) {
-		String stringId = event.getMessage().getStringID();
+		String stringId = Long.toString(event.getMessageID());
 		if (!MESSAGES.containsKey(stringId))
 			return;
 		ReactionMessage rMsg = MESSAGES.remove(stringId);
