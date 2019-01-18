@@ -7,6 +7,10 @@ import java.util.List;
 
 public class MiscUtils {
 
+	public static String fixCharacters(String in) {
+		return in.replaceAll("’", "'").replaceAll("�", "é");
+	}
+
 	public static String getTrainerCodeString(long trainerCode) {
 		String codeS = String.format("%012d", trainerCode);
 		return codeS.substring(0, 4) + " " + codeS.substring(4, 8) + " " + codeS.substring(8, 12);
