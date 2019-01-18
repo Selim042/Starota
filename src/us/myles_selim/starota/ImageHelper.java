@@ -5,28 +5,6 @@ import us.myles_selim.starota.trading.forms.FormSet.Form;
 
 public class ImageHelper {
 
-	public static String getPokeAPISprite(EnumPokemon pokemon) {
-		return getPokeAPISprite(pokemon, null, false);
-	}
-
-	public static String getPokeAPISprite(EnumPokemon pokemon, Form form) {
-		return getPokeAPISprite(pokemon, form, false);
-	}
-
-	public static String getPokeAPISprite(EnumPokemon pokemon, boolean shiny) {
-		return getPokeAPISprite(pokemon, null, shiny);
-	}
-
-	public static String getPokeAPISprite(EnumPokemon pokemon, Form form, boolean shiny) {
-		String formName = form == null ? "" : form.getSpritePostfix(pokemon);
-		if (formName == null)
-			formName = "";
-		if (!formName.isEmpty())
-			formName = '-' + formName;
-		return "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/"
-				+ (shiny ? "shiny/" : "") + pokemon.getId() + formName + ".png";
-	}
-
 	public static String getOfficalArtwork(EnumPokemon pokemon) {
 		return getOfficalArtwork(pokemon, null);
 	}
