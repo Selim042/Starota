@@ -190,6 +190,9 @@ public class Starota {
 		JavaCommandHandler.registerCommand("Silph Road", new CommandSilphCard());
 
 		JavaCommandHandler.registerCommand("Raids", new CommandRaid());
+		// JavaCommandHandler.registerCommand("Raids", new CommandRaidBosses());
+
+		JavaCommandHandler.registerCommand("Events", new CommandEvents());
 
 		try {
 			Thread.sleep(2500);
