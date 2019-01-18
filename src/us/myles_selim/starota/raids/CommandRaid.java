@@ -10,13 +10,13 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 public class CommandRaid extends StarotaCommand {
 
 	public CommandRaid() {
-		super("raid1", "Makes a new raid post.");
+		super("raid", "Makes a new raid post.");
 	}
 
 	@Override
 	public List<String> getAliases() {
 		List<String> aliases = super.getAliases();
-		for (int i = 2; i <= 5; i++)
+		for (int i = 1; i <= 5; i++)
 			aliases.add("raid" + i);
 		return aliases;
 	}
@@ -29,6 +29,11 @@ public class CommandRaid extends StarotaCommand {
 	@Override
 	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
 			throws Exception {
+		if (args[0].equalsIgnoreCase("raid")) {
+			channel.sendMessage("Please specify raid tier in command name. Example: `"
+					+ server.getPrefix() + "raid5 " + getGeneralUsage() + "`");
+			return;
+		}
 		if (args.length < 3) {
 			channel.sendMessage("**Usage**: " + server.getPrefix() + args[0] + " " + getGeneralUsage());
 			return;
