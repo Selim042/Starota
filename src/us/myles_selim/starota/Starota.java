@@ -39,6 +39,7 @@ import us.myles_selim.starota.commands.pvp.CommandNotReady;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 import us.myles_selim.starota.enums.EnumPatreonPerm;
+import us.myles_selim.starota.events.CommandEvents;
 import us.myles_selim.starota.leaderboards.commands.CommandEditLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandGetLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandListLeaderboards;
@@ -95,9 +96,10 @@ public class Starota {
 	public static boolean IS_DEV;
 	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "2.5.0";
+	public final static String VERSION = "2.7.0";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n" + "Public changes:\n"
-			+ " + New Pokedex command\n" + " * Fix tradeboard post serialization";
+			+ " + Add raid planning command\n" + " + Add event command\n"
+			+ " * Change tradeboard photos to use the same image set as the Pokedex\n";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static void main(String[] args) {
