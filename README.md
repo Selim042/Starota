@@ -8,7 +8,17 @@ Starota is a Discord bot designed for use on Pokemon Go oriented servers.
 
 If you want to add Starota to your own server, you can use [this](https://discordapp.com/oauth2/authorize?client_id=489245655710040099&scope=bot&permissions=268445776) link.  If you want to join the support server, you can join [here](https://discord.gg/NxverNw).
 
-It currently has a command system as well as player profiles, a WIP research reporting tracker, some basic role management functionality, a tradeboard system, custom Lua scripting, modules to enable/disable specific features, Pokedex lookup, a command to help coordinate and plan raids, a command to show ongoing and upcoming events, and a WIP web-sided interface.
+Features:
+- Player profiles (featuring level, team, trainer code, real name, link to Silph Road card, and alternate accounts)
+- Basic role management (mark roles as "self-assignable", users can add and remove said roles at any point)
+- Tradeboard (post Pokemon you are looking for/are looking to trade away)
+- Leaderboards (server owners can make unique leaderboards to track anything)
+- Pokedex lookup (using Pokemon Go Hub)
+- PvP coordination commands (mark yourself as "battle-ready")
+- Command to help coordinate and plan raids
+- Show ongoing and upcoming events
+- Custom Lua scripting for unique features (Patrons only)
+- WIP web-sided interface (Patrons only)
 
 I hope to make a simple wiki here soon to document these features in more detail as well as how to use them effectively.
 
