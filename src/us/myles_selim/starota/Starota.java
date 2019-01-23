@@ -59,6 +59,7 @@ import us.myles_selim.starota.profiles.commands.CommandRegister;
 import us.myles_selim.starota.profiles.commands.CommandSelfRegister;
 import us.myles_selim.starota.profiles.commands.CommandUpdateProfile;
 import us.myles_selim.starota.raids.CommandRaid;
+import us.myles_selim.starota.raids.CommandSetRaidEChannel;
 import us.myles_selim.starota.reaction_messages.ReactionMessageRegistry;
 import us.myles_selim.starota.research.CommandSetResearchChannel;
 import us.myles_selim.starota.research.ResearchTracker;
@@ -192,6 +193,7 @@ public class Starota {
 		JavaCommandHandler.registerCommand("Silph Road", new CommandSilphCard());
 
 		JavaCommandHandler.registerCommand("Raids", new CommandRaid());
+		JavaCommandHandler.registerCommand("Raids", new CommandSetRaidEChannel());
 		// JavaCommandHandler.registerCommand("Raids", new CommandRaidBosses());
 
 		JavaCommandHandler.registerCommand("Events", new CommandEvents());

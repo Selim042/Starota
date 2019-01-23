@@ -4,6 +4,7 @@ import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
+import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -62,7 +63,24 @@ public class CommandRaid extends StarotaCommand {
 			channel.sendMessage("Failed to get raid tier");
 			return;
 		}
-		new RaidReactionMessage(tier, args[1], location).sendMessage(channel);
+		IChannel sendChannel = getSendChannel(server, channel);
+		new RaidReactionMessage(tier, args[1], location).sendMessage(sendChannel);
+		if (!sendChannel.equals(channel))
+			channel.sendMessage("Posted raid in " + sendChannel + ".");
+	}
+
+	private static IChannel getSendChannel(StarotaServer server, IChannel msgChannel) {
+		if (!server.getOptions().containsKey(CommandSetRaidEChannel.CHANNELS_KEY))
+			return msgChannel;
+		EBStorage channels = server.getOptions().get(CommandSetRaidEChannel.CHANNELS_KEY,
+				EBStorage.class);
+		if (channels.containsKey(msgChannel.getStringID())) {
+			long channelId = channels.get(msgChannel.getStringID(), Long.class);
+			if (channelId == -1)
+				return msgChannel;
+			return server.getDiscordGuild().getChannelByID(channelId);
+		}
+		return msgChannel;
 	}
 
 }
