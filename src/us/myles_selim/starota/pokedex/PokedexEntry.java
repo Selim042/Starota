@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.ImageHelper;
+import us.myles_selim.starota.MiscUtils;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
 import us.myles_selim.starota.enums.EnumWeather;
@@ -66,7 +67,7 @@ public class PokedexEntry extends ReactionMessage {
 
 	public String getDescription() {
 		if (!switched)
-			description = description.replaceAll("â€™", "'").replaceAll("Ã©", "é");
+			description = MiscUtils.fixCharacters(description);
 		switched = true;
 		return description;
 	}
@@ -252,7 +253,7 @@ public class PokedexEntry extends ReactionMessage {
 
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withColor(entry.type1.getColor());
-		builder.withAuthorName("Pokémon Go Hub Database");
+		builder.withAuthorName("PokÃ©mon Go Hub Database");
 		builder.withAuthorIcon("https://db.pokemongohub.net/images/icons/favicon-32x32.png");
 		builder.withAuthorUrl("https://db.pokemongohub.net/");
 		String pokeName = entry.name;
@@ -407,8 +408,8 @@ public class PokedexEntry extends ReactionMessage {
 		}
 
 		public static final String STAB_MARKER = "\\*";
-		public static final String LEGACY_MARKER = "†";
-		public static final String EXCLUSIVE_MARKER = "‡"; // §
+		public static final String LEGACY_MARKER = "â€ ";
+		public static final String EXCLUSIVE_MARKER = "â€¡"; // Â§
 
 		public String toString(PokedexEntry entry) {
 			boolean marked = false;
