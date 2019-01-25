@@ -40,6 +40,20 @@
 			<artifactId>DBL-Java-Library</artifactId>
 			<version>2.0.1</version>
 		</dependency>
+
+		<!--<dependency> <groupId>com.patreon</groupId> <artifactId>patreon</artifactId> 
+			<version>0.4.2</version> </dependency> -->
+
+		<dependency>
+			<groupId>org.twitter4j</groupId>
+			<artifactId>twitter4j-core</artifactId>
+			<version>[4.0,)</version>
+		</dependency>
+		<dependency>
+			<groupId>org.twitter4j</groupId>
+			<artifactId>twitter4j-stream</artifactId>
+			<version>[4.0,)</version>
+		</dependency>
 	</dependencies>
 
 	<build>
