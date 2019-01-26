@@ -19,4 +19,8 @@ public class ImageHelper {
 				pokemon.getId());
 	}
 
+	public static String getRaidEgg(int level) {
+		return String.format("http://assets.myles-selim.us/starota/raids/eggs/%d.png", level);
+	}
+
 }

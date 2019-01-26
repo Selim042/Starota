@@ -19,6 +19,8 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 // TODO: Optimize this
 public class DebugServer extends Thread {
 
+	public static final long DEBUG_SERVER_ID = 517546213520965662L;
+
 	public static final Permissions[] USED_PERMISSIONS = new Permissions[] { Permissions.SEND_MESSAGES,
 			Permissions.READ_MESSAGES, Permissions.MANAGE_ROLES, Permissions.MANAGE_MESSAGES,
 			Permissions.USE_EXTERNAL_EMOJIS, Permissions.ADD_REACTIONS };
@@ -32,7 +34,7 @@ public class DebugServer extends Thread {
 	private static final EmbedObject NOT_READY_EMBED;
 
 	static {
-		DEBUG_SERVER = Starota.getGuild(517546213520965662L);
+		DEBUG_SERVER = Starota.getGuild(DEBUG_SERVER_ID);
 		if (Starota.IS_DEV) {
 			IChannel ch = DEBUG_SERVER.getChannelByID(517546371503357972L);
 			if (ch.getFullMessageHistory().isEmpty())

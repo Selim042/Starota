@@ -164,9 +164,9 @@ public class RaidReactionMessage extends ReactionMessage {
 					"React with the raid Pokemon to indicate what Pokemon the raid is for.", false);
 		else
 			builder.appendField("Reaction Usage:",
-					"React with a numbered emoji to indicate how many you will be bringing to the raid. "
+					"React with a numbered emoji to indicate how many you will be bringing to the raid.\n"
 							+ "React with " + EmojiServerHelper.getEmoji("here")
-							+ " to indicate that you and your other people are at the raid location. "
+							+ " to indicate that you and your other people are at the raid location.\n"
 							+ "React with " + ReactionEmoji.of(EMOJI_NAMES[6])
 							+ " if you are no longer able to attend.",
 					false);

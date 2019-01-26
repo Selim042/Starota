@@ -15,6 +15,7 @@ import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.IShard;
 import sx.blah.discord.api.events.EventDispatcher;
+import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.obj.ActivityType;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -39,6 +40,7 @@ import us.myles_selim.starota.commands.pvp.CommandNotReady;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 import us.myles_selim.starota.enums.EnumPatreonPerm;
+import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.events.CommandEvents;
 import us.myles_selim.starota.leaderboards.commands.CommandEditLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandGetLeaderboard;
@@ -78,12 +80,16 @@ import us.myles_selim.starota.trading.commands.CommandGetUserTrades;
 import us.myles_selim.starota.trading.commands.CommandLookingFor;
 import us.myles_selim.starota.trading.commands.CommandRemoveTrade;
 import us.myles_selim.starota.trading.commands.CommandTradeboardHelp;
+import us.myles_selim.starota.webserver.WebServer;
+import us.myles_selim.starota.webserver.webhooks.WebhookEvent;
+import us.myles_selim.starota.webserver.webhooks.WebhookRaid;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class Starota {
 
 	private static IDiscordClient CLIENT;
 	private static DiscordBotListAPI BOT_LIST;
+	// private static Socket MANAGER_SOCKET;
 	private static final Properties PROPERTIES = new Properties();
 
 	public static final long SELIM_USER_ID = 134855940938661889L;
@@ -96,6 +102,7 @@ public class Starota {
 	public final static boolean DEBUG = false;
 	public static boolean IS_DEV;
 	public static boolean FULLY_STARTED = false;
+	// public static EnumBotStatus STATUS = EnumBotStatus.UNKNOWN;
 	public final static String BOT_NAME = "Starota";
 	public final static String VERSION = "2.7.0";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n" + "Public changes:\n"
@@ -104,6 +111,48 @@ public class Starota {
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static void main(String[] args) {
+		// STATUS = EnumBotStatus.INITIALIZING;
+		// MANAGER_SOCKET = new Socket();
+		// try {
+		// MANAGER_SOCKET.bind(new InetSocketAddress("localhost",
+		// Integer.parseInt(args[0])));
+		// OutputStream out = MANAGER_SOCKET.getOutputStream();
+		// out.write((BOT_NAME.toLowerCase() + '\0').getBytes());
+		// out.write((args[1] + '\0').getBytes());
+		// Thread socketHandler = new Thread() {
+		//
+		// @Override
+		// public void run() {
+		// try {
+		// InputStream in = MANAGER_SOCKET.getInputStream();
+		// OutputStream out = MANAGER_SOCKET.getOutputStream();
+		// while (true) {
+		// String cmd = "";
+		// char c = (char) in.read();
+		// while (in.available() > 0 && c != '\0') {
+		// cmd += c;
+		// c = (char) in.read();
+		// }
+		// switch (cmd) {
+		// case "getStatus":
+		// out.write((STATUS.name() + '\0').getBytes());
+		// break;
+		// default:
+		// System.err.println("recieved cmd \"" + cmd
+		// + "\" from manager, unsure how to handle");
+		// }
+		// }
+		// } catch (IOException e) {
+		// System.err.println("error in socket handler thread");
+		// e.printStackTrace();
+		// }
+		// }
+		// };
+		// socketHandler.start();
+		// } catch (Exception e) {
+		// System.err.println("failed to connect to the bot manager");
+		// e.printStackTrace();
+		// }
 		try {
 			PROPERTIES.load(new FileInputStream("starota.properties"));
 		} catch (IOException e1) {
@@ -212,7 +261,34 @@ public class Starota {
 		dispatcher.registerListener(new ReactionMessageRegistry());
 		dispatcher.registerListener(new PrimaryCommandHandler());
 		dispatcher.registerListener(new EventHandler());
+		dispatcher.registerListener(new Object() {
+
+			@EventSubscriber
+			public void testThingy(WebhookEvent event) {
+				IChannel channel = Starota.getChannel(538156939868110854L);
+				EmbedBuilder builder = new EmbedBuilder();
+				switch (event.getType()) {
+				case "raid":
+					WebhookRaid raidHook = (WebhookRaid) event.getWebhookClass().message;
+					boolean hasHatched = raidHook.pokemon_id != 0;
+					builder.withTitle("Tier " + raidHook.level + " Raid at " + raidHook.gym_name);
+					if (hasHatched) {
+						builder.appendField("Boss:", "#**" + raidHook.pokemon_id + "** "
+								+ EnumPokemon.getPokemon(raidHook.pokemon_id), false);
+						builder.withThumbnail(
+								ImageHelper.getOfficalArtwork(raidHook.getPokemon(), raidHook.form));
+					} else
+						builder.withThumbnail(ImageHelper.getRaidEgg(raidHook.level));
+					builder.withImage(String.format(
+							"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/pin-s+%06X(%2$f,%3$f)/%2$f,%3$f,16.5,0,0/600x300@2x?logo=false&access_token=pk.eyJ1Ijoic2VsaW0wNDIiLCJhIjoiY2pyOXpmM2g1MG16cTQzbndqZXk5dHNndCJ9.vsh20BzsPBgTcBBcKWBqQw",
+							raidHook.getTeam().getColor(), raidHook.longitude, raidHook.latitude));
+					break;
+				}
+				RequestBuffer.request(() -> channel.sendMessage(builder.build()));
+			}
+		});
 		ReactionMessageRegistry.init();
+		WebServer.init();
 
 		Thread saveThread = new Thread("ResearchFlusher") {
 
@@ -271,6 +347,16 @@ public class Starota {
 		// STATUS = EnumBotStatus.ONLINE;
 		DebugServer.update();
 
+		if (IS_DEV) {
+			new Thread("wikiGen") {
+
+				@Override
+				public void run() {
+					WikiGenerator.generate();
+				}
+			}.start();
+		}
+
 		Thread discord4JWatchdog = new Thread("D4JWatchdog") {
 
 			private boolean isReady = CLIENT.isReady();
@@ -293,6 +379,8 @@ public class Starota {
 
 	public static class BaseModules {
 
+		private static boolean registered = false;
+
 		public static final StarotaModule PROFILES = new StarotaModule("PlayerProfiles", "Profiles");
 		public static final StarotaModule GROUPS = new StarotaModule("Groups", "Groups");
 		public static final StarotaModule TRADEBOARD = new StarotaModule("Tradeboard", "Tradeboard",
@@ -304,7 +392,11 @@ public class Starota {
 		public static final StarotaModule POKEDEX = new StarotaModule("Pokedex", "Pokedex");
 		public static final StarotaModule SILPH_ROAD = new StarotaModule("SilphRoad", "Silph Road");
 
-		private static void registerModules() {
+		public static void registerModules() {
+			if (registered)
+				return;
+			registered = true;
+
 			StarotaModule.registerModule(PROFILES);
 			StarotaModule.registerModule(GROUPS);
 			StarotaModule.registerModule(TRADEBOARD);

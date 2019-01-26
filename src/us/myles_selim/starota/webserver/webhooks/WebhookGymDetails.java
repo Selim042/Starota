@@ -13,6 +13,6 @@ public class WebhookGymDetails extends WebhookData {
 
 	public int team;
 	public int slots_available;
-	public int sponsor_id;
+	public boolean sponsor_id;
 
 }

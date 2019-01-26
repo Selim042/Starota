@@ -17,6 +17,6 @@ public class WebhookGym extends WebhookData {
 	public int guard_pokemon_id;
 	public int slots_available;
 	public long raid_active_until;
-	public int sponsor_id;
+	public boolean sponsor_id;
 
 }
