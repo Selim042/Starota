@@ -19,6 +19,7 @@ import com.sun.net.httpserver.HttpHandler;
 import sx.blah.discord.handle.obj.IGuild;
 import us.myles_selim.starota.Starota;
 
+@SuppressWarnings("restriction")
 public class HttpHandlerWebhooks implements HttpHandler {
 
 	private static final Gson GSON;

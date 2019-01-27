@@ -131,7 +131,7 @@ public class StarotaModule {
 
 	private final String name;
 	private final String commandCategory;
-	private final String description;
+	private String description;
 	private final StarotaModule[] dependencies;
 
 	public StarotaModule(String name) {
@@ -143,14 +143,8 @@ public class StarotaModule {
 	}
 
 	public StarotaModule(String name, String commandCategory, StarotaModule... dependencies) {
-		this(name, commandCategory, null, dependencies);
-	}
-
-	public StarotaModule(String name, String commandCategory, String description,
-			StarotaModule... dependencies) {
 		this.name = name;
 		this.commandCategory = commandCategory;
-		this.description = description;
 		this.dependencies = dependencies;
 	}
 
@@ -160,6 +154,11 @@ public class StarotaModule {
 
 	public String getCommandCategory() {
 		return this.commandCategory;
+	}
+
+	public StarotaModule setDescription(String description) {
+		this.description = description;
+		return this;
 	}
 
 	public String getDescription() {

@@ -12,6 +12,7 @@ import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.webserver.webhooks.HttpHandlerWebhooks;
 
 // https://www.reddit.com/r/discordapp/comments/82p8i6/a_basic_tutorial_on_how_to_get_the_most_out_of/
+@SuppressWarnings("restriction")
 public class WebServer {
 
 	public static int PORT = 7366;

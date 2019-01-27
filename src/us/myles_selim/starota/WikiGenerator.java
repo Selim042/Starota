@@ -77,14 +77,13 @@ public class WikiGenerator {
 					new String[] { "git", "commit", "-m", "\"Auto-generated updates\"" },
 					new String[] { "git", "push" } };
 			for (String[] cmd : cmds) {
-				Process pr = new ProcessBuilder(cmd).directory(new File(System.getProperty("user.dir")))
-						.start();
+				Process pr = new ProcessBuilder(cmd)
+						.directory(new File(System.getProperty("user.dir") + "/wiki")).start();
 				InputStream stream = pr.getInputStream();
-				System.out.println(pr.waitFor());
 				while (stream.available() != 0)
 					System.out.print((char) stream.read());
 			}
-		} catch (IOException | InterruptedException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		System.out.println("pushed to repo");
