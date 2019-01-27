@@ -1,26 +1,24 @@
 package us.myles_selim.starota.trading.commands;
 
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
-import us.myles_selim.starota.commands.registry.java.JavaCommand;
-import us.myles_selim.starota.trading.EnumPokemon;
+import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandGetForms extends JavaCommand {
+public class CommandGetForms extends StarotaCommand {
 
 	public CommandGetForms() {
 		super("getForms");
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
+	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
 		if (args.length != 2) {
-			channel.sendMessage(
-					"**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName() + " [Pokemon]");
+			channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName() + " [Pokemon]");
 			return;
 		}
 		EnumPokemon pokemon = EnumPokemon.getPokemon(args[1]);

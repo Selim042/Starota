@@ -5,16 +5,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.commands.registry.java.JavaCommand;
+import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.profiles.PlayerProfile;
-import us.myles_selim.starota.profiles.ProfileManager;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandGetProfilelessPlayers extends JavaCommand {
+public class CommandGetProfilelessPlayers extends StarotaCommand {
 
 	public CommandGetProfilelessPlayers() {
 		super("getProfilelessPlayers");
@@ -26,10 +25,10 @@ public class CommandGetProfilelessPlayers extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
-		List<PlayerProfile> profiles = ProfileManager.getProfiles(guild);
+	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
+		List<PlayerProfile> profiles = server.getProfiles();
 		List<String> players = new LinkedList<>();
-		for (IUser user : guild.getUsers()) {
+		for (IUser user : server.getDiscordGuild().getUsers()) {
 			boolean found = false;
 			if (profiles != null) {
 				for (PlayerProfile p : profiles) {
@@ -40,7 +39,7 @@ public class CommandGetProfilelessPlayers extends JavaCommand {
 				}
 			}
 			if (!found)
-				players.add(user.getDisplayName(guild) + " (_" + user.getName() + "#"
+				players.add(user.getDisplayName(server.getDiscordGuild()) + " (_" + user.getName() + "#"
 						+ user.getDiscriminator() + "_)\n");
 		}
 		players.sort(null);

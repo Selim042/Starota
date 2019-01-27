@@ -1,6 +1,6 @@
 package us.myles_selim.starota.trading.forms;
 
-import us.myles_selim.starota.trading.EnumPokemon;
+import us.myles_selim.starota.enums.EnumPokemon;
 
 public class FormSetUnown extends FormSet {
 
@@ -39,6 +39,7 @@ public class FormSetUnown extends FormSet {
 		private final char letter;
 
 		public FormUnown(char letter) {
+			super(-1);
 			if (Character.isAlphabetic(letter) || letter == '!' || letter == '?')
 				this.letter = letter;
 			else

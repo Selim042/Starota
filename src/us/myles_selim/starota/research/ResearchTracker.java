@@ -19,9 +19,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
-import us.myles_selim.starota.ServerOptions;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.research.CommandSetResearchChannel.EnumResearchChannel;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class ResearchTracker {
 
@@ -142,16 +142,16 @@ public class ResearchTracker {
 		return returnData;
 	}
 
-	public static void setResearchChannel(IGuild server, EnumResearchChannel rChannel,
+	public static void setResearchChannel(StarotaServer server, EnumResearchChannel rChannel,
 			IChannel channel) {
-		ServerOptions.setValue(server, rChannel.getKey(), channel.getLongID());
+		server.setValue(rChannel.getKey(), channel.getLongID());
 	}
 
-	public static IChannel getResearchChannel(IGuild server, EnumResearchChannel rChannel) {
-		if (rChannel == null || !ServerOptions.hasKey(server, rChannel.getKey(), long.class))
+	public static IChannel getResearchChannel(StarotaServer server, EnumResearchChannel rChannel) {
+		if (rChannel == null || !server.hasKey(rChannel.getKey(), long.class))
 			return null;
-		long channelId = (long) ServerOptions.getValue(server, rChannel.getKey());
-		IChannel channel = Starota.getChannel(server.getLongID(), channelId);
+		long channelId = (long) server.getValue(rChannel.getKey());
+		IChannel channel = Starota.getChannel(server.getDiscordGuild().getLongID(), channelId);
 		return channel;
 	}
 

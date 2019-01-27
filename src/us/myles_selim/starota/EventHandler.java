@@ -6,16 +6,19 @@ import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;
 import sx.blah.discord.handle.impl.events.guild.GuildLeaveEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
+import sx.blah.discord.handle.impl.events.guild.role.RoleUpdateEvent;
 import sx.blah.discord.handle.obj.IEmbed;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IPrivateChannel;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
+import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.research.ResearchTracker;
-import us.myles_selim.starota.trading.EnumPokemon;
 import us.myles_selim.starota.trading.FormManager;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class EventHandler {
 
@@ -64,6 +67,7 @@ public class EventHandler {
 
 	@EventSubscriber
 	public void onServerCreate(GuildCreateEvent event) {
+		Starota.submitStats();
 		IGuild server = event.getGuild();
 		IUser selimUser = Starota.getUser(Starota.SELIM_USER_ID);
 		RequestBuffer.request(() -> {
@@ -81,11 +85,17 @@ public class EventHandler {
 					+ Starota.SUPPORT_SERVER_LINK);
 			ownerPm.sendMessage(builder.build());
 		});
+		if (!Starota.getOurUser().getPermissionsForGuild(server).contains(Permissions.SEND_MESSAGES)) {
+			IUser serverOwner = server.getOwner();
+			IPrivateChannel ownerPm = serverOwner.getOrCreatePMChannel();
+			ownerPm.sendMessage(Starota.getOurName(server)
+					+ " requires the `SEND_MESSAGES` permission for all command functionality.");
+		}
 	}
 
 	@EventSubscriber
 	public void onServerLeave(GuildLeaveEvent event) {
-		ServerOptions.clearOptions(event.getGuild());
+		StarotaServer.getServer(event.getGuild()).clearOptions();
 	}
 
 	@EventSubscriber
@@ -130,6 +140,12 @@ public class EventHandler {
 			channel.sendMessage("Unknown command");
 			break;
 		}
+	}
+
+	@EventSubscriber
+	public void roleChange(RoleUpdateEvent event) {
+		if (event.getGuild().getLongID() == Starota.SUPPORT_SERVER)
+			DebugServer.update();
 	}
 
 }

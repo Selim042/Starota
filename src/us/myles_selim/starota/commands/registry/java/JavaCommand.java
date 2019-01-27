@@ -68,6 +68,10 @@ public class JavaCommand implements ICommand {
 		return this.category.compareTo(o.getCategory());
 	}
 
+	protected void sendUsage(String prefix, IChannel channel) {
+		channel.sendMessage(String.format("**Usage**: %s%s %s", prefix, getName(), getGeneralUsage()));
+	}
+
 	private String category;
 
 	@Override

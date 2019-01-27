@@ -1,15 +1,15 @@
 package us.myles_selim.starota.trading.forms;
 
-import us.myles_selim.starota.trading.EnumPokemon;
+import us.myles_selim.starota.enums.EnumPokemon;
 
 public class FormSetGiratina extends FormSet {
 
-	private static final FormString ALTERED = new FormString("Altered");
+	private static final FormString ALTERED = new FormString(0, "Altered");
 	public static final FormSetGiratina FORM_SET = new FormSetGiratina();
 
 	private FormSetGiratina() {
 		this.addForm(ALTERED);
-		this.addForm(new FormString("Origin") {
+		this.addForm(new FormString(1, "Origin") {
 
 			@Override
 			public String getSpritePostfix(EnumPokemon pokemon) {

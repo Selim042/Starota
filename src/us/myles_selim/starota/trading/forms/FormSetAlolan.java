@@ -1,7 +1,7 @@
 package us.myles_selim.starota.trading.forms;
 
-import us.myles_selim.starota.trading.EnumPokemon;
-import us.myles_selim.starota.trading.EnumPokemonType;
+import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.enums.EnumPokemonType;
 
 public class FormSetAlolan extends FormSet {
 
@@ -20,6 +20,10 @@ public class FormSetAlolan extends FormSet {
 	}
 
 	private static class FormAlolan extends Form {
+
+		public FormAlolan() {
+			super(1);
+		}
 
 		@Override
 		public boolean canBeShiny(EnumPokemon pokemon) {
@@ -99,6 +103,10 @@ public class FormSetAlolan extends FormSet {
 	}
 
 	private static class FormKantonian extends Form {
+
+		public FormKantonian() {
+			super(0);
+		}
 
 		@Override
 		public String toString() {

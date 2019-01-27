@@ -1,4 +1,4 @@
-package us.myles_selim.starota;
+package us.myles_selim.starota.enums;
 
 public enum EnumTeam {
 	// TODO: Replace NO_TEAM URL with a representative image

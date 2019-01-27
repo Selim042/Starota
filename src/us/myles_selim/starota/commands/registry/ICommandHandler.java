@@ -13,6 +13,8 @@ public interface ICommandHandler {
 
 	public List<ICommand> getAllCommands(IGuild server);
 
+	public List<ICommand> getCommandsByCategory(IGuild server, String category);
+
 	public ICommand findCommand(IGuild server, String name);
 
 }

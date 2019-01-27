@@ -10,12 +10,12 @@ import sx.blah.discord.handle.obj.IMessage.Attachment;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
-import us.myles_selim.starota.commands.registry.java.JavaCommand;
+import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.ScriptManager;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandUploadScript extends JavaCommand {
+public class CommandUploadScript extends StarotaCommand {
 
 	public CommandUploadScript() {
 		super("uploadScript", "Uploads a Lua script to Starota.");
@@ -39,14 +39,14 @@ public class CommandUploadScript extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
-		if (!Starota.canUseLua(guild)) {
+	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
+		if (!Starota.canUseLua(server.getDiscordGuild())) {
 			channel.sendMessage("This server cannot use Lua as it is a paid feature.");
 			return;
 		}
 		if (args.length < 2) {
-			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + getName() + " "
-					+ getGeneralUsage());
+			channel.sendMessage(
+					"**Usage**: " + server.getPrefix() + getName() + " " + getGeneralUsage());
 			return;
 		}
 		boolean uploaded = false;
@@ -54,19 +54,19 @@ public class CommandUploadScript extends JavaCommand {
 		case "event":
 		case "eventhandler":
 		case "e":
-			LuaUtils.clearEventHandlers(guild);
-			uploaded = ScriptManager.saveScript(guild, "eventHandler" + ScriptManager.LUA_EXENSION,
+			LuaUtils.clearEventHandlers(server);
+			uploaded = ScriptManager.saveScript(server, "eventHandler" + ScriptManager.LUA_EXENSION,
 					getAttachment(channel, message));
 			break;
 		case "command":
 		case "cmd":
 		case "c":
 			if (args.length < 3) {
-				channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + getName()
-						+ " command [cmdName]");
+				channel.sendMessage(
+						"**Usage**: " + server.getPrefix() + getName() + " command [cmdName]");
 				return;
 			}
-			uploaded = ScriptManager.saveScript(guild,
+			uploaded = ScriptManager.saveScript(server,
 					"commands" + File.separator + args[2] + ScriptManager.LUA_EXENSION,
 					getAttachment(channel, message));
 			break;
@@ -75,8 +75,8 @@ public class CommandUploadScript extends JavaCommand {
 		case "rem":
 		case "del":
 			if (args.length < 3) {
-				channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + getName()
-						+ " remove [event/cmdName]");
+				channel.sendMessage(
+						"**Usage**: " + server.getPrefix() + getName() + " remove [event/cmdName]");
 				return;
 			}
 			String scriptName;
@@ -89,23 +89,23 @@ public class CommandUploadScript extends JavaCommand {
 				scriptName = "commands" + File.separator + args[2];
 				break;
 			}
-			if (ScriptManager.removeScript(guild, scriptName + ScriptManager.LUA_EXENSION)) {
+			if (ScriptManager.removeScript(server, scriptName + ScriptManager.LUA_EXENSION)) {
 				channel.sendMessage("Successfully deleted script \"" + scriptName + "\"");
 				if (scriptName.equalsIgnoreCase("eventHandler"))
-					LuaUtils.clearEventHandlers(guild);
+					LuaUtils.clearEventHandlers(server);
 				return;
 			} else {
 				channel.sendMessage("Failed to remove script \"" + scriptName + "\"");
 				return;
 			}
 		default:
-			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + getName() + " "
-					+ getGeneralUsage());
+			channel.sendMessage(
+					"**Usage**: " + server.getPrefix() + getName() + " " + getGeneralUsage());
 			return;
 		}
 		if (uploaded) {
 			channel.sendMessage("Saved your new script");
-			ScriptManager.executeEventScript(guild);
+			ScriptManager.executeEventScript(server);
 		} else
 			channel.sendMessage("Failed to save your script");
 	}

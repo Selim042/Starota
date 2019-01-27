@@ -18,9 +18,13 @@ public class CommandCredits extends JavaCommand {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withTitle("Credits for " + Starota.BOT_NAME + " v" + Starota.VERSION);
 
-		builder.appendDesc("**General Development**: Selim_042 (http://github.com/Selim042)\n");
-		builder.appendDesc("**Discord4J**: austinv11 (https://github.com/austinv11)\n");
-//		builder.appendDesc("**Tradeboard Sprites**: The Artificial (https://theartificial.com)\n");
+		builder.appendDesc("**General Development**: Selim_042: [GitHub](http://github.com/Selim042) | "
+				+ "[Twitter](http://twitter.com/Selim_042)\n");
+		builder.appendDesc("**Discord4J**: [austinv11](https://github.com/austinv11)\n");
+		builder.appendDesc("**Pokemon Go Database**: [Pokemon Go Hub](https://pokemongohub.net/)\n");
+		builder.appendDesc(
+				"**Raid Boss, Field Research, and Egg Information**: [The Silph Road](https://thesilphroad.com/)\n");
+		builder.appendDesc("**Event Information**: [Leek Duck](https://leekduck.com)");
 
 		channel.sendMessage(builder.build());
 	}

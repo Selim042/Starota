@@ -5,12 +5,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.squiddev.cobalt.Constants;
+import org.squiddev.cobalt.LuaError;
 import org.squiddev.cobalt.LuaNil;
 import org.squiddev.cobalt.LuaState;
 import org.squiddev.cobalt.LuaTable;
+import org.squiddev.cobalt.LuaUserdata;
 import org.squiddev.cobalt.LuaValue;
 import org.squiddev.cobalt.ValueFactory;
 import org.squiddev.cobalt.compiler.LuaC;
+import org.squiddev.cobalt.function.LuaFunction;
 import org.squiddev.cobalt.function.VarArgFunction;
 import org.squiddev.cobalt.lib.BaseLib;
 import org.squiddev.cobalt.lib.CoroutineLib;
@@ -32,30 +35,25 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.Starota.BaseModules;
+import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.leaderboards.Leaderboard;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
-import us.myles_selim.starota.lua.conversion.discord.CategoryConverter;
-import us.myles_selim.starota.lua.conversion.discord.ChannelConverter;
-import us.myles_selim.starota.lua.conversion.discord.MessageConverter;
-import us.myles_selim.starota.lua.conversion.discord.RoleConverter;
-import us.myles_selim.starota.lua.conversion.discord.ServerConverter;
-import us.myles_selim.starota.lua.conversion.discord.UserConverter;
-import us.myles_selim.starota.lua.conversion.starota.EnumPokemonConverter;
-import us.myles_selim.starota.lua.conversion.starota.LeaderboardConverter;
-import us.myles_selim.starota.lua.conversion.starota.PlayerProfileConverter;
-import us.myles_selim.starota.lua.conversion.starota.TradeboardPostConverter;
+import us.myles_selim.starota.lua.events.LuaEvent;
 import us.myles_selim.starota.lua.libraries.DiscordEventLib;
 import us.myles_selim.starota.lua.libraries.DiscordLib;
 import us.myles_selim.starota.lua.libraries.StarotaLib;
+import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.profiles.PlayerProfile;
-import us.myles_selim.starota.trading.EnumPokemon;
 import us.myles_selim.starota.trading.TradeboardPost;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class LuaUtils {
 
-	private static final Map<IGuild, LuaState> STATES = new HashMap<>();
+	private static final Map<Long, LuaState> STATES = new HashMap<>();
 
 	private static boolean registeredConverters = false;
 
@@ -64,22 +62,37 @@ public class LuaUtils {
 			return;
 		registeredConverters = true;
 
-		ConversionHandler.registerConverter(PlayerProfile.class, new PlayerProfileConverter());
-		ConversionHandler.registerConverter(TradeboardPost.class, new TradeboardPostConverter());
-		ConversionHandler.registerConverter(EnumPokemon.class, new EnumPokemonConverter());
-		ConversionHandler.registerConverter(Leaderboard.class, new LeaderboardConverter());
+		// ConversionHandler.registerConverter(PlayerProfile.class, new PlayerProfileConverter());
+		// ConversionHandler.registerConverter(TradeboardPost.class, new TradeboardPostConverter());
+		// ConversionHandler.registerConverter(EnumPokemon.class, new EnumPokemonConverter());
+		// ConversionHandler.registerConverter(Leaderboard.class, new LeaderboardConverter());
+		//
+		// ConversionHandler.registerConverter(ICategory.class, new CategoryConverter());
+		// ConversionHandler.registerConverter(IChannel.class, new ChannelConverter());
+		// ConversionHandler.registerConverter(IMessage.class, new MessageConverter());
+		// ConversionHandler.registerConverter(IRole.class, new RoleConverter());
+		// ConversionHandler.registerConverter(IGuild.class, new ServerConverter());
+		// ConversionHandler.registerConverter(IUser.class, new UserConverter());
 
-		ConversionHandler.registerConverter(ICategory.class, new CategoryConverter());
-		ConversionHandler.registerConverter(IChannel.class, new ChannelConverter());
-		ConversionHandler.registerConverter(IMessage.class, new MessageConverter());
-		ConversionHandler.registerConverter(IRole.class, new RoleConverter());
-		ConversionHandler.registerConverter(IGuild.class, new ServerConverter());
-		ConversionHandler.registerConverter(IUser.class, new UserConverter());
+		ConversionHandler.registerAutoConverter(PlayerProfile.class);
+		ConversionHandler.registerAutoConverter(TradeboardPost.class);
+		ConversionHandler.registerAutoConverter(EnumPokemon.class);
+		ConversionHandler.registerAutoConverter(Leaderboard.class);
+		ConversionHandler.registerAutoConverter(StarotaServer.class);
+
+		ConversionHandler.registerAutoConverter(ICategory.class);
+		ConversionHandler.registerAutoConverter(IChannel.class);
+		ConversionHandler.registerAutoConverter(IMessage.class);
+		ConversionHandler.registerAutoConverter(IRole.class);
+		ConversionHandler.registerAutoConverter(IGuild.class);
+		ConversionHandler.registerAutoConverter(IUser.class);
 	}
 
-	public static LuaState getState(IGuild server) {
-		if (STATES.containsKey(server))
-			return STATES.get(server);
+	public static LuaState getState(StarotaServer server) {
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.LUA))
+			return null;
+		if (STATES.containsKey(server.getDiscordGuild().getLongID()))
+			return STATES.get(server.getDiscordGuild().getLongID());
 		LuaState state = new LuaState(new AbstractResourceManipulator() {
 
 			@Override
@@ -107,16 +120,16 @@ public class LuaUtils {
 		if (!Starota.IS_DEV)
 			_G.rawset("print", new VarArgFunction() {});
 		LuaC.install(state);
-		STATES.put(server, state);
+		STATES.put(server.getDiscordGuild().getLongID(), state);
 		return state;
 	}
 
-	public static boolean isInitialized(IGuild server) {
-		return STATES.containsKey(server);
+	public static boolean isInitialized(StarotaServer server) {
+		return STATES.containsKey(server.getDiscordGuild().getLongID());
 	}
 
-	public static void clearEventHandlers(IGuild server) {
-		if (STATES.containsKey(server))
+	public static void clearEventHandlers(StarotaServer server) {
+		if (STATES.containsKey(server.getDiscordGuild().getLongID()))
 			clearEventHandlers(getState(server));
 	}
 
@@ -157,8 +170,16 @@ public class LuaUtils {
 		return ConversionHandler.convertToJava(state, val);
 	}
 
-	public static LuaValue getEvent(LuaState state, GuildEvent event) {
-		// IGuild server = event.getGuild();
+	public static LuaValue getEvent(LuaState state, Object event) {
+		if (event instanceof GuildEvent)
+			return getEvent(state, (GuildEvent) event);
+		if (event instanceof LuaEvent)
+			return ((LuaEvent) event).toLua(state);
+		throw new RuntimeException(
+				"event must be a LuaEvent or GuildEvent, got " + event.getClass().getName());
+	}
+
+	private static LuaValue getEvent(LuaState state, GuildEvent event) {
 		LuaTable ret = new LuaTable();
 		ret.rawset("server", ConversionHandler.convertToLua(state, event.getGuild()));
 		if (event instanceof ChannelEvent)
@@ -189,6 +210,54 @@ public class LuaUtils {
 		if (event instanceof TypingEvent)
 			ret.rawset("user", ConversionHandler.convertToLua(state, ((TypingEvent) event).getUser()));
 		return ret;
+	}
+
+	public static void handleEvent(Object event) {
+		StarotaServer server = null;
+		LuaValue eventL = null;
+		LuaState state = null;
+		if (event instanceof GuildEvent) {
+			server = StarotaServer.getServer(((GuildEvent) event).getGuild());
+			state = getState(server);
+			eventL = getEvent(state, (GuildEvent) event);
+		} else if (event instanceof LuaEvent) {
+			server = ((LuaEvent) event).getServer();
+			state = getState(server);
+			eventL = getEvent(state, (LuaEvent) event);
+		}
+		if (state == null || !StarotaModule.isModuleEnabled(server, BaseModules.LUA))
+			return;
+		handleEvent(server, event, state, eventL);
+	}
+
+	private static void handleEvent(StarotaServer server, Object event, LuaState state,
+			LuaValue eventL) {
+		LuaTable _G = state.getMainThread().getfenv();
+		String functName = "on" + event.getClass().getSimpleName();
+		IChannel errorChannel;
+		if (eventL.isTable() && ((LuaTable) eventL).rawget("channel") instanceof LuaUserdata)
+			errorChannel = (IChannel) ((LuaUserdata) ((LuaTable) eventL).rawget("channel")).instance;
+		else
+			errorChannel = null;
+		try {
+			LuaTable eventLib = _G.rawget(DiscordEventLib.KEY).checkTable();
+			LuaValue funcV = eventLib.get(state, functName);
+			// for (LuaValue v : eventLib.keys()) {
+			// System.out.println("event handler: " + v);
+			// }
+			// System.out.println("event fired: " + functName);
+			if (funcV == null || !funcV.isFunction())
+				return;
+			((LuaFunction) funcV).call(state, eventLib, eventL);
+		} catch (LuaError e) {
+			System.out.println(
+					"event fired: " + functName + " on server: " + server.getDiscordGuild().getName());
+			if (errorChannel != null)
+				RequestBuffer
+						.request(() -> errorChannel.sendMessage("There was an error when processing a "
+								+ functName + " event: " + e.getLocalizedMessage()));
+			e.printStackTrace();
+		}
 	}
 
 	// protected static LuaValue getRole(IGuild server, IRole role) {

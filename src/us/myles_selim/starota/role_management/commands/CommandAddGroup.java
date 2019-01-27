@@ -3,15 +3,14 @@ package us.myles_selim.starota.role_management.commands;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
-import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
-import us.myles_selim.starota.commands.registry.java.JavaCommand;
+import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.role_management.GroupManager;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandAddGroup extends JavaCommand {
+public class CommandAddGroup extends StarotaCommand {
 
 	public CommandAddGroup() {
 		super("addGroup", "Join the given group.");
@@ -25,15 +24,14 @@ public class CommandAddGroup extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
+	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
 		if (args.length != 2) {
-			channel.sendMessage(
-					"**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName() + " [group]");
+			channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName() + " [group]");
 			return;
 		}
 		IRole targetRole = null;
-		for (IRole role : guild.getRolesByName(args[1])) {
-			if (GroupManager.isGroup(guild, role)) {
+		for (IRole role : server.getDiscordGuild().getRolesByName(args[1])) {
+			if (GroupManager.isGroup(server, role)) {
 				targetRole = role;
 				break;
 			}

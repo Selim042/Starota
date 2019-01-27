@@ -3,20 +3,18 @@ package us.myles_selim.starota.trading.commands;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.util.RequestBuffer;
-import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
-import us.myles_selim.starota.commands.registry.java.JavaCommand;
-import us.myles_selim.starota.trading.EnumGender;
-import us.myles_selim.starota.trading.EnumPokemon;
+import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.enums.EnumGender;
+import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.trading.PokemonInstance;
-import us.myles_selim.starota.trading.Tradeboard;
 import us.myles_selim.starota.trading.TradeboardPost;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandForTrade extends JavaCommand {
+public class CommandForTrade extends StarotaCommand {
 
 	public CommandForTrade() {
 		super("forTrade", "Posts the given Pokemon up for trade.");
@@ -28,9 +26,9 @@ public class CommandForTrade extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
+	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
 		if (args.length < 2) {
-			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName()
+			channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName()
 					+ " [pokemon] <form> <shiny> <gender>");
 			return;
 		}
@@ -63,28 +61,23 @@ public class CommandForTrade extends JavaCommand {
 		}
 
 		boolean foundTrade = false;
-		List<TradeboardPost> posts = Tradeboard.findPosts(false, guild, pokemon, form, shiny, gender,
+		List<TradeboardPost> posts = server.findPosts(false, pokemon, form, shiny, gender,
 				pokemonInst.isLegacy());
 		for (int i = 0; i < posts.size(); i++) {
 			TradeboardPost p = posts.get(i);
 			if (!foundTrade)
-				RequestBuffer.request(() -> {
-					channel.sendMessage(
-							"Found the following " + posts.size() + " trades that match your search",
-							Tradeboard.getPostEmbed(guild, p));
-				});
+				RequestBuffer.request(() -> channel.sendMessage(
+						"Found the following " + posts.size() + " trades that match your search",
+						p.getPostEmbed(server)));
 			else
-				RequestBuffer.request(() -> {
-					channel.sendMessage(Tradeboard.getPostEmbed(guild, p));
-				});
+				RequestBuffer.request(() -> channel.sendMessage(p.getPostEmbed(server)));
 			foundTrade = true;
 		}
 
 		if (!foundTrade) {
-			TradeboardPost post = Tradeboard.newPost(guild, false, message.getAuthor().getLongID(),
-					pokemon, form, shiny, gender, pokemonInst.isLegacy());
-			channel.sendMessage("Posted a new trade for your search",
-					Tradeboard.getPostEmbed(guild, post));
+			TradeboardPost post = server.newPost(false, message.getAuthor().getLongID(), pokemon, form,
+					shiny, gender, pokemonInst.isLegacy());
+			channel.sendMessage("Posted a new trade for your search", post.getPostEmbed(server));
 		}
 	}
 

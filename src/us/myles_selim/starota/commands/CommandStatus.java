@@ -1,16 +1,15 @@
 package us.myles_selim.starota.commands;
 
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.registry.java.JavaCommand;
 import us.myles_selim.starota.lua.LuaUtils;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandStatus extends JavaCommand {
+public class CommandStatus extends StarotaCommand {
 
 	public CommandStatus() {
 		super("status");
@@ -22,15 +21,17 @@ public class CommandStatus extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
+	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
 		IUser sender = message.getAuthor();
-		if (sender.getPermissionsForGuild(guild).contains(Permissions.ADMINISTRATOR)) {
+		if (sender.getPermissionsForGuild(server.getDiscordGuild())
+				.contains(Permissions.ADMINISTRATOR)) {
 			EmbedBuilder builder = new EmbedBuilder();
-			builder.withTitle(Starota.getClient().getOurUser().getDisplayName(guild) + " Status");
+			builder.withTitle(Starota.getClient().getOurUser().getDisplayName(server.getDiscordGuild())
+					+ " Status");
 			builder.appendField("Discord:", Starota.getClient().isReady() ? "Online" : "Offline", true);
-			if (Starota.canUseLua(guild))
+			if (Starota.canUseLua(server.getDiscordGuild()))
 				builder.appendField("Lua:",
-						LuaUtils.isInitialized(guild) ? "Initialized" : "Uninitalized", true);
+						LuaUtils.isInitialized(server) ? "Initialized" : "Uninitalized", true);
 			channel.sendMessage(builder.build());
 		}
 	}

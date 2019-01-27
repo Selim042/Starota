@@ -1,18 +1,17 @@
 package us.myles_selim.starota.role_management.commands;
 
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.Permissions;
-import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
-import us.myles_selim.starota.commands.registry.java.JavaCommand;
+import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.role_management.GroupManager;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandSetAsGroup extends JavaCommand {
+public class CommandSetAsGroup extends StarotaCommand {
 
 	public CommandSetAsGroup() {
-		super("setAsGroup", "Sets if the target role is a group.");
+		super("setAsGroup", "Sets the target role to a group.");
 	}
 
 	@Override
@@ -21,14 +20,14 @@ public class CommandSetAsGroup extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
+	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
 		if (args.length < 3) {
-			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName()
-					+ " [group] [isGroup]");
+			channel.sendMessage(
+					"**Usage**: " + server.getPrefix() + this.getName() + " [group] [isGroup]");
 			return;
 		}
 		IRole targetRole = null;
-		for (IRole role : guild.getRolesByName(args[1])) {
+		for (IRole role : server.getDiscordGuild().getRolesByName(args[1])) {
 			targetRole = role;
 			break;
 		}
@@ -37,7 +36,7 @@ public class CommandSetAsGroup extends JavaCommand {
 			return;
 		}
 		boolean isGroup = args[2].equalsIgnoreCase("true");
-		GroupManager.setAsGroup(guild, targetRole, isGroup);
+		GroupManager.setAsGroup(server, targetRole, isGroup);
 		if (isGroup)
 			channel.sendMessage("Role \"" + targetRole.getName() + "\" is now an assignable group.");
 		else

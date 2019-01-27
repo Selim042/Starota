@@ -4,14 +4,14 @@ import org.squiddev.cobalt.LuaState;
 import org.squiddev.cobalt.LuaTable;
 import org.squiddev.cobalt.LuaValue;
 
-import sx.blah.discord.handle.obj.IGuild;
 import us.myles_selim.starota.lua.ScriptManager;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class DiscordEventLib extends DiscordLib {
 
 	public static final String KEY = "events";
 
-	public DiscordEventLib(IGuild server) {
+	public DiscordEventLib(StarotaServer server) {
 		super(server);
 	}
 

@@ -6,15 +6,13 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
-import us.myles_selim.starota.EnumTeam;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
-import us.myles_selim.starota.commands.registry.java.JavaCommand;
-import us.myles_selim.starota.embed_converter.EmbedConverter;
+import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.profiles.PlayerProfile;
-import us.myles_selim.starota.profiles.ProfileManager;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandRegister extends JavaCommand {
+public class CommandRegister extends StarotaCommand {
 
 	public CommandRegister() {
 		super("register", "Registers the given user and assigns them a profile.");
@@ -38,19 +36,19 @@ public class CommandRegister extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
+	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
 		if (args.length != 5) {
-			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName()
+			channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName()
 					+ " [poGoName] [target] [team] [level]");
 			return;
 		}
 
-		IUser target = Starota.findUser(guild.getLongID(), args[2]);
+		IUser target = Starota.findUser(server.getDiscordGuild().getLongID(), args[2]);
 		if (target == null) {
 			channel.sendMessage("User \"" + args[2] + "\" not found");
 			return;
 		}
-		if (ProfileManager.hasProfile(guild, target)) {
+		if (server.hasProfile(target)) {
 			channel.sendMessage("User \"" + args[2] + "\" already has a profile");
 			return;
 		}
@@ -79,11 +77,11 @@ public class CommandRegister extends JavaCommand {
 
 		PlayerProfile profile = new PlayerProfile().setPoGoName(args[1]).setDiscordId(target.getLongID())
 				.setLevel(level).setTeam(team);
-		ProfileManager.setProfile(guild, target, profile);
-		channel.sendMessage("Sucessfully registered " + target.getName(),
-				EmbedConverter.toEmbed(profile));
+		server.setProfile(target, profile);
+		channel.sendMessage("Sucessfully registered " + target.getName(), profile.toEmbed(server));
 
 		// Role updates (pville only)
+		IGuild guild = server.getDiscordGuild();
 		IRole roleLost = guild.getRoleByID(ROLE_LOST);
 		if (roleLost != null && target.hasRole(roleLost)) {
 			target.removeRole(roleLost);

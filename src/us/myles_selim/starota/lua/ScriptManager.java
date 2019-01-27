@@ -28,11 +28,13 @@ import org.squiddev.cobalt.compiler.CompileException;
 import org.squiddev.cobalt.compiler.LoadState;
 
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IMessage.Attachment;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.Starota.BaseModules;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
+import us.myles_selim.starota.modules.StarotaModule;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class ScriptManager {
 
@@ -48,11 +50,11 @@ public class ScriptManager {
 		}
 	};
 
-	public static boolean saveScript(IGuild server, String name, Attachment attach) {
-		if (attach == null)
+	public static boolean saveScript(StarotaServer server, String name, Attachment attach) {
+		if (attach == null || !StarotaModule.isModuleEnabled(server, BaseModules.LUA))
 			return false;
 		String contents = getAttachmentContents(attach.getUrl());
-		File folder = new File(SCRIPT_FOLDER, server.getStringID());
+		File folder = new File(SCRIPT_FOLDER, server.getDiscordGuild().getStringID());
 		long folderSize = folderSize(folder.toPath());
 		if (folderSize + contents.getBytes().length >= FOLDER_SIZE_LIMIT)
 			return false;
@@ -71,15 +73,16 @@ public class ScriptManager {
 		}
 	}
 
-	public static boolean removeScript(IGuild server, String name) {
-		File folder = new File(SCRIPT_FOLDER, server.getStringID());
+	public static boolean removeScript(StarotaServer server, String name) {
+		File folder = new File(SCRIPT_FOLDER, server.getDiscordGuild().getStringID());
 		File script = new File(folder, name);
 		// if (script.exists() && !script.isDirectory())
 		try {
 			Files.delete(script.toPath());
 			return true;
 		} catch (IOException e) {
-			System.out.println("Attempting to remove " + name + " script for " + server.getName());
+			System.out.println("Attempting to remove " + name + " script for "
+					+ server.getDiscordGuild().getName());
 			e.printStackTrace();
 			Starota.submitError(e);
 			return false;
@@ -87,14 +90,16 @@ public class ScriptManager {
 		// return false;
 	}
 
-	public static boolean executeCommandScript(IGuild server, String name, IMessage message,
+	public static boolean executeCommandScript(StarotaServer server, String name, IMessage message,
 			IChannel channel) throws LuaError, IOException, CompileException {
 		return executeCommandScript(server, name, message, channel, new String[0]);
 	}
 
-	public static boolean executeCommandScript(IGuild server, String name, IMessage message,
+	public static boolean executeCommandScript(StarotaServer server, String name, IMessage message,
 			IChannel channel, String[] args) throws LuaError, IOException, CompileException {
-		File folder = new File(SCRIPT_FOLDER, server.getStringID());
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.LUA))
+			return false;
+		File folder = new File(SCRIPT_FOLDER, server.getDiscordGuild().getStringID());
 		LuaState state = LuaUtils.getState(server);
 		// state.stdout = System.out;
 		LuaTable _G = state.getMainThread().getfenv();
@@ -118,12 +123,14 @@ public class ScriptManager {
 		// }
 	}
 
-	public static boolean executeEventScript(IGuild server) {
+	public static boolean executeEventScript(StarotaServer server) {
 		return executeEventScript(LuaUtils.getState(server), server);
 	}
 
-	public static boolean executeEventScript(LuaState state, IGuild server) {
-		File folder = new File(SCRIPT_FOLDER, server.getStringID());
+	public static boolean executeEventScript(LuaState state, StarotaServer server) {
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.LUA))
+			return false;
+		File folder = new File(SCRIPT_FOLDER, server.getDiscordGuild().getStringID());
 		// state.stdout = System.out;
 		LuaTable _G = state.getMainThread().getfenv();
 		try {
@@ -142,9 +149,12 @@ public class ScriptManager {
 		}
 	}
 
-	public static List<String> getCommandScripts(IGuild server) {
+	public static List<String> getCommandScripts(StarotaServer server) {
+		if (!StarotaModule.isModuleEnabled(server, BaseModules.LUA))
+			return Collections.emptyList();
 		List<String> ret = new ArrayList<>();
-		File folder = new File(SCRIPT_FOLDER, server.getStringID() + File.separator + "commands");
+		File folder = new File(SCRIPT_FOLDER,
+				server.getDiscordGuild().getStringID() + File.separator + "commands");
 		if (folder.listFiles(LUA_FILTER) == null)
 			return Collections.emptyList();
 		for (File f : folder.listFiles(LUA_FILTER)) {

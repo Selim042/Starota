@@ -2,8 +2,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>PoGO-Raid-Monitor</groupId>
-	<artifactId>PoGO-Raid-Monitor</artifactId>
+	<groupId>Starota</groupId>
+	<artifactId>Starota</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
 	<repositories>
@@ -17,6 +17,12 @@
 		</repository>
 	</repositories>
 	<dependencies>
+        <dependency>
+            <groupId>com.github.Selim042</groupId>
+            <artifactId>Extendable-Binary-Storage</artifactId>
+	        <version>master-SNAPSHOT</version>
+        </dependency>
+		
 		<dependency>
 			<groupId>com.github.austinv11</groupId>
 			<artifactId>Discord4J</artifactId>
@@ -33,6 +39,26 @@
 			<groupId>com.github.SquidDev</groupId>
 			<artifactId>Cobalt</artifactId>
 			<version>master</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.discordbots</groupId>
+			<artifactId>DBL-Java-Library</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+
+		<!--<dependency> <groupId>com.patreon</groupId> <artifactId>patreon</artifactId> 
+			<version>0.4.2</version> </dependency> -->
+
+		<dependency>
+			<groupId>org.twitter4j</groupId>
+			<artifactId>twitter4j-core</artifactId>
+			<version>[4.0,)</version>
+		</dependency>
+		<dependency>
+			<groupId>org.twitter4j</groupId>
+			<artifactId>twitter4j-stream</artifactId>
+			<version>[4.0,)</version>
 		</dependency>
 	</dependencies>
 

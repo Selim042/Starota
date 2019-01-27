@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import us.myles_selim.starota.trading.EnumPokemon;
-import us.myles_selim.starota.trading.EnumPokemonType;
+import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.enums.EnumPokemonType;
 import us.myles_selim.starota.trading.FormManager;
 
 public abstract class FormSet {
@@ -38,6 +38,16 @@ public abstract class FormSet {
 	}
 
 	public static abstract class Form {
+
+		private int goHubId;
+
+		public Form(int goHubId) {
+			this.goHubId = goHubId;
+		}
+
+		public int getGoHubId(EnumPokemon pokemon) {
+			return this.goHubId;
+		}
 
 		public boolean canBeShiny(EnumPokemon pokemon) {
 			return FormManager.isShinyable(pokemon.getId());

@@ -21,6 +21,7 @@ public class FormSetSpinda extends FormSet {
 		private final int num;
 
 		public FormSpinda(int num) {
+			super(-1);
 			this.num = num;
 		}
 

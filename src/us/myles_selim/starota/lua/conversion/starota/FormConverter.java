@@ -10,8 +10,8 @@ import org.squiddev.cobalt.ValueFactory;
 import org.squiddev.cobalt.function.OneArgFunction;
 import org.squiddev.cobalt.function.ZeroArgFunction;
 
+import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.lua.conversion.IConverter;
-import us.myles_selim.starota.trading.EnumPokemon;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 
 public class FormConverter implements IConverter {

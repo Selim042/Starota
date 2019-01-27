@@ -6,8 +6,6 @@ bin/*
 libs/*
 target/*
 
-src/us/myles_selim/starota/DebugServer.java
-
 starota.properties
 starotaData/data/*
 starotaData/options/*
@@ -15,4 +13,6 @@ starotaData/profiles/*
 starotaData/tradeboard/*
 starotaData/lua/*
 starotaData/leaderboard/*
+starota_dump*
+
 /target/

@@ -1,15 +1,12 @@
 package us.myles_selim.starota.commands;
 
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
-import us.myles_selim.starota.ServerOptions;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
-import us.myles_selim.starota.commands.registry.java.JavaCommand;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandChangelogChannel extends JavaCommand {
+public class CommandChangelogChannel extends StarotaCommand {
 
 	public static final String CHANGES_CHANNEL = "changesChannel";
 
@@ -23,25 +20,24 @@ public class CommandChangelogChannel extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
+	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
 		if (args.length < 2) {
-			channel.sendMessage("**Usage**: " + PrimaryCommandHandler.getPrefix(guild) + this.getName()
-					+ " <channel>");
+			channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName() + " <channel>");
 			return;
 		}
 
 		if (args[1].contentEquals("none")) {
-			ServerOptions.clearValue(guild, CHANGES_CHANNEL);
+			server.clearValue(CHANGES_CHANNEL);
 			channel.sendMessage("Changelog channel cleared.");
 			return;
 		}
 
-		IChannel target = Starota.findChannel(guild.getLongID(), args[1]);
+		IChannel target = Starota.findChannel(server.getDiscordGuild().getLongID(), args[1]);
 		if (target == null) {
 			channel.sendMessage("Channel \"" + args[1] + "\" not found");
 			return;
 		}
-		ServerOptions.setValue(guild, CHANGES_CHANNEL, target.getLongID());
+		server.setValue(CHANGES_CHANNEL, target.getLongID());
 		channel.sendMessage("Set changelog channel to \"" + target.mention() + "\".");
 	}
 
