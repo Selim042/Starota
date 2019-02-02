@@ -6,7 +6,7 @@
 
 Starota is a Discord bot designed for use on Pokemon Go oriented servers.
 
-If you want to add Starota to your own server, you can use [this](https://discordapp.com/oauth2/authorize?client_id=489245655710040099&scope=bot&permissions=268445776) link.  If you want to join the support server, you can join [here](https://discord.gg/NxverNw).
+If you want to add Starota to your own server, you can invite it from here [this](https://discordbots.org/bot/489245655710040099).  If you want to join the support server, you can join [here](https://discord.gg/NxverNw).  If you are interested in just the Pokedex functionality, you are in luck, I made another bot with just that feature and nothing else and you can invite it from [here](https://discordbots.org/bot/541079916234407967).
 
 Features:
 - Player profiles (featuring level, team, trainer code, real name, link to Silph Road card, and alternate accounts)
