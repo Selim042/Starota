@@ -17,8 +17,9 @@ public class CommandRaid extends StarotaCommand {
 	@Override
 	public List<String> getAliases() {
 		List<String> aliases = super.getAliases();
-		for (int i = 1; i <= 5; i++)
+		for (int i = 1; i <= 6; i++)
 			aliases.add("raid" + i);
+		aliases.add("raidex");
 		return aliases;
 	}
 
@@ -58,6 +59,10 @@ public class CommandRaid extends StarotaCommand {
 			break;
 		case "raid5":
 			tier = 5;
+			break;
+		case "raid6":
+		case "raidex":
+			tier = 6;
 			break;
 		default:
 			channel.sendMessage("Failed to get raid tier");
