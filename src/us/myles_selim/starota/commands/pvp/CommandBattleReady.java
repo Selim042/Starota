@@ -41,8 +41,8 @@ public class CommandBattleReady extends StarotaCommand {
 		int hours = (int) ((time / 3600000) % 24);
 		int minutes = (int) ((time / 60000) % 60);
 		server.setReady(profile.getPoGoName(), time);
-		channel.sendMessage("You have been marked as battle ready for the next " + hours + " hours and "
-				+ minutes + " minutes.");
+		channel.sendMessage(message.getAuthor() + " has been marked as battle ready for the next "
+				+ hours + " hours and " + minutes + " minutes.");
 	}
 
 }
