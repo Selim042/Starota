@@ -3,9 +3,11 @@ package us.myles_selim.starota;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -25,6 +27,7 @@ import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
+import us.myles_selim.starota.assistants.pokedex.PokedexBot;
 import us.myles_selim.starota.commands.CommandChangelog;
 import us.myles_selim.starota.commands.CommandChangelogChannel;
 import us.myles_selim.starota.commands.CommandCredits;
@@ -40,8 +43,8 @@ import us.myles_selim.starota.commands.pvp.CommandNotReady;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 import us.myles_selim.starota.enums.EnumPatreonPerm;
-import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.events.CommandEvents;
+import us.myles_selim.starota.geofence.GeoPoint;
 import us.myles_selim.starota.leaderboards.commands.CommandEditLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandGetLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandListLeaderboards;
@@ -70,6 +73,8 @@ import us.myles_selim.starota.role_management.commands.CommandGetGroups;
 import us.myles_selim.starota.role_management.commands.CommandRemoveGroup;
 import us.myles_selim.starota.role_management.commands.CommandSetAsGroup;
 import us.myles_selim.starota.silph_road.CommandSilphCard;
+import us.myles_selim.starota.silph_road.SilphRoadData;
+import us.myles_selim.starota.silph_road.SilphRoadData.RaidBoss;
 import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.trading.commands.CommandFindTrade;
 import us.myles_selim.starota.trading.commands.CommandForTrade;
@@ -83,6 +88,7 @@ import us.myles_selim.starota.trading.commands.CommandTradeboardHelp;
 import us.myles_selim.starota.webserver.WebServer;
 import us.myles_selim.starota.webserver.webhooks.WebhookEvent;
 import us.myles_selim.starota.webserver.webhooks.WebhookRaid;
+import us.myles_selim.starota.webserver.webhooks.reaction_messages.WebhookRaidReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class Starota {
@@ -92,6 +98,8 @@ public class Starota {
 	// private static Socket MANAGER_SOCKET;
 	private static final Properties PROPERTIES = new Properties();
 
+	public static final long STAROTA_ID = 489245655710040099L;
+	public static final long STAROTA_DEV_ID = 504088307148521475L;
 	public static final long SELIM_USER_ID = 134855940938661889L;
 	public static final long SUPPORT_SERVER = 436614503606779914L;
 	public static final String SUPPORT_SERVER_LINK = "https://discord.gg/NxverNw";
@@ -104,10 +112,9 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	// public static EnumBotStatus STATUS = EnumBotStatus.UNKNOWN;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "2.7.0";
+	public final static String VERSION = "2.7.2";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n" + "Public changes:\n"
-			+ " + Add raid planning command\n" + " + Add event command\n"
-			+ " * Change tradeboard photos to use the same image set as the Pokedex\n";
+			+ " * Minor fast patch to fix error with .raid";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static void main(String[] args) {
@@ -170,6 +177,7 @@ public class Starota {
 			System.err.println("Failed to login, exiting");
 			return;
 		}
+		// StarotaAssistants.init();
 		IS_DEV = Boolean.parseBoolean(PROPERTIES.getProperty("is_dev"));
 		EventDispatcher dispatcher = CLIENT.getDispatcher();
 		try {
@@ -178,7 +186,6 @@ public class Starota {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		submitStats();
 		BaseModules.registerModules();
 		DebugServer debug = new DebugServer();
 		debug.start();
@@ -258,37 +265,91 @@ public class Starota {
 		FormManager.init();
 		ResearchTracker.init();
 
-		dispatcher.registerListener(new ReactionMessageRegistry());
+		ReactionMessageRegistry reactionRegistry = new ReactionMessageRegistry();
+		dispatcher.registerListener(reactionRegistry);
 		dispatcher.registerListener(new PrimaryCommandHandler());
 		dispatcher.registerListener(new EventHandler());
 		dispatcher.registerListener(new Object() {
 
+			private final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("hh:mm");
+
 			@EventSubscriber
 			public void testThingy(WebhookEvent event) {
-				IChannel channel = Starota.getChannel(538156939868110854L);
-				EmbedBuilder builder = new EmbedBuilder();
+				IChannel channel = Starota.getChannel(537736763184119818L);
+				// EmbedBuilder builder = new EmbedBuilder();
 				switch (event.getType()) {
-				case "raid":
-					WebhookRaid raidHook = (WebhookRaid) event.getWebhookClass().message;
-					boolean hasHatched = raidHook.pokemon_id != 0;
-					builder.withTitle("Tier " + raidHook.level + " Raid at " + raidHook.gym_name);
-					if (hasHatched) {
-						builder.appendField("Boss:", "#**" + raidHook.pokemon_id + "** "
-								+ EnumPokemon.getPokemon(raidHook.pokemon_id), false);
-						builder.withThumbnail(
-								ImageHelper.getOfficalArtwork(raidHook.getPokemon(), raidHook.form));
-					} else
-						builder.withThumbnail(ImageHelper.getRaidEgg(raidHook.level));
-					builder.withImage(String.format(
-							"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/pin-s+%06X(%2$f,%3$f)/%2$f,%3$f,16.5,0,0/600x300@2x?logo=false&access_token=pk.eyJ1Ijoic2VsaW0wNDIiLCJhIjoiY2pyOXpmM2g1MG16cTQzbndqZXk5dHNndCJ9.vsh20BzsPBgTcBBcKWBqQw",
-							raidHook.getTeam().getColor(), raidHook.longitude, raidHook.latitude));
+				case RAID:
+					WebhookRaid raidData = (WebhookRaid) event.getWebhookClass().message;
+					StarotaServer server = StarotaServer.getServer(event.getGuild());
+					RequestBuffer.request(() -> channel.sendMessage("Raid in region: "
+							+ server.getRegion(new GeoPoint(raidData.latitude, raidData.longitude))));
+					if ((raidData).pokemon_id != 0)
+						new WebhookRaidReactionMessage((WebhookRaid) event.getWebhookClass().message)
+								.sendMessage(channel);
+					else {
+						// WebhookRaid raidData = (WebhookRaid)
+						// event.getWebhookClass().message;
+						EmbedBuilder builder = new EmbedBuilder();
+						builder.withTitle("Tier " + raidData.level + " raid at " + raidData.gym_name);
+						builder.withThumbnail(ImageHelper.getRaidEgg(raidData.level));
+						builder.withColor(RaidBoss.getColor(raidData.level, null));
+						builder.appendDesc(
+								"\n**Time Left Until Hatch**: " + getTimeRemainingHatch(raidData));
+						builder.appendDesc(
+								"\n**Hatch Time**: " + TIME_FORMAT.format(new Date(raidData.start)));
+
+						List<RaidBoss> bosses = SilphRoadData.getBosses(raidData.level);
+						String bossesString = "";
+						for (RaidBoss b : bosses)
+							bossesString += (b.getForm() == null ? "" : b.getForm() + " ")
+									+ b.getPokemon() + "\n";
+						builder.appendField("Possible Bosses:", bossesString, false);
+
+						builder.appendField("Directions:", String.format(
+								"[Google Maps](https://www.google.com/maps/search/?api=1&query=%1$f,%2$f) | "
+										+ "[Apple Maps](http://maps.apple.com/?daddr=%1$f,%2$f)",
+								raidData.latitude, raidData.longitude), false);
+						builder.withImage(String.format(
+								"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/pin-s+%06X(%2$f,%3$f)/%2$f,%3$f,16.5,0,0/600x300@2x?logo=false&access_token=pk.eyJ1Ijoic2VsaW0wNDIiLCJhIjoiY2pyOXpmM2g1MG16cTQzbndqZXk5dHNndCJ9.vsh20BzsPBgTcBBcKWBqQw",
+								raidData.getTeam().getColor(), raidData.longitude, raidData.latitude));
+						channel.sendMessage(builder.build());
+					}
+					break;
+				default:
 					break;
 				}
-				RequestBuffer.request(() -> channel.sendMessage(builder.build()));
+				// RequestBuffer.request(() ->
+				// channel.sendMessage(builder.build()));
+			}
+
+			private String getTimeRemainingHatch(WebhookRaid raidData) {
+				long rem = raidData.getTimeRemainingHatch();
+				int hours = (int) rem / 360000;
+				rem = rem % 3600;
+				int mins = (int) rem / 36000;
+				rem = rem % 360;
+				int seconds = (int) rem / 6000;
+				String ret = "";
+				boolean cont = false;
+				if (hours > 0) {
+					ret += hours + " hours, ";
+					cont = true;
+				}
+				if (mins > 0 || cont) {
+					ret += mins + " minutes, ";
+					cont = true;
+				}
+				if (seconds > 0 || cont)
+					ret += seconds + " seconds, ";
+				if (ret.isEmpty())
+					return ret;
+				return ret.substring(0, ret.length() - 2);
 			}
 		});
 		ReactionMessageRegistry.init();
 		WebServer.init();
+		PokedexBot.start(reactionRegistry);
+		submitStats();
 
 		Thread saveThread = new Thread("ResearchFlusher") {
 
@@ -309,8 +370,22 @@ public class Starota {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		CLIENT.changePresence(StatusType.ONLINE, ActivityType.PLAYING,
-				"v" + VERSION + (DEBUG || IS_DEV ? "d" : ""));
+		Thread statusUpdater = new Thread("StarotaStatusUpdater") {
+
+			@Override
+			public void run() {
+				while (true) {
+					CLIENT.changePresence(StatusType.ONLINE, ActivityType.PLAYING,
+							"v" + VERSION + (DEBUG || IS_DEV ? "d" : ""));
+					try {
+						Thread.sleep(3600000); // 1 hour
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		statusUpdater.start();
 
 		Thread changesThread = new Thread("ChangelogThread") {
 
@@ -375,6 +450,8 @@ public class Starota {
 			}
 		};
 		discord4JWatchdog.start();
+
+		updateOwners();
 	}
 
 	public static class BaseModules {
@@ -423,6 +500,7 @@ public class Starota {
 						+ "list themselves as \"battle ready\".");
 		public static final StarotaModule POKEDEX = new StarotaModule("Pokedex", "Pokedex");
 		public static final StarotaModule SILPH_ROAD = new StarotaModule("SilphRoad", "Silph Road");
+		public static final StarotaModule HTTP = new StarotaModule("HTTP");
 
 		public static void registerModules() {
 			if (registered)
@@ -437,12 +515,20 @@ public class Starota {
 			StarotaModule.registerModule(PVP);
 			StarotaModule.registerModule(POKEDEX);
 			StarotaModule.registerModule(SILPH_ROAD);
+			StarotaModule.registerModule(HTTP);
 		}
 
 	}
 
 	public static IDiscordClient getClient() {
 		return CLIENT;
+	}
+
+	public static DiscordBotListAPI getBotListAPI() {
+		if (BOT_LIST == null && PROPERTIES.containsKey("bot_list_token"))
+			BOT_LIST = new DiscordBotListAPI.Builder().token(PROPERTIES.getProperty("bot_list_token"))
+					.botId(CLIENT.getOurUser().getStringID()).build();
+		return BOT_LIST;
 	}
 
 	public static IGuild getGuild(long guildId) {
@@ -671,10 +757,9 @@ public class Starota {
 	}
 
 	public static void submitStats() {
-		if (!IS_DEV && PROPERTIES.containsKey("bot_list_token")) {
+		getBotListAPI();
+		if (!IS_DEV) {
 			System.out.println("Submitting shard info to the bot list");
-			BOT_LIST = new DiscordBotListAPI.Builder().token(PROPERTIES.getProperty("bot_list_token"))
-					.botId(CLIENT.getOurUser().getStringID()).build();
 			List<Integer> shards = new ArrayList<>();
 			for (IShard s : CLIENT.getShards())
 				shards.add(s.getGuilds().size());
@@ -682,10 +767,38 @@ public class Starota {
 				if (e != null)
 					e.printStackTrace();
 				else
-					System.out.println("Submitted");
+					System.out.println("Starota Submitted");
 			});
+			if (PokedexBot.POKEDEX_CLIENT != null) {
+				shards.clear();
+				for (IShard s : PokedexBot.POKEDEX_CLIENT.getShards())
+					shards.add(s.getGuilds().size());
+				PokedexBot.getBotListAPI().setStats(shards).whenComplete((v, e) -> {
+					if (e != null)
+						e.printStackTrace();
+					else
+						System.out.println("Pokedex Submitted");
+				});
+			}
 		} else
 			System.out.println("BOT LIST TOKEN NOT FOUND");
+	}
+
+	public static void updateOwners() {
+		if (IS_DEV)
+			return;
+		IRole ownerRole = CLIENT.getRoleByID(539645716583284776L);
+		List<IUser> currentOwners = new ArrayList<>();
+		for (IGuild g : CLIENT.getGuilds()) {
+			IUser owner = getSupportServer().getUserByID(g.getOwnerLongID());
+			if (owner == null)
+				continue;
+			owner.addRole(ownerRole);
+			currentOwners.add(owner);
+		}
+		for (IUser u : getSupportServer().getUsersByRole(ownerRole))
+			if (!currentOwners.contains(u))
+				u.removeRole(ownerRole);
 	}
 
 }
