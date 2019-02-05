@@ -990,6 +990,10 @@ public enum EnumPokemon {
 	}
 
 	public static EnumPokemon getPokemon(String name) {
+		try {
+			int id = Integer.parseInt(name);
+			return getPokemon(id);
+		} catch (NumberFormatException e) {}
 		for (EnumPokemon p : values())
 			if (p.name.equalsIgnoreCase(name))
 				return p;
