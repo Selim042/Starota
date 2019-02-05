@@ -37,6 +37,13 @@ public abstract class FormSet {
 		return null;
 	}
 
+	public Form getForm(int form) {
+		for (Form f : forms)
+			if (f.goHubId == form)
+				return f;
+		return null;
+	}
+
 	public static abstract class Form {
 
 		private int goHubId;

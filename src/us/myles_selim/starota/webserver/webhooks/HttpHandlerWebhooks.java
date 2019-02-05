@@ -40,9 +40,10 @@ public class HttpHandlerWebhooks implements HttpHandler {
 				if (!jobj.has("message") || !jobj.get("message").isJsonObject())
 					throw new JsonParseException("json must contain a JsonObject with key message");
 				WebhookClass<?> wClass = new WebhookClass<>();
-				wClass.type = jobj.get("type").getAsString();
+				wClass.type = EnumWebhookType.valueOf(EnumWebhookType.class,
+						jobj.get("type").getAsString().toUpperCase());
 				wClass.message = context.deserialize(jobj.get("message").getAsJsonObject(),
-						WebhookData.getDataClassForType(wClass.type));
+						wClass.type.getDataClass());
 				return wClass;
 			}
 		});

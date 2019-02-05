@@ -10,7 +10,7 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class ReactionMessage {
 
-	public final EmbedObject sendMessage(IChannel channel) {
+	public final IMessage sendMessage(IChannel channel) {
 		EmbedObject emb = getEmbed(StarotaServer.getServer(channel.getGuild()));
 		IMessage msg = channel.sendMessage(emb);
 		ReactionMessageRegistry.MESSAGES.put(msg.getStringID(), this);
@@ -18,20 +18,20 @@ public class ReactionMessage {
 		onSend(sserver, channel, msg);
 		if (this instanceof PersistReactionMessage)
 			ReactionMessageRegistry.serialize(sserver, msg, (PersistReactionMessage) this);
-		return emb;
+		return msg;
 	}
 
-	public final EmbedObject editMessage(IChannel channel, IMessage msg) {
+	public final IMessage editMessage(IChannel channel, IMessage msg) {
 		if (msg == null)
 			return sendMessage(channel);
 		EmbedObject emb = getEmbed(StarotaServer.getServer(channel.getGuild()));
 		msg.edit(emb);
 		ReactionMessageRegistry.MESSAGES.put(msg.getStringID(), this);
 		StarotaServer sserver = StarotaServer.getServer(channel.getGuild());
-		onSend(sserver, channel, msg);
+		// onSend(sserver, channel, msg);
 		if (this instanceof PersistReactionMessage)
 			ReactionMessageRegistry.serialize(sserver, msg, (PersistReactionMessage) this);
-		return emb;
+		return msg;
 	}
 
 	public void onSend(StarotaServer server, IChannel channel, IMessage msg) {}

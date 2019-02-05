@@ -40,7 +40,8 @@ public class EventReactionMessage extends ReactionMessage {
 		if (react.getEmoji().getName().equals(LEFT_EMOJI)) {
 			if (eventIndex <= 0)
 				eventIndex = eventsSize;
-			eventIndex--;
+			else
+				eventIndex--;
 		} else if (react.getEmoji().getName().equals(RIGHT_EMOJI)) {
 			if (eventIndex >= eventsSize)
 				eventIndex = 0;

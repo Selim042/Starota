@@ -16,7 +16,7 @@ public class WebhookEvent extends GuildEvent {
 		return this.webhookClass;
 	}
 
-	public String getType() {
+	public EnumWebhookType getType() {
 		return this.webhookClass.type;
 	}
 

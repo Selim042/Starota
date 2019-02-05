@@ -38,6 +38,7 @@ public class WikiGenerator {
 				}
 				String out = "";
 				out += "## Commands\n\n_all sample commands use the default command prefix, `.`_\n\n---\n";
+				boolean hasCmds = false;
 				for (ICommand cmd : PrimaryCommandHandler.getCommandsByCategory(
 						Starota.getGuild(DebugServer.DEBUG_SERVER_ID), module.getCommandCategory())) {
 					out += "### " + cmd.getName() + "\n\n";
@@ -63,8 +64,10 @@ public class WikiGenerator {
 						out += "**Required Permission to Use**: " + cmd.requiredPermission().name()
 								+ "\n\n";
 					out += "---\n";
+					hasCmds = true;
 				}
-				moduleWriter.append(out);
+				if (hasCmds)
+					moduleWriter.append(out);
 				moduleWriter.close();
 			}
 			homeWriter.close();

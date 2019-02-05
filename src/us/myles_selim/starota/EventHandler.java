@@ -6,6 +6,7 @@ import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;
 import sx.blah.discord.handle.impl.events.guild.GuildLeaveEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
+import sx.blah.discord.handle.impl.events.guild.member.UserJoinEvent;
 import sx.blah.discord.handle.impl.events.guild.role.RoleUpdateEvent;
 import sx.blah.discord.handle.obj.IEmbed;
 import sx.blah.discord.handle.obj.IGuild;
@@ -68,6 +69,7 @@ public class EventHandler {
 	@EventSubscriber
 	public void onServerCreate(GuildCreateEvent event) {
 		Starota.submitStats();
+		Starota.updateOwners();
 		IGuild server = event.getGuild();
 		IUser selimUser = Starota.getUser(Starota.SELIM_USER_ID);
 		RequestBuffer.request(() -> {
@@ -96,6 +98,12 @@ public class EventHandler {
 	@EventSubscriber
 	public void onServerLeave(GuildLeaveEvent event) {
 		StarotaServer.getServer(event.getGuild()).clearOptions();
+		Starota.updateOwners();
+	}
+
+	@EventSubscriber
+	public void onUserJoin(UserJoinEvent event) {
+		Starota.updateOwners();
 	}
 
 	@EventSubscriber
@@ -142,6 +150,7 @@ public class EventHandler {
 		}
 	}
 
+	// update Patreon perms on debug server
 	@EventSubscriber
 	public void roleChange(RoleUpdateEvent event) {
 		if (event.getGuild().getLongID() == Starota.SUPPORT_SERVER)

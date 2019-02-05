@@ -3,6 +3,7 @@ package us.myles_selim.starota.webserver.webhooks;
 public class WebhookGym extends WebhookData {
 
 	public static final String TYPE = "gym";
+	public static final EnumWebhookType TYPE_ENUM = EnumWebhookType.GYM;
 
 	public String gym_id;
 	public String gym_name;

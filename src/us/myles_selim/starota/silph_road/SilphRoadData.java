@@ -179,6 +179,10 @@ public class SilphRoadData {
 		}
 
 		public final int getColor() {
+			return getColor(tier, pokemon);
+		}
+
+		public static int getColor(int tier, EnumPokemon pokemon) {
 			switch (tier) {
 			case 6:
 			case 5:
@@ -190,6 +194,8 @@ public class SilphRoadData {
 			case 1:
 				return 0xf79eee;
 			default:
+				if (pokemon == null)
+					return 0x000000;
 				return pokemon.getType1().getColor();
 			}
 		}

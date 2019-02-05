@@ -26,6 +26,10 @@ public class EmojiServerHelper {
 		return arrCont(EMOJI_SERVERS, guild.getLongID());
 	}
 
+	public static int getNumberServers() {
+		return EMOJI_SERVERS.length;
+	}
+
 	public static IEmoji getEmoji(String name) {
 		name = name.replaceAll("-", "_");
 		for (long id : EMOJI_SERVERS) {

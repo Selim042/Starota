@@ -42,10 +42,16 @@ public class RaidReactionMessage extends ReactionMessage {
 	private RaidBoss boss;
 	private EnumPokemon pokemon;
 	private Form form;
-	private final Map<IUser, ReactionEmoji> attending = new HashMap<>();;
+	private final Map<IUser, ReactionEmoji> attending = new HashMap<>();
 	private final Map<IUser, ReactionEmoji> here = new HashMap<>();
 
 	public RaidReactionMessage(int tier, String time, String location) {
+		List<RaidBoss> bosses = SilphRoadData.getBosses(tier);
+		if (bosses.size() == 1) {
+			this.boss = bosses.get(0);
+			this.pokemon = boss.getPokemon();
+			this.form = boss.getForm();
+		}
 		this.tier = tier;
 		this.time = time;
 		this.location = location;
@@ -175,14 +181,19 @@ public class RaidReactionMessage extends ReactionMessage {
 
 	@Override
 	public void onSend(StarotaServer server, IChannel channel, IMessage msg) {
-		List<RaidBoss> bosses = SilphRoadData.getBosses(tier);
-		if (bosses.size() == 1) {
-			RaidBoss boss = bosses.get(0);
-			pokemon = boss.getPokemon();
-			form = boss.getForm();
-			this.editMessage(channel, msg);
+		if (boss != null) {
+			for (int i = 0; i < EMOJI_NAMES.length - 2; i++) {
+				int iF = i;
+				RequestBuffer.request(() -> {
+					msg.addReaction(ReactionEmoji.of(EMOJI_NAMES[iF]));
+				}).get();
+			}
+			RequestBuffer.request(() -> msg.addReaction(EmojiServerHelper.getEmoji(EMOJI_NAMES[5])))
+					.get();
+			RequestBuffer.request(() -> msg.addReaction(ReactionEmoji.of(EMOJI_NAMES[6]))).get();
 			return;
 		}
+		List<RaidBoss> bosses = SilphRoadData.getBosses(tier);
 		for (RaidBoss b : bosses) {
 			String postfix = b.getForm() == null ? "" : "_" + b.getForm();
 			RequestBuffer

@@ -253,7 +253,7 @@ public class PokedexEntry extends ReactionMessage {
 
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withColor(entry.type1.getColor());
-		builder.withAuthorName("PokÃ©mon Go Hub Database");
+		builder.withAuthorName("Pokémon Go Hub Database");
 		builder.withAuthorIcon("https://db.pokemongohub.net/images/icons/favicon-32x32.png");
 		builder.withAuthorUrl("https://db.pokemongohub.net/");
 		String pokeName = entry.name;
@@ -309,19 +309,23 @@ public class PokedexEntry extends ReactionMessage {
 		for (DexMove m : entry.getFastMoves())
 			fastString += m.toString(entry) + "\n";
 		if (!fastString.isEmpty())
-			builder.appendField("Fast Moves:", fastString, true);
+			builder.appendField("Fast Moves:",
+					fastString.substring(0, fastString.length() > 1024 ? 1024 : fastString.length()),
+					true);
 		String chargedString = "";
 		for (DexMove m : entry.getChargedMoves())
 			chargedString += m.toString(entry) + "\n";
 		if (!chargedString.isEmpty())
-			builder.appendField("Charged Moves:", chargedString, true);
+			builder.appendField("Charged Moves:", chargedString.substring(0,
+					chargedString.length() > 1024 ? 1024 : chargedString.length()), true);
 
 		// movesets
 		String movesetString = "";
 		for (DexMoveset ms : entry.getTopMovesets())
 			movesetString += ms.toString(entry) + "\n";
 		if (!movesetString.isEmpty())
-			builder.appendField("Best Movesets:", movesetString, false);
+			builder.appendField("Best Movesets:", movesetString.substring(0,
+					movesetString.length() > 1024 ? 1024 : movesetString.length()), false);
 
 		// counters
 		String counterString = "";
@@ -408,8 +412,8 @@ public class PokedexEntry extends ReactionMessage {
 		}
 
 		public static final String STAB_MARKER = "\\*";
-		public static final String LEGACY_MARKER = "â€ ";
-		public static final String EXCLUSIVE_MARKER = "â€¡"; // Â§
+		public static final String LEGACY_MARKER = "†";
+		public static final String EXCLUSIVE_MARKER = "‡"; // §
 
 		public String toString(PokedexEntry entry) {
 			boolean marked = false;

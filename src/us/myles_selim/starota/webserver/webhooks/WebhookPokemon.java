@@ -3,6 +3,7 @@ package us.myles_selim.starota.webserver.webhooks;
 public class WebhookPokemon extends WebhookData {
 
 	public static final String TYPE = "pokemon";
+	public static final EnumWebhookType TYPE_ENUM = EnumWebhookType.POKEMON;
 
 	public String spawnpoint_id;
 	public String pokestop_id;

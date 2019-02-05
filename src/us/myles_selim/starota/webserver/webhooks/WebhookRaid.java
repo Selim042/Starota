@@ -6,6 +6,7 @@ import us.myles_selim.starota.enums.EnumTeam;
 public class WebhookRaid extends WebhookData {
 
 	public static final String TYPE = "raid";
+	public static final EnumWebhookType TYPE_ENUM = EnumWebhookType.RAID;
 
 	public String gym_id;
 	public String gym_name;
@@ -43,6 +44,14 @@ public class WebhookRaid extends WebhookData {
 		default:
 			return EnumTeam.NO_TEAM;
 		}
+	}
+
+	public long getTimeRemainingDespawn() {
+		return this.end - System.currentTimeMillis();
+	}
+
+	public long getTimeRemainingHatch() {
+		return this.start - System.currentTimeMillis();
 	}
 
 }
