@@ -202,25 +202,25 @@ public class PokedexEntry extends ReactionMessage {
 	 * @deprecated Do not use directly, for internal use only
 	 */
 	@Deprecated
-	private Counter[] counters;
-	private Counter[] topCounters;
+	private DexCounter[] counters;
+	private DexCounter[] topCounters;
 
-	public Counter[] getCounters() {
+	public DexCounter[] getCounters() {
 		if (counters != null)
 			return counters;
 		counters = GoHubDatabase.getCounters(getPokemon(), form);
 		return counters;
 	}
 
-	public Counter[] getTopCounters() {
+	public DexCounter[] getTopCounters() {
 		if (topCounters != null)
 			return topCounters;
 		int length = 6;
 		if (getCounters() == null)
-			return new Counter[0];
+			return new DexCounter[0];
 		if (length > getCounters().length)
 			length = getCounters().length;
-		topCounters = new Counter[length];
+		topCounters = new DexCounter[length];
 		for (int i = 0; i < 6 && i < length; i++)
 			topCounters[i] = getCounters()[i];
 		return topCounters;
@@ -330,7 +330,7 @@ public class PokedexEntry extends ReactionMessage {
 		// counters
 		String counterString = "";
 		int rank = 1;
-		for (Counter c : entry.getTopCounters())
+		for (DexCounter c : entry.getTopCounters())
 			counterString += String.format("#%d %s", rank++, c);
 		if (!counterString.isEmpty())
 			builder.appendField("Counters:", counterString, false);
@@ -501,6 +501,25 @@ public class PokedexEntry extends ReactionMessage {
 		public int eggMin;
 		public int questMax;
 		public int questMin;
+
+	}
+
+	public static class DexCounter {
+
+		public int pokemonId;
+		public String name;
+		public String formName;
+		public DexMove quickMove;
+		public DexMove chargedMove;
+		public int deaths;
+		public float ttw;
+		public float score;
+
+		@Override
+		public String toString() {
+			return String.format("**%s%s**: %s/%s\n", formName == null ? "" : formName + " ", name,
+					quickMove, chargedMove);
+		}
 
 	}
 

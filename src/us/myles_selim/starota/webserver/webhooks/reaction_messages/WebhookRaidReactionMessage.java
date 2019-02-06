@@ -171,9 +171,7 @@ public class WebhookRaidReactionMessage extends ReactionMessage {
 		}
 
 		if (raidData.move_1 != 0 && raidData.move_2 != 0) {
-			DexMoveset set = new DexMoveset();
-			set.quickMove = GoHubDatabase.getMove(raidData.move_1);
-			set.chargeMove = GoHubDatabase.getMove(raidData.move_2);
+			DexMoveset set = raidData.getMoveset();
 			if (entry == null)
 				builder.appendField("Moveset:", set.toString(), false);
 			else

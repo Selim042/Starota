@@ -20,9 +20,9 @@ import us.myles_selim.starota.Starota.BaseModules;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumWeather;
 import us.myles_selim.starota.modules.StarotaModule;
-import us.myles_selim.starota.pokedex.Counter;
 import us.myles_selim.starota.pokedex.GoHubDatabase;
 import us.myles_selim.starota.pokedex.PokedexEntry;
+import us.myles_selim.starota.pokedex.PokedexEntry.DexCounter;
 import us.myles_selim.starota.reaction_messages.ReactionMessage;
 import us.myles_selim.starota.silph_road.SilphRoadData;
 import us.myles_selim.starota.silph_road.SilphRoadData.RaidBoss;
@@ -160,7 +160,7 @@ public class RaidReactionMessage extends ReactionMessage {
 
 			String counterString = "";
 			int rank = 1;
-			for (Counter c : entry.getTopCounters())
+			for (DexCounter c : entry.getTopCounters())
 				counterString += String.format("#%d %s", rank++, c);
 			if (!counterString.isEmpty())
 				builder.appendField("Counters:", counterString, false);

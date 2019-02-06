@@ -2,6 +2,8 @@ package us.myles_selim.starota.webserver.webhooks;
 
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumTeam;
+import us.myles_selim.starota.pokedex.GoHubDatabase;
+import us.myles_selim.starota.pokedex.PokedexEntry;
 
 public class WebhookRaid extends WebhookData {
 
@@ -50,6 +52,13 @@ public class WebhookRaid extends WebhookData {
 		default:
 			return EnumTeam.NO_TEAM;
 		}
+	}
+
+	public PokedexEntry.DexMoveset getMoveset() {
+		PokedexEntry.DexMoveset moves = new PokedexEntry.DexMoveset();
+		moves.quickMove = GoHubDatabase.getMove(move_1);
+		moves.chargeMove = GoHubDatabase.getMove(move_2);
+		return moves;
 	}
 
 	public long getTimeRemainingDespawn() {

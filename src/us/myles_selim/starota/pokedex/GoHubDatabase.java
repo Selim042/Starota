@@ -25,6 +25,7 @@ import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
 import us.myles_selim.starota.enums.EnumWeather;
+import us.myles_selim.starota.pokedex.PokedexEntry.DexCounter;
 import us.myles_selim.starota.pokedex.PokedexEntry.DexMove;
 import us.myles_selim.starota.pokedex.PokedexEntry.DexMoveset;
 
@@ -51,7 +52,7 @@ public class GoHubDatabase {
 	private static final Map<String, CachedData<DexMove[]>> POKEMON_MOVES_CACHE = new HashMap<>();
 	private static final Map<Integer, CachedData<DexMove>> MOVE_CACHE = new HashMap<>();
 	private static final Map<String, CachedData<DexMoveset[]>> MOVESET_CACHE = new HashMap<>();
-	private static final Map<String, CachedData<Counter[]>> COUNTER_CACHE = new HashMap<>();
+	private static final Map<String, CachedData<DexCounter[]>> COUNTER_CACHE = new HashMap<>();
 
 	private static <K, V> boolean isCached(Map<K, CachedData<V>> cache, K key) {
 		if (!cache.containsKey(key))
@@ -84,15 +85,15 @@ public class GoHubDatabase {
 				return EnumWeather.valueOf(asString);
 			}
 		});
-		builder.registerTypeAdapter(Counter.class, new JsonDeserializer<Counter>() {
+		builder.registerTypeAdapter(DexCounter.class, new JsonDeserializer<DexCounter>() {
 
 			@Override
-			public Counter deserialize(JsonElement json, Type typeOfT,
+			public DexCounter deserialize(JsonElement json, Type typeOfT,
 					JsonDeserializationContext context) throws JsonParseException {
 				if (!json.isJsonArray())
 					return null;
 				JsonArray jarr = json.getAsJsonArray();
-				Counter counter = new Counter();
+				DexCounter counter = new DexCounter();
 				counter.pokemonId = jarr.get(0).getAsInt();
 				counter.name = jarr.get(1).getAsString();
 				if (!jarr.get(2).isJsonNull())
@@ -207,11 +208,11 @@ public class GoHubDatabase {
 		}
 	}
 
-	public static Counter[] getCounters(EnumPokemon pokemon) {
+	public static DexCounter[] getCounters(EnumPokemon pokemon) {
 		return getCounters(pokemon, "Normal");
 	}
 
-	public static Counter[] getCounters(EnumPokemon pokemon, String form) {
+	public static DexCounter[] getCounters(EnumPokemon pokemon, String form) {
 		String key = pokemon.toString().toLowerCase() + form;
 		if (isCached(COUNTER_CACHE, key))
 			return COUNTER_CACHE.get(key).getValue();
@@ -223,8 +224,8 @@ public class GoHubDatabase {
 				url = new URL(COUNTERS_API + pokemon.getId() + "?form=" + form);
 			URLConnection conn = url.openConnection();
 			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
-			Counter[] counters = GSON.fromJson(
-					PARSER.parse(new InputStreamReader(conn.getInputStream())), Counter[].class);
+			DexCounter[] counters = GSON.fromJson(
+					PARSER.parse(new InputStreamReader(conn.getInputStream())), DexCounter[].class);
 			COUNTER_CACHE.put(key, new CachedData<>(counters));
 			return counters;
 		} catch (IOException e) {
