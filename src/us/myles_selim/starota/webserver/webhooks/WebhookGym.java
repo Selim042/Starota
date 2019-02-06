@@ -1,6 +1,8 @@
 package us.myles_selim.starota.webserver.webhooks;
 
-public class WebhookGym extends WebhookData {
+import us.myles_selim.starota.webserver.webhooks.types.IGymWebhook;
+
+public class WebhookGym extends WebhookData implements IGymWebhook {
 
 	public static final String TYPE = "gym";
 	public static final EnumWebhookType TYPE_ENUM = EnumWebhookType.GYM;
@@ -19,5 +21,35 @@ public class WebhookGym extends WebhookData {
 	public int slots_available;
 	public long raid_active_until;
 	public boolean sponsor_id;
+
+	@Override
+	public String getGymId() {
+		return this.gym_id;
+	}
+
+	@Override
+	public String getGymName() {
+		return this.gym_name;
+	}
+
+	@Override
+	public int getTeamId() {
+		return this.team_id;
+	}
+
+	@Override
+	public boolean isSponsor() {
+		return this.sponsor_id;
+	}
+
+	@Override
+	public double getLatitude() {
+		return this.latitude;
+	}
+
+	@Override
+	public double getLongitude() {
+		return this.longitude;
+	}
 
 }

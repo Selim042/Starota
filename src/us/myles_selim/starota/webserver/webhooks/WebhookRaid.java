@@ -4,8 +4,11 @@ import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.pokedex.GoHubDatabase;
 import us.myles_selim.starota.pokedex.PokedexEntry;
+import us.myles_selim.starota.pokedex.PokedexEntry.DexMove;
+import us.myles_selim.starota.webserver.webhooks.types.IGymWebhook;
+import us.myles_selim.starota.webserver.webhooks.types.IPokemonWebhook;
 
-public class WebhookRaid extends WebhookData {
+public class WebhookRaid extends WebhookData implements IGymWebhook, IPokemonWebhook {
 
 	public static final String TYPE = "raid";
 	public static final EnumWebhookType TYPE_ENUM = EnumWebhookType.RAID;
@@ -31,16 +34,23 @@ public class WebhookRaid extends WebhookData {
 
 	public boolean is_exclusive;
 
+	@Override
 	public EnumPokemon getPokemon() {
 		if (!hasHatched())
 			return null;
 		return EnumPokemon.getPokemon(pokemon_id);
 	}
 
+	@Override
+	public int getForm() {
+		return this.form;
+	}
+
 	public boolean hasHatched() {
 		return this.pokemon_id != 1;
 	}
 
+	@Override
 	public EnumTeam getTeam() {
 		switch (team_id) {
 		case 1:
@@ -54,11 +64,14 @@ public class WebhookRaid extends WebhookData {
 		}
 	}
 
-	public PokedexEntry.DexMoveset getMoveset() {
-		PokedexEntry.DexMoveset moves = new PokedexEntry.DexMoveset();
-		moves.quickMove = GoHubDatabase.getMove(move_1);
-		moves.chargeMove = GoHubDatabase.getMove(move_2);
-		return moves;
+	@Override
+	public DexMove getFastMove() {
+		return GoHubDatabase.getMove(move_1);
+	}
+
+	@Override
+	public DexMove getChargedMove() {
+		return GoHubDatabase.getMove(move_2);
 	}
 
 	public long getTimeRemainingDespawn() {
@@ -67,6 +80,36 @@ public class WebhookRaid extends WebhookData {
 
 	public long getTimeRemainingHatch() {
 		return this.start - System.currentTimeMillis();
+	}
+
+	@Override
+	public String getGymId() {
+		return this.gym_id;
+	}
+
+	@Override
+	public String getGymName() {
+		return this.gym_name;
+	}
+
+	@Override
+	public int getTeamId() {
+		return this.team_id;
+	}
+
+	@Override
+	public boolean isSponsor() {
+		return this.sponsor_id;
+	}
+
+	@Override
+	public double getLatitude() {
+		return this.latitude;
+	}
+
+	@Override
+	public double getLongitude() {
+		return this.longitude;
 	}
 
 }

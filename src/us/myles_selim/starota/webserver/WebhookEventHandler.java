@@ -12,10 +12,12 @@ import us.myles_selim.starota.ImageHelper;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.assistants.AssistantRequest;
 import us.myles_selim.starota.assistants.StarotaAssistants;
+import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.geofence.GeoPoint;
 import us.myles_selim.starota.silph_road.SilphRoadData;
 import us.myles_selim.starota.silph_road.SilphRoadData.RaidBoss;
 import us.myles_selim.starota.webserver.webhooks.WebhookEvent;
+import us.myles_selim.starota.webserver.webhooks.WebhookPokemon;
 import us.myles_selim.starota.webserver.webhooks.WebhookRaid;
 import us.myles_selim.starota.webserver.webhooks.reaction_messages.WebhookRaidReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -25,19 +27,19 @@ public class WebhookEventHandler {
 	private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("hh:mm");
 
 	@EventSubscriber
-	public void testThingy(WebhookEvent event) {
+	public void onWebhookEvent(WebhookEvent event) {
 		IChannel channel = Starota.getChannel(538156939868110854L);
 		StarotaAssistants.setPermissionsForChannel(channel);
 		switch (event.getType()) {
 		case RAID:
 			WebhookRaid raidData = (WebhookRaid) event.getWebhookData();
-			StarotaServer server = StarotaServer.getServer(event.getGuild());
+			StarotaServer raidServer = StarotaServer.getServer(event.getGuild());
 			// RequestBuffer.request(() -> channel.sendMessage("Raid in
 			// region: "
 			// + server.getRegion(new GeoPoint(raidData.latitude,
 			// raidData.longitude))));
-			if (Starota.IS_DEV
-					|| server.getRegion(new GeoPoint(raidData.latitude, raidData.longitude)) != null) {
+			if (Starota.IS_DEV || raidServer
+					.getRegion(new GeoPoint(raidData.latitude, raidData.longitude)) != null) {
 				if (raidData.hasHatched()) {
 					AssistantRequest.request((client) -> {
 						return new WebhookRaidReactionMessage(raidData)
@@ -49,6 +51,16 @@ public class WebhookEventHandler {
 						return client.getChannelByID(channel.getLongID()).sendMessage(embed);
 					});
 				}
+			}
+			break;
+		case POKEMON:
+			WebhookPokemon pokeData = (WebhookPokemon) event.getWebhookData();
+			StarotaServer pokeServer = StarotaServer.getServer(event.getGuild());
+			if (pokeServer.getRegion(new GeoPoint(pokeData.latitude, pokeData.longitude)) != null) {
+				EmbedObject embed = getPokemonEmbed(pokeData);
+				AssistantRequest.request((client) -> {
+					return client.getChannelByID(channel.getLongID()).sendMessage(embed);
+				});
 			}
 			break;
 		default:
@@ -79,6 +91,25 @@ public class WebhookEventHandler {
 		builder.withImage(String.format(
 				"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/pin-s+%06X(%2$f,%3$f)/%2$f,%3$f,16.5,0,0/600x300@2x?logo=false&access_token=pk.eyJ1Ijoic2VsaW0wNDIiLCJhIjoiY2pyOXpmM2g1MG16cTQzbndqZXk5dHNndCJ9.vsh20BzsPBgTcBBcKWBqQw",
 				raidData.getTeam().getColor(), raidData.longitude, raidData.latitude));
+		return builder.build();
+	}
+
+	private static EmbedObject getPokemonEmbed(WebhookPokemon pokemonData) {
+		EmbedBuilder builder = new EmbedBuilder();
+		EnumPokemon pokemon = pokemonData.getPokemon();
+		builder.withTitle(String.format("A wild %s has spawned!", pokemon.getName()));
+		builder.withThumbnail(ImageHelper.getOfficalArtwork(pokemon, pokemonData.form));
+		builder.withColor(pokemon.getType1().getColor());
+
+		builder.appendField("Directions:",
+				String.format(
+						"[Google Maps](https://www.google.com/maps/search/?api=1&query=%1$f,%2$f) | "
+								+ "[Apple Maps](http://maps.apple.com/?daddr=%1$f,%2$f)",
+						pokemonData.latitude, pokemonData.longitude),
+				false);
+		builder.withImage(String.format(
+				"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/pin-s+%06X(%2$f,%3$f)/%2$f,%3$f,16.5,0,0/600x300@2x?logo=false&access_token=pk.eyJ1Ijoic2VsaW0wNDIiLCJhIjoiY2pyOXpmM2g1MG16cTQzbndqZXk5dHNndCJ9.vsh20BzsPBgTcBBcKWBqQw",
+				pokemon.getType1().getColor(), pokemonData.longitude, pokemonData.latitude));
 		return builder.build();
 	}
 

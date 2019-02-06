@@ -99,7 +99,8 @@ public class HttpHandlerWebhooks implements HttpHandler {
 				for (WebhookClass<?> hookC : data) {
 					if (hookC.secret == null)
 						hookC.secret = secret;
-					if (serverSecret == null || hookC.secret.equals(serverSecret)) {
+					if (hookC.type != null
+							&& (serverSecret == null || hookC.secret.equals(serverSecret))) {
 						Starota.getClient().getDispatcher().dispatch(new WebhookEvent(guild, hookC));
 					}
 				}

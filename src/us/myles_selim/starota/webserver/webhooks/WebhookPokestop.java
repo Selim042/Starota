@@ -1,6 +1,8 @@
 package us.myles_selim.starota.webserver.webhooks;
 
-public class WebhookPokestop extends WebhookData {
+import us.myles_selim.starota.webserver.webhooks.types.ILocationWebhook;
+
+public class WebhookPokestop extends WebhookData implements ILocationWebhook {
 
 	public static final String TYPE = "pokestop";
 	public static final EnumWebhookType TYPE_ENUM = EnumWebhookType.POKESTOP;
@@ -16,5 +18,15 @@ public class WebhookPokestop extends WebhookData {
 
 	public boolean enabled;
 	public long updated;
+
+	@Override
+	public double getLatitude() {
+		return this.latitude;
+	}
+
+	@Override
+	public double getLongitude() {
+		return this.longitute;
+	}
 
 }
