@@ -20,6 +20,7 @@ Features:
 - Show ongoing and upcoming events
 - Custom Lua scripting for unique features (Patrons only)
 - WIP web-sided interface (Patrons only)
+- WIP incoming webhooks for 3rd party scanners, currently optimized for [RealDeviceMap/RealDeviceMap](https://github.com/RealDeviceMap/RealDeviceMap)
 
 I hope to make a simple wiki here soon to document these features in more detail as well as how to use them effectively.
 
