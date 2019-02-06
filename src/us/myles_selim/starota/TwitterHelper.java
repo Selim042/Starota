@@ -88,6 +88,14 @@ public class TwitterHelper {
 		}
 	}
 
+	public static void sendDirectMessage(String username, String message) {
+		try {
+			TWITTER.sendDirectMessage(username, message);
+		} catch (TwitterException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public static void main(String... args) {}
 
 }

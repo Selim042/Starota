@@ -72,8 +72,9 @@ public class PokedexBot {
 	}
 
 	public static DiscordBotListAPI getBotListAPI() {
-		if (BOT_LIST == null && PROPERTIES.containsKey("bot_list_token"))
-			BOT_LIST = new DiscordBotListAPI.Builder().token(PROPERTIES.getProperty("bot_list_token"))
+		if (BOT_LIST == null && PROPERTIES.containsKey("dex_bot_list_token"))
+			BOT_LIST = new DiscordBotListAPI.Builder()
+					.token(PROPERTIES.getProperty("dex_bot_list_token"))
 					.botId(POKEDEX_CLIENT.getOurUser().getStringID()).build();
 		return BOT_LIST;
 	}

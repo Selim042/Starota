@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IMessage.Attachment;
 import sx.blah.discord.handle.obj.IRole;
@@ -27,10 +26,13 @@ public class CommandUploadScript extends StarotaCommand {
 	}
 
 	@Override
-	public IRole requiredRole(IGuild guild) {
-		if (guild.getLongID() == 481646364716040202L) // test server
-			return guild.getRoleByID(489249119311888385L); // Starota test role
-		return super.requiredRole(guild);
+	public IRole requiredRole(StarotaServer server) {
+		if (server.getDiscordGuild().getLongID() == 481646364716040202L) // test
+																			// server
+			return server.getDiscordGuild().getRoleByID(489249119311888385L); // Starota
+																				// test
+																				// role
+		return super.requiredRole(server);
 	}
 
 	@Override

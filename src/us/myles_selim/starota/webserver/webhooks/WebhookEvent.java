@@ -20,4 +20,8 @@ public class WebhookEvent extends GuildEvent {
 		return this.webhookClass.type;
 	}
 
+	public WebhookData getWebhookData() {
+		return this.webhookClass.message;
+	}
+
 }

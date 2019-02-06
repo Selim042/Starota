@@ -63,9 +63,8 @@ public class PrimaryCommandHandler {
 		if (!cmdS.startsWith(prefix))
 			return;
 		String[] args = getArgs(message, guild);
-		RequestBuffer.request(() -> {
-			channel.setTypingStatus(true);
-		});
+		if (!channel.getTypingStatus())
+			RequestBuffer.request(() -> channel.setTypingStatus(true));
 		if (Starota.DEBUG)
 			message.addReaction(ReactionEmoji.of("�?"));
 		boolean cmdFound = false;
@@ -108,9 +107,8 @@ public class PrimaryCommandHandler {
 			}
 			channel.sendMessage(builder.build());
 		}
-		RequestBuffer.request(() -> {
-			channel.setTypingStatus(false);
-		});
+		if (channel.getTypingStatus())
+			RequestBuffer.request(() -> channel.setTypingStatus(false));
 	}
 
 	private static void handleException(Throwable th, IGuild guild, IChannel channel, IMessage message) {

@@ -1,7 +1,6 @@
 package us.myles_selim.starota;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -19,9 +18,9 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 public class DebugServer extends Thread {
 
 	public static final long DEBUG_SERVER_ID = 517546213520965662L;
-	public static final Permissions[] USED_PERMISSIONS = new Permissions[] { Permissions.SEND_MESSAGES,
+	public static final EnumSet<Permissions> USED_PERMISSIONS = EnumSet.of(Permissions.SEND_MESSAGES,
 			Permissions.READ_MESSAGES, Permissions.MANAGE_ROLES, Permissions.MANAGE_MESSAGES,
-			Permissions.USE_EXTERNAL_EMOJIS, Permissions.ADD_REACTIONS, Permissions.MANAGE_CHANNELS };
+			Permissions.USE_EXTERNAL_EMOJIS, Permissions.ADD_REACTIONS, Permissions.MANAGE_CHANNELS);
 	public static final IGuild DEBUG_SERVER;
 
 	private static EmbedObject NOT_READY_EMBED;
@@ -160,8 +159,8 @@ public class DebugServer extends Thread {
 			if (g.equals(DEBUG_SERVER))
 				continue;
 			String text = "";
-			List<Permissions> invertPerms = new ArrayList<>(Arrays.asList(USED_PERMISSIONS));
-			invertPerms.removeAll(ourUser.getPermissionsForGuild(g));
+			EnumSet<Permissions> invertPerms = EnumSet.allOf(Permissions.class);
+			invertPerms.removeAll(USED_PERMISSIONS);
 			for (Permissions p : invertPerms)
 				text += " - " + p + "\n";
 			builder.appendField(g.getName(), text.isEmpty() ? "All permissions given" : text, true);

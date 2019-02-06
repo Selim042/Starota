@@ -1,8 +1,5 @@
 package us.myles_selim.starota.commands;
 
-import java.util.Arrays;
-import java.util.EnumSet;
-
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
@@ -25,10 +22,8 @@ public class CommandInvite extends StarotaCommand {
 			throws Exception {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withTitle("Thanks for showing an interest in Starota!");
-		EnumSet<Permissions> temp = EnumSet.noneOf(Permissions.class);
-		temp.addAll(Arrays.asList(DebugServer.USED_PERMISSIONS));
 		builder.withUrl(String.format(INVITE_TEMPLATE, Starota.getOurUser().getLongID(),
-				Permissions.generatePermissionsNumber(temp)));
+				Permissions.generatePermissionsNumber(DebugServer.USED_PERMISSIONS)));
 		builder.appendDesc("Click on the link above to invite Starota to your server. "
 				+ "The permissions suggested there will enable full functionality and there will be an "
 				+ "announcement on the support server when new features "

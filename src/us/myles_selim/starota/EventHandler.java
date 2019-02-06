@@ -16,6 +16,7 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
+import us.myles_selim.starota.assistants.StarotaAssistants;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.research.ResearchTracker;
 import us.myles_selim.starota.trading.FormManager;
@@ -104,6 +105,8 @@ public class EventHandler {
 	@EventSubscriber
 	public void onUserJoin(UserJoinEvent event) {
 		Starota.updateOwners();
+		if (StarotaAssistants.isAssistant(event.getUser()))
+			StarotaAssistants.setAssistantRole(event.getGuild(), event.getUser());
 	}
 
 	@EventSubscriber

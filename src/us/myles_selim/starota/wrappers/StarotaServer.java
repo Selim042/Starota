@@ -445,6 +445,14 @@ public class StarotaServer {
 		}
 		return 0;
 	}
+
+	public static final String WEBHOOK_SECRET_KEY = "webhook_secret";
+
+	public String getWebhookSecret() {
+		if (!options.containsKey(WEBHOOK_SECRET_KEY))
+			return null;
+		return options.get(WEBHOOK_SECRET_KEY, String.class);
+	}
 	// end other stuff
 
 	private static final Map<Long, StarotaServer> SERVERS = new ConcurrentHashMap<>();

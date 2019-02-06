@@ -29,10 +29,10 @@ public class CommandRegister extends StarotaCommand {
 	}
 
 	@Override
-	public IRole requiredRole(IGuild guild) {
-		if (guild.getLongID() == Starota.PVILLE_SERVER)
-			return guild.getRoleByID(314744756456521728l);
-		return super.requiredRole(guild);
+	public IRole requiredRole(StarotaServer server) {
+		if (server.getDiscordGuild().getLongID() == Starota.PVILLE_SERVER)
+			return server.getDiscordGuild().getRoleByID(314744756456521728l);
+		return super.requiredRole(server);
 	}
 
 	@Override

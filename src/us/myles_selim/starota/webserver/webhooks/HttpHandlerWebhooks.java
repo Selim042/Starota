@@ -18,6 +18,7 @@ import com.sun.net.httpserver.HttpHandler;
 
 import sx.blah.discord.handle.obj.IGuild;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
 @SuppressWarnings("restriction")
 public class HttpHandlerWebhooks implements HttpHandler {
@@ -55,7 +56,14 @@ public class HttpHandlerWebhooks implements HttpHandler {
 	public void handle(HttpExchange exchange) throws IOException {
 		try {
 			String url = exchange.getRequestURI().toString();
-			if (!url.matches(".*?/webhooks/\\d{18}?/?")) {
+			String secret = null;
+			int hookIndex = url.indexOf("webhooks/");
+			if (url.matches(".*?/webhooks/\\d{18}?/.+/?")) {
+				// System.out.println(url);
+				secret = url.substring(hookIndex + 28, url.length() - (url.endsWith("/") ? 1 : 0));
+				System.out.println(secret);
+			}
+			if (secret == null && !url.matches(".*?/webhooks/\\d{18}?/?")) {
 				exchange.sendResponseHeaders(400, 0);
 				OutputStream output = exchange.getResponseBody();
 				output.close();
@@ -63,19 +71,28 @@ public class HttpHandlerWebhooks implements HttpHandler {
 			}
 			InputStreamReader requestBody = new InputStreamReader(exchange.getRequestBody());
 			WebhookClass<?>[] data = GSON.fromJson(PARSER.parse(requestBody), WebhookClass[].class);
-			System.out.println(url);
-			boolean endingSlash = url.endsWith("/");
-			long guildId = Long.parseLong(url.substring(url.length() - (endingSlash ? 19 : 18),
-					endingSlash ? url.length() - 1 : url.length()));
+			// System.out.println(url);
+			// boolean endingSlash = url.endsWith("/");
+			// long guildId = Long.parseLong(url.substring(url.length() -
+			// (endingSlash ? 19 : 18),
+			// endingSlash ? url.length() - 1 : url.length()));
+			long guildId = Long.parseLong(url.substring(hookIndex + 9, hookIndex + 27));
 			IGuild guild;
 			if (Starota.FULLY_STARTED)
 				guild = Starota.getGuild(guildId);
 			else
 				guild = null;
-			if (guild != null)
-				for (WebhookClass<?> hookC : data)
-					Starota.getClient().getDispatcher().dispatch(new WebhookEvent(guild, hookC));
-			else
+			if (guild != null) {
+				StarotaServer server = StarotaServer.getServer(guild);
+				String serverSecret = server.getWebhookSecret();
+				for (WebhookClass<?> hookC : data) {
+					if (hookC.secret == null)
+						hookC.secret = secret;
+					if (serverSecret == null || hookC.secret.equals(serverSecret)) {
+						Starota.getClient().getDispatcher().dispatch(new WebhookEvent(guild, hookC));
+					}
+				}
+			} else
 				System.out.println("starota is not started, cannot continue");
 
 			String response = "";
