@@ -2,6 +2,9 @@ package us.myles_selim.starota.commands;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
+import us.myles_selim.starota.geofence.GeoPoint;
+import us.myles_selim.starota.geofence.GeoRegion;
+import us.myles_selim.starota.webserver.webhooks.EnumWebhookType;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandTest extends StarotaCommand {
@@ -12,31 +15,6 @@ public class CommandTest extends StarotaCommand {
 
 	@Override
 	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
-		// new ReactionMessage() {
-		//
-		// @Override
-		// protected EmbedObject getEmbed() {
-		// return new EmbedBuilder().withDescription("react to test").build();
-		// }
-		// }.sendMessage(channel);
-
-		// EmbedBuilder builder = new EmbedBuilder();
-		// builder.withDescription("loading");
-		// IMessage msg = channel.sendMessage(builder.build());
-		// builder.withDescription("");
-		// for (RaidBoss boss : SilphRoadData.getBosses()) {
-		// builder.appendDescription("Tier " + boss.getTier() + ": " +
-		// boss.getPokemon()
-		// + (boss.getForm() == null ? "\n" : " (" + boss.getForm() + ")\n"));
-		// String formName = boss.getForm() == null ? "" :
-		// boss.getForm().toString();
-		// RequestBuffer.request(() ->
-		// msg.addReaction(EmojiServerHelper.getEmoji(
-		// boss.getPokemon() + (formName.isEmpty() ? "" : "_" + formName),
-		// ImageHelper.getOfficalArtwork(boss.getPokemon(), boss.getForm()))));
-		// }
-		// msg.edit(builder.build());
-
 		// try {
 		// RaidReactionMessage rMsg = new RaidReactionMessage(6, "9:30",
 		// "Chess Pieces - UW-Platteville");
@@ -59,6 +37,24 @@ public class CommandTest extends StarotaCommand {
 		// } catch (Exception e) {
 		// e.printStackTrace();
 		// }
+
+		// channel.sendMessage(TimeZone.getTimeZone(args[1]).toString());
+
+		server.defineRegion("Test Region #1 (Mad)",
+				new GeoRegion(new GeoPoint(43.052199, -89.326932), new GeoPoint(43.056464, -89.307105),
+						new GeoPoint(43.045927, -89.296033), new GeoPoint(43.032879, -89.311225),
+						new GeoPoint(43.038713, -89.332511)));
+		server.defineRegion("Test Region #2 (Platt)",
+				new GeoRegion(new GeoPoint(42.777584, -90.572391), new GeoPoint(42.803786, -90.463901),
+						new GeoPoint(42.778592, -90.328632), new GeoPoint(42.672159, -90.368457),
+						new GeoPoint(42.673674, -90.560718)).setHookChannel(EnumWebhookType.RAID,
+								538156939868110854L));
+
+		// AssistantRequest.request((client) -> {
+		// IChannel ch = client.getChannelByID(channel.getLongID());
+		// ch.sendMessage("This is a test assistant request #1");
+		// ch.sendMessage("This is a test assistant request #2");
+		// });
 	}
 
 }

@@ -30,7 +30,13 @@ public class WebhookRaid extends WebhookData {
 	public boolean is_exclusive;
 
 	public EnumPokemon getPokemon() {
+		if (!hasHatched())
+			return null;
 		return EnumPokemon.getPokemon(pokemon_id);
+	}
+
+	public boolean hasHatched() {
+		return this.pokemon_id != 1;
 	}
 
 	public EnumTeam getTeam() {

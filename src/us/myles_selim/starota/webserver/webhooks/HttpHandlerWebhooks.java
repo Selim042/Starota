@@ -13,6 +13,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -70,7 +71,17 @@ public class HttpHandlerWebhooks implements HttpHandler {
 				return;
 			}
 			InputStreamReader requestBody = new InputStreamReader(exchange.getRequestBody());
-			WebhookClass<?>[] data = GSON.fromJson(PARSER.parse(requestBody), WebhookClass[].class);
+			WebhookClass<?>[] data;
+			try {
+				data = GSON.fromJson(PARSER.parse(requestBody), WebhookClass[].class);
+			} catch (JsonSyntaxException e) {
+				String response = "invalid json, " + e.getMessage();
+				exchange.sendResponseHeaders(200, response.length());
+				OutputStream output = exchange.getResponseBody();
+				output.write(response.getBytes());
+				output.close();
+				return;
+			}
 			// System.out.println(url);
 			// boolean endingSlash = url.endsWith("/");
 			// long guildId = Long.parseLong(url.substring(url.length() -
