@@ -3,7 +3,6 @@ package us.myles_selim.starota.webserver.webhooks;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.pokedex.GoHubDatabase;
-import us.myles_selim.starota.pokedex.PokedexEntry;
 import us.myles_selim.starota.pokedex.PokedexEntry.DexMove;
 import us.myles_selim.starota.webserver.webhooks.types.IGymWebhook;
 import us.myles_selim.starota.webserver.webhooks.types.IPokemonWebhook;

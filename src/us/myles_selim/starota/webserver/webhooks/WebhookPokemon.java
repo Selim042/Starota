@@ -4,9 +4,9 @@ import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.pokedex.GoHubDatabase;
 import us.myles_selim.starota.pokedex.PokedexEntry.DexMove;
 import us.myles_selim.starota.webserver.webhooks.types.ILocationWebhook;
-import us.myles_selim.starota.webserver.webhooks.types.IPokemonWebhook;
+import us.myles_selim.starota.webserver.webhooks.types.ISpecificPokemonWebhook;
 
-public class WebhookPokemon extends WebhookData implements ILocationWebhook, IPokemonWebhook {
+public class WebhookPokemon extends WebhookData implements ILocationWebhook, ISpecificPokemonWebhook {
 
 	public static final String TYPE = "pokemon";
 	public static final EnumWebhookType TYPE_ENUM = EnumWebhookType.POKEMON;
@@ -32,7 +32,7 @@ public class WebhookPokemon extends WebhookData implements ILocationWebhook, IPo
 
 	public int individual_attack;
 	public int individual_defense;
-	public int individial_stamina;
+	public int individual_stamina;
 
 	public int move_1;
 	public int move_2;
@@ -60,6 +60,37 @@ public class WebhookPokemon extends WebhookData implements ILocationWebhook, IPo
 	@Override
 	public DexMove getChargedMove() {
 		return GoHubDatabase.getMove(move_2);
+	}
+
+	// TODO: finish nagging Shawn for this too
+	@Override
+	public boolean isWeatherBoosted() {
+		return false;
+	}
+
+	@Override
+	public int getAttackIV() {
+		return this.individual_attack;
+	}
+
+	@Override
+	public int getDefenseIV() {
+		return this.individual_defense;
+	}
+
+	@Override
+	public int getStaminaIV() {
+		return this.individual_stamina;
+	}
+
+	@Override
+	public double getWeight() {
+		return this.weight;
+	}
+
+	@Override
+	public double getHeight() {
+		return this.height;
 	}
 
 	@Override

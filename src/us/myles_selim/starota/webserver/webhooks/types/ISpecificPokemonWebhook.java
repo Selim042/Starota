@@ -10,4 +10,8 @@ public interface ISpecificPokemonWebhook extends IPokemonWebhook {
 
 	public int getStaminaIV();
 
+	public double getWeight();
+
+	public double getHeight();
+
 }

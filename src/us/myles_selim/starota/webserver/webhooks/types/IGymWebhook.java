@@ -10,7 +10,7 @@ public interface IGymWebhook extends ILocationWebhook {
 
 	public int getTeamId();
 
-	// finish nagging Shawn for this
+	// TODO: finish nagging Shawn for this
 	public default EnumTeam getTeam() {
 		return EnumTeam.NO_TEAM;
 	}

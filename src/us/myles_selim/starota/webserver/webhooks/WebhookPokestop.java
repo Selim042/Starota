@@ -9,7 +9,7 @@ public class WebhookPokestop extends WebhookData implements ILocationWebhook {
 
 	public String pokestop_id;
 	public double latitude;
-	public double longitute;
+	public double longitude;
 	public String name;
 	public String url;
 
@@ -26,7 +26,7 @@ public class WebhookPokestop extends WebhookData implements ILocationWebhook {
 
 	@Override
 	public double getLongitude() {
-		return this.longitute;
+		return this.longitude;
 	}
 
 }
