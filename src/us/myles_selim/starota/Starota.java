@@ -106,9 +106,9 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	// public static EnumBotStatus STATUS = EnumBotStatus.UNKNOWN;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "2.7.5";
+	public final static String VERSION = "2.7.6";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n" + "Public changes:\n"
-			+ " * Fix raids when there are more than one possible boss";
+			+ " * Fix issue with form names on raids";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static void main(String[] args) {
