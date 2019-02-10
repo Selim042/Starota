@@ -14,6 +14,7 @@ import sx.blah.discord.handle.impl.obj.ReactionEmoji;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
@@ -63,7 +64,9 @@ public class PrimaryCommandHandler {
 		if (!cmdS.startsWith(prefix))
 			return;
 		String[] args = getArgs(message, guild);
-		if (!channel.getTypingStatus())
+		IUser ourUser = Starota.getOurUser();
+		if (!channel.getTypingStatus()
+				&& channel.getModifiedPermissions(ourUser).contains(Permissions.SEND_MESSAGES))
 			RequestBuffer.request(() -> channel.setTypingStatus(true));
 		if (Starota.DEBUG)
 			message.addReaction(ReactionEmoji.of("�?"));
@@ -107,7 +110,8 @@ public class PrimaryCommandHandler {
 			}
 			channel.sendMessage(builder.build());
 		}
-		if (channel.getTypingStatus())
+		if (channel.getTypingStatus()
+				&& channel.getModifiedPermissions(ourUser).contains(Permissions.SEND_MESSAGES))
 			RequestBuffer.request(() -> channel.setTypingStatus(false));
 	}
 
