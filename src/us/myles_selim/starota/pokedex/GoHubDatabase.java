@@ -126,7 +126,7 @@ public class GoHubDatabase {
 			return POKEMON_CACHE.get(key).getValue();
 		try {
 			URL url;
-			if (form == null || form.equals("Normal"))
+			if (form == null || (form.equals("Normal") && !pokemon.equals(EnumPokemon.ARCEUS)))
 				url = new URL(POKEMON_API + pokemon.getId());
 			else
 				url = new URL(POKEMON_API + pokemon.getId() + "?form=" + form);
@@ -152,7 +152,7 @@ public class GoHubDatabase {
 			return POKEMON_MOVES_CACHE.get(key).getValue();
 		try {
 			URL url;
-			if (form == null || form.equals("Normal"))
+			if (form == null || (form.equals("Normal") && !pokemon.equals(EnumPokemon.ARCEUS)))
 				url = new URL(POKEMON_MOVES_API + pokemon.getId());
 			else
 				url = new URL(POKEMON_MOVES_API + pokemon.getId() + "?form=" + form);
@@ -195,7 +195,7 @@ public class GoHubDatabase {
 			return MOVESET_CACHE.get(key).getValue();
 		try {
 			URL url;
-			if (form == null || form.equals("Normal"))
+			if (form == null || (form.equals("Normal") && !pokemon.equals(EnumPokemon.ARCEUS)))
 				url = new URL(MOVESETS_API + pokemon.getId());
 			else
 				url = new URL(MOVESETS_API + pokemon.getId() + "?form=" + form);
@@ -221,7 +221,7 @@ public class GoHubDatabase {
 			return COUNTER_CACHE.get(key).getValue();
 		try {
 			URL url;
-			if (form == null || form.equals("Normal"))
+			if (form == null || (form.equals("Normal") && !pokemon.equals(EnumPokemon.ARCEUS)))
 				url = new URL(COUNTERS_API + pokemon.getId());
 			else
 				url = new URL(COUNTERS_API + pokemon.getId() + "?form=" + form);

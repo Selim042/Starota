@@ -61,7 +61,7 @@ public class RaidReactionMessage extends ReactionMessage {
 	public void onReactionAdded(StarotaServer server, IChannel channel, IMessage msg, IUser user,
 			IReaction react) {
 		msg.removeReaction(user, react);
-		if (!MiscUtils.arrContains(EMOJI_NAMES, react.getEmoji().getName()))
+		if (pokemon != null && !MiscUtils.arrContains(EMOJI_NAMES, react.getEmoji().getName()))
 			return;
 		if (pokemon == null) {
 			String[] parts = react.getEmoji().getName().split("_");
