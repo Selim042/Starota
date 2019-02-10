@@ -70,6 +70,8 @@ public class RaidReactionMessage extends ReactionMessage {
 					? pokemon.getFormSet().getForm(parts[1])
 					: null;
 			boss = SilphRoadData.getBoss(pokemon, form);
+			if (boss == null)
+				return;
 			RequestBuffer.request(() -> msg.removeAllReactions()).get();
 			for (int i = 0; i < EMOJI_NAMES.length - 2; i++) {
 				int iF = i;
@@ -82,7 +84,10 @@ public class RaidReactionMessage extends ReactionMessage {
 			RequestBuffer.request(() -> msg.addReaction(ReactionEmoji.of(EMOJI_NAMES[6]))).get();
 			if (!GoHubDatabase.isEntryLoaded(pokemon)) {
 				msg.edit(GoHubDatabase.LOADING_EMBED);
-				GoHubDatabase.getEntry(pokemon, form == null ? null : form.toString());
+				GoHubDatabase.getEntry(pokemon,
+						form == null ? null
+								: (form.getSpritePostfix(pokemon) == null ? form.toString()
+										: form.getSpritePostfix(pokemon)));
 			}
 		} else {
 			if (react.getEmoji().getName().equals(EMOJI_NAMES[5])) {
@@ -113,7 +118,10 @@ public class RaidReactionMessage extends ReactionMessage {
 		EmbedBuilder builder = new EmbedBuilder();
 		PokedexEntry entry = null;
 		if (pokemon != null && StarotaModule.isModuleEnabled(server, BaseModules.POKEDEX))
-			entry = GoHubDatabase.getEntry(pokemon, form == null ? null : form.toString());
+			entry = GoHubDatabase.getEntry(pokemon,
+					form == null ? null
+							: (form.getSpritePostfix(pokemon) == null ? form.toString()
+									: form.getSpritePostfix(pokemon)));
 		if (pokemon != null) {
 			String titleString = (form == null ? "" : form + " ") + pokemon + " Raid ";
 			// if (boss.getTier() == 6)
@@ -195,7 +203,7 @@ public class RaidReactionMessage extends ReactionMessage {
 		}
 		List<RaidBoss> bosses = SilphRoadData.getBosses(tier);
 		for (RaidBoss b : bosses) {
-			String postfix = b.getForm() == null ? "" : "_" + b.getForm();
+			String postfix = b.getForm() == null ? "" : "_" + b.getForm().getSpritePostfix(b.getPokemon());
 			RequestBuffer
 					.request(() -> msg.addReaction(EmojiServerHelper.getEmoji(b.getPokemon() + postfix,
 							ImageHelper.getOfficalArtwork(b.getPokemon(), b.getForm()))));

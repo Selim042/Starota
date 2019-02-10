@@ -110,7 +110,10 @@ public class WebhookRaidReactionMessage extends ReactionMessage {
 		PokedexEntry entry = null;
 		builder.withColor(RaidBoss.getColor(raidData.level, pokemon));
 		if (pokemon != null && StarotaModule.isModuleEnabled(server, BaseModules.POKEDEX))
-			entry = GoHubDatabase.getEntry(pokemon, form == null ? null : form.toString());
+			entry = GoHubDatabase.getEntry(pokemon,
+					form == null ? null
+							: (form.getSpritePostfix(pokemon) == null ? form.toString()
+									: form.getSpritePostfix(pokemon)));
 		if (pokemon != null) {
 			String titleString = (form == null ? "" : form + " ") + pokemon + " Raid ";
 			// if (boss.getTier() == 6)

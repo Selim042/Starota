@@ -120,7 +120,7 @@ public class SilphRoadData {
 	public static RaidBoss getBoss(EnumPokemon pokemon, Form form) {
 		getBosses();
 		for (RaidBoss b : BOSSES.getValue())
-			if (b.pokemon.equals(pokemon) && (b.form == null || b.form.equals(form)))
+			if (b.pokemon.equals(pokemon) && ((form == null && b.form == null) || b.form.equals(form)))
 				return b;
 		return null;
 	}

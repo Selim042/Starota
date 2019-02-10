@@ -92,7 +92,7 @@ public class FormSetAlolan extends FormSet {
 
 		@Override
 		public String getSpritePostfix(EnumPokemon pokemon) {
-			return "alola";
+			return "Alola";
 		}
 
 		@Override

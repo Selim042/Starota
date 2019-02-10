@@ -30,8 +30,12 @@ public abstract class FormSet {
 	public Form getForm(String form) {
 		for (Form f : forms) {
 			String formName = f.toString().replaceAll("\\.", "").replaceAll(" ", "_");
-			if (formName.equalsIgnoreCase(form) || formName.split("_")[0].equalsIgnoreCase(form)
+			String postfix = f.getSpritePostfix(null);
+			if ((formName.equalsIgnoreCase(form) || formName.split("_")[0].equalsIgnoreCase(form)
 					|| formName.replaceAll("_", "").equalsIgnoreCase(form))
+					|| (postfix != null && (postfix.equalsIgnoreCase(form)
+							|| postfix.split("_")[0].equalsIgnoreCase(form)
+							|| postfix.replaceAll("_", "").equalsIgnoreCase(form))))
 				return f;
 		}
 		return null;
