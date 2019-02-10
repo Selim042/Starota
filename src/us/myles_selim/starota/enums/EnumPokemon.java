@@ -1,5 +1,6 @@
 package us.myles_selim.starota.enums;
 
+import us.myles_selim.starota.ImageHelper;
 import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.trading.forms.FormSet;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
@@ -974,6 +975,17 @@ public enum EnumPokemon {
 			return false;
 		default:
 			return true;
+		}
+	}
+
+	public String getArtwork(int formId) {
+		switch (this) {
+		case WORMADAM:
+		case ROTOM:
+		case ARCEUS:
+			return ImageHelper.getOfficalArtwork(this);
+		default:
+			return ImageHelper.getOfficalArtwork(this, formId);
 		}
 	}
 

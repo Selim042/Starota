@@ -29,12 +29,15 @@ public class ReactionMessage {
 		ReactionMessageRegistry.MESSAGES.put(msg.getStringID(), this);
 		StarotaServer sserver = StarotaServer.getServer(channel.getGuild());
 		// onSend(sserver, channel, msg);
+		onEdit(sserver, channel, msg);
 		if (this instanceof PersistReactionMessage)
 			ReactionMessageRegistry.serialize(sserver, msg, (PersistReactionMessage) this);
 		return msg;
 	}
 
 	public void onSend(StarotaServer server, IChannel channel, IMessage msg) {}
+
+	public void onEdit(StarotaServer server, IChannel channel, IMessage msg) {}
 
 	public void onReactionAdded(StarotaServer server, IChannel channel, IMessage msg, IUser user,
 			IReaction react) {

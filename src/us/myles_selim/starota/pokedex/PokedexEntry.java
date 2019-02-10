@@ -8,7 +8,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
+import sx.blah.discord.handle.obj.IEmoji;
 import sx.blah.discord.util.EmbedBuilder;
+import us.myles_selim.starota.EmojiServerHelper;
 import us.myles_selim.starota.ImageHelper;
 import us.myles_selim.starota.MiscUtils;
 import us.myles_selim.starota.enums.EnumPokemon;
@@ -117,7 +119,7 @@ public class PokedexEntry extends ReactionMessage {
 	private Map<String, PokedexEntry> formData = new ConcurrentHashMap<>();
 
 	public PokedexEntry getFormData(String form) {
-		if (form.equals("Normal"))
+		if (form.equals("Normal") && !getPokemon().equals(EnumPokemon.ARCEUS))
 			return this;
 		if (formData.containsKey(form))
 			return formData.get(form);
@@ -266,12 +268,12 @@ public class PokedexEntry extends ReactionMessage {
 			pokeName += String.format(" (%s)", embForm);
 		builder.withTitle(String.format("%s #%d", pokeName, entry.id));
 		builder.withUrl(String.format("https://db.pokemongohub.net/pokemon/%d", entry.id));
-		builder.withThumbnail(ImageHelper.getOfficalArtwork(entry.getPokemon(), formId));
+		builder.withThumbnail(entry.getPokemon().getArtwork(formId));
 		builder.appendDesc(entry.getDescription());
 
 		// stats
 		builder.appendField("Type:",
-				(entry.type2 != null ? entry.type1.getEmoji() + "/" + entry.type2.getEmoji()
+				(entry.type2 != null ? entry.type1.getEmoji() + "" + entry.type2.getEmoji()
 						: entry.type1.getEmoji() + ""),
 				true);
 		String weatherString = "";
@@ -363,6 +365,15 @@ public class PokedexEntry extends ReactionMessage {
 
 		public String name;
 		public String value;
+
+		public IEmoji getEmoji(PokedexEntry entry) {
+			if (entry.getPokemon().equals(EnumPokemon.ARCEUS)) {
+				EnumPokemonType type = EnumPokemonType.valueOf(name.toUpperCase());
+				return type.getEmoji();
+			}
+			return EmojiServerHelper.getEmoji(entry.name + "_" + name,
+					ImageHelper.getOfficalArtwork(entry.getPokemon(), entry.getFormId(name)));
+		}
 
 	}
 

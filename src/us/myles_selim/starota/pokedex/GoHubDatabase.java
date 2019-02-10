@@ -100,9 +100,12 @@ public class GoHubDatabase {
 					counter.formName = jarr.get(2).getAsString();
 				counter.quickMove = GoHubDatabase.getMove(jarr.get(3).getAsInt());
 				counter.chargedMove = GoHubDatabase.getMove(jarr.get(6).getAsInt());
-				counter.deaths = Integer.parseInt(jarr.get(9).getAsString());
-				counter.ttw = jarr.get(10).getAsFloat();
-				counter.score = jarr.get(11).getAsFloat();
+				if (!jarr.get(9).isJsonNull())
+					counter.deaths = Integer.parseInt(jarr.get(9).getAsString());
+				if (!jarr.get(10).isJsonNull())
+					counter.ttw = jarr.get(10).getAsFloat();
+				if (!jarr.get(11).isJsonNull())
+					counter.score = jarr.get(11).getAsFloat();
 				return counter;
 			}
 		});

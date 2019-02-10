@@ -7,8 +7,8 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IReaction;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.RequestBuffer;
-import us.myles_selim.starota.EmojiServerHelper;
-import us.myles_selim.starota.ImageHelper;
+import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.enums.EnumPokemonType;
 import us.myles_selim.starota.pokedex.PokedexEntry.DexForm;
 import us.myles_selim.starota.reaction_messages.ReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -17,6 +17,7 @@ public class PokedexReactionMessage extends ReactionMessage {
 
 	private PokedexEntry entry;
 	private String form;
+	private boolean sendForms = false;
 
 	public PokedexReactionMessage() {}
 
@@ -35,13 +36,19 @@ public class PokedexReactionMessage extends ReactionMessage {
 			return;
 		for (int i = 0; i < entry.forms.length; i++) {
 			DexForm f = entry.forms[i];
-			IEmoji emoji = EmojiServerHelper.getEmoji(entry.name + "_" + f.name,
-					ImageHelper.getOfficalArtwork(entry.getPokemon(), i));
+			sendForms = true;
+			IEmoji emoji = f.getEmoji(entry);
 			RequestBuffer.request(() -> msg.addReaction(emoji));
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {}
 		}
+	}
+
+	@Override
+	public void onEdit(StarotaServer server, IChannel channel, IMessage msg) {
+		if (!sendForms)
+			onSend(server, channel, msg);
 	}
 
 	@Override
@@ -51,6 +58,24 @@ public class PokedexReactionMessage extends ReactionMessage {
 		if (name.startsWith(entry.name + "_")) {
 			msg.removeReaction(user, react);
 			String formName = name.substring(name.indexOf("_") + 1);
+			if (!isFormValid(formName) || form.equals(formName))
+				return;
+			form = formName;
+			if (!entry.hasEmbedPrepared(formName))
+				RequestBuffer.request(() -> msg.edit(GoHubDatabase.LOADING_EMBED));
+			EmbedObject newEmbed = getEmbed(server);
+			RequestBuffer.request(() -> msg.edit(newEmbed));
+		} else if (this.entry.getPokemon().equals(EnumPokemon.ARCEUS)) {
+			msg.removeReaction(user, react);
+			String formName = react.getEmoji().getName().toUpperCase();
+			if (formName.endsWith("TYPE"))
+				formName = formName.substring(0, formName.length() - 4);
+			try {
+				EnumPokemonType.valueOf(formName);
+			} catch (IllegalArgumentException e) {
+				return;
+			}
+			formName = formName.substring(0, 1) + formName.substring(1, formName.length()).toLowerCase();
 			if (!isFormValid(formName) || form.equals(formName))
 				return;
 			form = formName;
