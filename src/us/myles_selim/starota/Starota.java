@@ -320,7 +320,10 @@ public class Starota {
 			@Override
 			public void run() {
 				boolean sentToAll = true;
-				for (IGuild g : CLIENT.getGuilds()) {
+				List<IGuild> guilds = new ArrayList<>(CLIENT.getGuilds());
+				if (!IS_DEV)
+					guilds.addAll(PokedexBot.POKEDEX_CLIENT.getGuilds());
+				for (IGuild g : guilds) {
 					StarotaServer server = StarotaServer.getServer(g);
 					if (!server.hasKey(CommandChangelogChannel.CHANGES_CHANNEL))
 						continue;
