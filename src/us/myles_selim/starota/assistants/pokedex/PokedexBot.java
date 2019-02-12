@@ -2,6 +2,7 @@ package us.myles_selim.starota.assistants.pokedex;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.Properties;
 
 import org.discordbots.api.client.DiscordBotListAPI;
@@ -10,9 +11,16 @@ import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.events.EventDispatcher;
 import sx.blah.discord.handle.obj.ActivityType;
+import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.DiscordException;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.commands.CommandChangelog;
+import us.myles_selim.starota.commands.CommandChangelogChannel;
+import us.myles_selim.starota.commands.CommandCredits;
+import us.myles_selim.starota.commands.CommandInvite;
+import us.myles_selim.starota.commands.CommandSupportBot;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 import us.myles_selim.starota.pokedex.CommandPokedex;
@@ -21,10 +29,14 @@ import us.myles_selim.starota.reaction_messages.ReactionMessageRegistry;
 public class PokedexBot {
 
 	public static final PrimaryCommandHandler COMMAND_HANDLER = new PrimaryCommandHandler();
+	public static final String BOT_NAME = "Pokedex";
+	public static final EnumSet<Permissions> USED_PERMISSIONS = EnumSet.of(Permissions.SEND_MESSAGES,
+			Permissions.READ_MESSAGES, Permissions.MANAGE_MESSAGES, Permissions.USE_EXTERNAL_EMOJIS,
+			Permissions.ADD_REACTIONS);
 
 	public static IDiscordClient POKEDEX_CLIENT;
 
-	private static Properties PROPERTIES = new Properties();;
+	private static Properties PROPERTIES = new Properties();
 	private static DiscordBotListAPI BOT_LIST;
 	private static boolean started = false;
 
@@ -74,12 +86,28 @@ public class PokedexBot {
 		JavaCommandHandler jCmdHandler = new JavaCommandHandler();
 		COMMAND_HANDLER.registerCommandHandler(jCmdHandler);
 		jCmdHandler.registerDefaultCommands();
+
+		jCmdHandler.registerCommand(new CommandChangelog());
+		jCmdHandler.registerCommand(new CommandCredits());
+		jCmdHandler.registerCommand(
+				new CommandSupportBot(BOT_NAME, POKEDEX_CLIENT.getOurUser().getLongID()));
+		jCmdHandler.registerCommand(
+				new CommandInvite(BOT_NAME, Permissions.generatePermissionsNumber(USED_PERMISSIONS)));
+
+		jCmdHandler.registerCommand("Administrative", new CommandChangelogChannel());
+
 		jCmdHandler.registerCommand(new CommandPokedex());
 
 		EventDispatcher dispatcher = POKEDEX_CLIENT.getDispatcher();
 		dispatcher.registerListener(COMMAND_HANDLER);
 		dispatcher.registerListener(new PokedexEventHandler());
 		dispatcher.registerListener(reactionRegistry);
+	}
+
+	public static IUser getOurUser() {
+		if (!started)
+			return null;
+		return POKEDEX_CLIENT.getOurUser();
 	}
 
 	public static DiscordBotListAPI getBotListAPI() {

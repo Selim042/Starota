@@ -7,14 +7,17 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
-import sx.blah.discord.util.RequestBuffer.IVoidRequest;
-import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
 
-public class CommandSupportStarota extends JavaCommand {
+public class CommandSupportBot extends JavaCommand {
 
-	public CommandSupportStarota() {
-		super("supportStarota", "Information on how to help support Starota.");
+	private String botName;
+	private long botId;
+
+	public CommandSupportBot(String botName, long botId) {
+		super("support" + botName, "Information on how to help support " + botName + ".");
+		this.botName = botName;
+		this.botId = botId;
 	}
 
 	@Override
@@ -27,17 +30,15 @@ public class CommandSupportStarota extends JavaCommand {
 	@Override
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.appendDesc("Thank you for your interest in helping support " + Starota.BOT_NAME + "!\n"
-				+ "If you visit the Patreon below you can support " + Starota.BOT_NAME
+		builder.appendDesc("Thank you for your interest in helping support " + this.botName + "!\n"
+				+ "If you visit the Patreon below you can support " + this.botName
 				+ " and its developers.\n"
 				+ "Every penny counts, but don't feel like you must donate if you use the bot.\n"
 				+ "Supporting Starota may allow access to additional features.  More information on Patreon.\n"
-				+ "https://patreon.com/Selim_042\n\n" + "You can also support " + Starota.BOT_NAME
-				+ " by voting for it to raise it in the rankings.\n"
-				+ "https://discordbots.org/bot/489245655710040099");
-		RequestBuffer.request((IVoidRequest) () -> {
-			channel.sendMessage(builder.build());
-		});
+				+ "https://patreon.com/Selim_042\n\n" + "You can also support " + this.botName
+				+ " by voting for it to raise it in the rankings.\n" + "https://discordbots.org/bot/"
+				+ this.botId);
+		RequestBuffer.request(() -> channel.sendMessage(builder.build()));
 	}
 
 }

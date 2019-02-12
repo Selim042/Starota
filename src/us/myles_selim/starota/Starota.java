@@ -20,6 +20,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.EmbedBuilder;
@@ -34,7 +35,7 @@ import us.myles_selim.starota.commands.CommandGenerateCommandWiki;
 import us.myles_selim.starota.commands.CommandGetTop;
 import us.myles_selim.starota.commands.CommandInvite;
 import us.myles_selim.starota.commands.CommandStatus;
-import us.myles_selim.starota.commands.CommandSupportStarota;
+import us.myles_selim.starota.commands.CommandSupportBot;
 import us.myles_selim.starota.commands.CommandTest;
 import us.myles_selim.starota.commands.pvp.CommandBattleReady;
 import us.myles_selim.starota.commands.pvp.CommandFindBattles;
@@ -192,11 +193,12 @@ public class Starota {
 		JavaCommandHandler jCmdHandler = new JavaCommandHandler();
 		COMMAND_HANDLER.registerCommandHandler(jCmdHandler);
 		jCmdHandler.registerDefaultCommands();
-		
+
 		jCmdHandler.registerCommand(new CommandChangelog());
 		jCmdHandler.registerCommand(new CommandCredits());
-		jCmdHandler.registerCommand(new CommandSupportStarota());
-		jCmdHandler.registerCommand(new CommandInvite());
+		jCmdHandler.registerCommand(new CommandSupportBot(Starota.BOT_NAME, Starota.STAROTA_ID));
+		jCmdHandler.registerCommand(new CommandInvite(Starota.BOT_NAME,
+				Permissions.generatePermissionsNumber(DebugServer.USED_PERMISSIONS)));
 
 		jCmdHandler.registerCommand("Administrative", new CommandStatus());
 		jCmdHandler.registerCommand("Administrative", new CommandSetResearchChannel());
