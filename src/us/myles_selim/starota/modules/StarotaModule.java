@@ -6,7 +6,7 @@ import java.util.List;
 
 import us.myles_selim.ebs.EBList;
 import us.myles_selim.ebs.data_types.DataTypeString;
-import us.myles_selim.starota.DebugServer;
+import us.myles_selim.starota.debug_server.DebugServer;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class StarotaModule {

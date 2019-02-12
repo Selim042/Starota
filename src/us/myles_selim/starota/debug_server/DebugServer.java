@@ -1,4 +1,4 @@
-package us.myles_selim.starota;
+package us.myles_selim.starota.debug_server;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -9,7 +9,8 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.debug_server.StatusReactionMessage;
+import us.myles_selim.starota.EmojiServerHelper;
+import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumPatreonPerm;
 import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.wrappers.StarotaServer;

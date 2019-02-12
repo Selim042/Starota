@@ -26,12 +26,13 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class PrimaryCommandHandler {
 
-	private static final List<ICommandHandler> COMMAND_HANDLERS = new CopyOnWriteArrayList<>();
 	private static String DEFAULT_PREFIX = ".";
 
 	public static final String PREFIX_KEY = "cmd_prefix";
 	public static final String DEFAULT_CATEGORY = "Uncategorized";
 	public static final int DEFAULT_SUGGESTION_COUNT = 10;
+
+	private final List<ICommandHandler> COMMAND_HANDLERS = new CopyOnWriteArrayList<>();
 
 	public static String getPrefix(IGuild guild) {
 		StarotaServer server = StarotaServer.getServer(guild);
@@ -45,7 +46,7 @@ public class PrimaryCommandHandler {
 		server.setValue(PREFIX_KEY, prefix);
 	}
 
-	public static void registerCommandHandler(ICommandHandler handler) {
+	public void registerCommandHandler(ICommandHandler handler) {
 		if (!COMMAND_HANDLERS.contains(handler))
 			COMMAND_HANDLERS.add(handler);
 	}
@@ -115,7 +116,7 @@ public class PrimaryCommandHandler {
 			RequestBuffer.request(() -> channel.setTypingStatus(false));
 	}
 
-	private static void handleException(Throwable th, IGuild guild, IChannel channel, IMessage message) {
+	private void handleException(Throwable th, IGuild guild, IChannel channel, IMessage message) {
 		if (channel.getModifiedPermissions(Starota.getOurUser()).contains(Permissions.SEND_MESSAGES))
 			RequestBuffer.request(() -> {
 				message.reply("There was an error encountered while executing your command: "
@@ -128,7 +129,7 @@ public class PrimaryCommandHandler {
 			Starota.submitError(" on server " + guild.getName(), th);
 	}
 
-	public static List<ICommand> getCommandsByCategory(IGuild server, String category) {
+	public List<ICommand> getCommandsByCategory(IGuild server, String category) {
 		if (category == null || category.isEmpty())
 			return getAllCommands(server);
 		if (!StarotaModule.isCategoryEnabled(StarotaServer.getServer(server), category))
@@ -141,14 +142,14 @@ public class PrimaryCommandHandler {
 		return Collections.unmodifiableList(ret);
 	}
 
-	public static List<ICommand> getAllCommands(IGuild server) {
+	public List<ICommand> getAllCommands(IGuild server) {
 		List<ICommand> ret = new ArrayList<>();
 		for (ICommandHandler h : COMMAND_HANDLERS)
 			ret.addAll(h.getAllCommands(server));
 		return ret;
 	}
 
-	public static ICommand findCommand(IGuild server, String name) {
+	public ICommand findCommand(IGuild server, String name) {
 		for (ICommandHandler h : COMMAND_HANDLERS) {
 			ICommand c = h.findCommand(server, name);
 			if (c != null)
@@ -157,19 +158,19 @@ public class PrimaryCommandHandler {
 		return null;
 	}
 
-	public static ICommand[] getSuggestions(IGuild server, String input) {
+	public ICommand[] getSuggestions(IGuild server, String input) {
 		return getSuggestions(server, null, input, DEFAULT_SUGGESTION_COUNT);
 	}
 
-	public static ICommand[] getSuggestions(IGuild server, String input, int count) {
+	public ICommand[] getSuggestions(IGuild server, String input, int count) {
 		return getSuggestions(server, null, input, count);
 	}
 
-	public static ICommand[] getSuggestions(IGuild server, IChannel channel, String input) {
+	public ICommand[] getSuggestions(IGuild server, IChannel channel, String input) {
 		return getSuggestions(server, channel, input, DEFAULT_SUGGESTION_COUNT);
 	}
 
-	public static ICommand[] getSuggestions(IGuild server, IChannel channel, String input, int count) {
+	public ICommand[] getSuggestions(IGuild server, IChannel channel, String input, int count) {
 		List<DistancedCommand> suggestions = new ArrayList<>();
 		for (ICommandHandler ch : COMMAND_HANDLERS) {
 			for (ICommand cmd : ch.getAllCommands(server)) {
@@ -193,6 +194,34 @@ public class PrimaryCommandHandler {
 				out[index++] = sug;
 		}
 		return out;
+	}
+
+	private String[] getArgs(IMessage message, IGuild guild) {
+		String cmdS = message.getContent();
+		String prefix = getPrefix(guild);
+		if (!cmdS.startsWith(prefix))
+			return new String[0];
+		cmdS = cmdS.substring(prefix.length());
+		List<String> argsL = new ArrayList<>();
+		String longArg = "";
+		for (String arg : cmdS.split(" ")) {
+			if (arg.startsWith("\"") && arg.endsWith("\""))
+				argsL.add(arg);
+			else if (arg.startsWith("\""))
+				longArg += arg;
+			else if (longArg != "" && arg.endsWith("\"")) {
+				String longArgFull = longArg + " " + arg;
+				argsL.add(longArgFull.substring(1, longArgFull.length() - 1));
+				longArg = "";
+			} else if (longArg != "")
+				longArg += " " + arg;
+			else
+				argsL.add(arg);
+		}
+		if (longArg != "")
+			for (String s : longArg.split(" "))
+				argsL.add(s);
+		return argsL.toArray(new String[0]);
 	}
 
 	private static class DistancedCommand implements Comparable<DistancedCommand> {
@@ -242,34 +271,6 @@ public class PrimaryCommandHandler {
 
 	private static int min(int... numbers) {
 		return Arrays.stream(numbers).min().orElse(Integer.MAX_VALUE);
-	}
-
-	private static String[] getArgs(IMessage message, IGuild guild) {
-		String cmdS = message.getContent();
-		String prefix = getPrefix(guild);
-		if (!cmdS.startsWith(prefix))
-			return new String[0];
-		cmdS = cmdS.substring(prefix.length());
-		List<String> argsL = new ArrayList<>();
-		String longArg = "";
-		for (String arg : cmdS.split(" ")) {
-			if (arg.startsWith("\"") && arg.endsWith("\""))
-				argsL.add(arg);
-			else if (arg.startsWith("\""))
-				longArg += arg;
-			else if (longArg != "" && arg.endsWith("\"")) {
-				String longArgFull = longArg + " " + arg;
-				argsL.add(longArgFull.substring(1, longArgFull.length() - 1));
-				longArg = "";
-			} else if (longArg != "")
-				longArg += " " + arg;
-			else
-				argsL.add(arg);
-		}
-		if (longArg != "")
-			for (String s : longArg.split(" "))
-				argsL.add(s);
-		return argsL.toArray(new String[0]);
 	}
 
 }

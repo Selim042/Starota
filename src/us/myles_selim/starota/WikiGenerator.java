@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import us.myles_selim.starota.commands.registry.ICommand;
-import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
+import us.myles_selim.starota.debug_server.DebugServer;
 import us.myles_selim.starota.modules.StarotaModule;
 
 public class WikiGenerator {
@@ -39,7 +39,7 @@ public class WikiGenerator {
 				String out = "";
 				out += "## Commands\n\n_all sample commands use the default command prefix, `.`_\n\n---\n";
 				boolean hasCmds = false;
-				for (ICommand cmd : PrimaryCommandHandler.getCommandsByCategory(
+				for (ICommand cmd : Starota.COMMAND_HANDLER.getCommandsByCategory(
 						Starota.getGuild(DebugServer.DEBUG_SERVER_ID), module.getCommandCategory())) {
 					out += "### " + cmd.getName() + "\n\n";
 					if (cmd.getGeneralUsage() == null)

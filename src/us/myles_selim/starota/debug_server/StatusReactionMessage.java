@@ -12,7 +12,6 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.ebs.Storage;
-import us.myles_selim.starota.DebugServer;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.reaction_messages.PersistReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;

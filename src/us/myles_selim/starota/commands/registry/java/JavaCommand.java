@@ -9,6 +9,7 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.starota.commands.registry.ICommand;
+import us.myles_selim.starota.commands.registry.ICommandHandler;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 
 public class JavaCommand implements ICommand {
@@ -85,6 +86,19 @@ public class JavaCommand implements ICommand {
 		if (this.category == null)
 			return PrimaryCommandHandler.DEFAULT_CATEGORY;
 		return this.category;
+	}
+
+	private ICommandHandler handler;
+
+	@Override
+	public void setCommandHandler(ICommandHandler handler) {
+		if (this.handler == null)
+			this.handler = handler;
+	}
+
+	@Override
+	public ICommandHandler getCommandHandler() {
+		return this.handler;
 	}
 
 }

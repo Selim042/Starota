@@ -5,7 +5,6 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.StarotaCommand;
-import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandRemoveChannelWhitelist extends StarotaCommand {
@@ -28,7 +27,7 @@ public class CommandRemoveChannelWhitelist extends StarotaCommand {
 		}
 		boolean found = false;
 		String cmdCategory = args[1];
-		for (String cat : JavaCommandHandler.getAllCategories()) {
+		for (String cat : this.getCommandHandler().getAllCategories(server.getDiscordGuild())) {
 			if (cmdCategory.equalsIgnoreCase(cat)) {
 				cmdCategory = cat;
 				found = true;

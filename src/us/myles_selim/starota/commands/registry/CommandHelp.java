@@ -35,7 +35,7 @@ public class CommandHelp extends JavaCommand {
 		IUser author = message.getAuthor();
 
 		if (args.length >= 2) {
-			ICommand cmd = PrimaryCommandHandler.findCommand(guild, args[1]);
+			ICommand cmd = this.getCommandHandler().findCommand(guild, args[1]);
 			if (cmd != null) {
 				EmbedBuilder builder = new EmbedBuilder();
 				builder.withTitle("Help: " + cmd.getName());
@@ -92,7 +92,7 @@ public class CommandHelp extends JavaCommand {
 			}
 		}
 
-		List<ICommand> cmds = PrimaryCommandHandler.getCommandsByCategory(guild, category);
+		List<ICommand> cmds = this.getCommandHandler().getCommandsByCategory(guild, category);
 		List<ICommand> disp = new LinkedList<>();
 		for (ICommand cmd : cmds)
 			if (guild != null

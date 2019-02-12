@@ -22,15 +22,10 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class JavaCommandHandler implements ICommandHandler {
 
-	public static final JavaCommandHandler INSTANCE;
+	private final List<JavaCommand> COMMANDS = new CopyOnWriteArrayList<>();
+	private final List<String> CATEGORIES = new CopyOnWriteArrayList<>();
 
-	private static final List<JavaCommand> COMMANDS = new CopyOnWriteArrayList<>();
-	private static final List<String> CATEGORIES = new CopyOnWriteArrayList<>();
-
-	static {
-		INSTANCE = new JavaCommandHandler();
-		PrimaryCommandHandler.registerCommandHandler(INSTANCE);
-
+	public void registerDefaultCommands() {
 		registerCommand("Help", new CommandHelp());
 
 		registerCommand("Commands", new CommandAddChannelWhitelist());
@@ -39,14 +34,15 @@ public class JavaCommandHandler implements ICommandHandler {
 		registerCommand("Commands", new CommandRemoveChannelWhitelist());
 	}
 
-	public static void registerCommand(JavaCommand cmd) {
+	public void registerCommand(JavaCommand cmd) {
 		registerCommand(PrimaryCommandHandler.DEFAULT_CATEGORY, cmd);
 	}
 
-	public static void registerCommand(String category, JavaCommand cmd) {
+	public void registerCommand(String category, JavaCommand cmd) {
 		if (!COMMANDS.contains(cmd)) {
 			cmd.setCategory(category);
 			COMMANDS.add(cmd);
+			cmd.setCommandHandler(this);
 			if (!CATEGORIES.contains(category))
 				CATEGORIES.add(category);
 		}
@@ -70,15 +66,16 @@ public class JavaCommandHandler implements ICommandHandler {
 	@Override
 	public List<ICommand> getAllCommands(IGuild server) {
 		List<ICommand> toRemove = new ArrayList<>();
-		for (ICommand c : COMMANDS)
-			if (!StarotaModule.isCategoryEnabled(StarotaServer.getServer(server), c.getCategory()))
-				toRemove.add(c);
+		if (server != null)
+			for (ICommand c : COMMANDS)
+				if (!StarotaModule.isCategoryEnabled(StarotaServer.getServer(server), c.getCategory()))
+					toRemove.add(c);
 		List<ICommand> ret = new ArrayList<>(COMMANDS);
 		ret.removeAll(toRemove);
 		return Collections.unmodifiableList(ret);
 	}
 
-	public static List<String> getAllCategories() {
+	public List<String> getAllCategories() {
 		return Collections.unmodifiableList(CATEGORIES);
 	}
 
@@ -107,6 +104,11 @@ public class JavaCommandHandler implements ICommandHandler {
 					return c;
 		}
 		return null;
+	}
+
+	@Override
+	public List<String> getAllCategories(IGuild server) {
+		return getAllCategories();
 	}
 
 	// public static void main(String... argsM) {

@@ -41,6 +41,7 @@ import us.myles_selim.starota.commands.pvp.CommandFindBattles;
 import us.myles_selim.starota.commands.pvp.CommandNotReady;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
+import us.myles_selim.starota.debug_server.DebugServer;
 import us.myles_selim.starota.enums.EnumPatreonPerm;
 import us.myles_selim.starota.events.CommandEvents;
 import us.myles_selim.starota.leaderboards.commands.CommandEditLeaderboard;
@@ -110,6 +111,8 @@ public class Starota {
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n" + "Public changes:\n"
 			+ " * Fix issue with form names on raids";
 	public final static File DATA_FOLDER = new File("starotaData");
+
+	public static final PrimaryCommandHandler COMMAND_HANDLER = new PrimaryCommandHandler();
 
 	public static void main(String[] args) {
 		// STATUS = EnumBotStatus.INITIALIZING;
@@ -186,68 +189,72 @@ public class Starota {
 
 		CLIENT.changePresence(StatusType.DND, ActivityType.PLAYING, "registering commands...");
 
-		JavaCommandHandler.registerCommand(new CommandChangelog());
-		JavaCommandHandler.registerCommand(new CommandCredits());
-		JavaCommandHandler.registerCommand(new CommandSupportStarota());
-		JavaCommandHandler.registerCommand(new CommandInvite());
+		JavaCommandHandler jCmdHandler = new JavaCommandHandler();
+		COMMAND_HANDLER.registerCommandHandler(jCmdHandler);
+		jCmdHandler.registerDefaultCommands();
+		
+		jCmdHandler.registerCommand(new CommandChangelog());
+		jCmdHandler.registerCommand(new CommandCredits());
+		jCmdHandler.registerCommand(new CommandSupportStarota());
+		jCmdHandler.registerCommand(new CommandInvite());
 
-		JavaCommandHandler.registerCommand("Administrative", new CommandStatus());
-		JavaCommandHandler.registerCommand("Administrative", new CommandSetResearchChannel());
-		JavaCommandHandler.registerCommand("Administrative", new CommandChangelogChannel());
-		JavaCommandHandler.registerCommand("Administrative", new CommandInviteAssistants());
+		jCmdHandler.registerCommand("Administrative", new CommandStatus());
+		jCmdHandler.registerCommand("Administrative", new CommandSetResearchChannel());
+		jCmdHandler.registerCommand("Administrative", new CommandChangelogChannel());
+		jCmdHandler.registerCommand("Administrative", new CommandInviteAssistants());
 		if (IS_DEV) {
-			JavaCommandHandler.registerCommand("Debug", new CommandGetTop());
-			JavaCommandHandler.registerCommand("Debug", new CommandTest());
-			JavaCommandHandler.registerCommand("Debug", new CommandGenerateCommandWiki());
+			jCmdHandler.registerCommand("Debug", new CommandGetTop());
+			jCmdHandler.registerCommand("Debug", new CommandTest());
+			jCmdHandler.registerCommand("Debug", new CommandGenerateCommandWiki());
 		}
 
-		JavaCommandHandler.registerCommand("Profiles", new CommandRegister());
-		JavaCommandHandler.registerCommand("Profiles", new CommandUpdateProfile());
-		JavaCommandHandler.registerCommand("Profiles", new CommandProfile());
-		JavaCommandHandler.registerCommand("Profiles", new CommandSelfRegister());
-		JavaCommandHandler.registerCommand("Profiles", new CommandGetProfilelessPlayers());
-		JavaCommandHandler.registerCommand("Profiles", new CommandProfileHelp());
+		jCmdHandler.registerCommand("Profiles", new CommandRegister());
+		jCmdHandler.registerCommand("Profiles", new CommandUpdateProfile());
+		jCmdHandler.registerCommand("Profiles", new CommandProfile());
+		jCmdHandler.registerCommand("Profiles", new CommandSelfRegister());
+		jCmdHandler.registerCommand("Profiles", new CommandGetProfilelessPlayers());
+		jCmdHandler.registerCommand("Profiles", new CommandProfileHelp());
 
-		JavaCommandHandler.registerCommand("Groups", new CommandGetGroups());
-		JavaCommandHandler.registerCommand("Groups", new CommandAddGroup());
-		JavaCommandHandler.registerCommand("Groups", new CommandRemoveGroup());
-		JavaCommandHandler.registerCommand("Groups", new CommandSetAsGroup());
+		jCmdHandler.registerCommand("Groups", new CommandGetGroups());
+		jCmdHandler.registerCommand("Groups", new CommandAddGroup());
+		jCmdHandler.registerCommand("Groups", new CommandRemoveGroup());
+		jCmdHandler.registerCommand("Groups", new CommandSetAsGroup());
 
-		JavaCommandHandler.registerCommand("Tradeboard", new CommandTradeboardHelp());
+		jCmdHandler.registerCommand("Tradeboard", new CommandTradeboardHelp());
 		if (IS_DEV) {
-			JavaCommandHandler.registerCommand("Debug", new CommandGetForms());
-			JavaCommandHandler.registerCommand("Debug", new CommandGetShinies());
+			jCmdHandler.registerCommand("Debug", new CommandGetForms());
+			jCmdHandler.registerCommand("Debug", new CommandGetShinies());
 		}
-		JavaCommandHandler.registerCommand("Tradeboard", new CommandForTrade());
-		JavaCommandHandler.registerCommand("Tradeboard", new CommandGetUserTrades());
-		JavaCommandHandler.registerCommand("Tradeboard", new CommandFindTrade());
-		JavaCommandHandler.registerCommand("Tradeboard", new CommandGetTrade());
-		JavaCommandHandler.registerCommand("Tradeboard", new CommandLookingFor());
-		JavaCommandHandler.registerCommand("Tradeboard", new CommandRemoveTrade());
+		jCmdHandler.registerCommand("Tradeboard", new CommandForTrade());
+		jCmdHandler.registerCommand("Tradeboard", new CommandGetUserTrades());
+		jCmdHandler.registerCommand("Tradeboard", new CommandFindTrade());
+		jCmdHandler.registerCommand("Tradeboard", new CommandGetTrade());
+		jCmdHandler.registerCommand("Tradeboard", new CommandLookingFor());
+		jCmdHandler.registerCommand("Tradeboard", new CommandRemoveTrade());
 
-		JavaCommandHandler.registerCommand("Lua", new CommandUploadScript());
+		jCmdHandler.registerCommand("Lua", new CommandUploadScript());
 
-		JavaCommandHandler.registerCommand("Leaderboard", new CommandEditLeaderboard());
-		JavaCommandHandler.registerCommand("Leaderboard", new CommandUpdateLeaderboard());
-		JavaCommandHandler.registerCommand("Leaderboard", new CommandNewLeaderboard());
-		JavaCommandHandler.registerCommand("Leaderboard", new CommandGetLeaderboard());
-		JavaCommandHandler.registerCommand("Leaderboard", new CommandListLeaderboards());
+		jCmdHandler.registerCommand("Leaderboard", new CommandEditLeaderboard());
+		jCmdHandler.registerCommand("Leaderboard", new CommandUpdateLeaderboard());
+		jCmdHandler.registerCommand("Leaderboard", new CommandNewLeaderboard());
+		jCmdHandler.registerCommand("Leaderboard", new CommandGetLeaderboard());
+		jCmdHandler.registerCommand("Leaderboard", new CommandListLeaderboards());
 
-		JavaCommandHandler.registerCommand("Modules", new CommandModules());
+		jCmdHandler.registerCommand("Modules", new CommandModules());
 
-		JavaCommandHandler.registerCommand("PvP", new CommandBattleReady());
-		JavaCommandHandler.registerCommand("PvP", new CommandNotReady());
-		JavaCommandHandler.registerCommand("PvP", new CommandFindBattles());
+		jCmdHandler.registerCommand("PvP", new CommandBattleReady());
+		jCmdHandler.registerCommand("PvP", new CommandNotReady());
+		jCmdHandler.registerCommand("PvP", new CommandFindBattles());
 
-		JavaCommandHandler.registerCommand("Pokedex", new CommandPokedex());
+		jCmdHandler.registerCommand("Pokedex", new CommandPokedex());
 
-		JavaCommandHandler.registerCommand("Silph Road", new CommandSilphCard());
+		jCmdHandler.registerCommand("Silph Road", new CommandSilphCard());
 
-		JavaCommandHandler.registerCommand("Raids", new CommandRaid());
-		JavaCommandHandler.registerCommand("Raids", new CommandSetRaidEChannel());
-		// JavaCommandHandler.registerCommand("Raids", new CommandRaidBosses());
+		jCmdHandler.registerCommand("Raids", new CommandRaid());
+		jCmdHandler.registerCommand("Raids", new CommandSetRaidEChannel());
+		// jCmdHandler.registerCommand("Raids", new CommandRaidBosses());
 
-		JavaCommandHandler.registerCommand("Events", new CommandEvents());
+		jCmdHandler.registerCommand("Events", new CommandEvents());
 
 		try {
 			Thread.sleep(2500);
@@ -262,7 +269,7 @@ public class Starota {
 
 		ReactionMessageRegistry reactionRegistry = new ReactionMessageRegistry();
 		dispatcher.registerListener(reactionRegistry);
-		dispatcher.registerListener(new PrimaryCommandHandler());
+		dispatcher.registerListener(COMMAND_HANDLER);
 		dispatcher.registerListener(new EventHandler());
 		dispatcher.registerListener(new WebhookEventHandler());
 		ReactionMessageRegistry.init();
@@ -335,7 +342,7 @@ public class Starota {
 
 		LuaUtils.registerConverters();
 		dispatcher.registerListener(new LuaEventHandler());
-		PrimaryCommandHandler.registerCommandHandler(new LuaCommandHandler());
+		COMMAND_HANDLER.registerCommandHandler(new LuaCommandHandler());
 
 		FULLY_STARTED = true;
 		// STATUS = EnumBotStatus.ONLINE;

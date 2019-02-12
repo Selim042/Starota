@@ -17,6 +17,7 @@ import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.assistants.StarotaAssistants;
+import us.myles_selim.starota.debug_server.DebugServer;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.research.ResearchTracker;
 import us.myles_selim.starota.trading.FormManager;

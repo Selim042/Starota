@@ -15,6 +15,8 @@ public interface ICommandHandler {
 
 	public List<ICommand> getCommandsByCategory(IGuild server, String category);
 
+	public List<String> getAllCategories(IGuild server);
+
 	public ICommand findCommand(IGuild server, String name);
 
 }

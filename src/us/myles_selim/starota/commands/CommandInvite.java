@@ -4,8 +4,8 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.DebugServer;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.debug_server.DebugServer;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandInvite extends StarotaCommand {

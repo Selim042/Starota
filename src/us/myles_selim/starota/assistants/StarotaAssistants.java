@@ -59,7 +59,7 @@ public class StarotaAssistants {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				client.changeAvatar(Image.forUser(Starota.getOurUser()));
+				// client.changeAvatar(Image.forUser(Starota.getOurUser()));
 				if (Starota.IS_DEV)
 					client.changePresence(StatusType.IDLE, ActivityType.LISTENING,
 							"to " + Starota.BOT_NAME);

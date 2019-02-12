@@ -3,8 +3,8 @@ package us.myles_selim.starota.commands;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
+import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.ICommand;
-import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
 import us.myles_selim.starota.modules.StarotaModule;
 
@@ -22,7 +22,7 @@ public class CommandGenerateCommandWiki extends JavaCommand {
 				module = m;
 		String out = "";
 		out += "## Commands\n\n_all sample commands use the default command prefix, `.`_\n\n---\n";
-		for (ICommand cmd : PrimaryCommandHandler.getCommandsByCategory(guild, args[1])) {
+		for (ICommand cmd : Starota.COMMAND_HANDLER.getCommandsByCategory(guild, args[1])) {
 			out += "### " + cmd.getName() + "\n\n";
 			if (cmd.getGeneralUsage() == null)
 				out += "**Usage**: ." + cmd.getName() + "\n\n";

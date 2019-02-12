@@ -18,6 +18,8 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class LuaCommandHandler implements ICommandHandler {
 
+	private static final String CATEGORY = "Lua";
+
 	@Override
 	public boolean executeCommand(String[] args, IMessage message, IGuild guild, IChannel channel)
 			throws Exception {
@@ -54,9 +56,12 @@ public class LuaCommandHandler implements ICommandHandler {
 		return null;
 	}
 
-	private static class LuaCommand implements ICommand {
+	@Override
+	public List<String> getAllCategories(IGuild server) {
+		return Collections.singletonList(CATEGORY);
+	}
 
-		private static final String CATEGORY = "Lua";
+	private class LuaCommand implements ICommand {
 
 		private final StarotaServer server;
 		private final String name;
@@ -115,6 +120,14 @@ public class LuaCommandHandler implements ICommandHandler {
 		@Override
 		public String getGeneralUsage() {
 			return null;
+		}
+
+		@Override
+		public void setCommandHandler(ICommandHandler handler) {}
+
+		@Override
+		public ICommandHandler getCommandHandler() {
+			return LuaCommandHandler.this;
 		}
 	}
 

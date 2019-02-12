@@ -13,9 +13,14 @@ import sx.blah.discord.handle.obj.ActivityType;
 import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.DiscordException;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
+import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
+import us.myles_selim.starota.pokedex.CommandPokedex;
 import us.myles_selim.starota.reaction_messages.ReactionMessageRegistry;
 
 public class PokedexBot {
+
+	public static final PrimaryCommandHandler COMMAND_HANDLER = new PrimaryCommandHandler();
 
 	public static IDiscordClient POKEDEX_CLIENT;
 
@@ -66,7 +71,13 @@ public class PokedexBot {
 		};
 		statusUpdater.start();
 
+		JavaCommandHandler jCmdHandler = new JavaCommandHandler();
+		COMMAND_HANDLER.registerCommandHandler(jCmdHandler);
+		jCmdHandler.registerDefaultCommands();
+		jCmdHandler.registerCommand(new CommandPokedex());
+
 		EventDispatcher dispatcher = POKEDEX_CLIENT.getDispatcher();
+		dispatcher.registerListener(COMMAND_HANDLER);
 		dispatcher.registerListener(new PokedexEventHandler());
 		dispatcher.registerListener(reactionRegistry);
 	}

@@ -29,4 +29,8 @@ public interface ICommand extends Comparable<ICommand> {
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel)
 			throws Exception;
 
+	public void setCommandHandler(ICommandHandler handler);
+
+	public ICommandHandler getCommandHandler();
+
 }
