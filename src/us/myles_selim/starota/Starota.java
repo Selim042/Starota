@@ -108,9 +108,10 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	// public static EnumBotStatus STATUS = EnumBotStatus.UNKNOWN;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "2.7.6";
+	public final static String VERSION = "2.7.7";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n" + "Public changes:\n"
-			+ " * Fix issue with form names on raids";
+			+ " * The Pokedex bot now runs more independently with it's own command structure\n"
+			+ " * Minor bug fixes";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static final PrimaryCommandHandler COMMAND_HANDLER = new PrimaryCommandHandler();
