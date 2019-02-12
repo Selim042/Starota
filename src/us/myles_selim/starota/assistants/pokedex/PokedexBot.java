@@ -11,6 +11,7 @@ import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.events.EventDispatcher;
 import sx.blah.discord.handle.obj.ActivityType;
+import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.handle.obj.StatusType;
@@ -108,6 +109,14 @@ public class PokedexBot {
 		if (!started)
 			return null;
 		return POKEDEX_CLIENT.getOurUser();
+	}
+
+	public static String getOurName(IGuild guild) {
+		if (POKEDEX_CLIENT == null)
+			return null;
+		if (guild == null)
+			return getOurUser().getName();
+		return getOurUser().getDisplayName(guild);
 	}
 
 	public static DiscordBotListAPI getBotListAPI() {
