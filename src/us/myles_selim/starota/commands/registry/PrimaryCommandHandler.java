@@ -33,6 +33,15 @@ public class PrimaryCommandHandler {
 	public static final int DEFAULT_SUGGESTION_COUNT = 10;
 
 	private final List<ICommandHandler> COMMAND_HANDLERS = new CopyOnWriteArrayList<>();
+	private final IShouldExecuteCallback shouldExecute;
+
+	public PrimaryCommandHandler() {
+		this((IChannel ch) -> true);
+	}
+
+	public PrimaryCommandHandler(IShouldExecuteCallback callback) {
+		this.shouldExecute = callback;
+	}
 
 	public static String getPrefix(IGuild guild) {
 		StarotaServer server = StarotaServer.getServer(guild);
@@ -59,6 +68,8 @@ public class PrimaryCommandHandler {
 		if (guild == null)
 			return;
 		IChannel channel = event.getChannel();
+		if (!shouldExecute.shouldExecute(channel))
+			return;
 		IMessage message = event.getMessage();
 		String cmdS = message.getContent();
 		String prefix = getPrefix(guild);
@@ -271,6 +282,12 @@ public class PrimaryCommandHandler {
 
 	private static int min(int... numbers) {
 		return Arrays.stream(numbers).min().orElse(Integer.MAX_VALUE);
+	}
+
+	public static interface IShouldExecuteCallback {
+
+		public boolean shouldExecute(IChannel channel);
+
 	}
 
 }

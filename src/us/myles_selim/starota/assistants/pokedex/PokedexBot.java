@@ -3,6 +3,7 @@ package us.myles_selim.starota.assistants.pokedex;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Properties;
 
 import org.discordbots.api.client.DiscordBotListAPI;
@@ -11,7 +12,9 @@ import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.events.EventDispatcher;
 import sx.blah.discord.handle.obj.ActivityType;
+import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IPrivateChannel;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.handle.obj.StatusType;
@@ -29,7 +32,16 @@ import us.myles_selim.starota.reaction_messages.ReactionMessageRegistry;
 
 public class PokedexBot {
 
-	public static final PrimaryCommandHandler COMMAND_HANDLER = new PrimaryCommandHandler();
+	public static final PrimaryCommandHandler COMMAND_HANDLER = new PrimaryCommandHandler(
+			(IChannel ch) -> {
+				IUser starota = Starota.getUser(Starota.STAROTA_ID);
+				IUser starotaDev = Starota.getUser(Starota.STAROTA_DEV_ID);
+				List<IUser> users = ch.getUsersHere();
+				if (ch instanceof IPrivateChannel || users.contains(starota)
+						|| users.contains(starotaDev))
+					return false;
+				return true;
+			});
 	public static final String BOT_NAME = "Pokedex";
 	public static final EnumSet<Permissions> USED_PERMISSIONS = EnumSet.of(Permissions.SEND_MESSAGES,
 			Permissions.READ_MESSAGES, Permissions.MANAGE_MESSAGES, Permissions.USE_EXTERNAL_EMOJIS,
