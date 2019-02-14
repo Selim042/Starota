@@ -1,6 +1,5 @@
 package us.myles_selim.starota.webserver.webhooks;
 
-import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.webserver.webhooks.types.IGymWebhook;
 
 public class WebhookGymDetails extends WebhookData implements IGymWebhook {
@@ -32,12 +31,6 @@ public class WebhookGymDetails extends WebhookData implements IGymWebhook {
 	@Override
 	public int getTeamId() {
 		return this.team;
-	}
-
-	// TODO: nag Shawn
-	@Override
-	public EnumTeam getTeam() {
-		return EnumTeam.NO_TEAM;
 	}
 
 	@Override

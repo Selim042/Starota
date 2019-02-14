@@ -137,7 +137,7 @@ public class WebhookRaidReactionMessage extends ReactionMessage {
 			builder.appendDesc("");
 		else
 			builder.appendDesc("\n**Time Left**: " + getTimeRemainingDespawn());
-		TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("CDT"));
+		TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("CST"));
 		builder.appendDesc("\n**End Time**: " + TIME_FORMAT.format(new Date(raidData.end)));
 		if (channel != null)
 			builder.appendDesc("\n**Raid Channel**: " + channel);
@@ -197,17 +197,17 @@ public class WebhookRaidReactionMessage extends ReactionMessage {
 
 	private String getRoleName() {
 		Date start = new Date(raidData.start);
-		ROLE_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("CDT"));
+		ROLE_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("CST"));
 		return (raidData.gym_name.replaceAll(" ", "_") + ROLE_DATE_FORMAT.format(start)).toLowerCase();
 	}
 
 	private String getTimeRemainingDespawn() {
 		long rem = raidData.getTimeRemainingDespawn();
-		int hours = (int) rem / 360000;
+		int hours = (int) rem / 3600000;
 		rem = rem % 3600;
-		int mins = (int) rem / 36000;
+		int mins = (int) rem / 360000;
 		rem = rem % 360;
-		int seconds = (int) rem / 6000;
+		int seconds = (int) rem / 60000;
 		String ret = "";
 		boolean cont = false;
 		if (hours > 0) {

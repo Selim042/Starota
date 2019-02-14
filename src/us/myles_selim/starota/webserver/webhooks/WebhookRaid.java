@@ -1,7 +1,6 @@
 package us.myles_selim.starota.webserver.webhooks;
 
 import us.myles_selim.starota.enums.EnumPokemon;
-import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.pokedex.GoHubDatabase;
 import us.myles_selim.starota.pokedex.PokedexEntry.DexMove;
 import us.myles_selim.starota.webserver.webhooks.types.IGymWebhook;
@@ -47,20 +46,6 @@ public class WebhookRaid extends WebhookData implements IGymWebhook, IPokemonWeb
 
 	public boolean hasHatched() {
 		return this.pokemon_id != 1;
-	}
-
-	@Override
-	public EnumTeam getTeam() {
-		switch (team_id) {
-		case 1:
-			return EnumTeam.INSTINCT;
-		case 2:
-			return EnumTeam.MYSTIC;
-		case 3:
-			return EnumTeam.VALOR;
-		default:
-			return EnumTeam.NO_TEAM;
-		}
 	}
 
 	@Override

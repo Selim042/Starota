@@ -10,7 +10,9 @@ public interface IGymWebhook extends ILocationWebhook {
 
 	public int getTeamId();
 
-	public EnumTeam getTeam();
+	public default EnumTeam getTeam() {
+		return EnumTeam.fromRDMIndex(getTeamId());
+	}
 
 	public boolean isSponsor();
 
