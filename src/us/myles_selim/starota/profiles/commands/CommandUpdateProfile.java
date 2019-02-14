@@ -2,6 +2,9 @@ package us.myles_selim.starota.profiles.commands;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.Permissions;
+import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -19,17 +22,38 @@ public class CommandUpdateProfile extends StarotaCommand {
 
 	@Override
 	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
-		if (!server.hasProfile(message.getAuthor())) {
-			channel.sendMessage("You do not yet have a profile.  Please contact an admin of \""
-					+ server.getDiscordGuild().getName() + "\".");
+		boolean isAdmin = channel.getModifiedPermissions(message.getAuthor())
+				.contains(Permissions.ADMINISTRATOR);
+		IUser target = message.getAuthor();
+		if (args.length > 3)
+			target = Starota.findUser(args[3]);
+		if (target == null && isAdmin) {
+			channel.sendMessage("User " + args[3] + " not found.");
+			return;
+		}
+		if (!isAdmin && !target.equals(message.getAuthor())) {
+			channel.sendMessage("Only admins can change other user's profile information.");
+			return;
+		}
+		if (!server.hasProfile(target)) {
+			if (target.equals(message.getAuthor()))
+				channel.sendMessage("You do not yet have a profile.  Please contact an admin of \""
+						+ server.getDiscordGuild().getName() + "\".");
+			else
+				channel.sendMessage(
+						target + " does not yet have a profile.  Please contact an admin of \""
+								+ server.getDiscordGuild().getName() + "\".");
 			return;
 		}
 		if (args.length < 3) {
-			channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName()
-					+ " [level/trainerCode/realName/alt] [value]");
+			if (isAdmin)
+				channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName()
+						+ " [level/trainerCode/realName/alt] [value] <target>");
+			else
+				this.sendUsage(server.getPrefix(), channel);
 			return;
 		}
-		PlayerProfile profile = server.getProfile(message.getAuthor());
+		PlayerProfile profile = server.getProfile(target);
 		boolean executed = false;
 		switch (args[1].toLowerCase()) {
 		case "level":
@@ -85,7 +109,7 @@ public class CommandUpdateProfile extends StarotaCommand {
 			break;
 		}
 		if (executed) {
-			server.setProfile(message.getAuthor(), profile);
+			server.setProfile(target, profile);
 			channel.sendMessage("Updated \"" + args[1] + "\" to \"" + args[2] + "\"",
 					profile.toEmbed(server));
 		} else
