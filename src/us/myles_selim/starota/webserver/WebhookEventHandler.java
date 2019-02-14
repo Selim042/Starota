@@ -53,16 +53,17 @@ public class WebhookEventHandler {
 				}
 			}
 			break;
-		case POKEMON:
-			WebhookPokemon pokeData = (WebhookPokemon) event.getWebhookData();
-			StarotaServer pokeServer = StarotaServer.getServer(event.getGuild());
-			if (pokeServer.getRegion(new GeoPoint(pokeData.latitude, pokeData.longitude)) != null) {
-				EmbedObject embed = getPokemonEmbed(pokeData);
-				AssistantRequest.request((client) -> {
-					return client.getChannelByID(channel.getLongID()).sendMessage(embed);
-				});
-			}
-			break;
+		// case POKEMON:
+		// WebhookPokemon pokeData = (WebhookPokemon) event.getWebhookData();
+		// StarotaServer pokeServer = StarotaServer.getServer(event.getGuild());
+		// if (pokeServer.getRegion(new GeoPoint(pokeData.latitude,
+		// pokeData.longitude)) != null) {
+		// EmbedObject embed = getPokemonEmbed(pokeData);
+		// AssistantRequest.request((client) -> {
+		// return client.getChannelByID(channel.getLongID()).sendMessage(embed);
+		// });
+		// }
+		// break;
 		default:
 			break;
 		}
