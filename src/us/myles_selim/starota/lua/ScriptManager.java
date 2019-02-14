@@ -31,8 +31,8 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IMessage.Attachment;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.Starota.BaseModules;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
+import us.myles_selim.starota.modules.BaseModules;
 import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.wrappers.StarotaServer;
 

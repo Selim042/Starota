@@ -38,7 +38,6 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.Starota.BaseModules;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.leaderboards.Leaderboard;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
@@ -46,6 +45,7 @@ import us.myles_selim.starota.lua.events.LuaEvent;
 import us.myles_selim.starota.lua.libraries.DiscordEventLib;
 import us.myles_selim.starota.lua.libraries.DiscordLib;
 import us.myles_selim.starota.lua.libraries.StarotaLib;
+import us.myles_selim.starota.modules.BaseModules;
 import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.trading.TradeboardPost;
@@ -62,17 +62,27 @@ public class LuaUtils {
 			return;
 		registeredConverters = true;
 
-		// ConversionHandler.registerConverter(PlayerProfile.class, new PlayerProfileConverter());
-		// ConversionHandler.registerConverter(TradeboardPost.class, new TradeboardPostConverter());
-		// ConversionHandler.registerConverter(EnumPokemon.class, new EnumPokemonConverter());
-		// ConversionHandler.registerConverter(Leaderboard.class, new LeaderboardConverter());
+		// ConversionHandler.registerConverter(PlayerProfile.class, new
+		// PlayerProfileConverter());
+		// ConversionHandler.registerConverter(TradeboardPost.class, new
+		// TradeboardPostConverter());
+		// ConversionHandler.registerConverter(EnumPokemon.class, new
+		// EnumPokemonConverter());
+		// ConversionHandler.registerConverter(Leaderboard.class, new
+		// LeaderboardConverter());
 		//
-		// ConversionHandler.registerConverter(ICategory.class, new CategoryConverter());
-		// ConversionHandler.registerConverter(IChannel.class, new ChannelConverter());
-		// ConversionHandler.registerConverter(IMessage.class, new MessageConverter());
-		// ConversionHandler.registerConverter(IRole.class, new RoleConverter());
-		// ConversionHandler.registerConverter(IGuild.class, new ServerConverter());
-		// ConversionHandler.registerConverter(IUser.class, new UserConverter());
+		// ConversionHandler.registerConverter(ICategory.class, new
+		// CategoryConverter());
+		// ConversionHandler.registerConverter(IChannel.class, new
+		// ChannelConverter());
+		// ConversionHandler.registerConverter(IMessage.class, new
+		// MessageConverter());
+		// ConversionHandler.registerConverter(IRole.class, new
+		// RoleConverter());
+		// ConversionHandler.registerConverter(IGuild.class, new
+		// ServerConverter());
+		// ConversionHandler.registerConverter(IUser.class, new
+		// UserConverter());
 
 		ConversionHandler.registerAutoConverter(PlayerProfile.class);
 		ConversionHandler.registerAutoConverter(TradeboardPost.class);
