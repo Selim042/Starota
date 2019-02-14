@@ -22,6 +22,11 @@ public class CommandUpdateProfile extends StarotaCommand {
 	}
 
 	@Override
+	public String getAdminUsage() {
+		return "[level/trainerCode/realName/alt/username/team] [value] <target>";
+	}
+
+	@Override
 	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
 		boolean isAdmin = channel.getModifiedPermissions(message.getAuthor())
 				.contains(Permissions.ADMINISTRATOR);

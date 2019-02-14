@@ -15,8 +15,6 @@ public class WikiGenerator {
 
 	public static void generate() {
 		System.out.println("starting wiki generation");
-		if (!Starota.FULLY_STARTED)
-			Starota.BaseModules.registerModules();
 		try {
 			FileWriter homeWriter = new FileWriter(new File("wiki/Home.md"));
 			homeWriter.append("Welcome to the Starota wiki!  "
@@ -42,10 +40,14 @@ public class WikiGenerator {
 				for (ICommand cmd : Starota.COMMAND_HANDLER.getCommandsByCategory(
 						Starota.getGuild(DebugServer.DEBUG_SERVER_ID), module.getCommandCategory())) {
 					out += "### " + cmd.getName() + "\n\n";
+
 					if (cmd.getGeneralUsage() == null)
 						out += "**Usage**: ." + cmd.getName() + "\n\n";
 					else
 						out += "**Usage**: ." + cmd.getName() + " " + cmd.getGeneralUsage() + "\n\n";
+					if (cmd.getAdminUsage() != null)
+						out += "**Admin Usage**: ." + cmd.getName() + " " + cmd.getAdminUsage() + "\n\n";
+
 					if (cmd.getDescription() == null)
 						out += "**Description**: ADD A DESCRIPTION\n\n";
 					else
@@ -93,7 +95,7 @@ public class WikiGenerator {
 	}
 
 	private static String getProperName(String name) {
-		if (name.equals("PvP"))
+		if (name.equals("PvP") || isAllCaps(name))
 			return name;
 		String out = "";
 		for (int i = 0; i < name.length() - 1; i++) {
@@ -103,6 +105,10 @@ public class WikiGenerator {
 		}
 		out += name.charAt(name.length() - 1);
 		return out;
+	}
+
+	private static boolean isAllCaps(String name) {
+		return name.equals(name.toUpperCase());
 	}
 
 	public static void main(String... args) {

@@ -123,6 +123,11 @@ public class LuaCommandHandler implements ICommandHandler {
 		}
 
 		@Override
+		public String getAdminUsage() {
+			return null;
+		}
+
+		@Override
 		public void setCommandHandler(ICommandHandler handler) {}
 
 		@Override

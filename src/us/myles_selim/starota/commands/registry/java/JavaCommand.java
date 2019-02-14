@@ -59,6 +59,11 @@ public class JavaCommand implements ICommand {
 	}
 
 	@Override
+	public String getAdminUsage() {
+		return null;
+	}
+
+	@Override
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel)
 			throws Exception {}
 

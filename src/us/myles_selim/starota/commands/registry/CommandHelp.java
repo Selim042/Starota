@@ -40,8 +40,12 @@ public class CommandHelp extends JavaCommand {
 				EmbedBuilder builder = new EmbedBuilder();
 				builder.withTitle("Help: " + cmd.getName());
 				builder.appendField("Category:", cmd.getCategory(), true);
+
 				if (cmd.getGeneralUsage() != null && !cmd.getGeneralUsage().isEmpty())
 					builder.appendField("Usage:", cmd.getGeneralUsage(), true);
+				if (channel.getModifiedPermissions(author).contains(Permissions.ADMINISTRATOR))
+					builder.appendField("Admin Usage:", cmd.getAdminUsage(), true);
+
 				if (cmd.getDescription() != null && !cmd.getDescription().isEmpty())
 					builder.appendField("Description:", cmd.getDescription(), true);
 				List<String> aliases = cmd.getAliases();

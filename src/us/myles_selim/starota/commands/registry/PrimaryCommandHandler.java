@@ -142,7 +142,7 @@ public class PrimaryCommandHandler {
 
 	public List<ICommand> getCommandsByCategory(IGuild server, String category) {
 		if (category == null || category.isEmpty())
-			return getAllCommands(server);
+			return Collections.emptyList();
 		if (!StarotaModule.isCategoryEnabled(StarotaServer.getServer(server), category))
 			return Collections.emptyList();
 		List<ICommand> ret = new ArrayList<>();
