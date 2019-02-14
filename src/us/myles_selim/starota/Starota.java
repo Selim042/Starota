@@ -54,8 +54,8 @@ import us.myles_selim.starota.lua.LuaEventHandler;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.commands.CommandUploadScript;
 import us.myles_selim.starota.lua.commands.LuaCommandHandler;
+import us.myles_selim.starota.modules.BaseModules;
 import us.myles_selim.starota.modules.CommandModules;
-import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.pokedex.CommandPokedex;
 import us.myles_selim.starota.profiles.commands.CommandGetProfilelessPlayers;
 import us.myles_selim.starota.profiles.commands.CommandProfile;
@@ -108,10 +108,9 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	// public static EnumBotStatus STATUS = EnumBotStatus.UNKNOWN;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "2.7.8";
+	public final static String VERSION = "2.7.9";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n" + "Public changes:\n"
-			+ " * Allow admins to update other user's profile information as well as team and username\n"
-			+ " * Pokedex bot once again ignores commands if Starota is in the channel";
+			+ " * Command admin usage is now displayed to admins";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static final PrimaryCommandHandler COMMAND_HANDLER = new PrimaryCommandHandler();
@@ -384,72 +383,6 @@ public class Starota {
 		discord4JWatchdog.start();
 
 		updateOwners();
-	}
-
-	public static class BaseModules {
-
-		private static boolean registered = false;
-
-		public static final StarotaModule PROFILES = new StarotaModule("PlayerProfiles", "Profiles")
-				.setDescription(
-						"Player profiles are a feature of Starota that allows players to easily share some "
-								+ "information about themselves with the community.  "
-								+ "Profiles can show such features as your Pokemon Go username, level, and team, "
-								+ "as well as optionally your real name, trainer code, and alternate accounts.\n\n"
-								+ "Your profile will be default show your team logo, but if you also have a trainer "
-								+ "card setup on [TheSilphRoad.com](http://thesilphroad.com/), it will instead show "
-								+ "your avatar from your card and a link to your card.  "
-								+ "If you are a patron of Starota, it will also show your patron tier.\n\n"
-								+ "![Player Profile Sample](http://assets.myles-selim.us/starota/wiki/player_profile.png)");
-		public static final StarotaModule GROUPS = new StarotaModule("Groups", "Groups").setDescription(
-				"The groups feature lets server owners specify roles that users can \"self-assign\" to "
-						+ "themselves and leave at will.");
-		public static final StarotaModule TRADEBOARD = new StarotaModule("Tradeboard", "Tradeboard",
-				PROFILES).setDescription(
-						"The tradeboard allows users to list Pokemon they are either looking for or would like "
-								+ "to get in a trade.  When posting a trade, you can specify if the Pokemon is shiny "
-								+ "(if released), has legacy moves, or a specific form (Kanotian vs Alolan, sunny vs "
-								+ "rainy vs snowy vs normal Castform, etc) as well as genders.\n\n"
-								+ "If the poster of the trade has their trainer code on their profile, it will also be displayed on the trade.\n\n"
-								+ "![Trade](http://assets.myles-selim.us/starota/wiki/trade.png)");
-		public static final StarotaModule LUA = new StarotaModule("Lua", "Lua").setDescription(
-				"The Lua module allows server admins to create custom commands and interactions on thier "
-						+ "Discord server.  Using `.uploadScript` you can upload both scripts to be "
-						+ "executed when a user executes a command as well as a \"event handler\" script "
-						+ "that are executed when Discord4J events are fired.\n\n"
-						+ "See [luaExamples](https://github.com/Selim042/Starota/tree/master/luaExamples) "
-						+ "for some examples and more information at PR [#1](https://github.com/Selim042/Starota/pull/1).");
-		public static final StarotaModule LEADERBOARDS = new StarotaModule("Leaderboards", "Leaderboard",
-				PROFILES).setDescription(
-						"Leaderboards allow server owners to create custom leaderboards that their users "
-								+ "can compete on for various things like total XP, level, Pokedex completion, "
-								+ "pretty much anything that can be tracked by a number, either incrementing or "
-								+ "decrementing.\n\n"
-								+ "![Leaderboard](http://assets.myles-selim.us/starota/wiki/leaderboard.png)\n\n"
-								+ "![Leaderboard Options](http://assets.myles-selim.us/starota/wiki/leaderboard_options.png)");
-		public static final StarotaModule PVP = new StarotaModule("PvP", "PvP", PROFILES).setDescription(
-				"Starota has commands that helps coordinate PvP battles by allowing users to "
-						+ "list themselves as \"battle ready\".");
-		public static final StarotaModule POKEDEX = new StarotaModule("Pokedex", "Pokedex");
-		public static final StarotaModule SILPH_ROAD = new StarotaModule("SilphRoad", "Silph Road");
-		public static final StarotaModule HTTP = new StarotaModule("HTTP");
-
-		public static void registerModules() {
-			if (registered)
-				return;
-			registered = true;
-
-			StarotaModule.registerModule(PROFILES);
-			StarotaModule.registerModule(GROUPS);
-			StarotaModule.registerModule(TRADEBOARD);
-			StarotaModule.registerModule(LUA);
-			StarotaModule.registerModule(LEADERBOARDS);
-			StarotaModule.registerModule(PVP);
-			StarotaModule.registerModule(POKEDEX);
-			StarotaModule.registerModule(SILPH_ROAD);
-			StarotaModule.registerModule(HTTP);
-		}
-
 	}
 
 	public static IDiscordClient getClient() {
