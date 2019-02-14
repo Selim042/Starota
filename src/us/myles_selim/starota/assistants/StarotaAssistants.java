@@ -18,7 +18,6 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.Image;
 import us.myles_selim.starota.Starota;
 
 public class StarotaAssistants {
@@ -43,6 +42,8 @@ public class StarotaAssistants {
 			e.printStackTrace();
 			return;
 		}
+		if (!properties.containsKey("assistants"))
+			return;
 		for (String token : properties.getProperty("assistants").split(";")) {
 			ClientBuilder clientBuilder = new ClientBuilder();
 			clientBuilder.withToken(token);

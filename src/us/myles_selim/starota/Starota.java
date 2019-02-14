@@ -509,9 +509,12 @@ public class Starota {
 		String user = name.replaceAll("@", "").replaceAll("#\\d{4}", "");
 		if (user.matches("<\\d{18}>")) {
 			long userId = Long.parseLong(user.substring(1, 19));
-			IUser userD = Starota.getClient().getGuildByID(serverId).getUserByID(userId);
-			if (userD != null)
-				return userD;
+			IGuild guild = Starota.getGuild(serverId);
+			if (guild != null) {
+				IUser userD = guild.getUserByID(userId);
+				if (userD != null)
+					return userD;
+			}
 		}
 		String discrim = null;
 		if (name.matches(".*#\\d{4}")) {

@@ -6,6 +6,7 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -108,12 +109,36 @@ public class CommandUpdateProfile extends StarotaCommand {
 			executed = true;
 			break;
 		}
+		if (!executed && isAdmin) {
+			switch (args[1].toLowerCase()) {
+			case "team":
+			case "t":
+				EnumTeam team;
+				try {
+					team = EnumTeam.valueOf(args[3].toUpperCase());
+				} catch (IllegalArgumentException e) {
+					team = null;
+				}
+				if (team == null) {
+					channel.sendMessage("Team \"" + args[3] + "\" not found");
+					return;
+				}
+				profile.setTeam(team);
+				executed = true;
+				break;
+			case "pogoname":
+			case "username":
+				profile.setPoGoName(args[2]);
+				executed = true;
+				break;
+			}
+		}
 		if (executed) {
 			server.setProfile(target, profile);
 			channel.sendMessage("Updated \"" + args[1] + "\" to \"" + args[2] + "\"",
 					profile.toEmbed(server));
 		} else
-			channel.sendMessage("Invalid option " + args[1]);
+			channel.sendMessage("Invalid option \"" + args[1] + "\".");
 	}
 
 }
