@@ -3,6 +3,7 @@
 [![](https://discordbots.org/api/widget/541079916234407967.svg)](https://discordbots.org/bot/541079916234407967)
 
 [![](https://img.shields.io/discord/436614503606779914.svg)](https://discord.gg/NxverNw)
+[![](https://img.shields.io/twitter/follow/Starota_Bot.svg?label=Follow&style=flat)](https://twitter.com/Starota_Bot)
 [![](https://discordbots.org/api/widget/status/489245655710040099.svg)](https://discordbots.org/bot/489245655710040099)
 
 Starota is a Discord bot designed for use on Pokemon Go oriented servers.
