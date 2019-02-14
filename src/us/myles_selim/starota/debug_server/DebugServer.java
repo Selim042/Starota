@@ -11,7 +11,7 @@ import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.EmojiServerHelper;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.enums.EnumPatreonPerm;
+import us.myles_selim.starota.enums.EnumDonorPerm;
 import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -179,13 +179,13 @@ public class DebugServer extends Thread {
 				continue;
 			if (g.equals(DEBUG_SERVER))
 				continue;
-			List<EnumPatreonPerm> perms = Starota.getPatreonPerms(g);
+			List<EnumDonorPerm> perms = Starota.getDonorPerms(g);
 			if (perms == null || perms.isEmpty()) {
 				builder.appendField(g.getName(), " - No Patreon permissions", true);
 				continue;
 			}
 			String text = "";
-			for (EnumPatreonPerm p : perms)
+			for (EnumDonorPerm p : perms)
 				text += " - " + p + "\n";
 			builder.appendField(g.getName(), text, true);
 		}

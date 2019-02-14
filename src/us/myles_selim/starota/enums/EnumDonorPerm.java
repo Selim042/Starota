@@ -3,7 +3,7 @@ package us.myles_selim.starota.enums;
 import sx.blah.discord.handle.obj.IRole;
 import us.myles_selim.starota.Starota;
 
-public enum EnumPatreonPerm {
+public enum EnumDonorPerm {
 	LUA(517172285103407104L),
 	HTTP(517172454783844382L),
 	LEADERBOARD_5(517810405041504273L),
@@ -13,7 +13,7 @@ public enum EnumPatreonPerm {
 
 	private long roleId;
 
-	EnumPatreonPerm(long roleId) {
+	EnumDonorPerm(long roleId) {
 		this.roleId = roleId;
 	}
 

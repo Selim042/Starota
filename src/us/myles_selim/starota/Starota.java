@@ -43,7 +43,7 @@ import us.myles_selim.starota.commands.pvp.CommandNotReady;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 import us.myles_selim.starota.debug_server.DebugServer;
-import us.myles_selim.starota.enums.EnumPatreonPerm;
+import us.myles_selim.starota.enums.EnumDonorPerm;
 import us.myles_selim.starota.events.CommandEvents;
 import us.myles_selim.starota.leaderboards.commands.CommandEditLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandGetLeaderboard;
@@ -108,10 +108,10 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	// public static EnumBotStatus STATUS = EnumBotStatus.UNKNOWN;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "2.7.7";
+	public final static String VERSION = "2.7.8";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n" + "Public changes:\n"
-			+ " * The Pokedex bot now runs more independently with it's own command structure\n"
-			+ " * Minor bug fixes";
+			+ " * Allow admins to update other user's profile information as well as team and username\n"
+			+ " * Pokedex bot once again ignores commands if Starota is in the channel";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static final PrimaryCommandHandler COMMAND_HANDLER = new PrimaryCommandHandler();
@@ -605,7 +605,7 @@ public class Starota {
 
 	public static int getMaxLeaderboards(IGuild server) {
 		int max = 3;
-		for (EnumPatreonPerm p : getPatreonPerms(server)) {
+		for (EnumDonorPerm p : getDonorPerms(server)) {
 			switch (p) {
 			case LEADERBOARD_5:
 				max = 5;
@@ -647,7 +647,7 @@ public class Starota {
 		return null;
 	}
 
-	public static List<EnumPatreonPerm> getPatreonPerms(IGuild server) {
+	public static List<EnumDonorPerm> getDonorPerms(IGuild server) {
 		if (server == null)
 			return Collections.emptyList();
 		IUser owner = server.getOwner();
@@ -655,10 +655,10 @@ public class Starota {
 		if (!supportServer.getUsers().contains(owner))
 			return Collections.emptyList();
 		if (owner.getLongID() == supportServer.getOwnerLongID())
-			return Arrays.asList(EnumPatreonPerm.values());
-		List<EnumPatreonPerm> perms = new ArrayList<>();
+			return Arrays.asList(EnumDonorPerm.values());
+		List<EnumDonorPerm> perms = new ArrayList<>();
 		List<IRole> roles = owner.getRolesForGuild(supportServer);
-		for (EnumPatreonPerm p : EnumPatreonPerm.values())
+		for (EnumDonorPerm p : EnumDonorPerm.values())
 			if (roles.contains(p.getRole()))
 				perms.add(p);
 		return Collections.unmodifiableList(perms);
