@@ -97,7 +97,7 @@ public class JavaCommand implements ICommand {
 	}
 
 	@Override
-	public ICommandHandler getCommandHandler() {
+	public final ICommandHandler getCommandHandler() {
 		return this.handler;
 	}
 

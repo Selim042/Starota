@@ -126,7 +126,7 @@ public class LuaCommandHandler implements ICommandHandler {
 		public void setCommandHandler(ICommandHandler handler) {}
 
 		@Override
-		public ICommandHandler getCommandHandler() {
+		public final ICommandHandler getCommandHandler() {
 			return LuaCommandHandler.this;
 		}
 	}
