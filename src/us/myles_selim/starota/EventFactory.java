@@ -41,16 +41,16 @@ public class EventFactory {
 			fields.add(new ExtraField("Alternate Accounts:", alts, false));
 		}
 		if (SilphRoadCardUtils.hasCard(profile.getPoGoName())) {
-			fields.add(new ExtraField("Silph Road Card:", SilphRoadCardUtils.getCardURL(profile.getPoGoName()),
-					false));
+			fields.add(new ExtraField("Silph Road Card:",
+					SilphRoadCardUtils.getCardURL(profile.getPoGoName()), false));
 			event.setThumbnail(SilphRoadCardUtils.getCardAvatar(profile.getPoGoName()));
 		}
 		IUser user = profile.getDiscordUser();
 		fields.add(
 				new ExtraField("Discord User:", user.getName() + "#" + user.getDiscriminator(), true));
-		String patronRoleName = profile.getPatronRoleName();
+		String patronRoleName = profile.getDonorRoleName();
 		if (patronRoleName != null)
-			fields.add(new ExtraField("Patron:", patronRoleName, true));
+			fields.add(new ExtraField("Donor:", patronRoleName, true));
 		LuaUtils.handleEvent(event);
 		return event;
 	}

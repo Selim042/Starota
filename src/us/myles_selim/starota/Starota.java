@@ -623,7 +623,7 @@ public class Starota {
 		return max;
 	}
 
-	public static IRole getPatronRole(IUser user) {
+	public static IRole getDonorRole(IUser user) {
 		IGuild supportServer = getSupportServer();
 		if (!supportServer.getUsers().contains(user))
 			return null;

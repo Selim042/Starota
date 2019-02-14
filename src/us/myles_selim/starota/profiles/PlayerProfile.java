@@ -15,30 +15,17 @@ import us.myles_selim.starota.EventFactory;
 import us.myles_selim.starota.MiscUtils;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.embed_converter.ExtraField;
-import us.myles_selim.starota.embed_converter.annotations.EmbedAuthorIcon;
-import us.myles_selim.starota.embed_converter.annotations.EmbedAuthorName;
-import us.myles_selim.starota.embed_converter.annotations.EmbedColor;
-import us.myles_selim.starota.embed_converter.annotations.EmbedField;
-import us.myles_selim.starota.embed_converter.annotations.EmbedFooterText;
-import us.myles_selim.starota.embed_converter.annotations.EmbedThumbnail;
-import us.myles_selim.starota.embed_converter.annotations.EmbedTimestamp;
-import us.myles_selim.starota.embed_converter.annotations.EmbedTitle;
 import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.lua.events.GetProfileEvent;
 import us.myles_selim.starota.silph_road.SilphRoadCardUtils;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-@EmbedFooterText("Profile last updated")
-@EmbedTitle("Profile for %poGoName%:")
 public class PlayerProfile {
 
-	@EmbedField(value = "Real Name:", isInline = true, order = 2)
 	private String realName;
 	private String poGoName;
-	@EmbedField(value = "Trainer Level:", isInline = true, order = 0)
 	private int level;
 	private long trainerCode = -1;
-	@EmbedField(value = "Team:", isInline = true, order = 1)
 	private EnumTeam team;
 	private long discordId;
 	private Map<String, Long> alts;
@@ -94,7 +81,6 @@ public class PlayerProfile {
 		return this;
 	}
 
-	@EmbedField(value = "Trainer Code:", isInline = true, order = 3)
 	public String getTrainerCodeString() {
 		if (this.trainerCode == -1)
 			return null;
@@ -137,14 +123,21 @@ public class PlayerProfile {
 		return Instant.ofEpochSecond(this.lastUpdated);
 	}
 
+	public String getDonorRoleName() {
+		IRole donorRole = Starota.getDonorRole(Starota.getUser(this.discordId));
+		if (donorRole != null)
+			return donorRole.getName();
+		return null;
+	}
+
 	public EmbedObject toEmbed(StarotaServer server) {
 		return toEmbed(EventFactory.fireProfileEvent(server, this));
 	}
 
 	private EmbedObject toEmbed(GetProfileEvent event) {
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.withAuthorIcon(this.authorIcon());
-		builder.withAuthorName(this.authorText());
+		builder.withAuthorIcon(Starota.getUser(this.discordId).getAvatarURL());
+		builder.withAuthorName(Starota.getUser(this.discordId).getName());
 		builder.withTitle("Profile for " + this.poGoName + ":");
 		for (ExtraField f : event.getFields()) {
 			if (f == null)
@@ -160,73 +153,8 @@ public class PlayerProfile {
 		return builder.build();
 	}
 
-	@EmbedField(value = "Silph Road Card:", order = 5)
 	public String getSilphRoadCard() {
 		return SilphRoadCardUtils.getCardURL(this.poGoName);
-	}
-
-	// only for EmbedConverter
-	@EmbedField(value = "Alternate Accounts:", order = 4)
-	private String altAccounts() {
-		if (this.alts == null || this.alts.isEmpty())
-			return null;
-		String ret = "";
-		for (Entry<String, Long> e : this.alts.entrySet())
-			ret += "- **" + e.getKey() + "**: " + MiscUtils.getTrainerCodeString(e.getValue());
-		return ret;
-	}
-
-	// only for EmbedConverter
-	@EmbedField(value = "Discord User:", order = 6)
-	private String discordUser() {
-		IUser user = Starota.getUser(this.discordId);
-		// String nickname = user.getNicknameForGuild(server);
-		// if (nickname != null)
-		// return nickname + " (_" + user.getName() + "#" +
-		// user.getDiscriminator() + "_)";
-		// else
-		return user.getName() + "#" + user.getDiscriminator();
-	}
-
-	// only for EmbedConverter
-	@EmbedField(value = "Patron:", order = 7)
-	public String getPatronRoleName() {
-		IRole patronRole = Starota.getPatronRole(Starota.getUser(this.discordId));
-		if (patronRole != null)
-			return patronRole.getName();
-		return null;
-	}
-
-	// only for EmbedConverter
-	@EmbedColor
-	private int teamColor() {
-		return this.team.getColor();
-	}
-
-	// only for EmbedConverter
-	@EmbedAuthorIcon
-	private String authorIcon() {
-		return Starota.getUser(this.discordId).getAvatarURL();
-	}
-
-	// only for EmbedConverter
-	@EmbedAuthorName
-	private String authorText() {
-		return Starota.getUser(this.discordId).getName();
-	}
-
-	// only for EmbedConverter
-	@EmbedThumbnail
-	private String thumbnail() {
-		if (SilphRoadCardUtils.hasCard(this.poGoName))
-			return SilphRoadCardUtils.getCardAvatar(this.poGoName);
-		return this.team.getIcon();
-	}
-
-	// only for EmbedConverter
-	@EmbedTimestamp
-	private long timestamp() {
-		return this.lastUpdated * 1000;
 	}
 
 	public static class DataTypePlayerProfile extends DataType<PlayerProfile> {
