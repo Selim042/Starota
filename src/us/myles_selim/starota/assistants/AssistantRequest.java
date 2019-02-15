@@ -2,6 +2,8 @@ package us.myles_selim.starota.assistants;
 
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.util.RateLimitException;
+import sx.blah.discord.util.RequestBuffer;
+import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.TwitterHelper;
 
 public class AssistantRequest {
@@ -11,6 +13,11 @@ public class AssistantRequest {
 	public static <T> T request(IAssistantRequest<T> request) {
 		T ret = null;
 		boolean executed = false;
+		boolean hasNoAssistants = StarotaAssistants.getClients().isEmpty();
+		if (hasNoAssistants && Starota.IS_DEV)
+			return RequestBuffer.request(() -> request.request(Starota.getClient())).get();
+		if (hasNoAssistants)
+			throw new IllegalArgumentException("there are no assistants defined");
 		for (IDiscordClient client : StarotaAssistants.getClients()) {
 			try {
 				ret = request.request(client);

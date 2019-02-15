@@ -14,10 +14,11 @@ import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.EmojiServerHelper;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.reaction_messages.PersistReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class StatusReactionMessage extends PersistReactionMessage {
+public class ModulesReactionMessage extends PersistReactionMessage {
 
 	public static final String LEFT_EMOJI = "⬅";
 	public static final String RIGHT_EMOJI = "➡";
@@ -61,7 +62,8 @@ public class StatusReactionMessage extends PersistReactionMessage {
 		List<IGuild> guilds = Starota.getClient().getGuilds();
 		int numGuilds = Starota.getClient().getGuilds().size() - EmojiServerHelper.getNumberServers()
 				- 1;
-		builder.withTitle("Status: (" + (index + 1) + "/" + (numGuilds / SERVERS_PER_PAGE + 1) + ")");
+		builder.withTitle(
+				"Enabled Modules: (" + (index + 1) + "/" + (numGuilds / SERVERS_PER_PAGE + 1) + ")");
 		int displayed = 0;
 		for (int i = 0; i < guilds.size() && displayed < SERVERS_PER_PAGE
 				&& (SERVERS_PER_PAGE * index) + i < guilds.size(); i++) {
@@ -69,18 +71,15 @@ public class StatusReactionMessage extends PersistReactionMessage {
 			if (EmojiServerHelper.isEmojiServer(g) || g.equals(DebugServer.DEBUG_SERVER))
 				continue;
 			StarotaServer s = StarotaServer.getServer(g);
+			List<StarotaModule> modules = StarotaModule.getEnabledModules(s);
+			if (modules == null || modules.isEmpty()) {
+				builder.appendField(g.getName(), " - No enabled modules", true);
+				continue;
+			}
 			String text = "";
-			text += "Owner: " + g.getOwner().getName() + "#" + g.getOwner().getDiscriminator() + "\n";
-			text += "Users: " + g.getUsers().size() + "\n";
-			int tradeId = s.hasKey(StarotaServer.TRADE_ID_KEY)
-					? (int) s.getValue(StarotaServer.TRADE_ID_KEY)
-					: 0;
-			text += "Trades: " + tradeId + "/9,999\n";
-			text += "Leaderboards: " + s.getLeaderboardCount() + "/" + Starota.getMaxLeaderboards(g)
-					+ "\n";
-			text += "Voter Ratio: " + s.getVoterPercent() + "\n";
+			for (StarotaModule m : modules)
+				text += " - " + m.getName() + "\n";
 			builder.appendField(g.getName(), text, true);
-			displayed++;
 		}
 		builder.withFooterText("Last updated");
 		builder.withTimestamp(System.currentTimeMillis());

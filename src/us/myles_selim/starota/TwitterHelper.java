@@ -7,8 +7,6 @@ import java.util.Properties;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
-import twitter4j.TwitterStream;
-import twitter4j.TwitterStreamFactory;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 
@@ -32,9 +30,9 @@ public class TwitterHelper {
 		conf.setDebugEnabled(true);
 		Configuration builtConf = conf.build();
 		TwitterFactory tf = new TwitterFactory(builtConf);
-		TwitterStreamFactory tsf = new TwitterStreamFactory(builtConf);
+		// TwitterStreamFactory tsf = new TwitterStreamFactory(builtConf);
 		TWITTER = tf.getInstance();
-		TwitterStream stream = tsf.getInstance();
+		// TwitterStream stream = tsf.getInstance();
 		// stream.addListener(new StatusListener() {
 		//
 		// @Override

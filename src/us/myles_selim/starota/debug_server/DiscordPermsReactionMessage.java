@@ -1,5 +1,6 @@
 package us.myles_selim.starota.debug_server;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -9,6 +10,7 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IReaction;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.ebs.Storage;
@@ -17,7 +19,7 @@ import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.reaction_messages.PersistReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class StatusReactionMessage extends PersistReactionMessage {
+public class DiscordPermsReactionMessage extends PersistReactionMessage {
 
 	public static final String LEFT_EMOJI = "⬅";
 	public static final String RIGHT_EMOJI = "➡";
@@ -61,26 +63,23 @@ public class StatusReactionMessage extends PersistReactionMessage {
 		List<IGuild> guilds = Starota.getClient().getGuilds();
 		int numGuilds = Starota.getClient().getGuilds().size() - EmojiServerHelper.getNumberServers()
 				- 1;
-		builder.withTitle("Status: (" + (index + 1) + "/" + (numGuilds / SERVERS_PER_PAGE + 1) + ")");
+		System.out.println(index);
+		builder.withTitle("Missing Discord Perms: (" + (index + 1) + "/"
+				+ (numGuilds / SERVERS_PER_PAGE + 1) + ")");
 		int displayed = 0;
 		for (int i = 0; i < guilds.size() && displayed < SERVERS_PER_PAGE
 				&& (SERVERS_PER_PAGE * index) + i < guilds.size(); i++) {
 			IGuild g = guilds.get(i);
-			if (EmojiServerHelper.isEmojiServer(g) || g.equals(DebugServer.DEBUG_SERVER))
+			if (EmojiServerHelper.isEmojiServer(g))
 				continue;
-			StarotaServer s = StarotaServer.getServer(g);
+			if (g.equals(DebugServer.DEBUG_SERVER))
+				continue;
 			String text = "";
-			text += "Owner: " + g.getOwner().getName() + "#" + g.getOwner().getDiscriminator() + "\n";
-			text += "Users: " + g.getUsers().size() + "\n";
-			int tradeId = s.hasKey(StarotaServer.TRADE_ID_KEY)
-					? (int) s.getValue(StarotaServer.TRADE_ID_KEY)
-					: 0;
-			text += "Trades: " + tradeId + "/9,999\n";
-			text += "Leaderboards: " + s.getLeaderboardCount() + "/" + Starota.getMaxLeaderboards(g)
-					+ "\n";
-			text += "Voter Ratio: " + s.getVoterPercent() + "\n";
-			builder.appendField(g.getName(), text, true);
-			displayed++;
+			EnumSet<Permissions> invertPerms = EnumSet.allOf(Permissions.class);
+			invertPerms.removeAll(DebugServer.USED_PERMISSIONS);
+			for (Permissions p : invertPerms)
+				text += " - " + p + "\n";
+			builder.appendField(g.getName(), text.isEmpty() ? "All permissions given" : text, true);
 		}
 		builder.withFooterText("Last updated");
 		builder.withTimestamp(System.currentTimeMillis());
