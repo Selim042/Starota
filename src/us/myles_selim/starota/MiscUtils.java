@@ -10,7 +10,7 @@ public class MiscUtils {
 	public static String fixCharacters(String in) {
 		if (in == null)
 			return null;
-		return in.replaceAll("’", "'").replaceAll("é", "�");
+		return in.replaceAll("’", "'").replaceAll("�", "é");
 	}
 
 	public static String getTrainerCodeString(long trainerCode) {

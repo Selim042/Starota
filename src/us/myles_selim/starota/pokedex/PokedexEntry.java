@@ -255,7 +255,7 @@ public class PokedexEntry extends ReactionMessage {
 
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withColor(entry.type1.getColor());
-		builder.withAuthorName("Pokémon Go Hub Database");
+		builder.withAuthorName("PokÃ©mon Go Hub Database");
 		builder.withAuthorIcon("https://db.pokemongohub.net/images/icons/favicon-32x32.png");
 		builder.withAuthorUrl("https://db.pokemongohub.net/");
 		String pokeName = entry.name;
@@ -423,8 +423,8 @@ public class PokedexEntry extends ReactionMessage {
 		}
 
 		public static final String STAB_MARKER = "\\*";
-		public static final String LEGACY_MARKER = "†";
-		public static final String EXCLUSIVE_MARKER = "‡"; // §
+		public static final String LEGACY_MARKER = "â€ ";
+		public static final String EXCLUSIVE_MARKER = "â€¡"; // ï¿½
 
 		public String toString(PokedexEntry entry) {
 			boolean marked = false;
