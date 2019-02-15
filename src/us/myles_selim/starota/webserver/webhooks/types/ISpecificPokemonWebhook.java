@@ -7,11 +7,24 @@ public interface ISpecificPokemonWebhook extends IPokemonWebhook {
 
 	public boolean isWeatherBoosted();
 
+	public int getCP();
+
+	public default boolean hasIVs() {
+		return getAttackIV() != 0 || getDefenseIV() != 0 || getStaminaIV() != 0;
+	}
+
 	public int getAttackIV();
 
 	public int getDefenseIV();
 
 	public int getStaminaIV();
+
+	public default float getIVPercent() {
+		int sum = getAttackIV() + getDefenseIV() + getStaminaIV();
+		if (sum == 0)
+			return -1f;
+		return sum / 45.0f;
+	}
 
 	public double getWeight();
 

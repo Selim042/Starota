@@ -69,6 +69,11 @@ public class WebhookPokemon extends WebhookData implements ILocationWebhook, ISp
 	}
 
 	@Override
+	public int getCP() {
+		return this.cp;
+	}
+
+	@Override
 	public int getAttackIV() {
 		return this.individual_attack;
 	}

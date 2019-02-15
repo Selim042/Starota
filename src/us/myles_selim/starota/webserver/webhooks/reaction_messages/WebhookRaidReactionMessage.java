@@ -106,6 +106,8 @@ public class WebhookRaidReactionMessage extends ReactionMessage {
 
 	@Override
 	protected EmbedObject getEmbed(StarotaServer server) {
+		if (raidData != null)
+			return raidData.toEmbed();
 		EmbedBuilder builder = new EmbedBuilder();
 		PokedexEntry entry = null;
 		builder.withColor(RaidBoss.getColor(raidData.level, pokemon));
@@ -116,6 +118,7 @@ public class WebhookRaidReactionMessage extends ReactionMessage {
 									: form.getSpritePostfix(pokemon)));
 		if (pokemon != null) {
 			String titleString = (form == null ? "" : form + " ") + pokemon + " Raid ";
+			// title tier emoji
 			// if (boss.getTier() == 6)
 			// titleString += EmojiServerHelper.getEmoji(EX_RAID_EMOJI);
 			// else {

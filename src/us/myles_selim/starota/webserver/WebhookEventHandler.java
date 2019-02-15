@@ -3,6 +3,7 @@ package us.myles_selim.starota.webserver;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -18,6 +19,7 @@ import us.myles_selim.starota.silph_road.SilphRoadData;
 import us.myles_selim.starota.silph_road.SilphRoadData.RaidBoss;
 import us.myles_selim.starota.webserver.webhooks.WebhookEvent;
 import us.myles_selim.starota.webserver.webhooks.WebhookPokemon;
+import us.myles_selim.starota.webserver.webhooks.WebhookQuest;
 import us.myles_selim.starota.webserver.webhooks.WebhookRaid;
 import us.myles_selim.starota.webserver.webhooks.reaction_messages.WebhookRaidReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -28,7 +30,11 @@ public class WebhookEventHandler {
 
 	@EventSubscriber
 	public void onWebhookEvent(WebhookEvent event) {
-		IChannel channel = Starota.getChannel(538156939868110854L);
+		IChannel channel;
+		if (Starota.IS_DEV)
+			channel = Starota.getChannel(545687895177166871L);
+		else
+			channel = Starota.getChannel(538156939868110854L);
 		StarotaAssistants.setPermissionsForChannel(channel);
 		switch (event.getType()) {
 		case RAID:
@@ -38,8 +44,7 @@ public class WebhookEventHandler {
 			// region: "
 			// + server.getRegion(new GeoPoint(raidData.latitude,
 			// raidData.longitude))));
-			if (Starota.IS_DEV || raidServer
-					.getRegion(new GeoPoint(raidData.latitude, raidData.longitude)) != null) {
+			if (Starota.IS_DEV || raidServer.getRegion(raidData.getPoint()) != null) {
 				if (raidData.hasHatched()) {
 					AssistantRequest.request((client) -> {
 						return new WebhookRaidReactionMessage(raidData)
@@ -53,17 +58,32 @@ public class WebhookEventHandler {
 				}
 			}
 			break;
-		// case POKEMON:
-		// WebhookPokemon pokeData = (WebhookPokemon) event.getWebhookData();
-		// StarotaServer pokeServer = StarotaServer.getServer(event.getGuild());
-		// if (pokeServer.getRegion(new GeoPoint(pokeData.latitude,
-		// pokeData.longitude)) != null) {
-		// EmbedObject embed = getPokemonEmbed(pokeData);
-		// AssistantRequest.request((client) -> {
-		// return client.getChannelByID(channel.getLongID()).sendMessage(embed);
-		// });
-		// }
-		// break;
+		case QUEST:
+			WebhookQuest taskData = (WebhookQuest) event.getWebhookData();
+			StarotaServer taskServer = StarotaServer.getServer(event.getGuild());
+			// RequestBuffer.request(() -> channel.sendMessage("Raid in
+			// region: "
+			// + server.getRegion(new GeoPoint(raidData.latitude,
+			// raidData.longitude))));
+			if (Starota.IS_DEV || taskServer.getRegion(taskData.getPoint()) != null) {
+				AssistantRequest.request((client) -> {
+					return client.getChannelByID(channel.getLongID())
+							.sendMessage("```json\n" + taskData.data + "\n```");
+				});
+			}
+			break;
+		case POKEMON:
+			if (!Starota.IS_DEV)
+				break;
+			WebhookPokemon pokeData = (WebhookPokemon) event.getWebhookData();
+			StarotaServer pokeServer = StarotaServer.getServer(event.getGuild());
+			if (pokeServer.getRegion(new GeoPoint(pokeData.latitude, pokeData.longitude)) != null) {
+				EmbedObject embed = getPokemonEmbed(pokeData);
+				AssistantRequest.request((client) -> {
+					return client.getChannelByID(channel.getLongID()).sendMessage(embed);
+				});
+			}
+			break;
 		default:
 			break;
 		}
@@ -75,6 +95,7 @@ public class WebhookEventHandler {
 		builder.withThumbnail(ImageHelper.getRaidEgg(raidData.level));
 		builder.withColor(RaidBoss.getColor(raidData.level, null));
 		builder.appendDesc("\n**Time Left Until Hatch**: " + getTimeRemainingHatch(raidData));
+		TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("CST"));
 		builder.appendDesc("\n**Hatch Time**: " + TIME_FORMAT.format(new Date(raidData.start)));
 
 		List<RaidBoss> bosses = SilphRoadData.getBosses(raidData.level);
@@ -101,6 +122,12 @@ public class WebhookEventHandler {
 		builder.withTitle(String.format("A wild %s has spawned!", pokemon.getName()));
 		builder.withThumbnail(ImageHelper.getOfficalArtwork(pokemon, pokemonData.form));
 		builder.withColor(pokemon.getType1().getColor());
+
+		builder.appendDesc("CP: " + pokemonData.cp);
+		if (pokemonData.hasIVs())
+			builder.appendDesc(String.format("IV: %.1f, Atk: %n, Def: %n, Sta: %n",
+					pokemonData.getIVPercent(), pokemonData.getAttackIV(), pokemonData.getDefenseIV(),
+					pokemonData.getStaminaIV()));
 
 		builder.appendField("Directions:",
 				String.format(

@@ -6,7 +6,7 @@ public enum EnumWebhookType {
 	POKEMON(WebhookPokemon.class),
 	POKESTOP(WebhookPokestop.class),
 	RAID(WebhookRaid.class),
-	TASK(WebhookTask.class);
+	QUEST(WebhookQuest.class);
 
 	private Class<? extends WebhookData> dataClass;
 
