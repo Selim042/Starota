@@ -86,21 +86,25 @@ public class PrimaryCommandHandler {
 		try {
 			for (ICommandHandler h : COMMAND_HANDLERS) {
 				ICommand cmd = h.findCommand(guild, args[0]);
-				if (cmd != null) {
-					new Thread(cmd.getName() + "Thread-" + guild.getName()) {
-
-						@Override
-						public void run() {
-							try {
-								cmd.execute(args, message, guild, channel);
-							} catch (Exception e) {
-								handleException(e, guild, channel, message);
-							}
-						}
-					}.start();
-					cmdFound = true;
+				if (cmd == null
+						|| !ChannelCommandManager.isAllowedHere(StarotaServer.getServer(guild),
+								cmd.getCategory(), channel)
+						|| (cmd.requiredPermission() != null && guild != null && !message.getAuthor()
+								.getPermissionsForGuild(guild).contains(cmd.requiredPermission())))
 					continue;
-				}
+				new Thread(cmd.getName() + "Thread-" + guild.getName()) {
+
+					@Override
+					public void run() {
+						try {
+							cmd.execute(args, message, guild, channel);
+						} catch (Exception e) {
+							handleException(e, guild, channel, message);
+						}
+					}
+				}.start();
+				cmdFound = true;
+				continue;
 				// if (h.executeCommand(args, message, server, channel)) {
 				// cmdFound = true;
 				// continue;
@@ -114,11 +118,15 @@ public class PrimaryCommandHandler {
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.withTitle("Did you mean...?");
 			for (ICommand cmd : getSuggestions(guild, channel, args[0], 5)) {
-				if (cmd != null) {
-					String desciption = cmd.getDescription();
-					builder.appendDesc("- " + prefix + cmd.getName()
-							+ (desciption == null ? "" : ", _" + cmd.getDescription() + "_") + "\n");
-				}
+				if (cmd == null
+						|| !ChannelCommandManager.isAllowedHere(StarotaServer.getServer(guild),
+								cmd.getCategory(), channel)
+						|| (cmd.requiredPermission() != null && guild != null && !message.getAuthor()
+								.getPermissionsForGuild(guild).contains(cmd.requiredPermission())))
+					continue;
+				String desciption = cmd.getDescription();
+				builder.appendDesc("- " + prefix + cmd.getName()
+						+ (desciption == null ? "" : ", _" + cmd.getDescription() + "_") + "\n");
 			}
 			channel.sendMessage(builder.build());
 		}
