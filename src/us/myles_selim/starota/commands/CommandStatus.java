@@ -5,6 +5,7 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
+import us.myles_selim.starota.RolePermHelper;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -29,7 +30,7 @@ public class CommandStatus extends StarotaCommand {
 			builder.withTitle(Starota.getClient().getOurUser().getDisplayName(server.getDiscordGuild())
 					+ " Status");
 			builder.appendField("Discord:", Starota.getClient().isReady() ? "Online" : "Offline", true);
-			if (Starota.canUseLua(server.getDiscordGuild()))
+			if (RolePermHelper.canUseLua(server.getDiscordGuild()))
 				builder.appendField("Lua:",
 						LuaUtils.isInitialized(server) ? "Initialized" : "Uninitalized", true);
 			channel.sendMessage(builder.build());

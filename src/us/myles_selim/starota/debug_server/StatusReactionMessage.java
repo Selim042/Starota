@@ -13,6 +13,7 @@ import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.EmojiServerHelper;
+import us.myles_selim.starota.RolePermHelper;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.reaction_messages.PersistReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -76,8 +77,8 @@ public class StatusReactionMessage extends PersistReactionMessage {
 					? (int) s.getValue(StarotaServer.TRADE_ID_KEY)
 					: 0;
 			text += "Trades: " + tradeId + "/9,999\n";
-			text += "Leaderboards: " + s.getLeaderboardCount() + "/" + Starota.getMaxLeaderboards(g)
-					+ "\n";
+			text += "Leaderboards: " + s.getLeaderboardCount() + "/"
+					+ RolePermHelper.getMaxLeaderboards(g) + "\n";
 			text += "Voter Ratio: " + s.getVoterPercent() + "\n";
 			builder.appendField(g.getName(), text, true);
 			displayed++;

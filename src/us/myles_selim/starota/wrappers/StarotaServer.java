@@ -20,6 +20,7 @@ import us.myles_selim.ebs.EBList;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.ebs.IOHelper;
 import us.myles_selim.starota.Pair;
+import us.myles_selim.starota.RolePermHelper;
 import us.myles_selim.starota.ServerDataHelper;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
@@ -290,7 +291,7 @@ public class StarotaServer {
 		Leaderboard testBoard = getLeaderboard(name);
 		if (testBoard != null)
 			return null;
-		if (leaderboards.getKeys().size() >= Starota.getMaxLeaderboards(guild))
+		if (leaderboards.getKeys().size() >= RolePermHelper.getMaxLeaderboards(guild))
 			return null;
 		Leaderboard board = new Leaderboard(guild, name);
 		board.addAlias(name.replaceAll(" ", "_"));

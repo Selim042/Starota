@@ -8,7 +8,7 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IMessage.Attachment;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.Permissions;
-import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.RolePermHelper;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.ScriptManager;
@@ -42,7 +42,7 @@ public class CommandUploadScript extends StarotaCommand {
 
 	@Override
 	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
-		if (!Starota.canUseLua(server.getDiscordGuild())) {
+		if (!RolePermHelper.canUseLua(server.getDiscordGuild())) {
 			channel.sendMessage("This server cannot use Lua as it is a paid feature.");
 			return;
 		}

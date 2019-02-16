@@ -13,6 +13,7 @@ import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.EventFactory;
 import us.myles_selim.starota.MiscUtils;
+import us.myles_selim.starota.RolePermHelper;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.embed_converter.ExtraField;
 import us.myles_selim.starota.enums.EnumTeam;
@@ -124,7 +125,7 @@ public class PlayerProfile {
 	}
 
 	public String getDonorRoleName() {
-		IRole donorRole = Starota.getDonorRole(Starota.getUser(this.discordId));
+		IRole donorRole = RolePermHelper.getDonorRole(Starota.getUser(this.discordId));
 		if (donorRole != null)
 			return donorRole.getName();
 		return null;

@@ -50,6 +50,8 @@ public class CommandModules extends StarotaCommand {
 					}
 					out += "- " + d.getName() + "\n";
 				}
+				if (out.isEmpty())
+					out += "no info to display";
 				builder.appendField(m.getName(), out, false);
 			}
 			channel.sendMessage(builder.build());

@@ -18,9 +18,7 @@ import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.assistants.StarotaAssistants;
 import us.myles_selim.starota.debug_server.DebugServer;
-import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.research.ResearchTracker;
-import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class EventHandler {
@@ -112,46 +110,47 @@ public class EventHandler {
 
 	@EventSubscriber
 	public void formManagerHandler(MessageReceivedEvent event) {
-		if (!(event.getChannel() instanceof IPrivateChannel))
-			return;
-		IPrivateChannel channel = (IPrivateChannel) event.getChannel();
-		// Selim's user id
-		if (channel.getRecipient().getLongID() != 134855940938661889L)
-			return;
-		String message = event.getMessage().getContent();
-		if (message.startsWith(".help")) {
-			channel.sendMessage(".removeExclude\n" + ".forceEnable\n" + ".addShinyable\n");
-			return;
-		}
-		String[] args = message.split(" ");
-		if (args.length != 2)
-			return;
-		EnumPokemon pokemon = EnumPokemon.getPokemon(args[1]);
-		if (pokemon == null)
-			pokemon = EnumPokemon.getPokemon(Integer.parseInt(args[1]));
-		switch (args[0].toLowerCase()) {
-		case ".removeexclude":
-			if (FormManager.removeExcluded(pokemon))
-				channel.sendMessage("Removed " + pokemon + " from exclusion");
-			else
-				channel.sendMessage(pokemon + " is already not excluded");
-			break;
-		case ".forceenable":
-			if (FormManager.addForceEnable(pokemon))
-				channel.sendMessage("Forced enabled " + pokemon);
-			else
-				channel.sendMessage(pokemon + " is already enabled");
-			break;
-		case ".addshinyable":
-			if (FormManager.addShinyable(pokemon))
-				channel.sendMessage("Added " + pokemon + " as shinyable");
-			else
-				channel.sendMessage(pokemon + " is already shinyable");
-			break;
-		default:
-			channel.sendMessage("Unknown command");
-			break;
-		}
+		// if (!(event.getChannel() instanceof IPrivateChannel))
+		// return;
+		// IPrivateChannel channel = (IPrivateChannel) event.getChannel();
+		// // Selim's user id
+		// if (channel.getRecipient().getLongID() != 134855940938661889L)
+		// return;
+		// String message = event.getMessage().getContent();
+		// if (message.startsWith(".help")) {
+		// channel.sendMessage(".removeExclude\n" + ".forceEnable\n" +
+		// ".addShinyable\n");
+		// return;
+		// }
+		// String[] args = message.split(" ");
+		// if (args.length != 2)
+		// return;
+		// EnumPokemon pokemon = EnumPokemon.getPokemon(args[1]);
+		// if (pokemon == null)
+		// pokemon = EnumPokemon.getPokemon(Integer.parseInt(args[1]));
+		// switch (args[0].toLowerCase()) {
+		// case ".removeexclude":
+		// if (FormManager.removeExcluded(pokemon))
+		// channel.sendMessage("Removed " + pokemon + " from exclusion");
+		// else
+		// channel.sendMessage(pokemon + " is already not excluded");
+		// break;
+		// case ".forceenable":
+		// if (FormManager.addForceEnable(pokemon))
+		// channel.sendMessage("Forced enabled " + pokemon);
+		// else
+		// channel.sendMessage(pokemon + " is already enabled");
+		// break;
+		// case ".addshinyable":
+		// if (FormManager.addShinyable(pokemon))
+		// channel.sendMessage("Added " + pokemon + " as shinyable");
+		// else
+		// channel.sendMessage(pokemon + " is already shinyable");
+		// break;
+		// default:
+		// channel.sendMessage("Unknown command");
+		// break;
+		// }
 	}
 
 	// update Patreon perms on debug server

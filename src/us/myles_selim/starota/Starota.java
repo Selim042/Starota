@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -43,7 +41,6 @@ import us.myles_selim.starota.commands.pvp.CommandNotReady;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 import us.myles_selim.starota.debug_server.DebugServer;
-import us.myles_selim.starota.enums.EnumDonorPerm;
 import us.myles_selim.starota.events.CommandEvents;
 import us.myles_selim.starota.leaderboards.commands.CommandEditLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandGetLeaderboard;
@@ -73,7 +70,6 @@ import us.myles_selim.starota.role_management.commands.CommandGetGroups;
 import us.myles_selim.starota.role_management.commands.CommandRemoveGroup;
 import us.myles_selim.starota.role_management.commands.CommandSetAsGroup;
 import us.myles_selim.starota.silph_road.CommandSilphCard;
-import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.trading.commands.CommandFindTrade;
 import us.myles_selim.starota.trading.commands.CommandForTrade;
 import us.myles_selim.starota.trading.commands.CommandGetForms;
@@ -266,7 +262,7 @@ public class Starota {
 		CLIENT.changePresence(StatusType.IDLE, ActivityType.PLAYING,
 				"starting threads and loading settings...");
 
-		FormManager.init();
+		// FormManager.init();
 		ResearchTracker.init();
 
 		ReactionMessageRegistry reactionRegistry = new ReactionMessageRegistry();
@@ -520,81 +516,6 @@ public class Starota {
 
 	public static IGuild getSupportServer() {
 		return getGuild(SUPPORT_SERVER);
-	}
-
-	public static boolean canUseLua(IGuild server) {
-		if (server == null)
-			return false;
-		IUser owner = server.getOwner();
-		IGuild supportServer = getGuild(SUPPORT_SERVER); // support server
-		if (!supportServer.getUsers().contains(owner))
-			return false;
-		if (owner.getLongID() == supportServer.getOwnerLongID())
-			return true;
-		IRole requiredRole = supportServer.getRoleByID(436617921620606976L); // supporter
-																				// role
-		return owner.hasRole(requiredRole);
-	}
-
-	public static int getMaxLeaderboards(IGuild server) {
-		int max = 3;
-		for (EnumDonorPerm p : getDonorPerms(server)) {
-			switch (p) {
-			case LEADERBOARD_5:
-				max = 5;
-				break;
-			case LEADERBOARD_10:
-				max = 10;
-				break;
-			case LEADERBOARD_20:
-				max = 20;
-				break;
-			case LEADERBOARD_100:
-				max = 100;
-				break;
-			default:
-				break;
-			}
-		}
-		return max;
-	}
-
-	public static IRole getDonorRole(IUser user) {
-		IGuild supportServer = getSupportServer();
-		if (!supportServer.getUsers().contains(user))
-			return null;
-		List<IRole> supportRoles = supportServer.getRoles();
-		List<IRole> patronRoles = new ArrayList<>();
-		boolean inRange = false;
-		for (IRole r : supportRoles) {
-			if (r.getName().equals("MARKER")) {
-				inRange = !inRange;
-				continue;
-			}
-			if (inRange)
-				patronRoles.add(r);
-		}
-		patronRoles.retainAll(user.getRolesForGuild(supportServer));
-		if (patronRoles.size() > 0)
-			return patronRoles.get(0);
-		return null;
-	}
-
-	public static List<EnumDonorPerm> getDonorPerms(IGuild server) {
-		if (server == null)
-			return Collections.emptyList();
-		IUser owner = server.getOwner();
-		IGuild supportServer = getGuild(SUPPORT_SERVER); // support server
-		if (!supportServer.getUsers().contains(owner))
-			return Collections.emptyList();
-		if (owner.getLongID() == supportServer.getOwnerLongID())
-			return Arrays.asList(EnumDonorPerm.values());
-		List<EnumDonorPerm> perms = new ArrayList<>();
-		List<IRole> roles = owner.getRolesForGuild(supportServer);
-		for (EnumDonorPerm p : EnumDonorPerm.values())
-			if (roles.contains(p.getRole()))
-				perms.add(p);
-		return Collections.unmodifiableList(perms);
 	}
 
 	public static void submitError(Throwable e) {

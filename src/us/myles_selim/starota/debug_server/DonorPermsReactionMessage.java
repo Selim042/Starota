@@ -13,6 +13,7 @@ import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.EmojiServerHelper;
+import us.myles_selim.starota.RolePermHelper;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumDonorPerm;
 import us.myles_selim.starota.reaction_messages.PersistReactionMessage;
@@ -70,7 +71,7 @@ public class DonorPermsReactionMessage extends PersistReactionMessage {
 			IGuild g = guilds.get(i);
 			if (EmojiServerHelper.isEmojiServer(g) || g.equals(DebugServer.DEBUG_SERVER))
 				continue;
-			List<EnumDonorPerm> perms = Starota.getDonorPerms(g);
+			List<EnumDonorPerm> perms = RolePermHelper.getDonorPerms(g);
 			if (perms == null || perms.isEmpty()) {
 				builder.appendField(g.getName(), " - No donor permissions", true);
 				continue;
