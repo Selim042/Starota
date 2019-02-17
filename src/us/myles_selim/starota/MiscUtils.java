@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import us.myles_selim.starota.enums.EnumPokemon;
+
 public class MiscUtils {
 
 	public static String fixCharacters(String in) {
@@ -23,6 +25,25 @@ public class MiscUtils {
 			if (t != null && t.equals(tv))
 				return true;
 		return false;
+	}
+
+	public static EnumPokemon[] getSuggestedPokemon(String input, int count) {
+		List<DistancedEnum<EnumPokemon>> suggestions = new ArrayList<>();
+		for (EnumPokemon e : EnumPokemon.values()) {
+			suggestions.add(new DistancedEnum<>(calculateDistance(e.name(), input), e));
+			suggestions.add(new DistancedEnum<>(calculateDistance(e.toString(), input), e));
+		}
+		suggestions.sort(null);
+		EnumPokemon[] out = new EnumPokemon[count];
+		int index = 0;
+		for (DistancedEnum<EnumPokemon> e : suggestions) {
+			if (index >= count)
+				break;
+			EnumPokemon sug = e.en;
+			if (!MiscUtils.arrContains(out, sug) && !sug.isAvailable())
+				out[index++] = sug;
+		}
+		return out;
 	}
 
 	public static <E extends Enum<E>> E[] getSuggestionsEnum(Class<E> enumClass, String input,

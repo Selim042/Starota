@@ -61,7 +61,7 @@ public abstract class FormSet {
 		}
 
 		public boolean canBeShiny(EnumPokemon pokemon) {
-			return FormManager.isShinyable(pokemon.getId());
+			return FormManager.isShinyable(pokemon);
 		}
 
 		public EnumPokemonType getType1(EnumPokemon pokemon) {

@@ -45,7 +45,7 @@ public class CommandPokedex extends StarotaCommand {
 		if (pokemon == null) {
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.withTitle("Did you mean...?");
-			for (EnumPokemon poke : MiscUtils.getSuggestionsEnum(EnumPokemon.class, args[1], 6)) {
+			for (EnumPokemon poke : MiscUtils.getSuggestedPokemon(args[1], 6)) {
 				if (poke != null)
 					builder.appendDesc("- " + poke + "\n");
 			}

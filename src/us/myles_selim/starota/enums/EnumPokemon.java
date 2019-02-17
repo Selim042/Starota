@@ -1,6 +1,18 @@
 package us.myles_selim.starota.enums;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import us.myles_selim.starota.CachedData;
 import us.myles_selim.starota.ImageHelper;
+import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.trading.forms.FormSet;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
@@ -1012,6 +1024,62 @@ public enum EnumPokemon {
 		return null;
 	}
 
+	private static CachedData<List<EnumPokemon>> AVAILABLE;
+	private static CachedData<List<EnumPokemon>> SHINYABLE;
+
+	private static final String SILPH_DEX = "https://thesilphroad.com/catalog";
+	private static final Pattern POKEMON_GENERAL_PATTERN = Pattern
+			.compile("<div class=\"pokemonOption (sighted|notSighted).*?</div>");
+	private static final Pattern DEX_NUM_PATTERN = Pattern.compile("<span>#[0-9]{0,3}</span>");
+
+	private static void checkCaches() {
+		if (AVAILABLE == null || AVAILABLE.hasPassed(86400000L) || SHINYABLE == null
+				|| SHINYABLE.hasPassed(86400000L)) { // 1 day
+			AVAILABLE = new CachedData<>(new LinkedList<>());
+			SHINYABLE = new CachedData<>(new LinkedList<>());
+
+			try {
+				URL url = new URL(SILPH_DEX);
+				URLConnection conn = url.openConnection();
+				conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
+				BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+				String html = "";
+				String line = null;
+				while ((line = in.readLine()) != null)
+					html += line;
+				Matcher generalMatcher = POKEMON_GENERAL_PATTERN.matcher(html);
+				while (generalMatcher.find()) {
+					String match = generalMatcher.group();
+					if (match.contains("data-released=\"1\"")) {
+						Matcher dexNumMatcher = DEX_NUM_PATTERN.matcher(match);
+						if (dexNumMatcher.find()) {
+							String dexMatch = dexNumMatcher.group();
+							EnumPokemon pokemon = EnumPokemon.getPokemon(
+									Integer.parseInt(dexMatch.substring(7, dexMatch.length() - 7)));
+							if (pokemon == null)
+								continue;
+							AVAILABLE.getValue().add(pokemon);
+							if (match.contains("data-shiny-released=\"1\""))
+								SHINYABLE.getValue().add(pokemon);
+						}
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public boolean isAvailable() {
+		checkCaches();
+		return AVAILABLE.getValue().contains(this);
+	}
+
+	public boolean isShinyable() {
+		checkCaches();
+		return SHINYABLE.getValue().contains(this);
+	}
+
 	public static void main(String... args) {
 		System.out.println("Number of entered Pokemon: " + EnumPokemon.values().length);
 		int alolan = 0;
@@ -1027,6 +1095,7 @@ public enum EnumPokemon {
 			// for (int i = 0; i < FormManager.MAX_DEX; i++) {
 			// EnumPokemon p = EnumPokemon.values()[i];
 			int genderMult = p.getGenderPossible() == EnumGender.EITHER ? 2 : 1;
+			@SuppressWarnings("deprecation")
 			int shinyMult = FormManager.isShinyable(p) ? 2 : 1;
 			space += ((p.getFormSet() == null ? 1 : p.getFormSet().getNumForms()) * genderMult
 					* shinyMult);
