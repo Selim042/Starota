@@ -178,7 +178,7 @@ public class RaidReactionMessage extends ReactionMessage {
 					"React with the raid Pokemon to indicate what Pokemon the raid is for.", false);
 		else
 			builder.appendField("Reaction Usage:",
-					"React with a numbered emoji to indicate how many you will be bringing to the raid.\n"
+					"React with a numbered emoji to indicate how many people you will be bringing to the raid.\n"
 							+ "React with " + EmojiServerHelper.getEmoji("here")
 							+ " to indicate that you and your other people are at the raid location.\n"
 							+ "React with " + ReactionEmoji.of(EMOJI_NAMES[6])
@@ -203,7 +203,8 @@ public class RaidReactionMessage extends ReactionMessage {
 		}
 		List<RaidBoss> bosses = SilphRoadData.getBosses(tier);
 		for (RaidBoss b : bosses) {
-			String postfix = b.getForm() == null ? "" : "_" + b.getForm().getSpritePostfix(b.getPokemon());
+			String postfix = b.getForm() == null ? ""
+					: "_" + b.getForm().getSpritePostfix(b.getPokemon());
 			RequestBuffer
 					.request(() -> msg.addReaction(EmojiServerHelper.getEmoji(b.getPokemon() + postfix,
 							ImageHelper.getOfficalArtwork(b.getPokemon(), b.getForm()))));

@@ -15,7 +15,7 @@ public class CommandInvite extends StarotaCommand {
 			+ "authorize?client_id=%d&scope=bot&permissions=%d";
 
 	public CommandInvite(String botName, int permsUsed) {
-		super("invite", "Provides an invite link to add " + botName + " to your server.");
+		super("invite", "Provides an invite link to add " + botName + " to your own server.");
 		this.botName = botName;
 		this.permsUsed = permsUsed;
 	}
