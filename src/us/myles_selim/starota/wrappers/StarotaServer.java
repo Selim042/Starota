@@ -457,6 +457,7 @@ public class StarotaServer {
 	// end other stuff
 
 	private static final Map<Long, StarotaServer> SERVERS = new ConcurrentHashMap<>();
+	private static final Map<Long, StarotaUser> USERS = new ConcurrentHashMap<>();
 
 	public static StarotaServer getServer(IGuild guild) {
 		if (guild == null)
@@ -477,6 +478,16 @@ public class StarotaServer {
 
 		SERVERS.put(guild.getLongID(), server);
 		return server;
+	}
+
+	public StarotaUser getUser(IUser user) {
+		if (user == null)
+			return null;
+		if (USERS.containsKey(user.getLongID()))
+			return USERS.get(user.getLongID());
+		StarotaUser sUser = new StarotaUser(this, user);
+
+		return sUser;
 	}
 
 }

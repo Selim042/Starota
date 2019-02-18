@@ -10,13 +10,13 @@ import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.ImageHelper;
+import us.myles_selim.starota.RaidBoss;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.assistants.AssistantRequest;
 import us.myles_selim.starota.assistants.StarotaAssistants;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.geofence.GeoPoint;
 import us.myles_selim.starota.silph_road.SilphRoadData;
-import us.myles_selim.starota.silph_road.SilphRoadData.RaidBoss;
 import us.myles_selim.starota.webserver.webhooks.WebhookEvent;
 import us.myles_selim.starota.webserver.webhooks.WebhookPokemon;
 import us.myles_selim.starota.webserver.webhooks.WebhookQuest;
@@ -27,6 +27,8 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 public class WebhookEventHandler {
 
 	private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("hh:mm");
+
+	private static long questTime;
 
 	@EventSubscriber
 	public void onWebhookEvent(WebhookEvent event) {
@@ -59,6 +61,9 @@ public class WebhookEventHandler {
 			}
 			break;
 		case QUEST:
+			if (System.currentTimeMillis() - questTime < 1800000) // 30 mins
+				break;
+			questTime = System.currentTimeMillis();
 			WebhookQuest taskData = (WebhookQuest) event.getWebhookData();
 			StarotaServer taskServer = StarotaServer.getServer(event.getGuild());
 			// RequestBuffer.request(() -> channel.sendMessage("Raid in

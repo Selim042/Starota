@@ -16,6 +16,7 @@ import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.EmojiServerHelper;
 import us.myles_selim.starota.ImageHelper;
 import us.myles_selim.starota.MiscUtils;
+import us.myles_selim.starota.RaidBoss;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumWeather;
 import us.myles_selim.starota.modules.BaseModules;
@@ -25,7 +26,6 @@ import us.myles_selim.starota.pokedex.PokedexEntry;
 import us.myles_selim.starota.pokedex.PokedexEntry.DexCounter;
 import us.myles_selim.starota.reaction_messages.ReactionMessage;
 import us.myles_selim.starota.silph_road.SilphRoadData;
-import us.myles_selim.starota.silph_road.SilphRoadData.RaidBoss;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 import us.myles_selim.starota.wrappers.StarotaServer;
 

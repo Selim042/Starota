@@ -16,6 +16,7 @@ import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.CachedData;
 import us.myles_selim.starota.EmojiServerHelper;
+import us.myles_selim.starota.RaidBoss;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
@@ -120,7 +121,8 @@ public class SilphRoadData {
 	public static RaidBoss getBoss(EnumPokemon pokemon, Form form) {
 		getBosses();
 		for (RaidBoss b : BOSSES.getValue())
-			if (b.pokemon.equals(pokemon) && ((form == null && b.form == null) || b.form.equals(form)))
+			if (b.getPokemon().equals(pokemon)
+					&& ((form == null && b.getForm() == null) || b.getForm().equals(form)))
 				return b;
 		return null;
 	}
@@ -129,11 +131,11 @@ public class SilphRoadData {
 	private static void setupTiers() {
 		TIERED_BOSSES = new ArrayList[6];
 		for (RaidBoss b : BOSSES.getValue()) {
-			List<RaidBoss> tier = TIERED_BOSSES[b.tier - 1];
+			List<RaidBoss> tier = TIERED_BOSSES[b.getTier() - 1];
 			if (tier == null)
 				tier = new ArrayList<>();
 			tier.add(b);
-			TIERED_BOSSES[b.tier - 1] = tier;
+			TIERED_BOSSES[b.getTier() - 1] = tier;
 		}
 	}
 
@@ -152,54 +154,6 @@ public class SilphRoadData {
 		} else
 			parts[0] = name;
 		return parts;
-	}
-
-	public static class RaidBoss {
-
-		private final EnumPokemon pokemon;
-		private final Form form;
-		private final int tier;
-
-		public RaidBoss(EnumPokemon pokemon, Form form, int tier) {
-			this.pokemon = pokemon;
-			this.form = form;
-			this.tier = tier;
-		}
-
-		public EnumPokemon getPokemon() {
-			return this.pokemon;
-		}
-
-		public Form getForm() {
-			return this.form;
-		}
-
-		public int getTier() {
-			return this.tier;
-		}
-
-		public final int getColor() {
-			return getColor(tier, pokemon);
-		}
-
-		public static int getColor(int tier, EnumPokemon pokemon) {
-			switch (tier) {
-			case 6:
-			case 5:
-				return 0xa9a2de;
-			case 4:
-			case 3:
-				return 0xfbee74;
-			case 2:
-			case 1:
-				return 0xf79eee;
-			default:
-				if (pokemon == null)
-					return 0x000000;
-				return pokemon.getType1().getColor();
-			}
-		}
-
 	}
 
 }

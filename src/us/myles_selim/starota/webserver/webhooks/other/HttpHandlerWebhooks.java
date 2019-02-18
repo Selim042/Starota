@@ -1,4 +1,4 @@
-package us.myles_selim.starota.webserver.webhooks;
+package us.myles_selim.starota.webserver.webhooks.other;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -18,7 +18,14 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import sx.blah.discord.handle.obj.IGuild;
+import us.myles_selim.starota.RolePermHelper;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.enums.EnumDonorPerm;
+import us.myles_selim.starota.webserver.webhooks.EnumWebhookType;
+import us.myles_selim.starota.webserver.webhooks.WebhookClass;
+import us.myles_selim.starota.webserver.webhooks.WebhookData;
+import us.myles_selim.starota.webserver.webhooks.WebhookEvent;
+import us.myles_selim.starota.webserver.webhooks.WebhookQuest;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 @SuppressWarnings("restriction")
@@ -77,6 +84,25 @@ public class HttpHandlerWebhooks implements HttpHandler {
 				output.close();
 				return;
 			}
+			// System.out.println(url);
+			// boolean endingSlash = url.endsWith("/");
+			// long guildId = Long.parseLong(url.substring(url.length() -
+			// (endingSlash ? 19 : 18),
+			// endingSlash ? url.length() - 1 : url.length()));
+			long guildId = Long.parseLong(url.substring(hookIndex + 9, hookIndex + 27));
+			IGuild guild;
+			if (Starota.FULLY_STARTED)
+				guild = Starota.getGuild(guildId);
+			else
+				guild = null;
+			if (guild == null || !RolePermHelper.getDonorPerms(guild).contains(EnumDonorPerm.WEBHOOKS)) {
+				String response = "{\"error\":\"server does not exist or does not have webhooks enabled\"}";
+				exchange.sendResponseHeaders(500, response.length());
+				OutputStream output = exchange.getResponseBody();
+				output.write(response.getBytes());
+				output.close();
+				return;
+			}
 			InputStreamReader requestBody = new InputStreamReader(exchange.getRequestBody());
 			WebhookClass<?>[] data;
 			try {
@@ -89,30 +115,15 @@ public class HttpHandlerWebhooks implements HttpHandler {
 				output.close();
 				return;
 			}
-			// System.out.println(url);
-			// boolean endingSlash = url.endsWith("/");
-			// long guildId = Long.parseLong(url.substring(url.length() -
-			// (endingSlash ? 19 : 18),
-			// endingSlash ? url.length() - 1 : url.length()));
-			long guildId = Long.parseLong(url.substring(hookIndex + 9, hookIndex + 27));
-			IGuild guild;
-			if (Starota.FULLY_STARTED)
-				guild = Starota.getGuild(guildId);
-			else
-				guild = null;
-			if (guild != null) {
-				StarotaServer server = StarotaServer.getServer(guild);
-				String serverSecret = server.getWebhookSecret();
-				for (WebhookClass<?> hookC : data) {
-					if (hookC.secret == null)
-						hookC.secret = secret;
-					if (hookC.type != null
-							&& (serverSecret == null || hookC.secret.equals(serverSecret))) {
-						Starota.getClient().getDispatcher().dispatch(new WebhookEvent(guild, hookC));
-					}
+			StarotaServer server = StarotaServer.getServer(guild);
+			String serverSecret = server.getWebhookSecret();
+			for (WebhookClass<?> hookC : data) {
+				if (hookC.secret == null)
+					hookC.secret = secret;
+				if (hookC.type != null && (serverSecret == null || hookC.secret.equals(serverSecret))) {
+					Starota.getClient().getDispatcher().dispatch(new WebhookEvent(guild, hookC));
 				}
-			} else
-				System.out.println("starota is not started, cannot continue");
+			}
 
 			String response = "";
 			exchange.sendResponseHeaders(200, response.length());

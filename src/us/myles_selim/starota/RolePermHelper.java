@@ -15,15 +15,7 @@ public class RolePermHelper {
 	public static boolean canUseLua(IGuild server) {
 		if (server == null)
 			return false;
-		IUser owner = server.getOwner();
-		IGuild supportServer = Starota.getSupportServer();
-		if (!supportServer.getUsers().contains(owner))
-			return false;
-		if (owner.getLongID() == supportServer.getOwnerLongID())
-			return true;
-		IRole requiredRole = supportServer.getRoleByID(436617921620606976L); // supporter
-																				// role
-		return owner.hasRole(requiredRole);
+		return getDonorPerms(server).contains(EnumDonorPerm.LUA);
 	}
 
 	public static int getMaxLeaderboards(IGuild server) {
@@ -77,8 +69,10 @@ public class RolePermHelper {
 		IGuild supportServer = Starota.getSupportServer();
 		if (!supportServer.getUsers().contains(owner))
 			return Collections.emptyList();
-		if (owner.getLongID() == supportServer.getOwnerLongID())
+		if (owner.getLongID() == Starota.SELIM_USER_ID) {
+			System.out.println("b);eh");
 			return Arrays.asList(EnumDonorPerm.values());
+		}
 		List<EnumDonorPerm> perms = new ArrayList<>();
 		List<IRole> roles = owner.getRolesForGuild(supportServer);
 		for (EnumDonorPerm p : EnumDonorPerm.values())
