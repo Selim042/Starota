@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 import us.myles_selim.starota.CachedData;
 import us.myles_selim.starota.ImageHelper;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.trading.forms.FormSet;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 import us.myles_selim.starota.trading.forms.FormSetAlolan;
@@ -1095,8 +1094,7 @@ public enum EnumPokemon {
 			// for (int i = 0; i < FormManager.MAX_DEX; i++) {
 			// EnumPokemon p = EnumPokemon.values()[i];
 			int genderMult = p.getGenderPossible() == EnumGender.EITHER ? 2 : 1;
-			@SuppressWarnings("deprecation")
-			int shinyMult = FormManager.isShinyable(p) ? 2 : 1;
+			int shinyMult = p.isShinyable() ? 2 : 1;
 			space += ((p.getFormSet() == null ? 1 : p.getFormSet().getNumForms()) * genderMult
 					* shinyMult);
 		}

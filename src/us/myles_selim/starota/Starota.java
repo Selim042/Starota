@@ -104,9 +104,10 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	// public static EnumBotStatus STATUS = EnumBotStatus.UNKNOWN;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "2.7.9";
+	public final static String VERSION = "2.7.10";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n" + "Public changes:\n"
-			+ " * Command admin usage is now displayed to admins";
+			+ " + Starota now automatically updates what Pokemon are available and which can be shiny\n"
+			+ " * Fix permssions based command blocking\n" + " * Misc fixes";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static final PrimaryCommandHandler COMMAND_HANDLER = new PrimaryCommandHandler();
