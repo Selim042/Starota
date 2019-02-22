@@ -1,8 +1,18 @@
 package us.myles_selim.starota.webserver.webhooks;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+
+import sx.blah.discord.api.internal.json.objects.EmbedObject;
+import sx.blah.discord.util.EmbedBuilder;
+import us.myles_selim.starota.ImageHelper;
+import us.myles_selim.starota.RaidBoss;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.pokedex.GoHubDatabase;
 import us.myles_selim.starota.pokedex.PokedexEntry.DexMove;
+import us.myles_selim.starota.silph_road.SilphRoadData;
 import us.myles_selim.starota.webserver.webhooks.types.IGymWebhook;
 import us.myles_selim.starota.webserver.webhooks.types.IPokemonWebhook;
 
@@ -94,6 +104,62 @@ public class WebhookRaid extends WebhookData implements IGymWebhook, IPokemonWeb
 	@Override
 	public double getLongitude() {
 		return this.longitude;
+	}
+
+	private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("hh:mm");
+
+	@Override
+	public EmbedObject toEmbed() {
+		if (hasHatched())
+			throw new IllegalArgumentException("egg has already hatched");
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.withTitle("Tier " + this.level + " raid at " + this.gym_name);
+		builder.withThumbnail(ImageHelper.getRaidEgg(this.level));
+		builder.withColor(RaidBoss.getColor(this.level, null));
+		builder.appendDesc("\n**Time Left Until Hatch**: " + getTimeRemainingHatch(this));
+		TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("CST"));
+		builder.appendDesc("\n**Hatch Time**: " + TIME_FORMAT.format(new Date(this.start)));
+
+		List<RaidBoss> bosses = SilphRoadData.getBosses(this.level);
+		String bossesString = "";
+		for (RaidBoss b : bosses)
+			bossesString += (b.getForm() == null ? "" : b.getForm() + " ") + b.getPokemon() + "\n";
+		builder.appendField("Possible Bosses:", bossesString, false);
+
+		builder.appendField("Directions:",
+				String.format(
+						"[Google Maps](https://www.google.com/maps/search/?api=1&query=%1$f,%2$f) | "
+								+ "[Apple Maps](http://maps.apple.com/?daddr=%1$f,%2$f)",
+						this.latitude, this.longitude),
+				false);
+		builder.withImage(String.format(
+				"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/pin-s+%06X(%2$f,%3$f)/%2$f,%3$f,16.5,0,0/600x300@2x?logo=false&access_token=pk.eyJ1Ijoic2VsaW0wNDIiLCJhIjoiY2pyOXpmM2g1MG16cTQzbndqZXk5dHNndCJ9.vsh20BzsPBgTcBBcKWBqQw",
+				this.getTeam().getColor(), this.longitude, this.latitude));
+		return builder.build();
+	}
+
+	private static String getTimeRemainingHatch(WebhookRaid raidData) {
+		long rem = raidData.getTimeRemainingHatch();
+		int hours = (int) rem / 360000;
+		rem = rem % 3600;
+		int mins = (int) rem / 36000;
+		rem = rem % 360;
+		int seconds = (int) rem / 6000;
+		String ret = "";
+		boolean cont = false;
+		if (hours > 0) {
+			ret += hours + " hours, ";
+			cont = true;
+		}
+		if (mins > 0 || cont) {
+			ret += mins + " minutes, ";
+			cont = true;
+		}
+		if (seconds > 0 || cont)
+			ret += seconds + " seconds, ";
+		if (ret.isEmpty())
+			return ret;
+		return ret.substring(0, ret.length() - 2);
 	}
 
 }

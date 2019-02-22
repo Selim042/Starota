@@ -68,18 +68,34 @@ public class DonorPermsReactionMessage extends PersistReactionMessage {
 		int displayed = 0;
 		for (int i = 0; i < guilds.size() && displayed < SERVERS_PER_PAGE
 				&& (SERVERS_PER_PAGE * index) + i < guilds.size(); i++) {
-			IGuild g = guilds.get(i);
+			IGuild g = guilds.get((SERVERS_PER_PAGE * index) + i);
 			if (EmojiServerHelper.isEmojiServer(g) || g.equals(DebugServer.DEBUG_SERVER))
 				continue;
 			List<EnumDonorPerm> perms = RolePermHelper.getDonorPerms(g);
-			if (perms == null || perms.isEmpty()) {
+			boolean hasAll = true;
+			if (perms == null)
+				hasAll = false;
+			else {
+				for (EnumDonorPerm p : EnumDonorPerm.values()) {
+					if (!perms.contains(p)) {
+						hasAll = false;
+						break;
+					}
+				}
+			}
+			if (hasAll) {
+				builder.appendField(g.getName(), " - All donor permissions", true);
+				continue;
+			} else if (perms == null || perms.isEmpty()) {
 				builder.appendField(g.getName(), " - No donor permissions", true);
 				continue;
+			} else {
+				String text = "";
+				for (EnumDonorPerm p : perms)
+					text += " - " + p + "\n";
+				builder.appendField(g.getName(), text, true);
 			}
-			String text = "";
-			for (EnumDonorPerm p : perms)
-				text += " - " + p + "\n";
-			builder.appendField(g.getName(), text, true);
+			displayed++;
 		}
 		builder.withFooterText("Last updated");
 		builder.withTimestamp(System.currentTimeMillis());

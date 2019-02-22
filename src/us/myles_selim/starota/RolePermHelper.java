@@ -69,10 +69,8 @@ public class RolePermHelper {
 		IGuild supportServer = Starota.getSupportServer();
 		if (!supportServer.getUsers().contains(owner))
 			return Collections.emptyList();
-		if (owner.getLongID() == Starota.SELIM_USER_ID) {
-			System.out.println("b);eh");
+		if (owner.getLongID() == Starota.SELIM_USER_ID)
 			return Arrays.asList(EnumDonorPerm.values());
-		}
 		List<EnumDonorPerm> perms = new ArrayList<>();
 		List<IRole> roles = owner.getRolesForGuild(supportServer);
 		for (EnumDonorPerm p : EnumDonorPerm.values())

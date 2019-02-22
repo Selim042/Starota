@@ -3,14 +3,13 @@ package us.myles_selim.starota.wrappers;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 import us.myles_selim.starota.profiles.PlayerProfile;
-import us.myles_selim.starota.webserver.webhooks.other.SubscriptionOptions;
 
 public class StarotaUser {
 
 	private final StarotaServer server;
 	private final IUser user;
 
-	private SubscriptionOptions subOptions;
+	// private SubscriptionOptions subOptions;
 
 	protected StarotaUser(StarotaServer server, IUser user) {
 		this.server = server;

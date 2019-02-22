@@ -1,5 +1,7 @@
 package us.myles_selim.starota.webserver.webhooks;
 
+import sx.blah.discord.api.internal.json.objects.EmbedObject;
+import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.webserver.webhooks.types.IGymWebhook;
 
 public class WebhookGym extends WebhookData implements IGymWebhook {
@@ -50,6 +52,11 @@ public class WebhookGym extends WebhookData implements IGymWebhook {
 	@Override
 	public double getLongitude() {
 		return this.longitude;
+	}
+
+	@Override
+	public EmbedObject toEmbed() {
+		return new EmbedBuilder().build();
 	}
 
 }

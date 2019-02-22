@@ -437,9 +437,11 @@ public class StarotaServer {
 			List<SimpleUser> voters = Starota.getBotListAPI()
 					.getVoters(Long.toString(Starota.STAROTA_ID)).toCompletableFuture().get();
 			int numVoters = 0;
-			for (SimpleUser su : voters)
-				if (guild.getUsersByName(su.getUsername()) != null)
+			for (SimpleUser su : voters) {
+				List<IUser> user = guild.getUsersByName(su.getUsername());
+				if (user != null && !user.isEmpty())
 					numVoters++;
+			}
 			return numVoters * 100.0f / (guild.getUsers().size() * today.get(Calendar.DATE));
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();

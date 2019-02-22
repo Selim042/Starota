@@ -63,23 +63,35 @@ public class ModulesReactionMessage extends PersistReactionMessage {
 		int numGuilds = Starota.getClient().getGuilds().size() - EmojiServerHelper.getNumberServers()
 				- 1;
 		builder.withTitle(
-				"Enabled Modules: (" + (index + 1) + "/" + (numGuilds / SERVERS_PER_PAGE + 1) + ")");
+				"Disabled Modules: (" + (index + 1) + "/" + (numGuilds / SERVERS_PER_PAGE + 1) + ")");
 		int displayed = 0;
 		for (int i = 0; i < guilds.size() && displayed < SERVERS_PER_PAGE
 				&& (SERVERS_PER_PAGE * index) + i < guilds.size(); i++) {
-			IGuild g = guilds.get(i);
+			IGuild g = guilds.get((SERVERS_PER_PAGE * index) + i);
 			if (EmojiServerHelper.isEmojiServer(g) || g.equals(DebugServer.DEBUG_SERVER))
 				continue;
 			StarotaServer s = StarotaServer.getServer(g);
 			List<StarotaModule> modules = StarotaModule.getEnabledModules(s);
-			if (modules == null || modules.isEmpty()) {
-				builder.appendField(g.getName(), " - No enabled modules", true);
-				continue;
+			boolean hasAll = true;
+			for (StarotaModule m : StarotaModule.getAllModules()) {
+				if (!modules.contains(m)) {
+					hasAll = false;
+					break;
+				}
 			}
-			String text = "";
-			for (StarotaModule m : modules)
-				text += " - " + m.getName() + "\n";
-			builder.appendField(g.getName(), text, true);
+			if (hasAll) {
+				builder.appendField(g.getName(), " - All modules enabled", true);
+				continue;
+			} else if (modules == null || modules.isEmpty()) {
+				builder.appendField(g.getName(), " - No modules enabled", true);
+				continue;
+			} else {
+				String text = "";
+				for (StarotaModule p : modules)
+					text += " - " + p + "\n";
+				builder.appendField(g.getName(), text, true);
+			}
+			displayed++;
 		}
 		builder.withFooterText("Last updated");
 		builder.withTimestamp(System.currentTimeMillis());

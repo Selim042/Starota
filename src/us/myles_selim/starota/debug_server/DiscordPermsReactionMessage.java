@@ -63,23 +63,24 @@ public class DiscordPermsReactionMessage extends PersistReactionMessage {
 		List<IGuild> guilds = Starota.getClient().getGuilds();
 		int numGuilds = Starota.getClient().getGuilds().size() - EmojiServerHelper.getNumberServers()
 				- 1;
-		System.out.println(index);
+		IUser ourUser = Starota.getOurUser();
 		builder.withTitle("Missing Discord Perms: (" + (index + 1) + "/"
 				+ (numGuilds / SERVERS_PER_PAGE + 1) + ")");
 		int displayed = 0;
 		for (int i = 0; i < guilds.size() && displayed < SERVERS_PER_PAGE
 				&& (SERVERS_PER_PAGE * index) + i < guilds.size(); i++) {
-			IGuild g = guilds.get(i);
+			IGuild g = guilds.get((SERVERS_PER_PAGE * index) + i);
 			if (EmojiServerHelper.isEmojiServer(g))
 				continue;
 			if (g.equals(DebugServer.DEBUG_SERVER))
 				continue;
 			String text = "";
-			EnumSet<Permissions> invertPerms = EnumSet.allOf(Permissions.class);
-			invertPerms.removeAll(DebugServer.USED_PERMISSIONS);
+			EnumSet<Permissions> invertPerms = DebugServer.USED_PERMISSIONS.clone();
+			invertPerms.removeAll(ourUser.getPermissionsForGuild(g));
 			for (Permissions p : invertPerms)
 				text += " - " + p + "\n";
 			builder.appendField(g.getName(), text.isEmpty() ? "All permissions given" : text, true);
+			displayed++;
 		}
 		builder.withFooterText("Last updated");
 		builder.withTimestamp(System.currentTimeMillis());
