@@ -105,4 +105,8 @@ public class ReactionMessageRegistry {
 		}
 	}
 
+	public static ReactionMessage getMessage(long msg) {
+		return MESSAGES.get(Long.toString(msg));
+	}
+
 }

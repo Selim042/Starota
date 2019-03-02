@@ -50,12 +50,12 @@ public class WebhookRaid extends WebhookData implements IGymWebhook, IPokemonWeb
 	}
 
 	@Override
-	public int getForm() {
+	public int getFormId() {
 		return this.form;
 	}
 
 	public boolean hasHatched() {
-		return this.pokemon_id != 1;
+		return this.pokemon_id != 0;
 	}
 
 	@Override

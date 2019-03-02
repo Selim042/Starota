@@ -63,7 +63,6 @@ import us.myles_selim.starota.profiles.commands.CommandUpdateProfile;
 import us.myles_selim.starota.raids.CommandRaid;
 import us.myles_selim.starota.raids.CommandSetRaidEChannel;
 import us.myles_selim.starota.reaction_messages.ReactionMessageRegistry;
-import us.myles_selim.starota.research.CommandSetResearchChannel;
 import us.myles_selim.starota.research.ResearchTracker;
 import us.myles_selim.starota.role_management.commands.CommandAddGroup;
 import us.myles_selim.starota.role_management.commands.CommandGetGroups;
@@ -104,10 +103,9 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	// public static EnumBotStatus STATUS = EnumBotStatus.UNKNOWN;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "2.7.10";
+	public final static String VERSION = "2.7.11";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n" + "Public changes:\n"
-			+ " + Starota now automatically updates what Pokemon are available and which can be shiny\n"
-			+ " * Fix permssions based command blocking\n" + " * Misc fixes";
+			+ " * Fix bug with help command";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static final PrimaryCommandHandler COMMAND_HANDLER = new PrimaryCommandHandler();
@@ -198,7 +196,8 @@ public class Starota {
 				Permissions.generatePermissionsNumber(DebugServer.USED_PERMISSIONS)));
 
 		jCmdHandler.registerCommand("Administrative", new CommandStatus());
-		jCmdHandler.registerCommand("Administrative", new CommandSetResearchChannel());
+		// jCmdHandler.registerCommand("Administrative", new
+		// CommandSetResearchChannel());
 		jCmdHandler.registerCommand("Administrative", new CommandChangelogChannel());
 		jCmdHandler.registerCommand("Administrative", new CommandInviteAssistants());
 		if (IS_DEV) {
@@ -264,7 +263,7 @@ public class Starota {
 				"starting threads and loading settings...");
 
 		// FormManager.init();
-		ResearchTracker.init();
+		// ResearchTracker.init();
 
 		ReactionMessageRegistry reactionRegistry = new ReactionMessageRegistry();
 		dispatcher.registerListener(reactionRegistry);

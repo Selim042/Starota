@@ -45,6 +45,15 @@ public class RaidReactionMessage extends ReactionMessage {
 	private final Map<IUser, ReactionEmoji> attending = new HashMap<>();
 	private final Map<IUser, ReactionEmoji> here = new HashMap<>();
 
+	public RaidReactionMessage(EnumPokemon pokemon, Form form, int tier, String time, String location) {
+		this.boss = new RaidBoss(pokemon, form, tier);
+		this.pokemon = pokemon;
+		this.form = form;
+		this.tier = tier;
+		this.time = time;
+		this.location = location;
+	}
+
 	public RaidReactionMessage(int tier, String time, String location) {
 		List<RaidBoss> bosses = SilphRoadData.getBosses(tier);
 		if (bosses.size() == 1) {

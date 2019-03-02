@@ -6,13 +6,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.ActivityType;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
@@ -23,6 +27,7 @@ import us.myles_selim.starota.Starota;
 public class StarotaAssistants {
 
 	private static final String ROLE_NAME = "Starota Assistant";
+	private static final Map<Long, IDiscordClient> CLIENT_MAP = new ConcurrentHashMap<>();
 	private static final List<IDiscordClient> CLIENTS = new ArrayList<>();
 	private static final List<Long> ASSISTANT_IDS = new ArrayList<>();
 	private static boolean inited = false;
@@ -35,6 +40,10 @@ public class StarotaAssistants {
 			return;
 		inited = true;
 
+		if (Starota.IS_DEV)
+			CLIENT_MAP.put(Starota.STAROTA_DEV_ID, Starota.getClient());
+		else
+			CLIENT_MAP.put(Starota.STAROTA_ID, Starota.getClient());
 		Properties properties = new Properties();
 		try {
 			properties.load(new FileInputStream("starota.properties"));
@@ -66,15 +75,36 @@ public class StarotaAssistants {
 							"to " + Starota.BOT_NAME);
 				else
 					client.changePresence(StatusType.INVISIBLE);
+				CLIENT_MAP.put(client.getOurUser().getLongID(), client);
 				CLIENTS.add(client);
 				ASSISTANT_IDS.add(client.getOurUser().getLongID());
 			}
 		}
+		new Thread("AssistantStatusUpdater") {
+
+			@Override
+			public void run() {
+				while (true) {
+					for (IDiscordClient client : CLIENTS) {
+						if (Starota.IS_DEV)
+							client.changePresence(StatusType.IDLE, ActivityType.LISTENING,
+									"to " + Starota.BOT_NAME);
+						else
+							client.changePresence(StatusType.INVISIBLE);
+					}
+					try {
+						Thread.sleep(3600000); // 1 hour
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}.start();
 	}
 
 	public static boolean areAllOnServer(IGuild guild) {
-		for (IDiscordClient client : CLIENTS)
-			if (guild.getUserByID(client.getOurUser().getLongID()) == null)
+		for (Entry<Long, IDiscordClient> e : CLIENT_MAP.entrySet())
+			if (guild.getUserByID(e.getKey()) == null)
 				return false;
 		return true;
 	}
@@ -111,6 +141,14 @@ public class StarotaAssistants {
 
 	public static List<IDiscordClient> getClients() {
 		return Collections.unmodifiableList(CLIENTS);
+	}
+
+	public static IDiscordClient getResponsibleClient(IMessage msg) {
+		long id = msg.getAuthor().getLongID();
+		for (Entry<Long, IDiscordClient> e : CLIENT_MAP.entrySet())
+			if (e.getKey().equals(id))
+				return e.getValue();
+		return null;
 	}
 
 }

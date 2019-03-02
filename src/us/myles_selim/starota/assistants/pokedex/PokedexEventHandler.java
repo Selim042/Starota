@@ -21,6 +21,8 @@ public class PokedexEventHandler {
 	public void onServerCreate(GuildCreateEvent event) {
 		Starota.submitStats();
 		IGuild server = event.getGuild();
+		if (!server.getUsers().contains(PokedexBot.POKEDEX_CLIENT.getOurUser()))
+			return;
 		IUser selimUser = Starota.getUser(Starota.SELIM_USER_ID);
 		RequestBuffer.request(() -> {
 			IPrivateChannel selimPm = selimUser.getOrCreatePMChannel();

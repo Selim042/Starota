@@ -71,6 +71,8 @@ public class EventHandler {
 		Starota.submitStats();
 		Starota.updateOwners();
 		IGuild server = event.getGuild();
+		if (!server.getUsers().contains(Starota.getClient().getOurUser()))
+			return;
 		IUser selimUser = Starota.getUser(Starota.SELIM_USER_ID);
 		RequestBuffer.request(() -> {
 			IPrivateChannel selimPm = selimUser.getOrCreatePMChannel();

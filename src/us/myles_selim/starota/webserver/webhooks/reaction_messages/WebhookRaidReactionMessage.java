@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.TimeZone;
 
+import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.impl.obj.ReactionEmoji;
 import sx.blah.discord.handle.obj.ICategory;
@@ -20,6 +21,7 @@ import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.ImageHelper;
 import us.myles_selim.starota.RaidBoss;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.assistants.StarotaAssistants;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumWeather;
 import us.myles_selim.starota.modules.BaseModules;
@@ -34,6 +36,8 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class WebhookRaidReactionMessage extends ReactionMessage {
 
+	// Matches {@link Matches CommandRaid.TOPIC_REGEX}
+	private static final String TOPIC_TEMPLATE = "Raid chat the %1$s raid at %2$s\n\n(Key: 0x%3$016X **DO NOT MODIFY**)";
 	private static final String CATEGORY_NAME = "Raid Channels";
 	private static final SimpleDateFormat ROLE_DATE_FORMAT = new SimpleDateFormat("HHmm");
 	private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("hh:mm");
@@ -51,6 +55,10 @@ public class WebhookRaidReactionMessage extends ReactionMessage {
 			this.form = this.pokemon.getFormSet().getForm(raidData.form);
 	}
 
+	public WebhookRaid getRaidData() {
+		return this.raidData;
+	}
+
 	@Override
 	public void onSend(StarotaServer server, IChannel channel, IMessage msg) {
 		RequestBuffer.request(() -> msg.addReaction(ReactionEmoji.of("✅")));
@@ -60,27 +68,47 @@ public class WebhookRaidReactionMessage extends ReactionMessage {
 	public void onReactionAdded(StarotaServer server, IChannel channel, IMessage msg, IUser user,
 			IReaction react) {
 		if (react.getEmoji().getName().equals("✅")) {
-			user.addRole(this.role);
-			this.channel.sendMessage(user + " was added.");
-			IGuild guild = server.getDiscordGuild();
-			String name = getRoleName();
-			if (this.channel == null) {
-				ICategory category = null;
-				for (ICategory c : guild.getCategoriesByName(CATEGORY_NAME)) {
-					category = c;
-					break;
-				}
-				if (category == null) {
-					category = guild.createCategory(CATEGORY_NAME);
-					category.overrideRolePermissions(guild.getEveryoneRole(),
-							EnumSet.noneOf(Permissions.class), EnumSet.of(Permissions.READ_MESSAGES));
-					category.overrideUserPermissions(
-							Starota.getOurUser(), EnumSet.of(Permissions.MANAGE_CHANNEL,
-									Permissions.MANAGE_PERMISSIONS, Permissions.READ_MESSAGES),
-							EnumSet.noneOf(Permissions.class));
-				}
-				System.out.println(name);
+			handleStarotaAddReaction(server, channel, msg, user, react);
+			handleAssistantAddReaction(server, channel, msg, user, react);
+		}
+	}
+
+	private void handleStarotaAddReaction(StarotaServer server, IChannel channel, IMessage msg,
+			IUser user, IReaction react) {
+		channel = server.getDiscordGuild().getChannelByID(channel.getLongID());
+		msg = server.getDiscordGuild().getMessageByID(msg.getLongID());
+		user = server.getDiscordGuild().getUserByID(user.getLongID());
+		IGuild guild = server.getDiscordGuild();
+		String name = getRoleName();
+
+		if (this.channel == null) {
+			ICategory category = null;
+			for (ICategory c : guild.getCategoriesByName(CATEGORY_NAME)) {
+				category = c;
+				break;
+			}
+			if (category == null) {
+				category = guild.createCategory(CATEGORY_NAME);
+				category.overrideRolePermissions(guild.getEveryoneRole(),
+						EnumSet.noneOf(Permissions.class), EnumSet.of(Permissions.READ_MESSAGES));
+				category.overrideUserPermissions(
+						Starota.getOurUser(), EnumSet.of(Permissions.MANAGE_CHANNEL,
+								Permissions.MANAGE_PERMISSIONS, Permissions.READ_MESSAGES),
+						EnumSet.noneOf(Permissions.class));
+			}
+			for (IChannel c : guild.getChannelsByName(name)) {
+				this.channel = c;
+				break;
+			}
+			if (this.channel == null)
 				this.channel = category.createChannel(name);
+			this.channel.changeTopic(String.format(TOPIC_TEMPLATE, raidData.getPokemon().getName(),
+					raidData.getGymName(), getMessage().getLongID()));
+		}
+		if (this.role == null) {
+			for (IRole r : guild.getRolesByName(name)) {
+				this.role = r;
+				break;
 			}
 			if (this.role == null) {
 				this.role = guild.createRole();
@@ -91,23 +119,53 @@ public class WebhookRaidReactionMessage extends ReactionMessage {
 						EnumSet.noneOf(Permissions.class));
 			}
 		}
+		user.addRole(this.role);
+	}
+
+	private void handleAssistantAddReaction(StarotaServer server, IChannel channel, IMessage msg,
+			IUser user, IReaction react) {
+		IDiscordClient client = StarotaAssistants.getResponsibleClient(msg);
+		channel = client.getChannelByID(channel.getLongID());
+		msg = client.getMessageByID(msg.getLongID());
+		user = client.getUserByID(user.getLongID());
+
 		this.editMessage(channel, msg);
+		this.channel.sendMessage(user + " was added.");
 	}
 
 	@Override
 	public void onReactionRemoved(StarotaServer server, IChannel channel, IMessage msg, IUser user,
 			IReaction react) {
 		if (react.getEmoji().getName().equals("✅")) {
-			user.removeRole(this.role);
-			this.channel.sendMessage(user + " was removed.");
+			handleStarotaRemoveReaction(server, channel, msg, user, react);
+			handleAssistantRemoveReaction(server, channel, msg, user, react);
 		}
+	}
+
+	private void handleStarotaRemoveReaction(StarotaServer server, IChannel channel, IMessage msg,
+			IUser user, IReaction react) {
+		channel = server.getDiscordGuild().getChannelByID(channel.getLongID());
+		msg = server.getDiscordGuild().getMessageByID(msg.getLongID());
+		user = server.getDiscordGuild().getUserByID(user.getLongID());
+
+		user.removeRole(this.role);
+	}
+
+	private void handleAssistantRemoveReaction(StarotaServer server, IChannel channel, IMessage msg,
+			IUser user, IReaction react) {
+		IDiscordClient client = StarotaAssistants.getResponsibleClient(msg);
+		channel = client.getChannelByID(channel.getLongID());
+		msg = client.getMessageByID(msg.getLongID());
+		user = client.getUserByID(user.getLongID());
+
+		this.channel.sendMessage(user + " was removed.");
 		this.editMessage(channel, msg);
 	}
 
 	@Override
 	protected EmbedObject getEmbed(StarotaServer server) {
-		if (raidData != null)
-			return raidData.toEmbed();
+		// if (raidData != null)
+		// return raidData.toEmbed();
 		EmbedBuilder builder = new EmbedBuilder();
 		PokedexEntry entry = null;
 		builder.withColor(RaidBoss.getColor(raidData.level, pokemon));

@@ -61,7 +61,8 @@ public class StarotaServer {
 	}
 
 	public IGuild getDiscordGuild() {
-		return this.guild;
+		return Starota.getGuild(this.guild.getLongID());
+		// return this.guild;
 	}
 
 	public String getPrefix() {

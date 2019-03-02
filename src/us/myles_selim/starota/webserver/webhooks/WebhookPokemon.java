@@ -50,7 +50,7 @@ public class WebhookPokemon extends WebhookData implements ILocationWebhook, ISp
 	}
 
 	@Override
-	public int getForm() {
+	public int getFormId() {
 		return this.form;
 	}
 

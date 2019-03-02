@@ -6,9 +6,16 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.reaction_messages.ReactionMessage;
+import us.myles_selim.starota.reaction_messages.ReactionMessageRegistry;
+import us.myles_selim.starota.webserver.webhooks.WebhookRaid;
+import us.myles_selim.starota.webserver.webhooks.reaction_messages.WebhookRaidReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandRaid extends StarotaCommand {
+
+	// Matches WebhookRaidReactionMessage.TOPIC_TEMPLATE
+	private static final String TOPIC_REGEX = "";
 
 	public CommandRaid() {
 		super("raid", "Makes a new raid post.");
@@ -32,9 +39,41 @@ public class CommandRaid extends StarotaCommand {
 	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
 			throws Exception {
 		if (args[0].equalsIgnoreCase("raid")) {
-			channel.sendMessage("Please specify raid tier in command name. Example: `"
-					+ server.getPrefix() + "raid5 " + getGeneralUsage() + "`");
-			return;
+			boolean needsTier = true;
+			String topic = channel.getTopic();
+			if (topic.contains("Key: ")) {
+				System.out.println("key found");
+				long key = -1;
+				int index = topic.indexOf("(Key: 0x");
+				try {
+					key = Long.parseLong(topic.substring(index + 8, index + 24), 16);
+					needsTier = false;
+				} catch (NumberFormatException e) {
+					needsTier = true;
+				}
+				if (key == -1)
+					needsTier = true;
+				if (!needsTier) {
+					if (args.length < 2) {
+						channel.sendMessage(
+								"**Usage**: " + server.getPrefix() + this.getName() + " [time]");
+						return;
+					}
+					ReactionMessage rMsg = ReactionMessageRegistry.getMessage(key);
+					if (rMsg instanceof WebhookRaidReactionMessage) {
+						WebhookRaid raidData = ((WebhookRaidReactionMessage) rMsg).getRaidData();
+						new RaidReactionMessage(raidData.getPokemon(), raidData.getForm(),
+								raidData.level, args[1], raidData.getGymName()).sendMessage(channel);
+						return;
+					} else
+						needsTier = true;
+				}
+			}
+			if (needsTier) {
+				channel.sendMessage("Please specify raid tier in command name. Example: `"
+						+ server.getPrefix() + "raid5 " + getGeneralUsage() + "`");
+				return;
+			}
 		}
 		if (args.length < 3) {
 			channel.sendMessage("**Usage**: " + server.getPrefix() + args[0] + " " + getGeneralUsage());

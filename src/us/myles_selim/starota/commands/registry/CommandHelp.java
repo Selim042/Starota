@@ -43,7 +43,7 @@ public class CommandHelp extends JavaCommand {
 
 				if (cmd.getGeneralUsage() != null && !cmd.getGeneralUsage().isEmpty())
 					builder.appendField("Usage:", cmd.getGeneralUsage(), true);
-				if (cmd.getGeneralUsage() != null && !cmd.getGeneralUsage().isEmpty()
+				if (cmd.getAdminUsage() != null && !cmd.getAdminUsage().isEmpty()
 						&& channel.getModifiedPermissions(author).contains(Permissions.ADMINISTRATOR))
 					builder.appendField("Admin Usage:", cmd.getAdminUsage(), true);
 
