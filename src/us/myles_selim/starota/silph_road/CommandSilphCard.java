@@ -71,12 +71,8 @@ public class CommandSilphCard extends StarotaCommand {
 		builder.appendField("XP:", card.data.xp, true);
 		String favPokemonString = "";
 		for (int id : card.data.top_6_pokemon)
-			// favPokemonString +=
-			// EmojiServerHelper.getEmoji(EnumPokemon.getPokemon(id).getName(),
-			// "https://db.pokemongohub.net/images/official/full/" +
-			// String.format("%03d", id)
-			// + ".png");
-			favPokemonString += EnumPokemon.getPokemon(id).getName() + ", ";
+			if (id != 0)
+				favPokemonString += EnumPokemon.getPokemon(id).getName() + ", ";
 		if (!favPokemonString.isEmpty())
 			builder.appendField("Top 6 Pokemon:",
 					favPokemonString.substring(0, favPokemonString.length() - 2), false);

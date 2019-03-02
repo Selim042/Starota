@@ -100,7 +100,7 @@ public class CommandUpdateProfile extends StarotaCommand {
 			executed = true;
 			break;
 		case "alt":
-			if (args[3].length() != 12) {
+			if (args[2].length() != 12) {
 				channel.sendMessage("Code \"" + args[3] + "\" is an invalid trainer code");
 				return;
 			}
@@ -120,7 +120,7 @@ public class CommandUpdateProfile extends StarotaCommand {
 			case "t":
 				EnumTeam team;
 				try {
-					team = EnumTeam.valueOf(args[3].toUpperCase());
+					team = EnumTeam.valueOf(args[2].toUpperCase());
 				} catch (IllegalArgumentException e) {
 					team = null;
 				}
