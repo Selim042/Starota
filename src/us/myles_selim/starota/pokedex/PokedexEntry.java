@@ -352,7 +352,7 @@ public class PokedexEntry extends ReactionMessage {
 	}
 
 	private int getFormId(String form) {
-		if (form == null || this.forms.length == 1)
+		if (form == null || this.forms == null || this.forms.length == 1)
 			return 0;
 		for (int i = 0; i < this.forms.length; i++)
 			if (form.equals(this.forms[i].name))

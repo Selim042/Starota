@@ -36,6 +36,13 @@ public enum EnumWeather {
 		return this.types;
 	}
 
+	public boolean isBoosted(EnumPokemon pokemon) {
+		for (EnumPokemonType t : this.types)
+			if (t.equals(pokemon.getType1()) || t.equals(pokemon.getType2()))
+				return true;
+		return false;
+	}
+
 	@Override
 	public String toString() {
 		return this.name;

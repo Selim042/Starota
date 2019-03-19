@@ -14,9 +14,6 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandRaid extends StarotaCommand {
 
-	// Matches WebhookRaidReactionMessage.TOPIC_TEMPLATE
-	private static final String TOPIC_REGEX = "";
-
 	public CommandRaid() {
 		super("raid", "Makes a new raid post.");
 	}
@@ -42,7 +39,6 @@ public class CommandRaid extends StarotaCommand {
 			boolean needsTier = true;
 			String topic = channel.getTopic();
 			if (topic.contains("Key: ")) {
-				System.out.println("key found");
 				long key = -1;
 				int index = topic.indexOf("(Key: 0x");
 				try {

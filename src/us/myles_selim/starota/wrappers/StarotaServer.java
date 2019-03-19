@@ -2,6 +2,7 @@ package us.myles_selim.starota.wrappers;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -15,7 +16,9 @@ import org.discordbots.api.client.entity.SimpleUser;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.ebs.EBList;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.ebs.IOHelper;
@@ -24,6 +27,7 @@ import us.myles_selim.starota.RolePermHelper;
 import us.myles_selim.starota.ServerDataHelper;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
+import us.myles_selim.starota.enums.EnumDonorPerm;
 import us.myles_selim.starota.enums.EnumGender;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.geofence.GeoPoint;
@@ -430,7 +434,7 @@ public class StarotaServer {
 	}
 	// end region stuffs
 
-	// start other stuff
+	// start vote stuff
 	@SuppressWarnings("deprecation")
 	public float getVoterPercent() {
 		try {
@@ -450,6 +454,73 @@ public class StarotaServer {
 		return 0;
 	}
 
+	public int getEarnedVotePoints() {
+		float per = getVoterPercent();
+		if (per > 98.0f)
+			return EnumDonorPerm.getMaxPoints();
+		int points = 0;
+		if (per > 0.01f)
+			points++;
+		points += per / 0.05f;
+//		return points > EnumDonorPerm.getMaxPoints() ? EnumDonorPerm.getMaxPoints() : points;
+		return 2;
+	}
+
+	public int getUsedVotePoints() {
+		int points = 0;
+		for (EnumDonorPerm p : getVoteRewards())
+			if (p.getPointsRequired() > 0)
+				points += p.getPointsRequired();
+		return points;
+	}
+
+	public List<EnumDonorPerm> getVoteRewards() {
+		List<EnumDonorPerm> donorPerms = new ArrayList<>();
+		for (IRole role : Starota.getSupportServer()
+				.getRolesForUser(this.getDiscordGuild().getOwner())) {
+			EnumDonorPerm perm = EnumDonorPerm.getPermForRole(role);
+			if (perm != null)
+				donorPerms.add(perm);
+		}
+		return Collections.unmodifiableList(donorPerms);
+	}
+
+	/**
+	 * Returns if reward was added
+	 */
+	public boolean addVoteReward(EnumDonorPerm perm) {
+		int currentPoints = getUsedVotePoints();
+		int earnedPoints = getEarnedVotePoints();
+		if (this.getDiscordGuild().getOwner().hasRole(perm.getRole()) || perm.getPointsRequired() < 0
+				|| currentPoints + perm.getPointsRequired() > earnedPoints
+				|| !hasRequiredVoteRewards(perm))
+			return false;
+		RequestBuffer.request(() -> this.getDiscordGuild().getOwner().addRole(perm.getRole())).get();
+		return true;
+	}
+
+	/**
+	 * Returns if reward was removed
+	 */
+	public boolean removeVoteReward(EnumDonorPerm perm) {
+		if (getUsedVotePoints() <= 0 || !this.getDiscordGuild().getOwner().hasRole(perm.getRole()))
+			return false;
+		RequestBuffer.request(() -> this.getDiscordGuild().getOwner().removeRole(perm.getRole())).get();
+		List<EnumDonorPerm> toRemove = new ArrayList<>();
+		for (EnumDonorPerm p : getVoteRewards())
+			if (!hasRequiredVoteRewards(p))
+				toRemove.add(p);
+		for (EnumDonorPerm p : toRemove)
+			removeVoteReward(p);
+		return true;
+	}
+
+	public boolean hasRequiredVoteRewards(EnumDonorPerm perm) {
+		return getVoteRewards().containsAll(Arrays.asList(perm.getPreReqs()));
+	}
+	// end vote stuff
+
+	// start other stuff
 	public static final String WEBHOOK_SECRET_KEY = "webhook_secret";
 
 	public String getWebhookSecret() {

@@ -71,8 +71,7 @@ public class StarotaAssistants {
 				}
 				// client.changeAvatar(Image.forUser(Starota.getOurUser()));
 				if (Starota.IS_DEV)
-					client.changePresence(StatusType.IDLE, ActivityType.LISTENING,
-							"to " + Starota.BOT_NAME);
+					client.changePresence(StatusType.IDLE, ActivityType.LISTENING, Starota.BOT_NAME);
 				else
 					client.changePresence(StatusType.INVISIBLE);
 				CLIENT_MAP.put(client.getOurUser().getLongID(), client);
@@ -88,7 +87,7 @@ public class StarotaAssistants {
 					for (IDiscordClient client : CLIENTS) {
 						if (Starota.IS_DEV)
 							client.changePresence(StatusType.IDLE, ActivityType.LISTENING,
-									"to " + Starota.BOT_NAME);
+									Starota.BOT_NAME);
 						else
 							client.changePresence(StatusType.INVISIBLE);
 					}

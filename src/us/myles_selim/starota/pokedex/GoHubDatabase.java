@@ -43,6 +43,8 @@ public class GoHubDatabase {
 	private static final String POKEMON_API = "https://db.pokemongohub.net/api/pokemon/";
 	private static final String POKEMON_MOVES_API = "https://db.pokemongohub.net/api/moves/with-pokemon/";
 	private static final String MOVES_API = "https://db.pokemongohub.net/api/moves/";
+//	private static final String FAST_MOVES_LIST_API = "https://db.pokemongohub.net/api/moves/with-filter/fast";
+//	private static final String CHARGE_MOVES_LIST_API = "https://db.pokemongohub.net/api/moves/with-filter/charge";
 	private static final String MOVESETS_API = "https://db.pokemongohub.net/api/movesets/with-pokemon/";
 	private static final String COUNTERS_API = "https://db.pokemongohub.net/api/pokemon/counters/";
 	private static final Gson GSON;
@@ -184,6 +186,21 @@ public class GoHubDatabase {
 			return null;
 		}
 	}
+
+//	public static DexMove[] getAllMoves() {
+//		try {
+//			URL url = new URL(FAST_MOVES_LIST_API);
+//			URLConnection conn = url.openConnection();
+//			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
+//			DexMove[] moves = GSON.fromJson(PARSER.parse(new InputStreamReader(conn.getInputStream())),
+//					DexMove[].class);
+//			// MOVE_CACHE.put(moveId, new CachedData<>(move));
+//			return moves;
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			return null;
+//		}
+//	}
 
 	public static DexMoveset[] getMovesets(EnumPokemon pokemon) {
 		return getMovesets(pokemon, "Normal");

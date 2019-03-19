@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.Timer;
 
 import org.discordbots.api.client.DiscordBotListAPI;
 
@@ -80,6 +82,8 @@ import us.myles_selim.starota.trading.commands.CommandGetUserTrades;
 import us.myles_selim.starota.trading.commands.CommandLookingFor;
 import us.myles_selim.starota.trading.commands.CommandRemoveTrade;
 import us.myles_selim.starota.trading.commands.CommandTradeboardHelp;
+import us.myles_selim.starota.vote_rewards.CommandVotePerks;
+import us.myles_selim.starota.vote_rewards.VoteReminderThread;
 import us.myles_selim.starota.webserver.WebServer;
 import us.myles_selim.starota.webserver.WebhookEventHandler;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -202,6 +206,7 @@ public class Starota {
 		// CommandSetResearchChannel());
 		jCmdHandler.registerCommand("Administrative", new CommandChangelogChannel());
 		jCmdHandler.registerCommand("Administrative", new CommandInviteAssistants());
+		jCmdHandler.registerCommand("Administrative", new CommandVotePerks());
 		if (IS_DEV) {
 			jCmdHandler.registerCommand("Debug", new CommandGetTop());
 			jCmdHandler.registerCommand("Debug", new CommandTest());
@@ -386,6 +391,12 @@ public class Starota {
 		discord4JWatchdog.start();
 
 		updateOwners();
+
+		Timer timer = new Timer();
+		Date midnight = new Date();
+		midnight.setHours(0);
+		midnight.setMinutes(0);
+		timer.scheduleAtFixedRate(new VoteReminderThread(), midnight, (long) 2.592e+8);
 	}
 
 	public static IDiscordClient getClient() {
