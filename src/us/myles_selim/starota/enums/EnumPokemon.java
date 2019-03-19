@@ -1138,7 +1138,7 @@ public enum EnumPokemon {
 		case IVYSAUR:
 		case VENUSAUR:
 		case CHARMANDER:
-		case CHARMEL:
+		case CHARMELEON:
 		case CHARIZARD:
 		case SQUIRTLE:
 		case WARTORTLE:
