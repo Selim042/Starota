@@ -20,6 +20,7 @@ import us.myles_selim.starota.trading.forms.FormSetArceus;
 import us.myles_selim.starota.trading.forms.FormSetBurmyFamily;
 import us.myles_selim.starota.trading.forms.FormSetCastform;
 import us.myles_selim.starota.trading.forms.FormSetDeoxys;
+import us.myles_selim.starota.trading.forms.FormSetEevee;
 import us.myles_selim.starota.trading.forms.FormSetGiratina;
 import us.myles_selim.starota.trading.forms.FormSetPichuHat;
 import us.myles_selim.starota.trading.forms.FormSetPikachuHat;
@@ -164,10 +165,10 @@ public enum EnumPokemon {
 	GYARADOS(EnumPokemonType.WATER, EnumPokemonType.FLYING),
 	LAPRAS(EnumPokemonType.WATER, EnumPokemonType.ICE),
 	DITTO(EnumPokemonType.NORMAL),
-	EEVEE(EnumPokemonType.NORMAL),
-	VAPOREON(EnumPokemonType.WATER),
-	JOLTEON(EnumPokemonType.ELECTRIC),
-	FLAREON(EnumPokemonType.FIRE),
+	EEVEE(EnumPokemonType.NORMAL, FormSetEevee.FORM_SET),
+	VAPOREON(EnumPokemonType.WATER, FormSetEevee.FORM_SET),
+	JOLTEON(EnumPokemonType.ELECTRIC, FormSetEevee.FORM_SET),
+	FLAREON(EnumPokemonType.FIRE, FormSetEevee.FORM_SET),
 	PORYGON(EnumPokemonType.NORMAL, EnumGender.UNKNOWN),
 	OMANYTE(EnumPokemonType.ROCK, EnumPokemonType.WATER),
 	OMASTAR(EnumPokemonType.ROCK, EnumPokemonType.WATER),
@@ -228,8 +229,8 @@ public enum EnumPokemon {
 	YANMA(EnumPokemonType.BUG, EnumPokemonType.FLYING),
 	WOOPER(EnumPokemonType.WATER, EnumPokemonType.GROUND),
 	QUAGSIRE(EnumPokemonType.WATER, EnumPokemonType.GROUND),
-	ESPEON(EnumPokemonType.PSYCHIC),
-	UMBREON(EnumPokemonType.DARK),
+	ESPEON(EnumPokemonType.PSYCHIC, FormSetEevee.FORM_SET),
+	UMBREON(EnumPokemonType.DARK, FormSetEevee.FORM_SET),
 	MURKROW(EnumPokemonType.DARK, EnumPokemonType.FLYING),
 	SLOWKING(EnumPokemonType.WATER, EnumPokemonType.PSYCHIC),
 	MISDREAVUS(EnumPokemonType.GHOST),
@@ -456,7 +457,7 @@ public enum EnumPokemon {
 	FLOATZEL(EnumPokemonType.WATER),
 	CHERUBI(EnumPokemonType.GRASS),
 	CHERRIM(EnumPokemonType.GRASS), // TODO: Add form if necessary later
-	SHELLOS(EnumPokemonType.WATER, EnumPokemonType.GROUND, FormSetShellosFamily.FORM_SET),
+	SHELLOS(EnumPokemonType.WATER, FormSetShellosFamily.FORM_SET),
 	GASTRODON(EnumPokemonType.WATER, EnumPokemonType.GROUND, FormSetShellosFamily.FORM_SET),
 	AMBIPOM(EnumPokemonType.NORMAL),
 	DRIFLOON(EnumPokemonType.GHOST, EnumPokemonType.FLYING),
@@ -487,8 +488,8 @@ public enum EnumPokemon {
 	HIPPOWDON(EnumPokemonType.GROUND),
 	SKORUPI(EnumPokemonType.POISON, EnumPokemonType.BUG),
 	DRAPION(EnumPokemonType.POISON, EnumPokemonType.DARK),
-	CROAGUNK(EnumPokemonType.DRAGON, EnumPokemonType.FIGHTING),
-	TOXICROAK(EnumPokemonType.DRAGON, EnumPokemonType.FIGHTING),
+	CROAGUNK(EnumPokemonType.POISON, EnumPokemonType.FIGHTING),
+	TOXICROAK(EnumPokemonType.POISON, EnumPokemonType.FIGHTING),
 	CARNIVINE(EnumPokemonType.GRASS),
 	FINNEON(EnumPokemonType.WATER),
 	LUMINEON(EnumPokemonType.WATER),
@@ -504,8 +505,8 @@ public enum EnumPokemon {
 	MAGMORTAR(EnumPokemonType.FIRE),
 	TOGEKISS(EnumPokemonType.FAIRY, EnumPokemonType.FLYING),
 	YANMEGA(EnumPokemonType.BUG, EnumPokemonType.FLYING),
-	LEAFEON(EnumPokemonType.GRASS),
-	GLACEON(EnumPokemonType.ICE),
+	LEAFEON(EnumPokemonType.GRASS, FormSetEevee.FORM_SET),
+	GLACEON(EnumPokemonType.ICE, FormSetEevee.FORM_SET),
 	GLISCOR(EnumPokemonType.GROUND, EnumPokemonType.FLYING),
 	MAMOSWINE(EnumPokemonType.ICE, EnumPokemonType.GROUND),
 	PORYGON_Z(EnumPokemonType.NORMAL, "Porygon-Z", EnumGender.UNKNOWN),
@@ -693,7 +694,7 @@ public enum EnumPokemon {
 	QUILLADIN(EnumPokemonType.GRASS),
 	CHESNAUGHT(EnumPokemonType.GRASS, EnumPokemonType.FIGHTING),
 	FENNEKIN(EnumPokemonType.FIRE),
-	BRAIZEN(EnumPokemonType.FIRE),
+	BRAIXEN(EnumPokemonType.FIRE),
 	DELPHOX(EnumPokemonType.FIRE),
 	FROAKIE(EnumPokemonType.WATER),
 	FROGADIER(EnumPokemonType.WATER),
@@ -739,7 +740,7 @@ public enum EnumPokemon {
 	TYRANTRUM(EnumPokemonType.ROCK, EnumPokemonType.DRAGON),
 	AMAURA(EnumPokemonType.ROCK, EnumPokemonType.ICE),
 	AURORUS(EnumPokemonType.ROCK, EnumPokemonType.ICE),
-	SYLVEON(EnumPokemonType.FAIRY),
+	SYLVEON(EnumPokemonType.FAIRY, FormSetEevee.FORM_SET),
 	HAWLUNCHA(EnumPokemonType.FIGHTING, EnumPokemonType.FLYING),
 	DEDENNE(EnumPokemonType.ELECTRIC, EnumPokemonType.FAIRY),
 	CARBINK(EnumPokemonType.ROCK, EnumPokemonType.FAIRY),
@@ -857,86 +858,99 @@ public enum EnumPokemon {
 	private EnumPokemonType type2;
 	private FormSet forms;
 	private EnumGender gender;
+	private EnumPokemon[] family;
 
-	EnumPokemon(EnumPokemonType type1) {
-		this(type1, (EnumPokemonType) null);
+	EnumPokemon(EnumPokemonType type1, EnumPokemon... family) {
+		this(type1, (EnumPokemonType) null, family);
 	}
 
-	EnumPokemon(EnumPokemonType type1, String name) {
-		this(type1, (EnumPokemonType) null, name);
+	EnumPokemon(EnumPokemonType type1, String name, EnumPokemon... family) {
+		this(type1, (EnumPokemonType) null, name, family);
 	}
 
-	EnumPokemon(EnumPokemonType type1, String name, EnumGender gender) {
-		this(type1, (EnumPokemonType) null, name, gender);
+	EnumPokemon(EnumPokemonType type1, String name, EnumGender gender, EnumPokemon... family) {
+		this(type1, (EnumPokemonType) null, name, gender, family);
 	}
 
-	EnumPokemon(EnumPokemonType type1, FormSet formSet) {
-		this(type1, (EnumPokemonType) null, formSet);
+	EnumPokemon(EnumPokemonType type1, FormSet formSet, EnumPokemon... family) {
+		this(type1, (EnumPokemonType) null, formSet, family);
 	}
 
-	EnumPokemon(EnumPokemonType type1, FormSet formSet, EnumGender gender) {
-		this(type1, (EnumPokemonType) null, formSet, gender);
+	EnumPokemon(EnumPokemonType type1, FormSet formSet, EnumGender gender, EnumPokemon... family) {
+		this(type1, (EnumPokemonType) null, formSet, gender, family);
 	}
 
-	EnumPokemon(EnumPokemonType type1, String name, FormSet formSet) {
-		this(type1, (EnumPokemonType) null, name, formSet);
+	EnumPokemon(EnumPokemonType type1, String name, FormSet formSet, EnumPokemon... family) {
+		this(type1, (EnumPokemonType) null, name, formSet, family);
 	}
 
-	EnumPokemon(EnumPokemonType type1, String name, FormSet formSet, EnumGender gender) {
-		this(type1, (EnumPokemonType) null, name, formSet);
+	EnumPokemon(EnumPokemonType type1, String name, FormSet formSet, EnumGender gender,
+			EnumPokemon... family) {
+		this(type1, (EnumPokemonType) null, name, formSet, family);
 		this.gender = gender;
 	}
 
-	EnumPokemon(EnumPokemonType type1, EnumGender gender) {
-		this(type1, (EnumPokemonType) null, gender);
+	EnumPokemon(EnumPokemonType type1, EnumGender gender, EnumPokemon... family) {
+		this(type1, (EnumPokemonType) null, gender, family);
 	}
 
-	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2) {
+	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, EnumPokemon... family) {
 		name = this.name();
 		name = name.substring(0, 1).toUpperCase() + name.substring(1, name.length()).toLowerCase();
 		this.type1 = type1;
 		this.type2 = type2;
 		this.gender = EnumGender.EITHER;
+		this.family = family;
 	}
 
-	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, String name) {
+	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, String name, EnumPokemon... family) {
 		this.name = name;
 		this.type1 = type1;
 		this.type2 = type2;
 		this.gender = EnumGender.EITHER;
+		this.family = family;
 	}
 
-	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, String name, EnumGender gender) {
+	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, String name, EnumGender gender,
+			EnumPokemon... family) {
 		this(type1, type2, name);
 		this.gender = gender;
+		this.family = family;
 	}
 
-	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, FormSet formSet) {
+	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, FormSet formSet, EnumPokemon... family) {
 		this(type1, type2);
 		this.forms = formSet;
 		this.gender = EnumGender.EITHER;
+		this.family = family;
 	}
 
-	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, FormSet formSet, EnumGender gender) {
+	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, FormSet formSet, EnumGender gender,
+			EnumPokemon... family) {
 		this(type1, type2, formSet);
 		this.gender = gender;
-	}
-
-	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, String name, FormSet formSet) {
-		this(type1, type2, name);
-		this.forms = formSet;
-		this.gender = EnumGender.EITHER;
+		this.family = family;
 	}
 
 	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, String name, FormSet formSet,
-			EnumGender gender) {
-		this(type1, type2, name, formSet);
-		this.gender = gender;
+			EnumPokemon... family) {
+		this(type1, type2, name);
+		this.forms = formSet;
+		this.gender = EnumGender.EITHER;
+		this.family = family;
 	}
 
-	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, EnumGender gender) {
+	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, String name, FormSet formSet,
+			EnumGender gender, EnumPokemon... family) {
+		this(type1, type2, name, formSet);
+		this.gender = gender;
+		this.family = family;
+	}
+
+	EnumPokemon(EnumPokemonType type1, EnumPokemonType type2, EnumGender gender, EnumPokemon... family) {
 		this(type1, type2);
 		this.gender = gender;
+		this.family = family;
 	}
 
 	public String getName() {
@@ -969,23 +983,266 @@ public enum EnumPokemon {
 		return ordinal() + 1;
 	}
 
+	// TODO: new gen, update trade exceptions
 	public boolean isTradable() {
 		switch (this) {
+		case MELTAN:
+		case MELMETAL:
+			return true;
+		default:
+			return !isMythical();
+		}
+	}
+
+	// TODO: new gen, update legends
+	public boolean isLegendary() {
+		switch (this) {
+		// gen 1
+		case ARTICUNO:
+		case ZAPDOS:
+		case MOLTRES:
+		case MEWTWO:
+			return true;
+		// gen 2
+		case RAIKOU:
+		case ENTEI:
+		case SUICUNE:
+		case HO_OH:
+		case LUGIA:
+			return true;
+		// gen 3
+		case REGICE:
+		case REGISTEEL:
+		case REGIROCK:
+		case LATIAS:
+		case LATIOS:
+		case GROUDON:
+		case KYOGRE:
+		case RAYQUAZA:
+			return true;
+		// gen 4
+		case AZELF:
+		case MESPRIT:
+		case UXIE:
+		case DIALGA:
+		case PALKIA:
+		case GIRATINA:
+		case CRESSELIA:
+		case HEATRAN:
+		case REGIGIGAS:
+			return true;
+		// gen 5
+		case COBALION:
+		case TERRAKION:
+		case VIRIZION:
+		case TORNADUS:
+		case THUNDURUS:
+		case LANDORUS:
+		case ZEKROM:
+		case RESHIRAM:
+		case KYUREM:
+			return true;
+		// gen 6
+		case XERNEAS:
+		case YVELTAL:
+		case ZYGARDE:
+			return true;
+		// gen 7
+		case TYPE_NULL:
+		case SILVALLY:
+		case TAPU_KOKO:
+		case TAPU_LELE:
+		case TAPU_BULU:
+		case TAPU_FINI:
+		case COSMOG:
+		case COSMOEM:
+		case SOLGALEO:
+		case LUNALA:
+		case NECROZMA:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	// TODO: new gen, update mythics
+	public boolean isMythical() {
+		switch (this) {
+		// gen 1
 		case MEW:
+			return true;
+		// gen 2
 		case CELEBI:
+			return true;
+		// gen 3
 		case JIRACHI:
 		case DEOXYS:
+			return true;
+		// gen 4
 		case MANAPHY:
 		case PHIONE:
 		case DARKRAI:
 		case SHAYMIN:
+		case ARCEUS:
+			return true;
+		// gen 5
 		case VICTINI:
 		case KELDEO:
 		case MELOETTA:
 		case GENESECT:
-			return false;
-		default:
 			return true;
+		// gen 6
+		case DIANCIE:
+		case HOOPA:
+		case VOLCANION:
+			return true;
+		// gen 7
+		case MAGEARNA:
+		case MARSHADOW:
+		case ZERAORA:
+		case MELTAN:
+		case MELMETAL:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	// TODO: new gen, update max num
+	public int getGeneration() {
+		int id = this.getId();
+		if (id < 0)
+			return -1;
+		if (id <= 151)
+			return 1;
+		if (id <= 251)
+			return 2;
+		if (id <= 386)
+			return 3;
+		if (id <= 493)
+			return 4;
+		if (id <= 649)
+			return 5;
+		if (id <= 721)
+			return 6;
+		if (id <= 809)
+			return 7;
+		return -1;
+	}
+
+	// TODO: new gen, update starters
+	public boolean isStarter() {
+		switch (this) {
+		// gen 1
+		case BULBASAUR:
+		case IVYSAUR:
+		case VENUSAUR:
+		case CHARMANDER:
+		case CHARMEL:
+		case CHARIZARD:
+		case SQUIRTLE:
+		case WARTORTLE:
+		case BLASTOISE:
+			return true;
+		// gen 2
+		case CHIKORITA:
+		case BAYLEEF:
+		case MEGANIUM:
+		case CYNDAQUIL:
+		case QUILAVA:
+		case TYPHLOSION:
+		case TOTODILE:
+		case CROCONAW:
+		case FERALIGATR:
+			return true;
+		// gen 3
+		case TREECKO:
+		case GROVYLE:
+		case SCEPTILE:
+		case TORCHIC:
+		case COMBUSKEN:
+		case BLAZIKEN:
+		case MUDKIP:
+		case MARSHTOMP:
+		case SWAMPERT:
+			return true;
+		// gen 4
+		case TURTWIG:
+		case GROTLE:
+		case TORTERRA:
+		case CHIMCHAR:
+		case MONFERNO:
+		case INFERNAPE:
+		case PIPLUP:
+		case PRINPLUP:
+		case EMPOLEON:
+			return true;
+		// gen 5
+		case SNIVY:
+		case SERVINE:
+		case SERPERIOR:
+		case TEPIG:
+		case PIGNITE:
+		case EMBOAR:
+		case OSHAWOTT:
+		case DEWOTT:
+		case SAMUROTT:
+			return true;
+		// gen 6
+		case CHESPIN:
+		case QUILLADIN:
+		case CHESNAUGHT:
+		case FENNEKIN:
+		case BRAIXEN:
+		case DELPHOX:
+		case FROAKIE:
+		case FROGADIER:
+		case GRENINJA:
+			return true;
+		// gen 7
+		case ROWLET:
+		case DARTRIX:
+		case DECIDUEYE:
+		case LITTEN:
+		case TORRACAT:
+		case INCINEROAR:
+		case POPPLIO:
+		case BRIONNE:
+		case PRIMARINA:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	public boolean isBaby() {
+		switch (this) {
+		// gen 2
+		case PICHU:
+		case CLEFFA:
+		case IGGLYBUFF:
+		case TOGEPI:
+		case TYROGUE:
+		case SMOOCHUM:
+		case ELEKID:
+		case MAGBY:
+			return true;
+		// gen 3
+		case AZURILL:
+		case WYNAUT:
+			return true;
+		// gen 4
+		case BUDEW:
+		case CHINGLING:
+		case BONSLY:
+		case MIME_JR:
+		case HAPPINY:
+		case MUNCHLAX:
+		case RIOLU:
+		case MANTYKE:
+			return true;
+		default:
+			return false;
 		}
 	}
 
