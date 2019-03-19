@@ -52,6 +52,8 @@ public class BaseModules {
 	public static final StarotaModule WEBHOOKS = new StarotaModule("Webhooks", "Webhooks")
 			.setDescription("The webhook module allows 3rd party scanners to connect to Starota "
 					+ "to display raid, task, and Pokemon spawn information.");
+	public static final StarotaModule SEARCH = new StarotaModule("Search", "Search").setDescription(
+			"The search module enables searching of data in the Pokedex and other information.");
 
 	public static void registerModules() {
 		if (registered)
@@ -68,6 +70,7 @@ public class BaseModules {
 		StarotaModule.registerModule(SILPH_ROAD);
 		StarotaModule.registerModule(HTTP);
 		StarotaModule.registerModule(WEBHOOKS);
+		StarotaModule.registerModule(SEARCH);
 	}
 
 }
