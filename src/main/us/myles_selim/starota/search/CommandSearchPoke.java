@@ -16,9 +16,9 @@ import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.reaction_messages.ReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandSearch extends StarotaCommand {
+public class CommandSearchPoke extends StarotaCommand {
 
-	public CommandSearch() {
+	public CommandSearchPoke() {
 		super("searchPoke", "Searches Pokedex information.");
 	}
 
@@ -90,7 +90,7 @@ public class CommandSearch extends StarotaCommand {
 		@Override
 		protected EmbedObject getEmbed(StarotaServer server) {
 			EmbedBuilder builder = new EmbedBuilder();
-			builder.withTitle("Search results:");
+			builder.withTitle(String.format("Search results: (%d)", results.size()));
 			int maxVal = Math.min(pageIndex * RESULTS_PER_PAGE + RESULTS_PER_PAGE, results.size());
 			int i = 0;
 			for (EnumPokemon p : results) {

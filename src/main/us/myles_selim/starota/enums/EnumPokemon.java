@@ -689,7 +689,7 @@ public enum EnumPokemon {
 	KELDEO(EnumPokemonType.WATER, EnumPokemonType.FIGHTING),
 	MELOETTA(EnumPokemonType.NORMAL, EnumPokemonType.PSYCHIC), // forms
 	GENESECT(EnumPokemonType.BUG, EnumPokemonType.STEEL),
-	// TODO: GEN 6 genders, forms, trade lock mythials
+	// TODO: GEN 6 genders, forms
 	CHESPIN(EnumPokemonType.GRASS),
 	QUILLADIN(EnumPokemonType.GRASS),
 	CHESNAUGHT(EnumPokemonType.GRASS, EnumPokemonType.FIGHTING),
@@ -762,7 +762,7 @@ public enum EnumPokemon {
 	DIANCIE(EnumPokemonType.ROCK, EnumPokemonType.FAIRY),
 	HOOPA(EnumPokemonType.PSYCHIC, EnumPokemonType.GHOST), // forms
 	VOLCANION(EnumPokemonType.FIRE, EnumPokemonType.WATER),
-	// TODO: GEN 7 genders, forms, trade lock mythics
+	// TODO: GEN 7 genders, forms
 	ROWLET(EnumPokemonType.GRASS, EnumPokemonType.FLYING),
 	DARTRIX(EnumPokemonType.GRASS, EnumPokemonType.FLYING),
 	DECIDUEYE(EnumPokemonType.GRASS, EnumPokemonType.GHOST),
@@ -849,7 +849,7 @@ public enum EnumPokemon {
 	STAKATAKA(EnumPokemonType.ROCK, EnumPokemonType.STEEL),
 	BLACEPHALON(EnumPokemonType.FIRE, EnumPokemonType.GHOST),
 	ZERAORA(EnumPokemonType.ELECTRIC),
-	// MELTAN
+	// MELTAN (gen 7?)
 	MELTAN(EnumPokemonType.STEEL),
 	MELMETAL(EnumPokemonType.STEEL),;
 

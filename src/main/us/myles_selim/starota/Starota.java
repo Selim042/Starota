@@ -70,7 +70,7 @@ import us.myles_selim.starota.role_management.commands.CommandAddGroup;
 import us.myles_selim.starota.role_management.commands.CommandGetGroups;
 import us.myles_selim.starota.role_management.commands.CommandRemoveGroup;
 import us.myles_selim.starota.role_management.commands.CommandSetAsGroup;
-import us.myles_selim.starota.search.CommandSearch;
+import us.myles_selim.starota.search.CommandSearchPoke;
 import us.myles_selim.starota.search.PokemonOperators;
 import us.myles_selim.starota.silph_road.CommandSilphCard;
 import us.myles_selim.starota.trading.commands.CommandFindTrade;
@@ -261,7 +261,7 @@ public class Starota {
 
 		jCmdHandler.registerCommand("Events", new CommandEvents());
 
-		jCmdHandler.registerCommand("Search", new CommandSearch());
+		jCmdHandler.registerCommand("Search", new CommandSearchPoke());
 
 		try {
 			Thread.sleep(2500);
