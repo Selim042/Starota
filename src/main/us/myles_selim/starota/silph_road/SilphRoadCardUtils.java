@@ -3,27 +3,74 @@ package us.myles_selim.starota.silph_road;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 import us.myles_selim.starota.CachedData;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.silph_road.SilphCard.SilphCheckin;
+import us.myles_selim.starota.silph_road.SilphCard.SilphCheckinTime;
 
 public class SilphRoadCardUtils {
 
 	private static final String API_URL = "https://sil.ph/";
 	private static final JsonParser PARSER = new JsonParser();
-	private static final Gson GSON = new Gson();
+	private static final Gson GSON;
 
 	private static final Map<String, CachedData<Boolean>> HAS_CARD_CACHE = new HashMap<>();
 	private static final Map<String, CachedData<SilphCard>> CARD_CACHE = new HashMap<>();
+
+	static {
+		GsonBuilder builder = new GsonBuilder();
+		builder.registerTypeAdapter(SilphCheckin[].class, new JsonDeserializer<SilphCheckin[]>() {
+
+			@Override
+			public SilphCheckin[] deserialize(JsonElement json, Type typeOfT,
+					JsonDeserializationContext context) throws JsonParseException {
+				if (!json.isJsonArray())
+					return new SilphCheckin[0];
+				JsonArray arr = json.getAsJsonArray();
+				SilphCheckin[] ret = new SilphCheckin[arr.size()];
+				for (int i = 0; i < arr.size(); i++) {
+					SilphCheckin checkin = new SilphCheckin();
+					JsonObject jObj = arr.get(i).getAsJsonObject();
+					if (!jObj.get("name").isJsonNull())
+						checkin.name = jObj.get("name").getAsString();
+					if (!jObj.get("description").isJsonNull())
+						checkin.description = jObj.get("description").getAsString();
+					if (!jObj.get("image").isJsonNull())
+						checkin.image = jObj.get("image").getAsString();
+					if (!jObj.get("is_global").isJsonNull())
+						checkin.is_global = jObj.get("is_global").getAsString();
+					if (!jObj.get("start").isJsonNull())
+						checkin.start = jObj.get("start").getAsString();
+					if (!jObj.get("end").isJsonNull())
+						checkin.end = jObj.get("end").getAsString();
+					if (!jObj.get("EventCheckin").isJsonNull()) {
+						checkin.EventCheckin = new SilphCheckinTime();
+						checkin.EventCheckin.created = jObj.get("EventCheckin").getAsJsonObject()
+								.get("created").getAsString();
+					}
+					ret[i] = checkin;
+				}
+				return ret;
+			}
+		});
+		GSON = builder.create();
+	}
 
 	private static <K, V> boolean isCached(Map<K, CachedData<V>> cache, K key) {
 		if (!cache.containsKey(key))
