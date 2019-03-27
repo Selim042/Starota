@@ -168,7 +168,10 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 			builder.appendField("Shiny:",
 					Character.toUpperCase(isShinyS.charAt(0)) + isShinyS.substring(1), true);
 		}
-		builder.appendField("Gender:", this.getGender().toString(), true);
+		EnumGender gender = this.getGender();
+		if (gender == null)
+			gender = this.pokemon.getGenderPossible();
+		builder.appendField("Gender:", gender.toString(), true);
 		String isLegacyS = Boolean.toString(this.isLegacy());
 		builder.appendField("Legacy:",
 				Character.toUpperCase(isLegacyS.charAt(0)) + isLegacyS.substring(1), true);
