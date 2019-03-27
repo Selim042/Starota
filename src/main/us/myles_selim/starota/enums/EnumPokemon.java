@@ -979,6 +979,14 @@ public enum EnumPokemon {
 		return this.gender;
 	}
 
+	/**
+	 * @deprecated Not functional yet
+	 */
+	@Deprecated
+	public EnumPokemon[] getFamily() {
+		return this.family;
+	}
+
 	public int getId() {
 		return ordinal() + 1;
 	}

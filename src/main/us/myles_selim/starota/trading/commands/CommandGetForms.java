@@ -5,7 +5,6 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.enums.EnumPokemon;
-import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -26,14 +25,14 @@ public class CommandGetForms extends StarotaCommand {
 			channel.sendMessage("Pokemon \"" + args[1] + "\" cannot be found");
 			return;
 		}
-		if (!FormManager.isAvailable(pokemon)) {
+		if (!pokemon.isAvailable()) {
 			channel.sendMessage("Pokemon \"" + pokemon + "\" is not yet available");
 			return;
 		}
 		EmbedBuilder builder = new EmbedBuilder();
 		int numForms = 0;
 		String text = "";
-		boolean shinyable = FormManager.isShinyable(pokemon.getId());
+		boolean shinyable = pokemon.isShinyable();
 		String shinyText = "shiny";
 		if (pokemon.getFormSet() == null) {
 			switch (pokemon.getGenderPossible()) {

@@ -15,7 +15,6 @@ import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
 import us.myles_selim.starota.lua.conversion.IConverter;
-import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.trading.forms.FormSet;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 
@@ -93,14 +92,14 @@ public class EnumPokemonConverter implements IConverter {
 
 			@Override
 			public LuaValue call(LuaState state) throws LuaError {
-				return ValueFactory.valueOf(FormManager.isAvailable(pokemon));
+				return ValueFactory.valueOf(pokemon.isAvailable());
 			}
 		});
 		methods.rawset("isShinyable", new ZeroArgFunction() {
 
 			@Override
 			public LuaValue call(LuaState state) throws LuaError {
-				return ValueFactory.valueOf(FormManager.isShinyable(pokemon));
+				return ValueFactory.valueOf(pokemon.isShinyable());
 			}
 		});
 		LuaTable mt = new LuaTable();

@@ -8,7 +8,6 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.enums.EnumPokemon;
-import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -27,7 +26,7 @@ public class CommandGetShinies extends StarotaCommand {
 		int numForms = 0;
 		List<String> lines = new LinkedList<>();
 		for (EnumPokemon pokemon : EnumPokemon.values()) {
-			boolean shinyable = FormManager.isShinyable(pokemon.getId());
+			boolean shinyable = pokemon.isShinyable();
 			if (!shinyable)
 				continue;
 			String shinyText = "shiny";

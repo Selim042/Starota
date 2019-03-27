@@ -105,7 +105,7 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 
 	public boolean isShiny() {
 		return this.shiny && ((this.form != null && this.form.canBeShiny(pokemon)))
-				|| (this.shiny && FormManager.isShinyable(this.pokemon));
+				|| (this.shiny && this.pokemon.isShinyable());
 	}
 
 	public Instant getTimePosted() {
@@ -163,7 +163,7 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 		builder.appendField("Pokemon:", pokemon.getName(), false);
 		if (form != null)
 			builder.appendField("Form:", form.toString(), true);
-		if (FormManager.isShinyable(pokemon) || (form != null && form.canBeShiny(pokemon))) {
+		if (pokemon.isShinyable() || (form != null && form.canBeShiny(pokemon))) {
 			String isShinyS = Boolean.toString(this.isShiny());
 			builder.appendField("Shiny:",
 					Character.toUpperCase(isShinyS.charAt(0)) + isShinyS.substring(1), true);

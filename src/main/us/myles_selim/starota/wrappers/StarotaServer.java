@@ -462,8 +462,8 @@ public class StarotaServer {
 		if (per > 0.01f)
 			points++;
 		points += per / 0.05f;
-//		return points > EnumDonorPerm.getMaxPoints() ? EnumDonorPerm.getMaxPoints() : points;
-		return 2;
+		return points > EnumDonorPerm.getMaxPoints() ? EnumDonorPerm.getMaxPoints() : points;
+		// return 2;
 	}
 
 	public int getUsedVotePoints() {

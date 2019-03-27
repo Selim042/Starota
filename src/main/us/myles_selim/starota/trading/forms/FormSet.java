@@ -6,7 +6,6 @@ import java.util.List;
 
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
-import us.myles_selim.starota.trading.FormManager;
 
 public abstract class FormSet {
 
@@ -61,7 +60,7 @@ public abstract class FormSet {
 		}
 
 		public boolean canBeShiny(EnumPokemon pokemon) {
-			return FormManager.isShinyable(pokemon);
+			return pokemon.isShinyable();
 		}
 
 		public EnumPokemonType getType1(EnumPokemon pokemon) {

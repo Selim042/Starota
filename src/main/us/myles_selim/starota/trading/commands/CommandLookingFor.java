@@ -8,7 +8,6 @@ import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.enums.EnumGender;
 import us.myles_selim.starota.enums.EnumPokemon;
-import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.trading.PokemonInstance;
 import us.myles_selim.starota.trading.TradeboardPost;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
@@ -41,7 +40,7 @@ public class CommandLookingFor extends StarotaCommand {
 			channel.sendMessage("Pokemon \"" + args[1] + "\" not found");
 			return;
 		}
-		if (!FormManager.isAvailable(pokemon)) {
+		if (!pokemon.isShinyable()) {
 			channel.sendMessage("Pokemon **" + pokemon + "** is not available");
 			return;
 		}
@@ -49,7 +48,7 @@ public class CommandLookingFor extends StarotaCommand {
 			channel.sendMessage("Pokemon **" + pokemon + "** is not tradable");
 			return;
 		}
-		if (shiny && ((form == null && !FormManager.isShinyable(pokemon))
+		if (shiny && ((form == null && !pokemon.isShinyable())
 				|| (form != null && !form.canBeShiny(pokemon)))) {
 			channel.sendMessage("Pokemon **" + pokemon + "** cannot be shiny"
 					+ (form == null ? "" : " in form \"" + form + "\""));

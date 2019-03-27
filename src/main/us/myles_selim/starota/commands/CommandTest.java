@@ -2,10 +2,6 @@ package us.myles_selim.starota.commands;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.MiscUtils;
-import us.myles_selim.starota.enums.EnumPokemon;
-import us.myles_selim.starota.trading.FormManager;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandTest extends StarotaCommand {
@@ -48,40 +44,6 @@ public class CommandTest extends StarotaCommand {
 		// channel.sendMessage(
 		// "weight" " + hook.getWeightModifier() + "\nheight" " +
 		// hook.getHeightModifier());
-
-		// String[] emoji = new String[] { "1⃣", "2⃣", "3⃣", "4⃣", "5⃣" };
-		// String enabled = "✅";
-		// String disabled = "❌";
-		// Random rand = new Random();
-		// EmbedBuilder builder = new EmbedBuilder();
-		// builder.withTitle("Choose your vote perks:");
-		// int index = 0;
-		// for (EnumDonorPerm p : EnumDonorPerm.values()) {
-		// if (index >= emoji.length)
-		// continue;
-		// builder.appendDesc(ReactionEmoji.of(emoji[index++]) + ": " + p + " "
-		// + ReactionEmoji.of(rand.nextFloat() < 0.3f ? enabled : disabled) +
-		// "\n");
-		// }
-		// builder.appendDesc("\nAvailable vote points: 2/3");
-		// IMessage msg = channel.sendMessage(builder.build());
-		// for (String e : emoji)
-		// RequestBuffer.request(() ->
-		// msg.addReaction(ReactionEmoji.of(e))).get();
-
-		EnumPokemon pokemon = EnumPokemon.getPokemon(args[1]);
-		if (pokemon == null) {
-			EmbedBuilder builder = new EmbedBuilder();
-			builder.withTitle("Did you mean...?");
-			for (EnumPokemon poke : MiscUtils.getSuggestedPokemon(args[1], 6)) {
-				if (poke != null)
-					builder.appendDesc("- " + poke + "\n");
-			}
-			channel.sendMessage("Pokemon \"" + args[1] + "\" not found", builder.build());
-			return;
-		}
-		channel.sendMessage(
-				pokemon + " is " + (FormManager.isShinyable(pokemon) ? "shinyable" : "not shinyable"));
 	}
 
 }
