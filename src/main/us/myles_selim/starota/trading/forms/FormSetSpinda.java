@@ -7,7 +7,7 @@ public class FormSetSpinda extends FormSet {
 
 	private FormSetSpinda() {
 		this.addForm(ONE);
-		for (int i = 2; i < 9; i++)
+		for (int i = 2; i <= 20; i++)
 			this.addForm(new FormSpinda(i));
 	}
 
