@@ -1,5 +1,6 @@
 package us.myles_selim.starota.search;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,6 +51,13 @@ public abstract class SearchOperator<T> {
 		return null;
 	}
 
+	public static <T> List<String[]> getOperatorTerms(Class<T> type) {
+		List<String[]> ret = new ArrayList<>();
+		for (SearchOperator<?> ops : OPERATORS.get(type))
+			ret.add(ops.getSearchTerms());
+		return ret;
+	}
+
 	public SearchOperator(Class<T> type) {
 		if (type == null)
 			return;
@@ -76,6 +84,11 @@ public abstract class SearchOperator<T> {
 	 */
 	public boolean isCaseSensitive() {
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return "SearchOperator:" + getSearchTerms()[0];
 	}
 
 	public static final class OrSearchOperator<T> extends SearchOperator<T> {

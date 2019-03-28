@@ -23,6 +23,26 @@ public class CommandSearchPoke extends StarotaCommand {
 	}
 
 	@Override
+	public String getDescription() {
+		String desc = super.getDescription();
+		desc += "\n\nSearch Operators:\n```\n";
+		for (String[] ops : SearchOperator.getOperatorTerms(EnumPokemon.class)) {
+			if (ops.length == 0)
+				continue;
+			if (ops.length == 1) {
+				desc += " - " + ops[0] + "\n";
+				continue;
+			}
+			String opString = " - ";
+			for (String op : ops)
+				opString += op + ", ";
+			desc += opString.substring(0, opString.length() - 2) + "\n";
+		}
+		desc += "\n```";
+		return desc;
+	}
+
+	@Override
 	public String getGeneralUsage() {
 		return "<searchTerms>";
 	}

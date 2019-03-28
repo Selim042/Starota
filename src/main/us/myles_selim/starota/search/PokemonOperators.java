@@ -1,6 +1,5 @@
 package us.myles_selim.starota.search;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,37 +41,18 @@ public class PokemonOperators {
 		registered = true;
 
 		for (EnumPokemonType type : EnumPokemonType.values())
-			TYPING.put(type, new TypeSearchOperator(type));
+			TYPING.put(type,
+					new LlambadaSearchOperator<>(EnumPokemon.class,
+							p -> !type.equals(p.getType1()) && !type.equals(p.getType2()),
+							type.name().toLowerCase()));
 		for (EnumWeather w : EnumWeather.values())
-			new LlambadaSearchOperator<>(EnumPokemon.class, p -> !w.isBoosted(p), w.name());
+			new LlambadaSearchOperator<>(EnumPokemon.class, p -> !w.isBoosted(p),
+					w.name().toLowerCase());
 		for (int i = 1; i <= 7; i++) {
 			int finalI = i;
 			new LlambadaSearchOperator<>(EnumPokemon.class, p -> p.getGeneration() != finalI,
 					"gen" + finalI);
 		}
-	}
-
-	private static final class TypeSearchOperator extends SearchOperator<EnumPokemon> {
-
-		private final EnumPokemonType type;
-
-		public TypeSearchOperator(EnumPokemonType type) {
-			super(EnumPokemon.class);
-			this.type = type;
-		}
-
-		@Override
-		public void filter(Collection<EnumPokemon> vals, Collection<EnumPokemon> removed) {
-			for (EnumPokemon p : vals)
-				if (!this.type.equals(p.getType1()) && !this.type.equals(p.getType2()))
-					removed.add(p);
-		}
-
-		@Override
-		public String[] getSearchTerms() {
-			return new String[] { type.name() };
-		}
-
 	}
 
 }
