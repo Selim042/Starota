@@ -109,16 +109,9 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	// public static EnumBotStatus STATUS = EnumBotStatus.UNKNOWN;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "2.7.12";
+	public final static String VERSION = "2.7.13";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n" + "Public changes:\n"
-			+ " + Add flower crown forms for Eevee and Pikachu families\n"
-			+ " + Add seach functionality and module\n"
-			+ " * Fix bug with silphRoad command if card never attended a meetup\n"
-			+ " * Fix some bugs in updateProfile\n"
-			+ " * Fix bug where help wouldn't display admin usage\n"
-			+ " * Fix some typos in Pokemon names\n"
-			+ " * Fix bug with tradeboard if gender isn't specified\n"
-			+ " * Update Spinda to be able to have 20 forms";
+			+ " * Fix raid command error with Giratina";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static final PrimaryCommandHandler COMMAND_HANDLER = new PrimaryCommandHandler();
