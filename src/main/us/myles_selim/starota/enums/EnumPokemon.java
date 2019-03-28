@@ -254,7 +254,7 @@ public enum EnumPokemon {
 	SLUGMA(EnumPokemonType.FIRE),
 	MAGCARGO(EnumPokemonType.FIRE, EnumPokemonType.ROCK),
 	SWINUB(EnumPokemonType.ICE, EnumPokemonType.GROUND),
-	PINOSWINE(EnumPokemonType.ICE, EnumPokemonType.GROUND),
+	PILOSWINE(EnumPokemonType.ICE, EnumPokemonType.GROUND),
 	CORSOLA(EnumPokemonType.WATER, EnumPokemonType.ROCK),
 	REMORIAD(EnumPokemonType.WATER),
 	OCTILLERY(EnumPokemonType.WATER),

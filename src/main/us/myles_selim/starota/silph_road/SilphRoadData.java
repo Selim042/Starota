@@ -91,6 +91,11 @@ public class SilphRoadData {
 						String match2 = nameMatcher.group();
 						String[] pokemonName = splitName(match2.substring(12, match2.length() - 6));
 						EnumPokemon pokemon = EnumPokemon.getPokemon(pokemonName[0]);
+						if (pokemon == null) {
+							Starota.submitError("Cannot find raid boss named " + pokemonName[0],
+									new IllegalArgumentException());
+							continue;
+						}
 						Form form = null;
 						if (pokemon.getFormSet() != null)
 							form = pokemon.getFormSet().getForm(pokemonName[1]);
