@@ -3,6 +3,7 @@ package us.myles_selim.starota.profiles.commands;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.IPrivateChannel;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
@@ -13,6 +14,9 @@ import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandRegister extends StarotaCommand {
+
+	public static final String REGISTERED_PM = "You have been registered for a profile on `%s`.\n"
+			+ "For more profile information, go into that server and type the command `.profileHelp`.";
 
 	public CommandRegister() {
 		super("register", "Registers the given user and assigns them a profile.");
@@ -79,6 +83,8 @@ public class CommandRegister extends StarotaCommand {
 				.setLevel(level).setTeam(team);
 		server.setProfile(target, profile);
 		channel.sendMessage("Sucessfully registered " + target.getName(), profile.toEmbed(server));
+		IPrivateChannel targetPm = target.getOrCreatePMChannel();
+		targetPm.sendMessage(String.format(REGISTERED_PM, server.getDiscordGuild().getName()));
 
 		// Role updates (pville only)
 		IGuild guild = server.getDiscordGuild();
