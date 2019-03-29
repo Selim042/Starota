@@ -31,15 +31,16 @@ public class CommandUpdateProfile extends StarotaCommand {
 		boolean isAdmin = channel.getModifiedPermissions(message.getAuthor())
 				.contains(Permissions.ADMINISTRATOR);
 		IUser target = message.getAuthor();
-		if (args.length > 3)
-			target = Starota.findUser(args[3]);
-		if (target == null && isAdmin) {
-			channel.sendMessage("User " + args[3] + " not found.");
-			return;
-		}
-		if (!isAdmin && !target.equals(message.getAuthor())) {
+		if (args.length > 3 && !isAdmin) {
 			channel.sendMessage("Only admins can change other user's profile information.");
 			return;
+		}
+		if (args.length > 3 && isAdmin) {
+			target = Starota.findUser(server.getDiscordGuild().getLongID(), args[3]);
+			if (target == null) {
+				channel.sendMessage("User " + args[3] + " not found.");
+				return;
+			}
 		}
 		if (!server.hasProfile(target)) {
 			if (target.equals(message.getAuthor()))
