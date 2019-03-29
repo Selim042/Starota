@@ -489,8 +489,8 @@ public class Starota {
 			IGuild server = client.getGuildByID(serverId);
 			for (IUser u : server.getUsers()) {
 				String nickname = u.getNicknameForGuild(server);
-				if (u.getName().equals(user) || u.getDisplayName(server).equals(user)
-						|| (nickname != null && nickname.equals(user)))
+				if (u.getName().equalsIgnoreCase(user) || u.getDisplayName(server).equalsIgnoreCase(user)
+						|| (nickname != null && nickname.equalsIgnoreCase(user)))
 					return u;
 			}
 		}
