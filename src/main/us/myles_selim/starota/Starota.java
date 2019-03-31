@@ -63,6 +63,7 @@ import us.myles_selim.starota.profiles.commands.CommandRegister;
 import us.myles_selim.starota.profiles.commands.CommandSelfRegister;
 import us.myles_selim.starota.profiles.commands.CommandUpdateProfile;
 import us.myles_selim.starota.raids.CommandRaid;
+import us.myles_selim.starota.raids.CommandRaidBosses;
 import us.myles_selim.starota.raids.CommandSetRaidEChannel;
 import us.myles_selim.starota.reaction_messages.ReactionMessageRegistry;
 import us.myles_selim.starota.research.ResearchTracker;
@@ -72,6 +73,7 @@ import us.myles_selim.starota.role_management.commands.CommandRemoveGroup;
 import us.myles_selim.starota.role_management.commands.CommandSetAsGroup;
 import us.myles_selim.starota.search.CommandSearchPoke;
 import us.myles_selim.starota.search.PokemonOperators;
+import us.myles_selim.starota.silph_road.CommandEggHatches;
 import us.myles_selim.starota.silph_road.CommandSilphCard;
 import us.myles_selim.starota.trading.commands.CommandFindTrade;
 import us.myles_selim.starota.trading.commands.CommandForTrade;
@@ -257,11 +259,13 @@ public class Starota {
 
 		jCmdHandler.registerCommand("Raids", new CommandRaid());
 		jCmdHandler.registerCommand("Raids", new CommandSetRaidEChannel());
-		// jCmdHandler.registerCommand("Raids", new CommandRaidBosses());
+		jCmdHandler.registerCommand("Raids", new CommandRaidBosses());
 
 		jCmdHandler.registerCommand("Events", new CommandEvents());
 
 		jCmdHandler.registerCommand("Search", new CommandSearchPoke());
+
+		jCmdHandler.registerCommand("Eggs", new CommandEggHatches());
 
 		try {
 			Thread.sleep(2500);

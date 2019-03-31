@@ -13,10 +13,11 @@ import java.util.regex.Pattern;
 
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.CachedData;
 import us.myles_selim.starota.EmojiServerHelper;
 import us.myles_selim.starota.MiscUtils;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.cache.CachedData;
+import us.myles_selim.starota.cache.ClearCache;
 
 public class LeekDuckData {
 
@@ -224,6 +225,11 @@ public class LeekDuckData {
 			return output;
 		}
 
+	}
+
+	@ClearCache("leekduck")
+	public static void clearCache() {
+		EVENT_CACHE = null;
 	}
 
 }

@@ -53,8 +53,11 @@ public abstract class SearchOperator<T> {
 
 	public static <T> List<String[]> getOperatorTerms(Class<T> type) {
 		List<String[]> ret = new ArrayList<>();
-		for (SearchOperator<?> ops : OPERATORS.get(type))
-			ret.add(ops.getSearchTerms());
+		Set<SearchOperator<?>> ops = OPERATORS.get(type);
+		if (ops == null)
+			Collections.emptyList();
+		for (SearchOperator<?> op : ops)
+			ret.add(op.getSearchTerms());
 		return ret;
 	}
 

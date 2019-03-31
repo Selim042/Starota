@@ -1,5 +1,10 @@
 package us.myles_selim.starota.webserver;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Date;
+
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
@@ -20,6 +25,7 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 public class WebhookEventHandler {
 
 	private static long questTime;
+	private static int date;
 
 	@EventSubscriber
 	public void onWebhookEvent(WebhookEvent event) {
@@ -52,20 +58,35 @@ public class WebhookEventHandler {
 			}
 			break;
 		case QUEST:
-			if (System.currentTimeMillis() - questTime < 1800000) // 30 mins
-				break;
-			questTime = System.currentTimeMillis();
-			WebhookQuest taskData = (WebhookQuest) event.getWebhookData();
-			StarotaServer taskServer = StarotaServer.getServer(event.getGuild());
-			// RequestBuffer.request(() -> channel.sendMessage("Raid in
-			// region: "
-			// + server.getRegion(new GeoPoint(raidData.latitude,
-			// raidData.longitude))));
-			if (Starota.IS_DEV || taskServer.getRegion(taskData.getPoint()) != null) {
-				AssistantRequest.request((client) -> {
-					return client.getChannelByID(channel.getLongID())
-							.sendMessage("```json\n" + taskData.data + "\n```");
-				});
+			// if (System.currentTimeMillis() - questTime < 1800000) // 30 mins
+			// break;
+			// questTime = System.currentTimeMillis();
+			// WebhookQuest taskData = (WebhookQuest) event.getWebhookData();
+			// StarotaServer taskServer =
+			// StarotaServer.getServer(event.getGuild());
+			// // RequestBuffer.request(() -> channel.sendMessage("Raid in
+			// // region: "
+			// // + server.getRegion(new GeoPoint(raidData.latitude,
+			// // raidData.longitude))));
+			// if (Starota.IS_DEV || taskServer.getRegion(taskData.getPoint())
+			// != null) {
+			// AssistantRequest.request((client) -> {
+			// return client.getChannelByID(channel.getLongID())
+			// .sendMessage("```json\n" + taskData.data + "\n```");
+			// });
+			// }
+			File file = new File("quests.txt");
+			Date today = new Date();
+			if (today.getDate() != date)
+				file.delete();
+			date = today.getDate();
+			try {
+				FileWriter writer = new FileWriter(file);
+				writer.write("\n" + ((WebhookQuest) event.getWebhookData()).data);
+				writer.flush();
+				writer.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 			break;
 		case POKEMON:

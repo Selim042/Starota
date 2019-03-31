@@ -19,9 +19,10 @@ import com.google.gson.JsonParser;
 
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.CachedData;
 import us.myles_selim.starota.EmojiServerHelper;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.cache.CachedData;
+import us.myles_selim.starota.cache.ClearCache;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
 import us.myles_selim.starota.enums.EnumWeather;
@@ -43,8 +44,10 @@ public class GoHubDatabase {
 	private static final String POKEMON_API = "https://db.pokemongohub.net/api/pokemon/";
 	private static final String POKEMON_MOVES_API = "https://db.pokemongohub.net/api/moves/with-pokemon/";
 	private static final String MOVES_API = "https://db.pokemongohub.net/api/moves/";
-//	private static final String FAST_MOVES_LIST_API = "https://db.pokemongohub.net/api/moves/with-filter/fast";
-//	private static final String CHARGE_MOVES_LIST_API = "https://db.pokemongohub.net/api/moves/with-filter/charge";
+	// private static final String FAST_MOVES_LIST_API =
+	// "https://db.pokemongohub.net/api/moves/with-filter/fast";
+	// private static final String CHARGE_MOVES_LIST_API =
+	// "https://db.pokemongohub.net/api/moves/with-filter/charge";
 	private static final String MOVESETS_API = "https://db.pokemongohub.net/api/movesets/with-pokemon/";
 	private static final String COUNTERS_API = "https://db.pokemongohub.net/api/pokemon/counters/";
 	private static final Gson GSON;
@@ -187,20 +190,21 @@ public class GoHubDatabase {
 		}
 	}
 
-//	public static DexMove[] getAllMoves() {
-//		try {
-//			URL url = new URL(FAST_MOVES_LIST_API);
-//			URLConnection conn = url.openConnection();
-//			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
-//			DexMove[] moves = GSON.fromJson(PARSER.parse(new InputStreamReader(conn.getInputStream())),
-//					DexMove[].class);
-//			// MOVE_CACHE.put(moveId, new CachedData<>(move));
-//			return moves;
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			return null;
-//		}
-//	}
+	// public static DexMove[] getAllMoves() {
+	// try {
+	// URL url = new URL(FAST_MOVES_LIST_API);
+	// URLConnection conn = url.openConnection();
+	// conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
+	// DexMove[] moves = GSON.fromJson(PARSER.parse(new
+	// InputStreamReader(conn.getInputStream())),
+	// DexMove[].class);
+	// // MOVE_CACHE.put(moveId, new CachedData<>(move));
+	// return moves;
+	// } catch (IOException e) {
+	// e.printStackTrace();
+	// return null;
+	// }
+	// }
 
 	public static DexMoveset[] getMovesets(EnumPokemon pokemon) {
 		return getMovesets(pokemon, "Normal");
@@ -252,6 +256,15 @@ public class GoHubDatabase {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	@ClearCache("gohub")
+	public static void dumpCache() {
+		POKEMON_CACHE.clear();
+		POKEMON_MOVES_CACHE.clear();
+		MOVE_CACHE.clear();
+		MOVESET_CACHE.clear();
+		COUNTER_CACHE.clear();
 	}
 
 }

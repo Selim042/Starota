@@ -12,7 +12,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class CachedMap<K, V> extends HashMap<K, V> {
+public class CachedMap<K, V> extends HashMap<K, V> implements ICache {
 
 	private static final long serialVersionUID = 8458113639890753658L;
 	private final Map<K, CachedData<V>> data = new HashMap<>();

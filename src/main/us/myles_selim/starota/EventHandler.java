@@ -1,6 +1,13 @@
 package us.myles_selim.starota;
 
-import java.util.List;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
+
+import org.reflections.Reflections;
+import org.reflections.scanners.MethodAnnotationsScanner;
 
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;
@@ -8,23 +15,22 @@ import sx.blah.discord.handle.impl.events.guild.GuildLeaveEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.events.guild.member.UserJoinEvent;
 import sx.blah.discord.handle.impl.events.guild.role.RoleUpdateEvent;
-import sx.blah.discord.handle.obj.IEmbed;
 import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IPrivateChannel;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.assistants.StarotaAssistants;
+import us.myles_selim.starota.cache.ClearCache;
 import us.myles_selim.starota.debug_server.DebugServer;
-import us.myles_selim.starota.research.ResearchTracker;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class EventHandler {
 
-	private static final long RESEARCH_WEBHOOK = 490020347408678922L;
-	private static final String SUBMITTED_REGEX = "\\*\\*Submitted by:\\*\\* .*#\\d{4}";
+	// private static final long RESEARCH_WEBHOOK = 490020347408678922L;
+	// private static final String SUBMITTED_REGEX = "\\*\\*Submitted by:\\*\\*
+	// .*#\\d{4}";
 
 	@EventSubscriber
 	public void onMessageRecieved(MessageReceivedEvent event) {
@@ -36,34 +42,35 @@ public class EventHandler {
 		// if (JavaCommandHandler.executeCommand(event.getMessage(),
 		// event.getGuild(), event.getChannel()))
 		// return;
-		if (event.getGuild().getLongID() == Starota.PVILLE_SERVER) {
-			long authorId = event.getAuthor().getLongID();
-			long webhookId = event.getMessage().getWebhookLongID();
-			if (webhookId == RESEARCH_WEBHOOK) {
-				System.out.println("webhook research");
-				IMessage message = event.getMessage();
-				List<IEmbed> embeds = message.getEmbeds();
-				for (IEmbed embed : embeds) {
-					for (String line : embed.getDescription().split("\n")) {
-						if (line.matches(SUBMITTED_REGEX)) {
-							String trueAuthor = line.substring(18);
-							IUser trueAuthorUser = Starota.findUser(event.getGuild().getLongID(),
-									trueAuthor);
-							if (trueAuthorUser != null) {
-								authorId = trueAuthorUser.getLongID();
-								System.out.println(
-										"true author for \"" + line + "\" is " + trueAuthorUser.getName()
-												+ "#" + trueAuthorUser.getDiscriminator());
-							} else
-								authorId = -1;
-						}
-					}
-				}
-			}
-			if (authorId != -1)
-				ResearchTracker.addPost(event.getGuild().getLongID(), authorId);
-		} else
-			ResearchTracker.addPost(event.getGuild(), event.getAuthor());
+		// if (event.getGuild().getLongID() == Starota.PVILLE_SERVER) {
+		// long authorId = event.getAuthor().getLongID();
+		// long webhookId = event.getMessage().getWebhookLongID();
+		// if (webhookId == RESEARCH_WEBHOOK) {
+		// System.out.println("webhook research");
+		// IMessage message = event.getMessage();
+		// List<IEmbed> embeds = message.getEmbeds();
+		// for (IEmbed embed : embeds) {
+		// for (String line : embed.getDescription().split("\n")) {
+		// if (line.matches(SUBMITTED_REGEX)) {
+		// String trueAuthor = line.substring(18);
+		// IUser trueAuthorUser = Starota.findUser(event.getGuild().getLongID(),
+		// trueAuthor);
+		// if (trueAuthorUser != null) {
+		// authorId = trueAuthorUser.getLongID();
+		// System.out.println(
+		// "true author for \"" + line + "\" is " + trueAuthorUser.getName()
+		// + "#" + trueAuthorUser.getDiscriminator());
+		// } else
+		// authorId = -1;
+		// }
+		// }
+		// }
+		// }
+		// if (authorId != -1)
+		// ResearchTracker.addPost(event.getGuild().getLongID(), authorId);
+		// }
+		// else
+		// ResearchTracker.addPost(event.getGuild(), event.getAuthor());
 	}
 
 	@EventSubscriber
@@ -110,49 +117,57 @@ public class EventHandler {
 			StarotaAssistants.setAssistantRole(event.getGuild(), event.getUser());
 	}
 
+	private static final Map<String, Consumer<String>> CACHES = new HashMap<>();
+
+	static {
+		Reflections ref = new Reflections("us.myles_selim.starota", new MethodAnnotationsScanner());
+		for (Method cl : ref.getMethodsAnnotatedWith(ClearCache.class)) {
+			ClearCache clear = cl.getAnnotation(ClearCache.class);
+			CACHES.put(clear.value(), cache -> {
+				try {
+					cl.invoke(null);
+				} catch (IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException e) {
+					e.printStackTrace();
+				}
+			});
+		}
+	}
+
 	@EventSubscriber
-	public void formManagerHandler(MessageReceivedEvent event) {
-		// if (!(event.getChannel() instanceof IPrivateChannel))
-		// return;
-		// IPrivateChannel channel = (IPrivateChannel) event.getChannel();
-		// // Selim's user id
-		// if (channel.getRecipient().getLongID() != 134855940938661889L)
-		// return;
-		// String message = event.getMessage().getContent();
-		// if (message.startsWith(".help")) {
-		// channel.sendMessage(".removeExclude\n" + ".forceEnable\n" +
-		// ".addShinyable\n");
-		// return;
-		// }
-		// String[] args = message.split(" ");
-		// if (args.length != 2)
-		// return;
-		// EnumPokemon pokemon = EnumPokemon.getPokemon(args[1]);
-		// if (pokemon == null)
-		// pokemon = EnumPokemon.getPokemon(Integer.parseInt(args[1]));
-		// switch (args[0].toLowerCase()) {
-		// case ".removeexclude":
-		// if (FormManager.removeExcluded(pokemon))
-		// channel.sendMessage("Removed " + pokemon + " from exclusion");
-		// else
-		// channel.sendMessage(pokemon + " is already not excluded");
-		// break;
-		// case ".forceenable":
-		// if (FormManager.addForceEnable(pokemon))
-		// channel.sendMessage("Forced enabled " + pokemon);
-		// else
-		// channel.sendMessage(pokemon + " is already enabled");
-		// break;
-		// case ".addshinyable":
-		// if (FormManager.addShinyable(pokemon))
-		// channel.sendMessage("Added " + pokemon + " as shinyable");
-		// else
-		// channel.sendMessage(pokemon + " is already shinyable");
-		// break;
-		// default:
-		// channel.sendMessage("Unknown command");
-		// break;
-		// }
+	public void cacheHandler(MessageReceivedEvent event) {
+		if (!(event.getChannel() instanceof IPrivateChannel))
+			return;
+		IPrivateChannel channel = (IPrivateChannel) event.getChannel();
+		// Selim's user id
+		if (channel.getRecipient().getLongID() != 134855940938661889L)
+			return;
+		String message = event.getMessage().getContent();
+		if (message.startsWith(".help")) {
+			channel.sendMessage(".dumpCache\n" + ".getCaches\n");
+			return;
+		}
+		String[] args = message.split(" ");
+		switch (args[0].toLowerCase()) {
+		case ".getcaches":
+			String out = "";
+			for (String key : CACHES.keySet())
+				out += key + ", ";
+			channel.sendMessage(out);
+			return;
+		case ".dumpcache":
+			if (args.length < 2) {
+				channel.sendMessage("Usage: .dumpCache <cacheName>");
+				return;
+			}
+			if (!CACHES.containsKey(args[1])) {
+				channel.sendMessage("Cache not found");
+				return;
+			}
+			CACHES.get(args[1]).accept(args[1]);
+			channel.sendMessage("Dumped");
+			return;
+		}
 	}
 
 	// update Patreon perms on debug server

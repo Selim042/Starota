@@ -19,8 +19,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
-import us.myles_selim.starota.CachedData;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.cache.CachedData;
+import us.myles_selim.starota.cache.ClearCache;
 import us.myles_selim.starota.silph_road.SilphCard.SilphCheckin;
 import us.myles_selim.starota.silph_road.SilphCard.SilphCheckinTime;
 
@@ -144,6 +145,12 @@ public class SilphRoadCardUtils {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	@ClearCache("silphroadcards")
+	public static void dumpCache() {
+		HAS_CARD_CACHE.clear();
+		CARD_CACHE.clear();
 	}
 
 }

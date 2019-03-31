@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class CachedSet<V> extends TreeSet<V> {
+public class CachedSet<V> extends TreeSet<V> implements ICache {
 
 	private static final long serialVersionUID = -6539607562419913707L;
 	private final Set<CachedData<V>> data = new TreeSet<>();

@@ -8,11 +8,17 @@ public class RaidBoss {
 	private final EnumPokemon pokemon;
 	private final Form form;
 	private final int tier;
+	private final boolean shinyable;
 
 	public RaidBoss(EnumPokemon pokemon, Form form, int tier) {
+		this(pokemon, form, tier, false);
+	}
+
+	public RaidBoss(EnumPokemon pokemon, Form form, int tier, boolean shinyable) {
 		this.pokemon = pokemon;
 		this.form = form;
 		this.tier = tier;
+		this.shinyable = shinyable;
 	}
 
 	public EnumPokemon getPokemon() {
@@ -25,6 +31,10 @@ public class RaidBoss {
 
 	public int getTier() {
 		return this.tier;
+	}
+
+	public boolean isShinyable() {
+		return this.shinyable;
 	}
 
 	public final int getColor() {

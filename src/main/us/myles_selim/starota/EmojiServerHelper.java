@@ -21,6 +21,7 @@ public class EmojiServerHelper {
 			533472551146618880L, // Emoji Server #2
 			533816836609802240L, // Emoji Server #3
 			542428050134925314L, // Emoji Server #4
+			561385227977752578L, // Emoji Server #5
 	};
 
 	public static boolean isEmojiServer(IGuild guild) {

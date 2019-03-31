@@ -10,9 +10,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import us.myles_selim.starota.CachedData;
 import us.myles_selim.starota.ImageHelper;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.cache.CachedData;
+import us.myles_selim.starota.cache.ClearCache;
 import us.myles_selim.starota.trading.forms.FormSet;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 import us.myles_selim.starota.trading.forms.FormSetAlolan;
@@ -111,7 +112,7 @@ public enum EnumPokemon {
 	GOLEM(EnumPokemonType.ROCK, EnumPokemonType.GROUND, FormSetAlolan.FORM_SET),
 	PONYTA(EnumPokemonType.FIRE),
 	RAPIDASH(EnumPokemonType.FIRE),
-	SOWPOKE(EnumPokemonType.WATER, EnumPokemonType.PSYCHIC),
+	SLOWPOKE(EnumPokemonType.WATER, EnumPokemonType.PSYCHIC),
 	SLOWBRO(EnumPokemonType.WATER, EnumPokemonType.PSYCHIC),
 	MAGNEMITE(EnumPokemonType.ELECTRIC, EnumPokemonType.STEEL, EnumGender.UNKNOWN),
 	MAGNETON(EnumPokemonType.ELECTRIC, EnumPokemonType.STEEL, EnumGender.UNKNOWN),
@@ -1332,6 +1333,12 @@ public enum EnumPokemon {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	@ClearCache("pokemon")
+	public static void dumpCache() {
+		AVAILABLE = null;
+		SHINYABLE = null;
 	}
 
 	public boolean isAvailable() {

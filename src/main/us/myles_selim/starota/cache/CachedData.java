@@ -1,6 +1,6 @@
-package us.myles_selim.starota;
+package us.myles_selim.starota.cache;
 
-public class CachedData<V> {
+public class CachedData<V> implements ICache {
 
 	private long time;
 	private V value;
