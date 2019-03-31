@@ -24,8 +24,8 @@ public class CommandCredits extends JavaCommand {
 		builder.appendDesc("**Pokemon Go Database**: [Pokemon Go Hub](https://pokemongohub.net/)\n");
 		builder.appendDesc(
 				"**Raid Boss, Field Research, and Egg Information**: [The Silph Road](https://thesilphroad.com/)\n");
-		builder.appendDesc("**Event Information**: [Leek Duck](https://leekduck.com)");
-		builder.appendDesc("**Maps**: [MapBox](https://www.mapbox.com/)");
+		builder.appendDesc("**Event Information**: [Leek Duck](https://leekduck.com)\n");
+		builder.appendDesc("**Maps**: [MapBox](https://www.mapbox.com/)\n");
 
 		channel.sendMessage(builder.build());
 	}

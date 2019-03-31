@@ -43,12 +43,13 @@ import us.myles_selim.starota.commands.pvp.CommandNotReady;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 import us.myles_selim.starota.debug_server.DebugServer;
-import us.myles_selim.starota.events.CommandEvents;
 import us.myles_selim.starota.leaderboards.commands.CommandEditLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandGetLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandListLeaderboards;
 import us.myles_selim.starota.leaderboards.commands.CommandNewLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandUpdateLeaderboard;
+import us.myles_selim.starota.leek_duck.ditto.CommandDitto;
+import us.myles_selim.starota.leek_duck.events.CommandEvents;
 import us.myles_selim.starota.lua.LuaEventHandler;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.commands.CommandUploadScript;
@@ -266,6 +267,8 @@ public class Starota {
 		jCmdHandler.registerCommand("Search", new CommandSearchPoke());
 
 		jCmdHandler.registerCommand("Eggs", new CommandEggHatches());
+
+		jCmdHandler.registerCommand("Misc", new CommandDitto());
 
 		try {
 			Thread.sleep(2500);

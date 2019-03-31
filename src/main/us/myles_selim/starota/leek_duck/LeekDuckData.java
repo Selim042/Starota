@@ -18,6 +18,7 @@ import us.myles_selim.starota.MiscUtils;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.cache.CachedData;
 import us.myles_selim.starota.cache.ClearCache;
+import us.myles_selim.starota.enums.EnumPokemon;
 
 public class LeekDuckData {
 
@@ -31,6 +32,7 @@ public class LeekDuckData {
 
 	private static final String LEEK_URL = "https://leekduck.com";
 	private static final String EVENTS_URL = "https://leekduck.com/events/";
+	private static final String DITTO_URL = "https://leekduck.com/FindDitto/";
 
 	private static final Pattern EVENT_GENERAL_PATTERN = Pattern
 			.compile("<div class=\"event-item\".*?img class.*?<br.*?<\\/div>");
@@ -142,6 +144,18 @@ public class LeekDuckData {
 		return RUN_UP_EVENTS;
 	}
 
+	public static boolean areEventsLoaded() {
+		if (EVENT_CACHE != null && !EVENT_CACHE.hasPassed(3600000)) // 1 hour
+			return true;
+		return false;
+	}
+
+	public static long getEventsCacheTime() {
+		if (EVENT_CACHE == null)
+			return -1;
+		return EVENT_CACHE.getCreationTime();
+	}
+
 	public static class LeekEvent {
 
 		private int color;
@@ -227,9 +241,58 @@ public class LeekDuckData {
 
 	}
 
+	private static final Pattern DITTOABLE_PATTERN = Pattern.compile("listlabel\">.*?<");
+	private static CachedData<List<EnumPokemon>> DITTOABLES;
+
+	public static List<EnumPokemon> getDittoablePokemon() {
+		if (DITTOABLES != null && !DITTOABLES.hasPassed(86400000)) // 1 day
+			return DITTOABLES.getValue();
+		List<EnumPokemon> newDittos = new ArrayList<>();
+		try {
+			URL url = new URL(DITTO_URL);
+			URLConnection conn = url.openConnection();
+			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
+			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			String html = "";
+			String line = null;
+			while ((line = in.readLine()) != null)
+				html += line;
+			Matcher generalMatcher = DITTOABLE_PATTERN.matcher(html);
+			while (generalMatcher.find()) {
+				String match = generalMatcher.group();
+				String pokemonName = match.substring(11, match.length() - 1);
+				EnumPokemon pokemon = EnumPokemon.getPokemon(pokemonName);
+				if (pokemon == null) {
+					Starota.submitError("Cannot find dittoable named " + pokemonName,
+							new IllegalArgumentException("Cannot find dittoable named " + pokemonName));
+					continue;
+				}
+				newDittos.add(pokemon);
+			}
+			DITTOABLES = new CachedData<>(newDittos);
+			return newDittos;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public static boolean areDittoablesLoaded() {
+		if (DITTOABLES != null && !DITTOABLES.hasPassed(86400000)) // 1 day
+			return true;
+		return false;
+	}
+
+	public static long getDittoableCacheTime() {
+		if (DITTOABLES == null)
+			return -1;
+		return DITTOABLES.getCreationTime();
+	}
+
 	@ClearCache("leekduck")
 	public static void clearCache() {
 		EVENT_CACHE = null;
+		DITTOABLES = null;
 	}
 
 }

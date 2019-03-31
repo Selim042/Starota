@@ -1,4 +1,4 @@
-package us.myles_selim.starota.events;
+package us.myles_selim.starota.leek_duck.events;
 
 import java.util.List;
 
@@ -32,6 +32,11 @@ public class EventReactionMessage extends ReactionMessage {
 	}
 
 	@Override
+	public void onEdit(StarotaServer server, IChannel channel, IMessage msg) {
+		onSend(server, channel, msg);
+	}
+
+	@Override
 	public void onReactionAdded(StarotaServer server, IChannel channel, IMessage msg, IUser user,
 			IReaction react) {
 		if (!react.getUserReacted(Starota.getOurUser()))
@@ -59,17 +64,21 @@ public class EventReactionMessage extends ReactionMessage {
 			eventIndex = 0;
 		LeekEvent event = events.get(eventIndex);
 		EmbedBuilder builder = new EmbedBuilder();
+		builder.withAuthorIcon("https://leekduck.com/assets/img/favicon/favicon-32x32.png");
+		builder.withAuthorName("Leek Duck");
+		builder.withAuthorUrl("http://leekduck.com");
+
 		builder.withColor(event.getColor());
 		builder.withImage(event.getThumbnail());
-		builder.withAuthorName(event.getTitle());
-		builder.withTitle(event.getDuration());
+		builder.withTitle(event.getTitle() + " | " + event.getDuration());
 		builder.withDesc(event.getDescription());
 		if (event.getTimeLeft() != null)
 			builder.appendDesc("\n\n**" + event.getTimeLeft() + "**");
 		if (event.getLink() != null)
 			builder.appendDesc(String.format("\n\n[%s](%s)", event.getLinkTitle(), event.getLink()));
 
-		builder.withFooterText("Event " + (eventIndex + 1) + "/" + events.size());
+		builder.withFooterText("Event " + (eventIndex + 1) + "/" + events.size() + " | Last updated");
+		builder.withTimestamp(LeekDuckData.getEventsCacheTime());
 		return builder.build();
 	}
 

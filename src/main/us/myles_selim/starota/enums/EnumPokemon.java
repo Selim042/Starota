@@ -257,7 +257,7 @@ public enum EnumPokemon {
 	SWINUB(EnumPokemonType.ICE, EnumPokemonType.GROUND),
 	PILOSWINE(EnumPokemonType.ICE, EnumPokemonType.GROUND),
 	CORSOLA(EnumPokemonType.WATER, EnumPokemonType.ROCK),
-	REMORIAD(EnumPokemonType.WATER),
+	REMORAID(EnumPokemonType.WATER),
 	OCTILLERY(EnumPokemonType.WATER),
 	DELIBIRD(EnumPokemonType.ICE, EnumPokemonType.FLYING),
 	MANTINE(EnumPokemonType.WATER, EnumPokemonType.FLYING),
