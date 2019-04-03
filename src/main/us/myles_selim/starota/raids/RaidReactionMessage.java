@@ -178,7 +178,8 @@ public class RaidReactionMessage extends ReactionMessage {
 			String counterString = "";
 			int rank = 1;
 			for (DexCounter c : entry.getTopCounters())
-				counterString += String.format("#%d %s", rank++, c);
+				if (c != null)
+					counterString += String.format("#%d %s", rank++, c);
 			if (!counterString.isEmpty())
 				builder.appendField("Counters:", counterString, false);
 		}

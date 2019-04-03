@@ -223,8 +223,15 @@ public class PokedexEntry extends ReactionMessage {
 		if (length > getCounters().length)
 			length = getCounters().length;
 		topCounters = new DexCounter[length];
-		for (int i = 0; i < 6 && i < length; i++)
-			topCounters[i] = getCounters()[i];
+		DexCounter[] allCounters = getCounters();
+		int index = 0;
+		for (DexCounter c : allCounters) {
+			if (index >= length)
+				break;
+			if (!EnumPokemon.getPokemon(c.pokemonId).isAvailable())
+				continue;
+			topCounters[index++] = c;
+		}
 		return topCounters;
 	}
 
@@ -333,7 +340,8 @@ public class PokedexEntry extends ReactionMessage {
 		String counterString = "";
 		int rank = 1;
 		for (DexCounter c : entry.getTopCounters())
-			counterString += String.format("#%d %s", rank++, c);
+			if (c != null)
+				counterString += String.format("#%d %s", rank++, c);
 		if (!counterString.isEmpty())
 			builder.appendField("Counters:", counterString, false);
 
