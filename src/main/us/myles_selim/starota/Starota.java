@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.Timer;
+import java.util.function.Predicate;
 
 import org.discordbots.api.client.DiscordBotListAPI;
 
@@ -399,11 +400,16 @@ public class Starota {
 
 		updateOwners();
 
-		Timer timer = new Timer();
-		Date midnight = new Date();
-		midnight.setHours(0);
-		midnight.setMinutes(0);
-		timer.scheduleAtFixedRate(new VoteReminderThread(), midnight, (long) 2.592e+8);
+		@SuppressWarnings("deprecation")
+		Predicate<Void> f = (v) -> {
+			Timer timer = new Timer();
+			Date midnight = new Date();
+			midnight.setHours(0);
+			midnight.setMinutes(0);
+			timer.scheduleAtFixedRate(new VoteReminderThread(), midnight, (long) 2.592e+8);
+			return false;
+		};
+		f.test(null);
 	}
 
 	public static IDiscordClient getClient() {
