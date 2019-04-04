@@ -66,10 +66,9 @@ public class JavaCommandHandler implements ICommandHandler {
 	@Override
 	public List<ICommand> getAllCommands(IGuild server) {
 		List<ICommand> toRemove = new ArrayList<>();
-		if (server != null)
-			for (ICommand c : COMMANDS)
-				if (!StarotaModule.isCategoryEnabled(StarotaServer.getServer(server), c.getCategory()))
-					toRemove.add(c);
+		for (ICommand c : COMMANDS)
+			if (!StarotaModule.isCategoryEnabled(StarotaServer.getServer(server), c.getCategory()))
+				toRemove.add(c);
 		List<ICommand> ret = new ArrayList<>(COMMANDS);
 		ret.removeAll(toRemove);
 		return Collections.unmodifiableList(ret);

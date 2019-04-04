@@ -14,6 +14,7 @@ import sx.blah.discord.handle.impl.obj.ReactionEmoji;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.IPrivateChannel;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
@@ -36,7 +37,7 @@ public class PrimaryCommandHandler {
 	private final IShouldExecuteCallback shouldExecute;
 
 	public PrimaryCommandHandler() {
-		this((IChannel ch) -> true);
+		this((IChannel ch) -> !(ch instanceof IPrivateChannel));
 	}
 
 	public PrimaryCommandHandler(IShouldExecuteCallback callback) {
@@ -44,6 +45,8 @@ public class PrimaryCommandHandler {
 	}
 
 	public static String getPrefix(IGuild guild) {
+		if (guild == null)
+			return DEFAULT_PREFIX;
 		StarotaServer server = StarotaServer.getServer(guild);
 		if (server.hasKey(PREFIX_KEY))
 			return String.valueOf(server.getValue(PREFIX_KEY));
@@ -51,6 +54,8 @@ public class PrimaryCommandHandler {
 	}
 
 	public static void setPrefix(IGuild guild, String prefix) {
+		if (guild == null)
+			return;
 		StarotaServer server = StarotaServer.getServer(guild);
 		server.setValue(PREFIX_KEY, prefix);
 	}
@@ -65,8 +70,8 @@ public class PrimaryCommandHandler {
 		if (event.getAuthor().isBot() || !Starota.FULLY_STARTED)
 			return;
 		IGuild guild = event.getGuild();
-		if (guild == null)
-			return;
+		// if (guild == null)
+		// return;
 		IChannel channel = event.getChannel();
 		if (!shouldExecute.shouldExecute(channel))
 			return;
@@ -92,7 +97,7 @@ public class PrimaryCommandHandler {
 						|| (cmd.requiredPermission() != null && guild != null && !message.getAuthor()
 								.getPermissionsForGuild(guild).contains(cmd.requiredPermission())))
 					continue;
-				new Thread(cmd.getName() + "Thread-" + guild.getName()) {
+				new Thread(cmd.getName() + "Thread-" + (guild == null ? "PM" : guild.getName())) {
 
 					@Override
 					public void run() {

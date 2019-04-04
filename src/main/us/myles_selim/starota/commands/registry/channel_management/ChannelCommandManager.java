@@ -17,6 +17,8 @@ public class ChannelCommandManager {
 
 	@SuppressWarnings({ "unchecked" })
 	public static boolean isAllowedHere(StarotaServer server, String category, IChannel channel) {
+		if (server == null)
+			return true;
 		EBStorage stor = (EBStorage) server.getValue(WHITELIST_KEY);
 		if (stor == null)
 			return true;

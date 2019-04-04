@@ -18,7 +18,7 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 public class CommandEggHatches extends StarotaCommand {
 
 	public CommandEggHatches() {
-		super("eggHatces", "Gets information on what can currently hatch from eggs.");
+		super("eggHatches", "Gets information on what can currently hatch from eggs.");
 	}
 
 	@Override

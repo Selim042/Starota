@@ -43,6 +43,7 @@ import us.myles_selim.starota.commands.pvp.CommandFindBattles;
 import us.myles_selim.starota.commands.pvp.CommandNotReady;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
+import us.myles_selim.starota.commands.selim_pm.SelimPMCommandHandler;
 import us.myles_selim.starota.debug_server.DebugServer;
 import us.myles_selim.starota.leaderboards.commands.CommandEditLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandGetLeaderboard;
@@ -270,6 +271,8 @@ public class Starota {
 		jCmdHandler.registerCommand("Eggs", new CommandEggHatches());
 
 		jCmdHandler.registerCommand("Misc", new CommandDitto());
+		
+		SelimPMCommandHandler.INSTANCE.getClass();
 
 		try {
 			Thread.sleep(2500);

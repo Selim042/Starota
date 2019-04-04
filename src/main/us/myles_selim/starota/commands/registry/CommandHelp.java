@@ -99,7 +99,9 @@ public class CommandHelp extends JavaCommand {
 
 		List<ICommand> cmds = this.getCommandHandler().getCommandsByCategory(guild, category);
 		List<ICommand> disp = new LinkedList<>();
-		for (ICommand cmd : cmds)
+		for (ICommand cmd : cmds) {
+			if (guild == null)
+				disp.add(cmd);
 			if (guild != null
 					&& (author.getPermissionsForGuild(guild).contains(Permissions.ADMINISTRATOR)
 							|| ((author.getPermissionsForGuild(guild).contains(cmd.requiredPermission())
@@ -107,6 +109,7 @@ public class CommandHelp extends JavaCommand {
 									&& (author.getRolesForGuild(guild).contains(cmd.requiredRole(guild))
 											|| cmd.requiredRole(guild) == null))))
 				disp.add(cmd);
+		}
 		disp.sort(null);
 		if (page > disp.size() / CMDS_PER_PAGE)
 			page = 0;

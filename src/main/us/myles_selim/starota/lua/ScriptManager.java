@@ -51,7 +51,7 @@ public class ScriptManager {
 	};
 
 	public static boolean saveScript(StarotaServer server, String name, Attachment attach) {
-		if (attach == null || !StarotaModule.isModuleEnabled(server, BaseModules.LUA))
+		if (server == null || attach == null || !StarotaModule.isModuleEnabled(server, BaseModules.LUA))
 			return false;
 		String contents = getAttachmentContents(attach.getUrl());
 		File folder = new File(SCRIPT_FOLDER, server.getDiscordGuild().getStringID());
@@ -74,6 +74,8 @@ public class ScriptManager {
 	}
 
 	public static boolean removeScript(StarotaServer server, String name) {
+		if (server == null)
+			return false;
 		File folder = new File(SCRIPT_FOLDER, server.getDiscordGuild().getStringID());
 		File script = new File(folder, name);
 		// if (script.exists() && !script.isDirectory())
@@ -97,7 +99,7 @@ public class ScriptManager {
 
 	public static boolean executeCommandScript(StarotaServer server, String name, IMessage message,
 			IChannel channel, String[] args) throws LuaError, IOException, CompileException {
-		if (!StarotaModule.isModuleEnabled(server, BaseModules.LUA))
+		if (server == null || !StarotaModule.isModuleEnabled(server, BaseModules.LUA))
 			return false;
 		File folder = new File(SCRIPT_FOLDER, server.getDiscordGuild().getStringID());
 		LuaState state = LuaUtils.getState(server);
@@ -128,7 +130,7 @@ public class ScriptManager {
 	}
 
 	public static boolean executeEventScript(LuaState state, StarotaServer server) {
-		if (!StarotaModule.isModuleEnabled(server, BaseModules.LUA))
+		if (server == null || !StarotaModule.isModuleEnabled(server, BaseModules.LUA))
 			return false;
 		File folder = new File(SCRIPT_FOLDER, server.getDiscordGuild().getStringID());
 		// state.stdout = System.out;
@@ -150,7 +152,7 @@ public class ScriptManager {
 	}
 
 	public static List<String> getCommandScripts(StarotaServer server) {
-		if (!StarotaModule.isModuleEnabled(server, BaseModules.LUA))
+		if (server == null || !StarotaModule.isModuleEnabled(server, BaseModules.LUA))
 			return Collections.emptyList();
 		List<String> ret = new ArrayList<>();
 		File folder = new File(SCRIPT_FOLDER,

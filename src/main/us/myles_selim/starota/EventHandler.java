@@ -136,38 +136,38 @@ public class EventHandler {
 
 	@EventSubscriber
 	public void cacheHandler(MessageReceivedEvent event) {
-		if (!(event.getChannel() instanceof IPrivateChannel))
-			return;
-		IPrivateChannel channel = (IPrivateChannel) event.getChannel();
-		// Selim's user id
-		if (channel.getRecipient().getLongID() != 134855940938661889L)
-			return;
-		String message = event.getMessage().getContent();
-		if (message.startsWith(".help")) {
-			channel.sendMessage(".dumpCache\n" + ".getCaches\n");
-			return;
-		}
-		String[] args = message.split(" ");
-		switch (args[0].toLowerCase()) {
-		case ".getcaches":
-			String out = "";
-			for (String key : CACHES.keySet())
-				out += key + ", ";
-			channel.sendMessage(out);
-			return;
-		case ".dumpcache":
-			if (args.length < 2) {
-				channel.sendMessage("Usage: .dumpCache <cacheName>");
-				return;
-			}
-			if (!CACHES.containsKey(args[1])) {
-				channel.sendMessage("Cache not found");
-				return;
-			}
-			CACHES.get(args[1]).accept(args[1]);
-			channel.sendMessage("Dumped");
-			return;
-		}
+//		if (!(event.getChannel() instanceof IPrivateChannel))
+//			return;
+//		IPrivateChannel channel = (IPrivateChannel) event.getChannel();
+//		// Selim's user id
+//		if (channel.getRecipient().getLongID() != 134855940938661889L)
+//			return;
+//		String message = event.getMessage().getContent();
+//		if (message.startsWith(".help")) {
+//			channel.sendMessage(".dumpCache\n" + ".getCaches\n");
+//			return;
+//		}
+//		String[] args = message.split(" ");
+//		switch (args[0].toLowerCase()) {
+//		case ".getcaches":
+//			String out = "";
+//			for (String key : CACHES.keySet())
+//				out += key + ", ";
+//			channel.sendMessage(out);
+//			return;
+//		case ".dumpcache":
+//			if (args.length < 2) {
+//				channel.sendMessage("Usage: .dumpCache <cacheName>");
+//				return;
+//			}
+//			if (!CACHES.containsKey(args[1])) {
+//				channel.sendMessage("Cache not found");
+//				return;
+//			}
+//			CACHES.get(args[1]).accept(args[1]);
+//			channel.sendMessage("Dumped");
+//			return;
+//		}
 	}
 
 	// update Patreon perms on debug server
