@@ -94,6 +94,9 @@ public class PrimaryCommandHandler {
 			message.addReaction(ReactionEmoji.of("�?"));
 		boolean cmdFound = false;
 		try {
+			EnumSet<Permissions> hasPerms = channel.getModifiedPermissions(client.getOurUser());
+			if (!hasPerms.contains(Permissions.SEND_MESSAGES))
+				return;
 			for (ICommandHandler h : COMMAND_HANDLERS) {
 				ICommand cmd = h.findCommand(guild, args[0]);
 				if (cmd == null
@@ -102,7 +105,6 @@ public class PrimaryCommandHandler {
 						|| (cmd.requiredUsePermission() != null && guild != null && !message.getAuthor()
 								.getPermissionsForGuild(guild).contains(cmd.requiredUsePermission())))
 					continue;
-				EnumSet<Permissions> hasPerms = channel.getModifiedPermissions(client.getOurUser());
 				EnumSet<Permissions> reqPerms = cmd.getCommandPermissions();
 				if (!hasPerms.containsAll(reqPerms)) {
 					reqPerms.removeAll(hasPerms);
