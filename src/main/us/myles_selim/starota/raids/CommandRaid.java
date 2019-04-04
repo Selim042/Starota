@@ -1,9 +1,11 @@
 package us.myles_selim.starota.raids;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.reaction_messages.ReactionMessage;
@@ -16,6 +18,12 @@ public class CommandRaid extends StarotaCommand {
 
 	public CommandRaid() {
 		super("raid", "Makes a new raid post.");
+	}
+
+	@Override
+	public EnumSet<Permissions> getCommandPermissions() {
+		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS,
+				Permissions.USE_EXTERNAL_EMOJIS, Permissions.ADD_REACTIONS, Permissions.MANAGE_MESSAGES);
 	}
 
 	@Override

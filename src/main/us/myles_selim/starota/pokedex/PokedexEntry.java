@@ -10,12 +10,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IEmoji;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.EmojiServerHelper;
-import us.myles_selim.starota.ImageHelper;
-import us.myles_selim.starota.MiscUtils;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
 import us.myles_selim.starota.enums.EnumWeather;
+import us.myles_selim.starota.misc.utils.EmojiServerHelper;
+import us.myles_selim.starota.misc.utils.ImageHelper;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.reaction_messages.ReactionMessage;
 
 public class PokedexEntry extends ReactionMessage {

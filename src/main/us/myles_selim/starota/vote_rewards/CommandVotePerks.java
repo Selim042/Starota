@@ -1,5 +1,7 @@
 package us.myles_selim.starota.vote_rewards;
 
+import java.util.EnumSet;
+
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
@@ -13,7 +15,13 @@ public class CommandVotePerks extends StarotaCommand {
 	}
 
 	@Override
-	public Permissions requiredPermission() {
+	public EnumSet<Permissions> getCommandPermissions() {
+		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS,
+				Permissions.USE_EXTERNAL_EMOJIS, Permissions.ADD_REACTIONS, Permissions.MANAGE_MESSAGES);
+	}
+
+	@Override
+	public Permissions requiredUsePermission() {
 		return Permissions.ADMINISTRATOR;
 	}
 

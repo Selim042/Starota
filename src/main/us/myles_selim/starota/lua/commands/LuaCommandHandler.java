@@ -2,6 +2,7 @@ package us.myles_selim.starota.lua.commands;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
@@ -98,7 +99,12 @@ public class LuaCommandHandler implements ICommandHandler {
 		}
 
 		@Override
-		public Permissions requiredPermission() {
+		public Permissions requiredUsePermission() {
+			return null;
+		}
+
+		@Override
+		public EnumSet<Permissions> getCommandPermissions() {
 			return null;
 		}
 

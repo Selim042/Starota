@@ -1,5 +1,6 @@
 package us.myles_selim.starota.commands.registry;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
@@ -16,7 +17,9 @@ public interface ICommand extends Comparable<ICommand> {
 
 	public String getDescription();
 
-	public Permissions requiredPermission();
+	public Permissions requiredUsePermission();
+
+	public EnumSet<Permissions> getCommandPermissions();
 
 	public IRole requiredRole(IGuild guild);
 

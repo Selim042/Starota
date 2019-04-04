@@ -12,8 +12,8 @@ import org.squiddev.cobalt.ValueFactory;
 import org.squiddev.cobalt.function.OneArgFunction;
 import org.squiddev.cobalt.function.ZeroArgFunction;
 
-import us.myles_selim.starota.MiscUtils;
 import us.myles_selim.starota.lua.conversion.IConverter;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.profiles.PlayerProfile;
 
 public class PlayerProfileConverter implements IConverter {

@@ -13,7 +13,7 @@ public class CommandSetPrefix extends JavaCommand {
 	}
 
 	@Override
-	public Permissions requiredPermission() {
+	public Permissions requiredUsePermission() {
 		return Permissions.ADMINISTRATOR;
 	}
 

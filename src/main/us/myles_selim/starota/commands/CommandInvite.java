@@ -1,7 +1,10 @@
 package us.myles_selim.starota.commands;
 
+import java.util.EnumSet;
+
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.assistants.pokedex.PokedexBot;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -18,6 +21,11 @@ public class CommandInvite extends StarotaCommand {
 		super("invite", "Provides an invite link to add " + botName + " to your own server.");
 		this.botName = botName;
 		this.permsUsed = permsUsed;
+	}
+
+	@Override
+	public EnumSet<Permissions> getCommandPermissions() {
+		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
 	}
 
 	@Override

@@ -19,7 +19,7 @@ public class CommandChangelogChannel extends StarotaCommand {
 	}
 
 	@Override
-	public Permissions requiredPermission() {
+	public Permissions requiredUsePermission() {
 		return Permissions.ADMINISTRATOR;
 	}
 

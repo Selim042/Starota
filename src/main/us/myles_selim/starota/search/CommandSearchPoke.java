@@ -1,6 +1,7 @@
 package us.myles_selim.starota.search;
 
 import java.util.Collection;
+import java.util.EnumSet;
 
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.impl.obj.ReactionEmoji;
@@ -8,6 +9,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IReaction;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.Starota;
@@ -20,6 +22,12 @@ public class CommandSearchPoke extends StarotaCommand {
 
 	public CommandSearchPoke() {
 		super("searchPoke", "Searches Pokedex information.");
+	}
+
+	@Override
+	public EnumSet<Permissions> getCommandPermissions() {
+		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS,
+				Permissions.USE_EXTERNAL_EMOJIS, Permissions.ADD_REACTIONS, Permissions.MANAGE_MESSAGES);
 	}
 
 	@Override

@@ -10,8 +10,8 @@ import sx.blah.discord.handle.obj.IReaction;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
-import us.myles_selim.starota.Pair;
 import us.myles_selim.starota.enums.EnumDonorPerm;
+import us.myles_selim.starota.misc.data_types.Pair;
 import us.myles_selim.starota.reaction_messages.ReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;
 

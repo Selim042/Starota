@@ -1,10 +1,12 @@
 package us.myles_selim.starota.trading.commands;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.StarotaCommand;
@@ -16,6 +18,11 @@ public class CommandGetUserTrades extends StarotaCommand {
 
 	public CommandGetUserTrades() {
 		super("getUserTrades", "Get trades either you posted or a specific user.");
+	}
+
+	@Override
+	public EnumSet<Permissions> getCommandPermissions() {
+		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
 	}
 
 	@Override

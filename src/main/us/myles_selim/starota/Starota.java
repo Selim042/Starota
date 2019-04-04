@@ -56,6 +56,8 @@ import us.myles_selim.starota.lua.LuaEventHandler;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.commands.CommandUploadScript;
 import us.myles_selim.starota.lua.commands.LuaCommandHandler;
+import us.myles_selim.starota.misc.utils.TwitterHelper;
+import us.myles_selim.starota.misc.utils.WikiGenerator;
 import us.myles_selim.starota.modules.BaseModules;
 import us.myles_selim.starota.modules.CommandModules;
 import us.myles_selim.starota.pokedex.CommandPokedex;
@@ -119,7 +121,7 @@ public class Starota {
 			+ " * Hopefully fix another bug with updateProfile";
 	public final static File DATA_FOLDER = new File("starotaData");
 
-	public static final PrimaryCommandHandler COMMAND_HANDLER = new PrimaryCommandHandler();
+	public static PrimaryCommandHandler COMMAND_HANDLER;
 
 	public static void main(String[] args) {
 		// STATUS = EnumBotStatus.INITIALIZING;
@@ -181,6 +183,7 @@ public class Starota {
 			System.err.println("Failed to login, exiting");
 			return;
 		}
+		COMMAND_HANDLER = new PrimaryCommandHandler(CLIENT);
 		StarotaAssistants.init();
 		IS_DEV = Boolean.parseBoolean(PROPERTIES.getProperty("is_dev"));
 		EventDispatcher dispatcher = CLIENT.getDispatcher();
@@ -271,8 +274,8 @@ public class Starota {
 		jCmdHandler.registerCommand("Eggs", new CommandEggHatches());
 
 		jCmdHandler.registerCommand("Misc", new CommandDitto());
-		
-		SelimPMCommandHandler.INSTANCE.getClass();
+
+		SelimPMCommandHandler.init();
 
 		try {
 			Thread.sleep(2500);

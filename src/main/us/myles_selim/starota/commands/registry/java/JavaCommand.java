@@ -1,6 +1,7 @@
 package us.myles_selim.starota.commands.registry.java;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
@@ -32,8 +33,13 @@ public class JavaCommand implements ICommand {
 	}
 
 	@Override
-	public Permissions requiredPermission() {
+	public Permissions requiredUsePermission() {
 		return null;
+	}
+
+	@Override
+	public EnumSet<Permissions> getCommandPermissions() {
+		return EnumSet.of(Permissions.SEND_MESSAGES);
 	}
 
 	@Override

@@ -18,9 +18,9 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import sx.blah.discord.handle.obj.IGuild;
-import us.myles_selim.starota.RolePermHelper;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumDonorPerm;
+import us.myles_selim.starota.misc.utils.RolePermHelper;
 import us.myles_selim.starota.webserver.webhooks.EnumWebhookType;
 import us.myles_selim.starota.webserver.webhooks.WebhookClass;
 import us.myles_selim.starota.webserver.webhooks.WebhookData;

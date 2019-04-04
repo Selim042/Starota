@@ -1,4 +1,4 @@
-package us.myles_selim.starota;
+package us.myles_selim.starota.misc.data_types;
 
 public class Pair<L, R> {
 

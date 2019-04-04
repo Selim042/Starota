@@ -1,7 +1,10 @@
 package us.myles_selim.starota.trading.commands;
 
+import java.util.EnumSet;
+
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.trading.TradeboardPost;
 import us.myles_selim.starota.trading.TradeboardReactionMessage;
@@ -11,6 +14,12 @@ public class CommandGetTrade extends StarotaCommand {
 
 	public CommandGetTrade() {
 		super("getTrade", "Gets a specific trade by ID.");
+	}
+
+	@Override
+	public EnumSet<Permissions> getCommandPermissions() {
+		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS,
+				Permissions.USE_EXTERNAL_EMOJIS, Permissions.ADD_REACTIONS, Permissions.MANAGE_MESSAGES);
 	}
 
 	@Override

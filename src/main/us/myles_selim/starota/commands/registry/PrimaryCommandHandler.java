@@ -3,12 +3,15 @@ package us.myles_selim.starota.commands.registry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.squiddev.cobalt.LuaError;
 
+import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.events.EventSubscriber;
+import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.impl.obj.ReactionEmoji;
 import sx.blah.discord.handle.obj.IChannel;
@@ -19,9 +22,9 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
-import us.myles_selim.starota.MiscUtils;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.channel_management.ChannelCommandManager;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -35,13 +38,15 @@ public class PrimaryCommandHandler {
 
 	private final List<ICommandHandler> COMMAND_HANDLERS = new CopyOnWriteArrayList<>();
 	private final IShouldExecuteCallback shouldExecute;
+	private final IDiscordClient client;
 
-	public PrimaryCommandHandler() {
-		this((IChannel ch) -> !(ch instanceof IPrivateChannel));
+	public PrimaryCommandHandler(IDiscordClient client) {
+		this(client, (IChannel ch) -> !(ch instanceof IPrivateChannel));
 	}
 
-	public PrimaryCommandHandler(IShouldExecuteCallback callback) {
+	public PrimaryCommandHandler(IDiscordClient client, IShouldExecuteCallback callback) {
 		this.shouldExecute = callback;
+		this.client = client;
 	}
 
 	public static String getPrefix(IGuild guild) {
@@ -94,9 +99,17 @@ public class PrimaryCommandHandler {
 				if (cmd == null
 						|| !ChannelCommandManager.isAllowedHere(StarotaServer.getServer(guild),
 								cmd.getCategory(), channel)
-						|| (cmd.requiredPermission() != null && guild != null && !message.getAuthor()
-								.getPermissionsForGuild(guild).contains(cmd.requiredPermission())))
+						|| (cmd.requiredUsePermission() != null && guild != null && !message.getAuthor()
+								.getPermissionsForGuild(guild).contains(cmd.requiredUsePermission())))
 					continue;
+				EnumSet<Permissions> hasPerms = channel.getModifiedPermissions(client.getOurUser());
+				EnumSet<Permissions> reqPerms = cmd.getCommandPermissions();
+				if (!hasPerms.containsAll(reqPerms)) {
+					reqPerms.removeAll(hasPerms);
+					channel.sendMessage(getPermissionError(reqPerms));
+					cmdFound = true;
+					continue;
+				}
 				new Thread(cmd.getName() + "Thread-" + (guild == null ? "PM" : guild.getName())) {
 
 					@Override
@@ -126,8 +139,8 @@ public class PrimaryCommandHandler {
 				if (cmd == null
 						|| !ChannelCommandManager.isAllowedHere(StarotaServer.getServer(guild),
 								cmd.getCategory(), channel)
-						|| (cmd.requiredPermission() != null && guild != null && !message.getAuthor()
-								.getPermissionsForGuild(guild).contains(cmd.requiredPermission())))
+						|| (cmd.requiredUsePermission() != null && guild != null && !message.getAuthor()
+								.getPermissionsForGuild(guild).contains(cmd.requiredUsePermission())))
 					continue;
 				String desciption = cmd.getDescription();
 				builder.appendDesc("- " + prefix + cmd.getName()
@@ -138,6 +151,17 @@ public class PrimaryCommandHandler {
 		if (channel.getTypingStatus()
 				&& channel.getModifiedPermissions(ourUser).contains(Permissions.SEND_MESSAGES))
 			RequestBuffer.request(() -> channel.setTypingStatus(false));
+	}
+
+	private EmbedObject getPermissionError(EnumSet<Permissions> reqPerms) {
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.withTitle("This command cannot be used here");
+		builder.withDesc(
+				"This command requires the following missing permissions in the channel:\n```\n");
+		for (Permissions p : reqPerms)
+			builder.appendDesc(" - " + p + "\n");
+		builder.appendDesc("\n```\nPlease contact a server moderator to fix this.");
+		return builder.build();
 	}
 
 	private void handleException(Throwable th, IGuild guild, IChannel channel, IMessage message) {

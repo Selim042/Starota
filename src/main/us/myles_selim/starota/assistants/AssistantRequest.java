@@ -4,7 +4,7 @@ import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.util.RateLimitException;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.TwitterHelper;
+import us.myles_selim.starota.misc.utils.TwitterHelper;
 
 public class AssistantRequest {
 

@@ -1,4 +1,4 @@
-package us.myles_selim.starota;
+package us.myles_selim.starota.misc.utils;
 
 import java.io.IOException;
 import java.net.URL;
@@ -9,6 +9,7 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.Image;
+import us.myles_selim.starota.Starota;
 
 public class EmojiServerHelper {
 

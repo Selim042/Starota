@@ -1,6 +1,7 @@
 package us.myles_selim.starota.commands.registry;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,6 +19,11 @@ public class CommandHelp extends JavaCommand {
 
 	public CommandHelp() {
 		super("help", "Displays the help menu.");
+	}
+
+	@Override
+	public EnumSet<Permissions> getCommandPermissions() {
+		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
 	}
 
 	@Override
@@ -104,8 +110,8 @@ public class CommandHelp extends JavaCommand {
 				disp.add(cmd);
 			if (guild != null
 					&& (author.getPermissionsForGuild(guild).contains(Permissions.ADMINISTRATOR)
-							|| ((author.getPermissionsForGuild(guild).contains(cmd.requiredPermission())
-									|| cmd.requiredPermission() == null)
+							|| ((author.getPermissionsForGuild(guild).contains(cmd.requiredUsePermission())
+									|| cmd.requiredUsePermission() == null)
 									&& (author.getRolesForGuild(guild).contains(cmd.requiredRole(guild))
 											|| cmd.requiredRole(guild) == null))))
 				disp.add(cmd);

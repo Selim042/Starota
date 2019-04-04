@@ -1,17 +1,19 @@
 package us.myles_selim.starota.silph_road;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.EmojiServerHelper;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumTeam;
+import us.myles_selim.starota.misc.utils.EmojiServerHelper;
 import us.myles_selim.starota.modules.BaseModules;
 import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.silph_road.SilphCard.SilphBadgeData;
@@ -22,6 +24,11 @@ public class CommandSilphCard extends StarotaCommand {
 
 	public CommandSilphCard() {
 		super("silphCard", "Displays a given users Silph Road card.");
+	}
+
+	@Override
+	public EnumSet<Permissions> getCommandPermissions() {
+		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS, Permissions.USE_EXTERNAL_EMOJIS);
 	}
 
 	@Override

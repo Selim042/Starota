@@ -1,5 +1,6 @@
 package us.myles_selim.starota.leaderboards.commands;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
@@ -15,6 +16,11 @@ public class CommandListLeaderboards extends StarotaCommand {
 
 	public CommandListLeaderboards() {
 		super("listLeaderboards", "Displays all leaderboards.");
+	}
+
+	@Override
+	public EnumSet<Permissions> getCommandPermissions() {
+		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
 	}
 
 	@Override

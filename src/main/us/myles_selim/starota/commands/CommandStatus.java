@@ -1,13 +1,15 @@
 package us.myles_selim.starota.commands;
 
+import java.util.EnumSet;
+
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.RolePermHelper;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.lua.LuaUtils;
+import us.myles_selim.starota.misc.utils.RolePermHelper;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandStatus extends StarotaCommand {
@@ -17,8 +19,13 @@ public class CommandStatus extends StarotaCommand {
 	}
 
 	@Override
-	public Permissions requiredPermission() {
+	public Permissions requiredUsePermission() {
 		return Permissions.ADMINISTRATOR;
+	}
+
+	@Override
+	public EnumSet<Permissions> getCommandPermissions() {
+		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
 	}
 
 	@Override

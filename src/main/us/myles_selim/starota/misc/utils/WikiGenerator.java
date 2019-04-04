@@ -1,10 +1,12 @@
-package us.myles_selim.starota;
+package us.myles_selim.starota.misc.utils;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 
+import sx.blah.discord.handle.obj.Permissions;
+import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.ICommand;
 import us.myles_selim.starota.debug_server.DebugServer;
 import us.myles_selim.starota.modules.StarotaModule;
@@ -62,9 +64,14 @@ public class WikiGenerator {
 					out += "**Category**: " + cmd.getCategory() + "\n\n";
 					if (module != null)
 						out += "**Module**: " + module.getName() + "\n\n";
-					if (cmd.requiredPermission() != null)
-						out += "**Required Permission to Use**: " + cmd.requiredPermission().name()
+					if (cmd.requiredUsePermission() != null)
+						out += "**Required Permission to Use**: " + cmd.requiredUsePermission().name()
 								+ "\n\n";
+
+					out += "**Requried Channel Permissions to Use**:\n";
+					for (Permissions p : cmd.getCommandPermissions())
+						out += " - " + p + "\n";
+
 					out += "---\n";
 					hasCmds = true;
 				}

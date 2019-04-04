@@ -32,22 +32,13 @@ import us.myles_selim.starota.reaction_messages.ReactionMessageRegistry;
 
 public class PokedexBot {
 
-	public static final PrimaryCommandHandler COMMAND_HANDLER = new PrimaryCommandHandler(
-			(IChannel ch) -> {
-				IUser starota = Starota.getUser(Starota.STAROTA_ID);
-				IUser starotaDev = Starota.getUser(Starota.STAROTA_DEV_ID);
-				List<IUser> users = ch.getUsersHere();
-				if (ch instanceof IPrivateChannel || users.contains(starota)
-						|| users.contains(starotaDev))
-					return false;
-				return true;
-			});
+	public static IDiscordClient POKEDEX_CLIENT;
+	public static PrimaryCommandHandler COMMAND_HANDLER;
+
 	public static final String BOT_NAME = "Pokedex";
 	public static final EnumSet<Permissions> USED_PERMISSIONS = EnumSet.of(Permissions.SEND_MESSAGES,
 			Permissions.READ_MESSAGES, Permissions.MANAGE_MESSAGES, Permissions.USE_EXTERNAL_EMOJIS,
 			Permissions.ADD_REACTIONS);
-
-	public static IDiscordClient POKEDEX_CLIENT;
 
 	private static Properties PROPERTIES = new Properties();
 	private static DiscordBotListAPI BOT_LIST;
@@ -73,6 +64,14 @@ public class PokedexBot {
 			System.err.println("failed to start Pokedex bot");
 			return;
 		}
+		COMMAND_HANDLER = new PrimaryCommandHandler(POKEDEX_CLIENT, (IChannel ch) -> {
+			IUser starota = Starota.getUser(Starota.STAROTA_ID);
+			IUser starotaDev = Starota.getUser(Starota.STAROTA_DEV_ID);
+			List<IUser> users = ch.getUsersHere();
+			if (ch instanceof IPrivateChannel || users.contains(starota) || users.contains(starotaDev))
+				return false;
+			return true;
+		});
 		try {
 			while (!POKEDEX_CLIENT.isReady())
 				Thread.sleep(10);

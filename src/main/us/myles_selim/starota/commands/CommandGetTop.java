@@ -1,5 +1,6 @@
 package us.myles_selim.starota.commands;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
@@ -18,8 +19,13 @@ public class CommandGetTop extends JavaCommand {
 	}
 
 	@Override
-	public Permissions requiredPermission() {
+	public Permissions requiredUsePermission() {
 		return Permissions.ADMINISTRATOR;
+	}
+
+	@Override
+	public EnumSet<Permissions> getCommandPermissions() {
+		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
 	}
 
 	@Override

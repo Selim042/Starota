@@ -1,6 +1,7 @@
 package us.myles_selim.starota.profiles.commands;
 
 import java.awt.Color;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,8 +21,13 @@ public class CommandGetProfilelessPlayers extends StarotaCommand {
 	}
 
 	@Override
-	public Permissions requiredPermission() {
+	public Permissions requiredUsePermission() {
 		return Permissions.ADMINISTRATOR;
+	}
+
+	@Override
+	public EnumSet<Permissions> getCommandPermissions() {
+		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
 	}
 
 	@Override

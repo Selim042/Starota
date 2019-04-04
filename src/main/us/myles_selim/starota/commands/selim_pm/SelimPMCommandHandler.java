@@ -19,20 +19,27 @@ import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 
 public class SelimPMCommandHandler {
 
-	public static final PrimaryCommandHandler INSTANCE = new PrimaryCommandHandler(
-			(IChannel c) -> isSelimPM(c));
+	private static PrimaryCommandHandler INSTANCE;
+	private static JavaCommandHandler JAVA_HANDLER;
 
-	private static final JavaCommandHandler JAVA_HANDLER = new JavaCommandHandler();
+	private static boolean inited = false;
+
+	public static void init() {
+		if (inited && Starota.FULLY_STARTED)
+			return;
+		inited = true;
+
+		INSTANCE = new PrimaryCommandHandler(Starota.getClient(), (IChannel c) -> isSelimPM(c));
+		Starota.getClient().getDispatcher().registerListener(INSTANCE);
+		INSTANCE.registerCommandHandler(JAVA_HANDLER);
+		JAVA_HANDLER = new JavaCommandHandler();
+
+		registerCommand("Help", new CommandHelp());
+	}
 
 	// private final List<JavaCommand> COMMANDS = new CopyOnWriteArrayList<>();
 	// private final List<String> CATEGORIES = new CopyOnWriteArrayList<>();
 	//
-	static {
-		Starota.getClient().getDispatcher().registerListener(INSTANCE);
-		INSTANCE.registerCommandHandler(JAVA_HANDLER);
-
-		registerCommand("Help", new CommandHelp());
-	}
 
 	private SelimPMCommandHandler() {}
 
@@ -84,7 +91,7 @@ public class SelimPMCommandHandler {
 		}
 
 		@Override
-		public final Permissions requiredPermission() {
+		public final Permissions requiredUsePermission() {
 			return null;
 		}
 

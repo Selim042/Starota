@@ -14,7 +14,7 @@ public class CommandSetResearchChannel extends StarotaCommand {
 	}
 
 	@Override
-	public Permissions requiredPermission() {
+	public Permissions requiredUsePermission() {
 		return Permissions.ADMINISTRATOR;
 	}
 

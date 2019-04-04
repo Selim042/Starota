@@ -1,16 +1,18 @@
 package us.myles_selim.starota.raids;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
-import us.myles_selim.starota.EmojiServerHelper;
-import us.myles_selim.starota.ImageHelper;
-import us.myles_selim.starota.RaidBoss;
 import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.misc.data_types.RaidBoss;
+import us.myles_selim.starota.misc.utils.EmojiServerHelper;
+import us.myles_selim.starota.misc.utils.ImageHelper;
 import us.myles_selim.starota.silph_road.SilphRoadData;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -18,6 +20,12 @@ public class CommandRaidBosses extends StarotaCommand {
 
 	public CommandRaidBosses() {
 		super("raidBosses", "Gets information on raid bosses for a specific tier.");
+	}
+
+	@Override
+	public EnumSet<Permissions> getCommandPermissions() {
+		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS,
+				Permissions.USE_EXTERNAL_EMOJIS);
 	}
 
 	@Override

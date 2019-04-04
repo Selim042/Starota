@@ -1,10 +1,12 @@
 package us.myles_selim.starota.commands;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
@@ -18,6 +20,11 @@ public class CommandSupportBot extends JavaCommand {
 		super("support" + botName, "Information on how to help support " + botName + ".");
 		this.botName = botName;
 		this.botId = botId;
+	}
+
+	@Override
+	public EnumSet<Permissions> getCommandPermissions() {
+		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
 	}
 
 	@Override

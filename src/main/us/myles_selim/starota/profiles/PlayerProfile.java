@@ -12,12 +12,12 @@ import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.EventFactory;
-import us.myles_selim.starota.MiscUtils;
-import us.myles_selim.starota.RolePermHelper;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.embed_converter.ExtraField;
 import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.lua.events.GetProfileEvent;
+import us.myles_selim.starota.misc.utils.MiscUtils;
+import us.myles_selim.starota.misc.utils.RolePermHelper;
 import us.myles_selim.starota.silph_road.SilphRoadCardUtils;
 import us.myles_selim.starota.wrappers.StarotaServer;
 

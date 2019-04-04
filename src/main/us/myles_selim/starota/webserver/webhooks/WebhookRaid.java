@@ -7,9 +7,9 @@ import java.util.TimeZone;
 
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.ImageHelper;
-import us.myles_selim.starota.RaidBoss;
 import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.misc.data_types.RaidBoss;
+import us.myles_selim.starota.misc.utils.ImageHelper;
 import us.myles_selim.starota.pokedex.GoHubDatabase;
 import us.myles_selim.starota.pokedex.PokedexEntry.DexMove;
 import us.myles_selim.starota.silph_road.SilphRoadData;

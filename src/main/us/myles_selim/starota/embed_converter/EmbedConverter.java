@@ -6,7 +6,6 @@ import java.lang.reflect.Method;
 
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.Pair;
 import us.myles_selim.starota.embed_converter.annotations.EmbedAuthorIcon;
 import us.myles_selim.starota.embed_converter.annotations.EmbedAuthorName;
 import us.myles_selim.starota.embed_converter.annotations.EmbedAuthorURL;
@@ -19,6 +18,7 @@ import us.myles_selim.starota.embed_converter.annotations.EmbedThumbnail;
 import us.myles_selim.starota.embed_converter.annotations.EmbedTimestamp;
 import us.myles_selim.starota.embed_converter.annotations.EmbedTitle;
 import us.myles_selim.starota.embed_converter.annotations.EmbedURL;
+import us.myles_selim.starota.misc.data_types.Pair;
 
 public class EmbedConverter {
 

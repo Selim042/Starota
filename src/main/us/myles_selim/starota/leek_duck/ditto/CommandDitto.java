@@ -1,7 +1,10 @@
 package us.myles_selim.starota.leek_duck.ditto;
 
+import java.util.EnumSet;
+
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.enums.EnumPokemon;
@@ -12,6 +15,11 @@ public class CommandDitto extends StarotaCommand {
 
 	public CommandDitto() {
 		super("ditto", "Lists all Pokemon Ditto can take the form of.");
+	}
+
+	@Override
+	public EnumSet<Permissions> getCommandPermissions() {
+		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
 	}
 
 	@Override

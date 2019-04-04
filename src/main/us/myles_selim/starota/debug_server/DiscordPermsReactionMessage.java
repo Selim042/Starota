@@ -14,8 +14,8 @@ import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.ebs.Storage;
-import us.myles_selim.starota.EmojiServerHelper;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.misc.utils.EmojiServerHelper;
 import us.myles_selim.starota.reaction_messages.PersistReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;
 

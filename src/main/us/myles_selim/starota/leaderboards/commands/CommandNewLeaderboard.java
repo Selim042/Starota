@@ -5,9 +5,9 @@ import java.util.List;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
-import us.myles_selim.starota.RolePermHelper;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.leaderboards.Leaderboard;
+import us.myles_selim.starota.misc.utils.RolePermHelper;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandNewLeaderboard extends StarotaCommand {
@@ -24,7 +24,7 @@ public class CommandNewLeaderboard extends StarotaCommand {
 	}
 
 	@Override
-	public Permissions requiredPermission() {
+	public Permissions requiredUsePermission() {
 		return Permissions.ADMINISTRATOR;
 	}
 

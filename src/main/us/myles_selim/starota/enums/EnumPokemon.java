@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import us.myles_selim.starota.ImageHelper;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.cache.CachedData;
 import us.myles_selim.starota.cache.ClearCache;
+import us.myles_selim.starota.misc.utils.ImageHelper;
 import us.myles_selim.starota.trading.forms.FormSet;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 import us.myles_selim.starota.trading.forms.FormSetAlolan;

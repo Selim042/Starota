@@ -1,4 +1,4 @@
-package us.myles_selim.starota;
+package us.myles_selim.starota.misc.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,6 +8,7 @@ import java.util.List;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
+import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumDonorPerm;
 
 public class RolePermHelper {

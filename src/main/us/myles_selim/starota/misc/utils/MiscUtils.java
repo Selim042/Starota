@@ -1,4 +1,4 @@
-package us.myles_selim.starota;
+package us.myles_selim.starota.misc.utils;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;

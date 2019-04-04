@@ -1,8 +1,11 @@
 package us.myles_selim.starota.profiles.commands;
 
+import java.util.EnumSet;
+
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.profiles.PlayerProfile;
@@ -12,6 +15,11 @@ public class CommandProfile extends StarotaCommand {
 
 	public CommandProfile() {
 		super("profile", "Views a user's profile.");
+	}
+
+	@Override
+	public EnumSet<Permissions> getCommandPermissions() {
+		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
 	}
 
 	@Override

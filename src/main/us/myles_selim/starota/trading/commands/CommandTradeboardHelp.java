@@ -1,9 +1,11 @@
 package us.myles_selim.starota.trading.commands;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -12,6 +14,11 @@ public class CommandTradeboardHelp extends StarotaCommand {
 
 	public CommandTradeboardHelp() {
 		super("tradeboardHelp", "Displays tradeboard help information.");
+	}
+
+	@Override
+	public EnumSet<Permissions> getCommandPermissions() {
+		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
 	}
 
 	@Override

@@ -1,9 +1,11 @@
 package us.myles_selim.starota.trading.commands;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.enums.EnumGender;
@@ -17,6 +19,11 @@ public class CommandFindTrade extends StarotaCommand {
 
 	public CommandFindTrade() {
 		super("findTrade", "Searches for a specific trade.");
+	}
+
+	@Override
+	public EnumSet<Permissions> getCommandPermissions() {
+		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
 	}
 
 	@Override

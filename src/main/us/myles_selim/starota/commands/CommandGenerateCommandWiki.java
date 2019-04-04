@@ -42,8 +42,8 @@ public class CommandGenerateCommandWiki extends JavaCommand {
 			out += "**Category**: " + cmd.getCategory() + "\n\n";
 			if (module != null)
 				out += "**Module**: " + module.getName() + "\n\n";
-			if (cmd.requiredPermission() != null)
-				out += "**Required Permission to Use**: " + cmd.requiredPermission().name() + "\n\n";
+			if (cmd.requiredUsePermission() != null)
+				out += "**Required Permission to Use**: " + cmd.requiredUsePermission().name() + "\n\n";
 			out += "---\n";
 		}
 		channel.sendMessage("```" + out + "```");

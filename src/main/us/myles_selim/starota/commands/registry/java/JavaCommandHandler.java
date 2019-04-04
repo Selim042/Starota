@@ -56,8 +56,8 @@ public class JavaCommandHandler implements ICommandHandler {
 			return false;
 		if (!ChannelCommandManager.isAllowedHere(StarotaServer.getServer(guild), cmd.getCategory(),
 				channel)
-				|| (cmd.requiredPermission() != null && guild != null && !message.getAuthor()
-						.getPermissionsForGuild(guild).contains(cmd.requiredPermission())))
+				|| (cmd.requiredUsePermission() != null && guild != null && !message.getAuthor()
+						.getPermissionsForGuild(guild).contains(cmd.requiredUsePermission())))
 			return false;
 		cmd.execute(args, message, guild, channel);
 		return true;
