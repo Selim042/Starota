@@ -1,4 +1,4 @@
-package us.myles_selim.starota.silph_road;
+package us.myles_selim.starota.silph_road.eggs;
 
 import java.util.List;
 
@@ -7,11 +7,12 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
-import us.myles_selim.starota.EggEntry;
 import us.myles_selim.starota.EmojiServerHelper;
 import us.myles_selim.starota.ImageHelper;
 import us.myles_selim.starota.RaidBoss;
 import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.misc.EggEntry;
+import us.myles_selim.starota.silph_road.SilphRoadData;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandEggHatches extends StarotaCommand {

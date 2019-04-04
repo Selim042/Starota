@@ -1,4 +1,4 @@
-package us.myles_selim.starota;
+package us.myles_selim.starota.misc;
 
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
