@@ -116,9 +116,14 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	// public static EnumBotStatus STATUS = EnumBotStatus.UNKNOWN;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "2.7.14";
+	public final static String VERSION = "2.8.0";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n" + "Public changes:\n"
-			+ " * Hopefully fix another bug with updateProfile";
+			+ " + Now sends PM to users that just created a profile"
+			+ " + New egg hatch and Ditto disguise commands" + " * Actually fixed updateProfile issue"
+			+ " * Pokedex and raid counters now only displays counters that are currently available\n\n"
+			+ "Administrative changes:\n"
+			+ " + The wiki now displays what permissions a specific command requires and "
+			+ "Starota checks which permissions it is missing before execution";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static PrimaryCommandHandler COMMAND_HANDLER;
