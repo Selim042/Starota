@@ -207,7 +207,7 @@ public class Starota {
 		jCmdHandler.registerCommand(new CommandCredits());
 		jCmdHandler.registerCommand(new CommandSupportBot(Starota.BOT_NAME, Starota.STAROTA_ID));
 		jCmdHandler.registerCommand(new CommandInvite(Starota.BOT_NAME,
-				Permissions.generatePermissionsNumber(DebugServer.USED_PERMISSIONS)));
+				Permissions.generatePermissionsNumber(DebugServer.getUsedPermissions())));
 
 		jCmdHandler.registerCommand("Administrative", new CommandStatus());
 		// jCmdHandler.registerCommand("Administrative", new

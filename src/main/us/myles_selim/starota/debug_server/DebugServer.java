@@ -13,12 +13,10 @@ import us.myles_selim.starota.Starota;
 public class DebugServer extends Thread {
 
 	public static final long DEBUG_SERVER_ID = 517546213520965662L;
-	public static final EnumSet<Permissions> USED_PERMISSIONS = EnumSet.of(Permissions.SEND_MESSAGES,
-			Permissions.READ_MESSAGES, Permissions.MANAGE_ROLES, Permissions.MANAGE_MESSAGES,
-			Permissions.USE_EXTERNAL_EMOJIS, Permissions.ADD_REACTIONS, Permissions.MANAGE_CHANNELS);
 	public static final IGuild DEBUG_SERVER;
 
 	private static EmbedObject NOT_READY_EMBED;
+	private static final EnumSet<Permissions> USED_PERMISSIONS = EnumSet.noneOf(Permissions.class);
 
 	// private static final IMessage STATUS;
 	// private static final IMessage DISCORD_PERMS;
@@ -56,6 +54,14 @@ public class DebugServer extends Thread {
 			ch = DEBUG_SERVER.getChannelByID(518285130108764181L);
 		if (ch.getFullMessageHistory().isEmpty())
 			new ModulesReactionMessage().sendMessage(ch);
+	}
+
+	public static void addPermission(Permissions perm) {
+		USED_PERMISSIONS.add(perm);
+	}
+
+	public static EnumSet<Permissions> getUsedPermissions() {
+		return USED_PERMISSIONS.clone();
 	}
 
 	public static EmbedObject getNotReadyEmbed() {

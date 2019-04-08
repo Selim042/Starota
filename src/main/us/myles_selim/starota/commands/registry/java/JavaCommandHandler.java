@@ -8,6 +8,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.starota.commands.registry.CommandHelp;
 import us.myles_selim.starota.commands.registry.CommandSetPrefix;
 import us.myles_selim.starota.commands.registry.ICommand;
@@ -17,6 +18,7 @@ import us.myles_selim.starota.commands.registry.channel_management.ChannelComman
 import us.myles_selim.starota.commands.registry.channel_management.CommandAddChannelWhitelist;
 import us.myles_selim.starota.commands.registry.channel_management.CommandGetWhitelist;
 import us.myles_selim.starota.commands.registry.channel_management.CommandRemoveChannelWhitelist;
+import us.myles_selim.starota.debug_server.DebugServer;
 import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -45,6 +47,8 @@ public class JavaCommandHandler implements ICommandHandler {
 			cmd.setCommandHandler(this);
 			if (!CATEGORIES.contains(category))
 				CATEGORIES.add(category);
+			for (Permissions p : cmd.getCommandPermissions())
+				DebugServer.addPermission(p);
 		}
 	}
 

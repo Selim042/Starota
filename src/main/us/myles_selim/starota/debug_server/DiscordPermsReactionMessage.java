@@ -75,7 +75,7 @@ public class DiscordPermsReactionMessage extends PersistReactionMessage {
 			if (g.equals(DebugServer.DEBUG_SERVER))
 				continue;
 			String text = "";
-			EnumSet<Permissions> invertPerms = DebugServer.USED_PERMISSIONS.clone();
+			EnumSet<Permissions> invertPerms = DebugServer.getUsedPermissions();
 			invertPerms.removeAll(ourUser.getPermissionsForGuild(g));
 			for (Permissions p : invertPerms)
 				text += " - " + p + "\n";
