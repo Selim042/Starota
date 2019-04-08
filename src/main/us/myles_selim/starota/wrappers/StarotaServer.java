@@ -60,6 +60,11 @@ public class StarotaServer {
 	private Map<String, Long> battleTimers = new ConcurrentHashMap<>();
 	private EBStorage regions;
 
+//	private int numDays;
+//	private int day;
+//	private Map<EnumUsageType, int[]> avgUsage;
+//	private Map<EnumUsageType, int[]> todayUsage;
+
 	private StarotaServer(IGuild server) {
 		this.guild = server;
 	}
@@ -519,6 +524,56 @@ public class StarotaServer {
 		return getVoteRewards().containsAll(Arrays.asList(perm.getPreReqs()));
 	}
 	// end vote stuff
+
+	// start usage stuff
+//	public void used(EnumUsageType type) {
+//		OffsetDateTime instant = Instant.now().atOffset(ZoneOffset.UTC);
+//		updateUsage();
+//		int[] used = todayUsage.get(type);
+//		if (used == null) {
+//			used = new int[24];
+//			todayUsage.put(type, used);
+//		}
+//		LocalTime timeOfDay = instant.toLocalTime();
+//		used[timeOfDay.getHour()]++;
+//	}
+//
+//	private void updateUsage() {
+//		OffsetDateTime instant = Instant.now().atOffset(ZoneOffset.UTC);
+//		if (day == instant.getDayOfYear())
+//			return;
+//		numDays++;
+//		day = instant.getDayOfYear();
+//
+//		for (EnumUsageType type : EnumUsageType.values()) {
+//			if (!avgUsage.containsKey(type) && !todayUsage.containsKey(type))
+//				continue;
+//			int[] avgUsed = avgUsage.get(type);
+//			if (avgUsed == null) {
+//				avgUsed = new int[24];
+//				avgUsage.put(type, avgUsed);
+//			}
+//			int[] todayUsed = todayUsage.get(type);
+//			if (todayUsed == null)
+//				todayUsed = new int[24];
+//			for (int i = 0; i < 24; i++)
+//				avgUsed[i] += todayUsed[i] / 2;
+//		}
+//		todayUsage.clear();
+//	}
+//
+//	public int getAvgUsage(EnumUsageType type, int hour) {
+//		updateUsage();
+//		int[] used = avgUsage.get(type);
+//		if (used != null)
+//			return used[hour];
+//		return 0;
+//	}
+//
+//	public int getDays() {
+//		return this.numDays;
+//	}
+	// end usage stuff
 
 	// start other stuff
 	public static final String WEBHOOK_SECRET_KEY = "webhook_secret";
