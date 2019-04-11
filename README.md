@@ -19,6 +19,10 @@ Features:
 - PvP coordination commands (mark yourself as "battle-ready")
 - Command to help coordinate and plan raids
 - Show ongoing and upcoming events
+- Raid coordination commands
+- Pokemon search functionality
+- Command to display current Ditto disguises
+- Command to show all current egg hatches
 - Custom Lua scripting for unique features (Patrons only)
 - WIP web-sided interface (Patrons only)
 - WIP incoming webhooks for 3rd party scanners, currently optimized for [RealDeviceMap/RealDeviceMap](https://github.com/RealDeviceMap/RealDeviceMap)
