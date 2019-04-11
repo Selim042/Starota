@@ -116,9 +116,9 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	// public static EnumBotStatus STATUS = EnumBotStatus.UNKNOWN;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "2.8.1";
+	public final static String VERSION = "2.8.2";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n" + "Public changes:\n"
-			+ " * Fix a bug with the egg and raid commands";
+			+ " + Registering a profile now auto assigns a team role if found";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static PrimaryCommandHandler COMMAND_HANDLER;
