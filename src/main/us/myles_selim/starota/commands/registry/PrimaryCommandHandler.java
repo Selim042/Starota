@@ -98,6 +98,8 @@ public class PrimaryCommandHandler {
 			if (!hasPerms.contains(Permissions.SEND_MESSAGES))
 				return;
 			for (ICommandHandler h : COMMAND_HANDLERS) {
+				if (h == null)
+					continue;
 				ICommand cmd = h.findCommand(guild, args[0]);
 				if (cmd == null
 						|| !ChannelCommandManager.isAllowedHere(StarotaServer.getServer(guild),

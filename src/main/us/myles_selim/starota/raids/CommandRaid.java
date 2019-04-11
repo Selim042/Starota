@@ -46,7 +46,7 @@ public class CommandRaid extends StarotaCommand {
 		if (args[0].equalsIgnoreCase("raid")) {
 			boolean needsTier = true;
 			String topic = channel.getTopic();
-			if (topic.contains("Key: ")) {
+			if (topic != null && topic.contains("Key: ")) {
 				long key = -1;
 				int index = topic.indexOf("(Key: 0x");
 				try {

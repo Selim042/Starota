@@ -70,7 +70,7 @@ public class CommandEggHatches extends StarotaCommand {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withTitle(
 				String.format("%dk Eggs: %s", dist, EmojiServerHelper.getEmoji(dist + "kEgg")));
-		for (RaidBoss b : SilphRoadData.getBosses(dist)) {
+		for (EggEntry b : SilphRoadData.getEggs(dist)) {
 			String postfix = b.getForm() == null ? "" : "_" + b.getForm();
 			builder.appendDescription(
 					b.getPokemon() + (b.getForm() == null ? "" : " (" + b.getForm() + ") ")
