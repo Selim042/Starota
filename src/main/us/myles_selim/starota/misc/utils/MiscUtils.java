@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IRole;
 import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.enums.EnumTeam;
 
 public class MiscUtils {
 
@@ -25,6 +28,14 @@ public class MiscUtils {
 			if (t != null && t.equals(tv))
 				return true;
 		return false;
+	}
+
+	public static IRole getTeamRole(IGuild guild, EnumTeam team) {
+		for (IRole r : guild.getRoles()) {
+			if (team.name().equalsIgnoreCase(r.getName().replaceAll(" ", "_")))
+				return r;
+		}
+		return null;
 	}
 
 	public static EnumPokemon[] getSuggestedPokemon(String input, int count) {

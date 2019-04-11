@@ -1,12 +1,16 @@
 package us.myles_selim.starota.profiles.commands;
 
+import java.util.EnumSet;
+
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.enums.EnumTeam;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -14,6 +18,12 @@ public class CommandSelfRegister extends StarotaCommand {
 
 	public CommandSelfRegister() {
 		super("sregister", "Registers your own profile and assigns you a profile.");
+	}
+
+	@Override
+	public EnumSet<Permissions> getCommandPermissions() {
+		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS, Permissions.MANAGE_ROLES,
+				Permissions.MANAGE_MESSAGES);
 	}
 
 	@Override
@@ -82,6 +92,11 @@ public class CommandSelfRegister extends StarotaCommand {
 		PlayerProfile profile = new PlayerProfile().setPoGoName(args[1]).setDiscordId(target.getLongID())
 				.setLevel(level).setTeam(team);
 		server.setProfile(target, profile);
+
+		IRole teamRole = MiscUtils.getTeamRole(server.getDiscordGuild(), team);
+		if (teamRole != null)
+			target.addRole(teamRole);
+
 		channel.sendMessage("Sucessfully registered " + target.getName(), profile.toEmbed(server));
 	}
 
