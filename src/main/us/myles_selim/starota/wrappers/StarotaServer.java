@@ -37,6 +37,8 @@ import us.myles_selim.starota.misc.utils.ServerDataHelper;
 import us.myles_selim.starota.modules.BaseModules;
 import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.profiles.PlayerProfile;
+import us.myles_selim.starota.silph_road.SilphCard;
+import us.myles_selim.starota.silph_road.SilphRoadCardUtils;
 import us.myles_selim.starota.trading.TradeboardPost;
 import us.myles_selim.starota.trading.forms.FormSet;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
@@ -88,7 +90,12 @@ public class StarotaServer {
 	public PlayerProfile getProfile(IUser user) {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.PROFILES))
 			return null;
-		return hasProfile(user) ? profiles.get(user.getStringID(), PlayerProfile.class) : null;
+		if (hasProfile(user)) {
+			PlayerProfile profile = profiles.get(user.getStringID(), PlayerProfile.class);
+			updateLevel(profile);
+			return profile;
+		}
+		return null;
 	}
 
 	public PlayerProfile setProfile(IUser user, PlayerProfile profile) {
@@ -102,8 +109,11 @@ public class StarotaServer {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.PROFILES))
 			return null;
 		List<PlayerProfile> profilesL = new LinkedList<>();
-		for (String k : profiles.getKeys())
-			profilesL.add(profiles.get(k, PlayerProfile.class));
+		for (String k : profiles.getKeys()) {
+			PlayerProfile profile = profiles.get(k, PlayerProfile.class);
+			updateLevel(profile);
+			profilesL.add(profile);
+		}
 		return Collections.unmodifiableList(profilesL);
 	}
 
@@ -112,10 +122,22 @@ public class StarotaServer {
 			return null;
 		for (String k : profiles.getKeys()) {
 			PlayerProfile profile = profiles.get(k, PlayerProfile.class);
-			if (profile.getPoGoName().equalsIgnoreCase(pogoName))
+			if (profile.getPoGoName().equalsIgnoreCase(pogoName)) {
+				updateLevel(profile);
 				return profile;
+			}
 		}
 		return null;
+	}
+
+	private void updateLevel(PlayerProfile profile) {
+		if (SilphRoadCardUtils.hasCard(profile.getPoGoName())) {
+			SilphCard card = SilphRoadCardUtils.getCard(profile.getPoGoName());
+			if (card.data.trainer_level > profile.getLevel()) {
+				profile.setLevel(SilphRoadCardUtils.getCard(profile.getPoGoName()).data.trainer_level);
+				setProfile(profile.getDiscordUser(), profile);
+			}
+		}
 	}
 	// end profile stuffs
 
