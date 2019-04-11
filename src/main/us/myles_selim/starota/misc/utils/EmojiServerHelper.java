@@ -9,6 +9,7 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.Image;
+import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.Starota;
 
 public class EmojiServerHelper {
@@ -34,10 +35,10 @@ public class EmojiServerHelper {
 	}
 
 	public static IEmoji getEmoji(String name) {
-		name = name.replaceAll("-", "_");
+		final String name2 = name.replaceAll("-", "_");
 		for (long id : EMOJI_SERVERS) {
 			IGuild guild = Starota.getGuild(id);
-			IEmoji emoji = guild.getEmojiByName(name);
+			IEmoji emoji = RequestBuffer.request(() -> guild.getEmojiByName(name2)).get();
 			if (emoji != null)
 				return emoji;
 		}

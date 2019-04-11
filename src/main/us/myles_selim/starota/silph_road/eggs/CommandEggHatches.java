@@ -11,9 +11,7 @@ import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.misc.data_types.EggEntry;
-import us.myles_selim.starota.misc.data_types.RaidBoss;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
-import us.myles_selim.starota.misc.utils.ImageHelper;
 import us.myles_selim.starota.silph_road.SilphRoadData;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -25,7 +23,8 @@ public class CommandEggHatches extends StarotaCommand {
 
 	@Override
 	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS, Permissions.USE_EXTERNAL_EMOJIS);
+		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS,
+				Permissions.USE_EXTERNAL_EMOJIS);
 	}
 
 	@Override
@@ -74,8 +73,6 @@ public class CommandEggHatches extends StarotaCommand {
 			String postfix = b.getForm() == null ? "" : "_" + b.getForm();
 			builder.appendDescription(
 					b.getPokemon() + (b.getForm() == null ? "" : " (" + b.getForm() + ") ")
-							+ EmojiServerHelper.getEmoji(b.getPokemon() + postfix,
-									ImageHelper.getOfficalArtwork(b.getPokemon(), b.getForm()))
 							+ (b.isShinyable() ? EmojiServerHelper.getEmoji("shiny") + "\n" : "\n"));
 		}
 
@@ -84,7 +81,7 @@ public class CommandEggHatches extends StarotaCommand {
 		builder.withAuthorIcon("https://thesilphroad.com/favicon.ico?1476895361");
 		builder.withAuthorUrl("https://thesilphroad.com/");
 		builder.withFooterText("Last updated");
-		builder.withTimestamp(SilphRoadData.getBossCacheTime());
+		builder.withTimestamp(SilphRoadData.getEggCacheTime());
 		IMessage msgF = msg;
 		if (msgF != null)
 			RequestBuffer.request(() -> msgF.edit(builder.build()));
