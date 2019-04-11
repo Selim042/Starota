@@ -69,12 +69,10 @@ public class CommandEggHatches extends StarotaCommand {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withTitle(
 				String.format("%dk Eggs: %s", dist, EmojiServerHelper.getEmoji(dist + "kEgg")));
-		for (EggEntry b : SilphRoadData.getEggs(dist)) {
-			String postfix = b.getForm() == null ? "" : "_" + b.getForm();
+		for (EggEntry b : SilphRoadData.getEggs(dist))
 			builder.appendDescription(
 					b.getPokemon() + (b.getForm() == null ? "" : " (" + b.getForm() + ") ")
 							+ (b.isShinyable() ? EmojiServerHelper.getEmoji("shiny") + "\n" : "\n"));
-		}
 
 		builder.withUrl("https://thesilphroad.com/raid-bosses");
 		builder.withAuthorName("The Silph Road");
