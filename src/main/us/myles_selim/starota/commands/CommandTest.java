@@ -1,12 +1,10 @@
 package us.myles_selim.starota.commands;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -14,11 +12,6 @@ public class CommandTest extends StarotaCommand {
 
 	public CommandTest() {
 		super("test");
-	}
-
-	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.allOf(Permissions.class);
 	}
 
 	@Override

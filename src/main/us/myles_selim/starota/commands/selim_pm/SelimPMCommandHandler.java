@@ -31,10 +31,14 @@ public class SelimPMCommandHandler {
 
 		INSTANCE = new PrimaryCommandHandler(Starota.getClient(), (IChannel c) -> isSelimPM(c));
 		Starota.getClient().getDispatcher().registerListener(INSTANCE);
-		INSTANCE.registerCommandHandler(JAVA_HANDLER);
 		JAVA_HANDLER = new JavaCommandHandler();
+		INSTANCE.registerCommandHandler(JAVA_HANDLER);
 
 		registerCommand("Help", new CommandHelp());
+
+		registerCommand("Admin", new CommandCaches());
+		registerCommand("Admin", new CommandServerInfo());
+		registerCommand("Admin", new CommandChannelInfo());
 	}
 
 	// private final List<JavaCommand> COMMANDS = new CopyOnWriteArrayList<>();

@@ -81,7 +81,16 @@ public class JavaCommand implements ICommand {
 	}
 
 	protected void sendUsage(String prefix, IChannel channel) {
-		channel.sendMessage(String.format("**Usage**: %s%s %s", prefix, getName(), getGeneralUsage()));
+		sendUsage(prefix, channel, false);
+	}
+
+	protected void sendUsage(String prefix, IChannel channel, boolean adminUsage) {
+		if (adminUsage)
+			channel.sendMessage(
+					String.format("**Admin Usage**: %s%s %s", prefix, getName(), getAdminUsage()));
+		else
+			channel.sendMessage(
+					String.format("**Usage**: %s%s %s", prefix, getName(), getGeneralUsage()));
 	}
 
 	private String category;
@@ -102,7 +111,7 @@ public class JavaCommand implements ICommand {
 	private ICommandHandler handler;
 
 	@Override
-	public void setCommandHandler(ICommandHandler handler) {
+	public final void setCommandHandler(ICommandHandler handler) {
 		if (this.handler == null)
 			this.handler = handler;
 	}

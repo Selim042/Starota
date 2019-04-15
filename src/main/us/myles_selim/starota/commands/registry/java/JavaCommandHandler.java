@@ -28,6 +28,8 @@ public class JavaCommandHandler implements ICommandHandler {
 	private final List<String> CATEGORIES = new CopyOnWriteArrayList<>();
 
 	public void registerDefaultCommands() {
+		DebugServer.addPermission(Permissions.READ_MESSAGES);
+		
 		registerCommand("Help", new CommandHelp());
 
 		registerCommand("Commands", new CommandAddChannelWhitelist());

@@ -30,8 +30,7 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class PrimaryCommandHandler {
 
-	private static String DEFAULT_PREFIX = ".";
-
+	public static final String DEFAULT_PREFIX = ".";
 	public static final String PREFIX_KEY = "cmd_prefix";
 	public static final String DEFAULT_CATEGORY = "Uncategorized";
 	public static final int DEFAULT_SUGGESTION_COUNT = 10;
@@ -66,6 +65,8 @@ public class PrimaryCommandHandler {
 	}
 
 	public void registerCommandHandler(ICommandHandler handler) {
+		if (handler == null)
+			throw new IllegalArgumentException("handler cannot be null");
 		if (!COMMAND_HANDLERS.contains(handler))
 			COMMAND_HANDLERS.add(handler);
 	}
@@ -98,8 +99,6 @@ public class PrimaryCommandHandler {
 			if (!hasPerms.contains(Permissions.SEND_MESSAGES))
 				return;
 			for (ICommandHandler h : COMMAND_HANDLERS) {
-				if (h == null)
-					continue;
 				ICommand cmd = h.findCommand(guild, args[0]);
 				if (cmd == null
 						|| !ChannelCommandManager.isAllowedHere(StarotaServer.getServer(guild),
@@ -181,53 +180,60 @@ public class PrimaryCommandHandler {
 			Starota.submitError(" on server " + guild.getName(), th);
 	}
 
-	public List<ICommand> getCommandsByCategory(IGuild server, String category) {
+	public List<ICommand> getCommandsByCategory(IGuild guild, String category) {
 		if (category == null || category.isEmpty())
 			return Collections.emptyList();
-		if (!StarotaModule.isCategoryEnabled(StarotaServer.getServer(server), category))
+		if (!StarotaModule.isCategoryEnabled(StarotaServer.getServer(guild), category))
 			return Collections.emptyList();
 		List<ICommand> ret = new ArrayList<>();
 		for (ICommandHandler h : COMMAND_HANDLERS)
-			for (ICommand c : h.getCommandsByCategory(server, category))
+			for (ICommand c : h.getCommandsByCategory(guild, category))
 				if (category.equalsIgnoreCase(c.getCategory()))
 					ret.add(c);
 		return Collections.unmodifiableList(ret);
 	}
 
-	public List<ICommand> getAllCommands(IGuild server) {
-		List<ICommand> ret = new ArrayList<>();
+	public List<String> getAllCategories(IGuild guild) {
+		List<String> ret = new ArrayList<>();
 		for (ICommandHandler h : COMMAND_HANDLERS)
-			ret.addAll(h.getAllCommands(server));
+			ret.addAll(h.getAllCategories(guild));
 		return ret;
 	}
 
-	public ICommand findCommand(IGuild server, String name) {
+	public List<ICommand> getAllCommands(IGuild guild) {
+		List<ICommand> ret = new ArrayList<>();
+		for (ICommandHandler h : COMMAND_HANDLERS)
+			ret.addAll(h.getAllCommands(guild));
+		return ret;
+	}
+
+	public ICommand findCommand(IGuild guild, String name) {
 		for (ICommandHandler h : COMMAND_HANDLERS) {
-			ICommand c = h.findCommand(server, name);
+			ICommand c = h.findCommand(guild, name);
 			if (c != null)
 				return c;
 		}
 		return null;
 	}
 
-	public ICommand[] getSuggestions(IGuild server, String input) {
-		return getSuggestions(server, null, input, DEFAULT_SUGGESTION_COUNT);
+	public ICommand[] getSuggestions(IGuild guild, String input) {
+		return getSuggestions(guild, null, input, DEFAULT_SUGGESTION_COUNT);
 	}
 
-	public ICommand[] getSuggestions(IGuild server, String input, int count) {
-		return getSuggestions(server, null, input, count);
+	public ICommand[] getSuggestions(IGuild guild, String input, int count) {
+		return getSuggestions(guild, null, input, count);
 	}
 
-	public ICommand[] getSuggestions(IGuild server, IChannel channel, String input) {
-		return getSuggestions(server, channel, input, DEFAULT_SUGGESTION_COUNT);
+	public ICommand[] getSuggestions(IGuild guild, IChannel channel, String input) {
+		return getSuggestions(guild, channel, input, DEFAULT_SUGGESTION_COUNT);
 	}
 
-	public ICommand[] getSuggestions(IGuild server, IChannel channel, String input, int count) {
+	public ICommand[] getSuggestions(IGuild guild, IChannel channel, String input, int count) {
 		List<DistancedCommand> suggestions = new ArrayList<>();
 		for (ICommandHandler ch : COMMAND_HANDLERS) {
-			for (ICommand cmd : ch.getAllCommands(server)) {
+			for (ICommand cmd : ch.getAllCommands(guild)) {
 				if (channel != null && !ChannelCommandManager
-						.isAllowedHere(StarotaServer.getServer(server), cmd.getCategory(), channel))
+						.isAllowedHere(StarotaServer.getServer(guild), cmd.getCategory(), channel))
 					continue;
 				for (String a : cmd.getAliases()) {
 					DistancedCommand dc = new DistancedCommand(calculateDistance(a, input), cmd);
