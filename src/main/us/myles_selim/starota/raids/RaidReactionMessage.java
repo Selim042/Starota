@@ -155,8 +155,15 @@ public class RaidReactionMessage extends ReactionMessage {
 		builder.appendField("Location:", location, true);
 
 		String attendingString = "";
-		for (Entry<IUser, ReactionEmoji> e : attending.entrySet())
-			attendingString += e.getValue() + " " + e.getKey().getName() + "\n";
+		for (Entry<IUser, ReactionEmoji> e : attending.entrySet()) {
+			String nickname = e.getKey().getNicknameForGuild(server.getDiscordGuild());
+			if (nickname == null)
+				attendingString += e.getValue() + " " + e.getKey().getName() + "#"
+						+ e.getKey().getDiscriminator() + "\n";
+			else
+				attendingString += e.getValue() + " " + nickname + " (_" + e.getKey().getName() + "#"
+						+ e.getKey().getDiscriminator() + "_)\n";
+		}
 		if (!attendingString.isEmpty())
 			builder.appendField("Attending:", attendingString, false);
 
