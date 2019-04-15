@@ -26,6 +26,7 @@ import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
+import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.assistants.CommandInviteAssistants;
 import us.myles_selim.starota.assistants.StarotaAssistants;
 import us.myles_selim.starota.assistants.pokedex.PokedexBot;
@@ -35,6 +36,7 @@ import us.myles_selim.starota.commands.CommandCredits;
 import us.myles_selim.starota.commands.CommandGenerateCommandWiki;
 import us.myles_selim.starota.commands.CommandGetTop;
 import us.myles_selim.starota.commands.CommandInvite;
+import us.myles_selim.starota.commands.CommandSettings;
 import us.myles_selim.starota.commands.CommandStatus;
 import us.myles_selim.starota.commands.CommandSupportBot;
 import us.myles_selim.starota.commands.CommandTest;
@@ -56,6 +58,7 @@ import us.myles_selim.starota.lua.LuaEventHandler;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.commands.CommandUploadScript;
 import us.myles_selim.starota.lua.commands.LuaCommandHandler;
+import us.myles_selim.starota.misc.data_types.ChannelDataType;
 import us.myles_selim.starota.misc.utils.TwitterHelper;
 import us.myles_selim.starota.misc.utils.WikiGenerator;
 import us.myles_selim.starota.modules.BaseModules;
@@ -124,298 +127,334 @@ public class Starota {
 	public static PrimaryCommandHandler COMMAND_HANDLER;
 
 	public static void main(String[] args) {
-		// STATUS = EnumBotStatus.INITIALIZING;
-		// MANAGER_SOCKET = new Socket();
-		// try {
-		// MANAGER_SOCKET.bind(new InetSocketAddress("localhost",
-		// Integer.parseInt(args[0])));
-		// OutputStream out = MANAGER_SOCKET.getOutputStream();
-		// out.write((BOT_NAME.toLowerCase() + '\0').getBytes());
-		// out.write((args[1] + '\0').getBytes());
-		// Thread socketHandler = new Thread() {
-		//
-		// @Override
-		// public void run() {
-		// try {
-		// InputStream in = MANAGER_SOCKET.getInputStream();
-		// OutputStream out = MANAGER_SOCKET.getOutputStream();
-		// while (true) {
-		// String cmd = "";
-		// char c = (char) in.read();
-		// while (in.available() > 0 && c != '\0') {
-		// cmd += c;
-		// c = (char) in.read();
-		// }
-		// switch (cmd) {
-		// case "getStatus":
-		// out.write((STATUS.name() + '\0').getBytes());
-		// break;
-		// default:
-		// System.err.println("recieved cmd \"" + cmd
-		// + "\" from manager, unsure how to handle");
-		// }
-		// }
-		// } catch (IOException e) {
-		// System.err.println("error in socket handler thread");
-		// e.printStackTrace();
-		// }
-		// }
-		// };
-		// socketHandler.start();
-		// } catch (Exception e) {
-		// System.err.println("failed to connect to the bot manager");
-		// e.printStackTrace();
-		// }
 		try {
-			PROPERTIES.load(new FileInputStream("starota.properties"));
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		ClientBuilder clientBuilder = new ClientBuilder();
-		clientBuilder.withToken(PROPERTIES.getProperty("token"));
-		CLIENT = null;
-		try {
-			CLIENT = clientBuilder.login();
-		} catch (DiscordException e) {
-			e.printStackTrace();
-		}
-		if (CLIENT == null) {
-			System.err.println("Failed to login, exiting");
-			return;
-		}
-		COMMAND_HANDLER = new PrimaryCommandHandler(CLIENT);
-		StarotaAssistants.init();
-		IS_DEV = Boolean.parseBoolean(PROPERTIES.getProperty("is_dev"));
-		EventDispatcher dispatcher = CLIENT.getDispatcher();
-		try {
-			while (!CLIENT.isReady())
-				Thread.sleep(10);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		BaseModules.registerModules();
-		DebugServer debug = new DebugServer();
-		debug.start();
-
-		CLIENT.changePresence(StatusType.DND, ActivityType.PLAYING, "registering commands...");
-
-		JavaCommandHandler jCmdHandler = new JavaCommandHandler();
-		COMMAND_HANDLER.registerCommandHandler(jCmdHandler);
-		jCmdHandler.registerDefaultCommands();
-
-		jCmdHandler.registerCommand(new CommandChangelog());
-		jCmdHandler.registerCommand(new CommandCredits());
-		jCmdHandler.registerCommand(new CommandSupportBot(Starota.BOT_NAME, Starota.STAROTA_ID));
-		jCmdHandler.registerCommand(new CommandInvite(Starota.BOT_NAME,
-				Permissions.generatePermissionsNumber(DebugServer.getUsedPermissions())));
-
-		jCmdHandler.registerCommand("Administrative", new CommandStatus());
-		// jCmdHandler.registerCommand("Administrative", new
-		// CommandSetResearchChannel());
-		jCmdHandler.registerCommand("Administrative", new CommandChangelogChannel());
-		jCmdHandler.registerCommand("Administrative", new CommandInviteAssistants());
-		jCmdHandler.registerCommand("Administrative", new CommandVotePerks());
-		if (IS_DEV) {
-			jCmdHandler.registerCommand("Debug", new CommandGetTop());
-			jCmdHandler.registerCommand("Debug", new CommandTest());
-			jCmdHandler.registerCommand("Debug", new CommandGenerateCommandWiki());
-		}
-
-		jCmdHandler.registerCommand("Profiles", new CommandRegister());
-		jCmdHandler.registerCommand("Profiles", new CommandUpdateProfile());
-		jCmdHandler.registerCommand("Profiles", new CommandProfile());
-		jCmdHandler.registerCommand("Profiles", new CommandSelfRegister());
-		jCmdHandler.registerCommand("Profiles", new CommandGetProfilelessPlayers());
-		jCmdHandler.registerCommand("Profiles", new CommandProfileHelp());
-
-		jCmdHandler.registerCommand("Groups", new CommandGetGroups());
-		jCmdHandler.registerCommand("Groups", new CommandAddGroup());
-		jCmdHandler.registerCommand("Groups", new CommandRemoveGroup());
-		jCmdHandler.registerCommand("Groups", new CommandSetAsGroup());
-
-		jCmdHandler.registerCommand("Tradeboard", new CommandTradeboardHelp());
-		if (IS_DEV) {
-			jCmdHandler.registerCommand("Debug", new CommandGetForms());
-			jCmdHandler.registerCommand("Debug", new CommandGetShinies());
-		}
-		jCmdHandler.registerCommand("Tradeboard", new CommandForTrade());
-		jCmdHandler.registerCommand("Tradeboard", new CommandGetUserTrades());
-		jCmdHandler.registerCommand("Tradeboard", new CommandFindTrade());
-		jCmdHandler.registerCommand("Tradeboard", new CommandGetTrade());
-		jCmdHandler.registerCommand("Tradeboard", new CommandLookingFor());
-		jCmdHandler.registerCommand("Tradeboard", new CommandRemoveTrade());
-
-		jCmdHandler.registerCommand("Lua", new CommandUploadScript());
-
-		jCmdHandler.registerCommand("Leaderboard", new CommandEditLeaderboard());
-		jCmdHandler.registerCommand("Leaderboard", new CommandUpdateLeaderboard());
-		jCmdHandler.registerCommand("Leaderboard", new CommandNewLeaderboard());
-		jCmdHandler.registerCommand("Leaderboard", new CommandGetLeaderboard());
-		jCmdHandler.registerCommand("Leaderboard", new CommandListLeaderboards());
-
-		jCmdHandler.registerCommand("Modules", new CommandModules());
-
-		jCmdHandler.registerCommand("PvP", new CommandBattleReady());
-		jCmdHandler.registerCommand("PvP", new CommandNotReady());
-		jCmdHandler.registerCommand("PvP", new CommandFindBattles());
-
-		jCmdHandler.registerCommand("Pokedex", new CommandPokedex());
-
-		jCmdHandler.registerCommand("Silph Road", new CommandSilphCard());
-
-		jCmdHandler.registerCommand("Raids", new CommandRaid());
-		jCmdHandler.registerCommand("Raids", new CommandSetRaidEChannel());
-		jCmdHandler.registerCommand("Raids", new CommandRaidBosses());
-
-		jCmdHandler.registerCommand("Events", new CommandEvents());
-
-		jCmdHandler.registerCommand("Search", new CommandSearchPoke());
-
-		jCmdHandler.registerCommand("Eggs", new CommandEggHatches());
-
-		jCmdHandler.registerCommand("Misc", new CommandDitto());
-
-		SelimPMCommandHandler.init();
-
-		try {
-			Thread.sleep(2500);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		CLIENT.changePresence(StatusType.IDLE, ActivityType.PLAYING,
-				"starting threads and loading settings...");
-
-		// FormManager.init();
-		// ResearchTracker.init();
-
-		ReactionMessageRegistry reactionRegistry = new ReactionMessageRegistry();
-		dispatcher.registerListener(reactionRegistry);
-		dispatcher.registerListener(COMMAND_HANDLER);
-		dispatcher.registerListener(new EventHandler());
-		dispatcher.registerListener(new WebhookEventHandler());
-		ReactionMessageRegistry.init();
-		WebServer.init();
-		PokedexBot.start(reactionRegistry);
-		submitStats();
-
-		Thread saveThread = new Thread("ResearchFlusher") {
-
-			@Override
-			public void run() {
-				while (true) {
-					try {
-						Thread.sleep(36000);
-					} catch (InterruptedException e) {}
-					ResearchTracker.flush();
-				}
+			// STATUS = EnumBotStatus.INITIALIZING;
+			// MANAGER_SOCKET = new Socket();
+			// try {
+			// MANAGER_SOCKET.bind(new InetSocketAddress("localhost",
+			// Integer.parseInt(args[0])));
+			// OutputStream out = MANAGER_SOCKET.getOutputStream();
+			// out.write((BOT_NAME.toLowerCase() + '\0').getBytes());
+			// out.write((args[1] + '\0').getBytes());
+			// Thread socketHandler = new Thread() {
+			//
+			// @Override
+			// public void run() {
+			// try {
+			// InputStream in = MANAGER_SOCKET.getInputStream();
+			// OutputStream out = MANAGER_SOCKET.getOutputStream();
+			// while (true) {
+			// String cmd = "";
+			// char c = (char) in.read();
+			// while (in.available() > 0 && c != '\0') {
+			// cmd += c;
+			// c = (char) in.read();
+			// }
+			// switch (cmd) {
+			// case "getStatus":
+			// out.write((STATUS.name() + '\0').getBytes());
+			// break;
+			// default:
+			// System.err.println("recieved cmd \"" + cmd
+			// + "\" from manager, unsure how to handle");
+			// }
+			// }
+			// } catch (IOException e) {
+			// System.err.println("error in socket handler thread");
+			// e.printStackTrace();
+			// }
+			// }
+			// };
+			// socketHandler.start();
+			// } catch (Exception e) {
+			// System.err.println("failed to connect to the bot manager");
+			// e.printStackTrace();
+			// }
+			try {
+				PROPERTIES.load(new FileInputStream("starota.properties"));
+			} catch (IOException e1) {
+				e1.printStackTrace();
 			}
-		};
-		saveThread.start();
-
-		try {
-			Thread.sleep(2500);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		Thread statusUpdater = new Thread("StarotaStatusUpdater") {
-
-			@Override
-			public void run() {
-				while (true) {
-					CLIENT.changePresence(StatusType.ONLINE, ActivityType.PLAYING,
-							"v" + VERSION + (DEBUG || IS_DEV ? "d" : ""));
-					try {
-						Thread.sleep(3600000); // 1 hour
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
+			ClientBuilder clientBuilder = new ClientBuilder();
+			clientBuilder.withToken(PROPERTIES.getProperty("token"));
+			CLIENT = null;
+			try {
+				CLIENT = clientBuilder.login();
+			} catch (DiscordException e) {
+				e.printStackTrace();
 			}
-		};
-		statusUpdater.start();
-
-		Thread changesThread = new Thread("ChangelogThread") {
-
-			@Override
-			public void run() {
-				boolean sentToAll = true;
-				List<IGuild> guilds = new ArrayList<>(CLIENT.getGuilds());
-				if (!IS_DEV)
-					guilds.addAll(PokedexBot.POKEDEX_CLIENT.getGuilds());
-				for (IGuild g : guilds) {
-					StarotaServer server = StarotaServer.getServer(g);
-					if (!server.hasKey(CommandChangelogChannel.CHANGES_CHANNEL))
-						continue;
-					IChannel changesChannel = CLIENT.getChannelByID(
-							(long) server.getValue(CommandChangelogChannel.CHANGES_CHANNEL));
-					if (changesChannel == null)
-						continue;
-					String latestChangelog = (String) server.getValue("changesVersion");
-					if (!VERSION.equalsIgnoreCase(latestChangelog)) {
-						RequestBuffer
-								.request(() -> changesChannel.sendMessage("```" + CHANGELOG + "```"));
-						server.setValue("changesVersion", VERSION);
-					} else
-						sentToAll = false;
-				}
-				if (!IS_DEV && sentToAll)
-					TwitterHelper.sendTweet(CHANGELOG);
+			if (CLIENT == null) {
+				System.err.println("Failed to login, exiting");
+				return;
 			}
-		};
-		changesThread.start();
+			COMMAND_HANDLER = new PrimaryCommandHandler(CLIENT);
+			StarotaAssistants.init();
+			IS_DEV = Boolean.parseBoolean(PROPERTIES.getProperty("is_dev"));
+			EventDispatcher dispatcher = CLIENT.getDispatcher();
+			try {
+				while (!CLIENT.isReady())
+					Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			BaseModules.registerModules();
+			DebugServer debug = new DebugServer();
+			debug.start();
 
-		LuaUtils.registerConverters();
-		dispatcher.registerListener(new LuaEventHandler());
-		COMMAND_HANDLER.registerCommandHandler(new LuaCommandHandler());
+			System.out.println("registering commands");
+			CLIENT.changePresence(StatusType.DND, ActivityType.PLAYING, "registering commands...");
 
-		FULLY_STARTED = true;
-		// STATUS = EnumBotStatus.ONLINE;
-		DebugServer.update();
+			JavaCommandHandler jCmdHandler = new JavaCommandHandler();
+			COMMAND_HANDLER.registerCommandHandler(jCmdHandler);
+			jCmdHandler.registerDefaultCommands();
 
-		if (IS_DEV) {
-			new Thread("wikiGen") {
+			jCmdHandler.registerCommand(new CommandChangelog());
+			jCmdHandler.registerCommand(new CommandCredits());
+			jCmdHandler.registerCommand(new CommandSupportBot(Starota.BOT_NAME, Starota.STAROTA_ID));
+			jCmdHandler.registerCommand(new CommandInvite(Starota.BOT_NAME,
+					Permissions.generatePermissionsNumber(DebugServer.getUsedPermissions())));
+
+			jCmdHandler.registerCommand("Administrative", new CommandStatus());
+			// jCmdHandler.registerCommand("Administrative", new
+			// CommandSetResearchChannel());
+			jCmdHandler.registerCommand("Administrative", new CommandChangelogChannel());
+			jCmdHandler.registerCommand("Administrative", new CommandInviteAssistants());
+			jCmdHandler.registerCommand("Administrative", new CommandVotePerks());
+			jCmdHandler.registerCommand("Administrative", new CommandSettings());
+			if (IS_DEV) {
+				jCmdHandler.registerCommand("Debug", new CommandGetTop());
+				jCmdHandler.registerCommand("Debug", new CommandTest());
+				jCmdHandler.registerCommand("Debug", new CommandGenerateCommandWiki());
+			}
+
+			jCmdHandler.registerCommand("Profiles", new CommandRegister());
+			jCmdHandler.registerCommand("Profiles", new CommandUpdateProfile());
+			jCmdHandler.registerCommand("Profiles", new CommandProfile());
+			jCmdHandler.registerCommand("Profiles", new CommandSelfRegister());
+			jCmdHandler.registerCommand("Profiles", new CommandGetProfilelessPlayers());
+			jCmdHandler.registerCommand("Profiles", new CommandProfileHelp());
+
+			jCmdHandler.registerCommand("Groups", new CommandGetGroups());
+			jCmdHandler.registerCommand("Groups", new CommandAddGroup());
+			jCmdHandler.registerCommand("Groups", new CommandRemoveGroup());
+			jCmdHandler.registerCommand("Groups", new CommandSetAsGroup());
+
+			jCmdHandler.registerCommand("Tradeboard", new CommandTradeboardHelp());
+			if (IS_DEV) {
+				jCmdHandler.registerCommand("Debug", new CommandGetForms());
+				jCmdHandler.registerCommand("Debug", new CommandGetShinies());
+			}
+			jCmdHandler.registerCommand("Tradeboard", new CommandForTrade());
+			jCmdHandler.registerCommand("Tradeboard", new CommandGetUserTrades());
+			jCmdHandler.registerCommand("Tradeboard", new CommandFindTrade());
+			jCmdHandler.registerCommand("Tradeboard", new CommandGetTrade());
+			jCmdHandler.registerCommand("Tradeboard", new CommandLookingFor());
+			jCmdHandler.registerCommand("Tradeboard", new CommandRemoveTrade());
+
+			jCmdHandler.registerCommand("Lua", new CommandUploadScript());
+
+			jCmdHandler.registerCommand("Leaderboard", new CommandEditLeaderboard());
+			jCmdHandler.registerCommand("Leaderboard", new CommandUpdateLeaderboard());
+			jCmdHandler.registerCommand("Leaderboard", new CommandNewLeaderboard());
+			jCmdHandler.registerCommand("Leaderboard", new CommandGetLeaderboard());
+			jCmdHandler.registerCommand("Leaderboard", new CommandListLeaderboards());
+
+			jCmdHandler.registerCommand("Modules", new CommandModules());
+
+			jCmdHandler.registerCommand("PvP", new CommandBattleReady());
+			jCmdHandler.registerCommand("PvP", new CommandNotReady());
+			jCmdHandler.registerCommand("PvP", new CommandFindBattles());
+
+			jCmdHandler.registerCommand("Pokedex", new CommandPokedex());
+
+			jCmdHandler.registerCommand("Silph Road", new CommandSilphCard());
+
+			jCmdHandler.registerCommand("Raids", new CommandRaid());
+			jCmdHandler.registerCommand("Raids", new CommandSetRaidEChannel());
+			jCmdHandler.registerCommand("Raids", new CommandRaidBosses());
+
+			jCmdHandler.registerCommand("Events", new CommandEvents());
+
+			jCmdHandler.registerCommand("Search", new CommandSearchPoke());
+
+			jCmdHandler.registerCommand("Eggs", new CommandEggHatches());
+
+			jCmdHandler.registerCommand("Misc", new CommandDitto());
+
+			CommandSettings.setDefaultValue(CommandChangelogChannel.CHANGES_CHANNEL,
+					new ChannelDataType(), ChannelDataType.NULL_CHANNEL);
+
+			SelimPMCommandHandler.init();
+
+			try {
+				Thread.sleep(2500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			System.out.println("starting threads and loading settings...");
+			CLIENT.changePresence(StatusType.IDLE, ActivityType.PLAYING,
+					"starting threads and loading settings...");
+
+			// FormManager.init();
+			// ResearchTracker.init();
+
+			ReactionMessageRegistry reactionRegistry = new ReactionMessageRegistry();
+			dispatcher.registerListener(reactionRegistry);
+			dispatcher.registerListener(COMMAND_HANDLER);
+			dispatcher.registerListener(new EventHandler());
+			dispatcher.registerListener(new WebhookEventHandler());
+			ReactionMessageRegistry.init();
+			WebServer.init();
+			PokedexBot.start(reactionRegistry);
+			submitStats();
+
+			Thread saveThread = new Thread("ResearchFlusher") {
 
 				@Override
 				public void run() {
-					WikiGenerator.generate();
+					while (true) {
+						try {
+							Thread.sleep(36000);
+						} catch (InterruptedException e) {}
+						ResearchTracker.flush();
+					}
+				}
+			};
+			saveThread.start();
+
+			try {
+				Thread.sleep(2500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			System.out.println("v" + VERSION + (DEBUG || IS_DEV ? "d" : ""));
+			Thread statusUpdater = new Thread("StarotaStatusUpdater") {
+
+				@Override
+				public void run() {
+					while (true) {
+						CLIENT.changePresence(StatusType.ONLINE, ActivityType.PLAYING,
+								"v" + VERSION + (DEBUG || IS_DEV ? "d" : ""));
+						try {
+							Thread.sleep(3600000); // 1 hour
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			};
+			statusUpdater.start();
+
+			Thread changesThread = new Thread("ChangelogThread") {
+
+				@Override
+				public void run() {
+					boolean sentToAll = true;
+					List<IGuild> guilds = new ArrayList<>(CLIENT.getGuilds());
+					if (!IS_DEV)
+						guilds.addAll(PokedexBot.POKEDEX_CLIENT.getGuilds());
+					for (IGuild g : guilds) {
+						StarotaServer server = StarotaServer.getServer(g);
+						if (!server.hasKey(CommandChangelogChannel.CHANGES_CHANNEL))
+							continue;
+						IChannel changesChannel = CLIENT.getChannelByID(
+								(long) server.getValue(CommandChangelogChannel.CHANGES_CHANNEL));
+						if (changesChannel == null)
+							continue;
+						String latestChangelog = (String) server.getValue("changesVersion");
+						if (!VERSION.equalsIgnoreCase(latestChangelog)) {
+							RequestBuffer.request(
+									() -> changesChannel.sendMessage("```" + CHANGELOG + "```"));
+							server.setValue("changesVersion", VERSION);
+						} else
+							sentToAll = false;
+					}
+					if (!IS_DEV && sentToAll)
+						TwitterHelper.sendTweet(CHANGELOG);
+				}
+			};
+			changesThread.start();
+
+			LuaUtils.registerConverters();
+			dispatcher.registerListener(new LuaEventHandler());
+			COMMAND_HANDLER.registerCommandHandler(new LuaCommandHandler());
+
+			FULLY_STARTED = true;
+			// STATUS = EnumBotStatus.ONLINE;
+			DebugServer.update();
+
+			if (IS_DEV) {
+				new Thread("wikiGen") {
+
+					@Override
+					public void run() {
+						WikiGenerator.generate();
+					}
+				}.start();
+			}
+
+			// register search operators for Pokemon
+			PokemonOperators.registerOperators();
+
+			Thread discord4JWatchdog = new Thread("D4JWatchdog") {
+
+				private boolean isReady = CLIENT.isReady();
+
+				@Override
+				public void run() {
+					while (true) {
+						boolean inReady = CLIENT.isReady();
+						if (!isReady && !inReady)
+							System.exit(1);
+						isReady = inReady;
+						try {
+							Thread.sleep(60000); // 1 min
+						} catch (InterruptedException e) {}
+					}
+				}
+			};
+			discord4JWatchdog.start();
+
+			updateOwners();
+
+			// hacky, weird thing just to hide the deprecation warning
+			@SuppressWarnings("deprecation")
+			Predicate<Void> f = (v) -> {
+				Timer timer = new Timer();
+				Date midnight = new Date();
+				midnight.setHours(0);
+				midnight.setMinutes(0);
+				timer.scheduleAtFixedRate(new VoteReminderThread(), midnight, (long) 2.592e+8);
+				return false;
+			};
+			f.test(null);
+
+			// migrate old settings to new system
+			new Thread() {
+
+				@Override
+				public void run() {
+					for (IGuild g : CLIENT.getGuilds()) {
+						StarotaServer server = StarotaServer.getServer(g);
+						EBStorage options = server.getOptions();
+						if (options.containsKey(CommandChangelogChannel.CHANGES_CHANNEL)) {
+							EBStorage settings = options.get(CommandSettings.SETTINGS_KEY,
+									EBStorage.class);
+							if (settings == null) {
+								settings = CommandSettings.getDefaultSettings();
+								options.set(CommandSettings.SETTINGS_KEY, settings);
+							}
+							settings.set(CommandChangelogChannel.CHANGES_CHANNEL, g.getChannelByID(
+									options.get(CommandChangelogChannel.CHANGES_CHANNEL, long.class)));
+						}
+					}
 				}
 			}.start();
+		} catch (Exception e) {
+			System.out.println("Starota failed to start properly. Printing exception then exiting");
+			e.printStackTrace();
+			Runtime.getRuntime().exit(0);
 		}
-
-		// register search operators for Pokemon
-		PokemonOperators.registerOperators();
-
-		Thread discord4JWatchdog = new Thread("D4JWatchdog") {
-
-			private boolean isReady = CLIENT.isReady();
-
-			@Override
-			public void run() {
-				while (true) {
-					boolean inReady = CLIENT.isReady();
-					if (!isReady && !inReady)
-						System.exit(1);
-					isReady = inReady;
-					try {
-						Thread.sleep(60000); // 1 min
-					} catch (InterruptedException e) {}
-				}
-			}
-		};
-		discord4JWatchdog.start();
-
-		updateOwners();
-
-		@SuppressWarnings("deprecation")
-		Predicate<Void> f = (v) -> {
-			Timer timer = new Timer();
-			Date midnight = new Date();
-			midnight.setHours(0);
-			midnight.setMinutes(0);
-			timer.scheduleAtFixedRate(new VoteReminderThread(), midnight, (long) 2.592e+8);
-			return false;
-		};
-		f.test(null);
 	}
 
 	public static IDiscordClient getClient() {

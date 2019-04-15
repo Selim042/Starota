@@ -18,7 +18,7 @@ public class StarotaModule {
 	@SuppressWarnings("unchecked")
 	private static List<StarotaModule> getDisabledModulesRaw(StarotaServer server) {
 		if (server == null || !server.hasKey(MODULE_KEY, EBList.class))
-			return new ArrayList<>(MODULES);
+			return new ArrayList<>();
 		List<StarotaModule> modules = new ArrayList<>();
 		for (String name : ((EBList<String>) server.getValue(MODULE_KEY)).values()) {
 			StarotaModule module = getModule(name);
