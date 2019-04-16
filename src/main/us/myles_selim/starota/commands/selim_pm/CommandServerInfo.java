@@ -40,7 +40,8 @@ public class CommandServerInfo extends JavaCommand {
 			byName = false;
 		} catch (NumberFormatException e) {
 			for (int i = 1; i < args.length; i++)
-				enteredServerName += args[i];
+				enteredServerName += args[i] + " ";
+			enteredServerName = enteredServerName.substring(0, enteredServerName.length() - 1);
 			for (IGuild g : Starota.getClient().getGuilds()) {
 				if (g.getName().equalsIgnoreCase(enteredServerName)) {
 					targetGuild = g;

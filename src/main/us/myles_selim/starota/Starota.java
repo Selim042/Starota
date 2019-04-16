@@ -36,6 +36,7 @@ import us.myles_selim.starota.commands.CommandCredits;
 import us.myles_selim.starota.commands.CommandGenerateCommandWiki;
 import us.myles_selim.starota.commands.CommandGetTop;
 import us.myles_selim.starota.commands.CommandInvite;
+import us.myles_selim.starota.commands.CommandPing;
 import us.myles_selim.starota.commands.CommandSettings;
 import us.myles_selim.starota.commands.CommandStatus;
 import us.myles_selim.starota.commands.CommandSupportBot;
@@ -112,12 +113,9 @@ public class Starota {
 	public static final String SUPPORT_SERVER_LINK = "https://discord.gg/NxverNw";
 	public static final String HTTP_USER_AGENT = "Mozilla/5.0; Starota/" + Starota.VERSION;
 
-	public static final long PVILLE_SERVER = 314733127027130379L;
-
 	public final static boolean DEBUG = false;
 	public static boolean IS_DEV;
 	public static boolean FULLY_STARTED = false;
-	// public static EnumBotStatus STATUS = EnumBotStatus.UNKNOWN;
 	public final static String BOT_NAME = "Starota";
 	public final static String VERSION = "2.8.2";
 	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n" + "Public changes:\n"
@@ -128,48 +126,6 @@ public class Starota {
 
 	public static void main(String[] args) {
 		try {
-			// STATUS = EnumBotStatus.INITIALIZING;
-			// MANAGER_SOCKET = new Socket();
-			// try {
-			// MANAGER_SOCKET.bind(new InetSocketAddress("localhost",
-			// Integer.parseInt(args[0])));
-			// OutputStream out = MANAGER_SOCKET.getOutputStream();
-			// out.write((BOT_NAME.toLowerCase() + '\0').getBytes());
-			// out.write((args[1] + '\0').getBytes());
-			// Thread socketHandler = new Thread() {
-			//
-			// @Override
-			// public void run() {
-			// try {
-			// InputStream in = MANAGER_SOCKET.getInputStream();
-			// OutputStream out = MANAGER_SOCKET.getOutputStream();
-			// while (true) {
-			// String cmd = "";
-			// char c = (char) in.read();
-			// while (in.available() > 0 && c != '\0') {
-			// cmd += c;
-			// c = (char) in.read();
-			// }
-			// switch (cmd) {
-			// case "getStatus":
-			// out.write((STATUS.name() + '\0').getBytes());
-			// break;
-			// default:
-			// System.err.println("recieved cmd \"" + cmd
-			// + "\" from manager, unsure how to handle");
-			// }
-			// }
-			// } catch (IOException e) {
-			// System.err.println("error in socket handler thread");
-			// e.printStackTrace();
-			// }
-			// }
-			// };
-			// socketHandler.start();
-			// } catch (Exception e) {
-			// System.err.println("failed to connect to the bot manager");
-			// e.printStackTrace();
-			// }
 			try {
 				PROPERTIES.load(new FileInputStream("starota.properties"));
 			} catch (IOException e1) {
@@ -213,6 +169,7 @@ public class Starota {
 			jCmdHandler.registerCommand(new CommandSupportBot(Starota.BOT_NAME, Starota.STAROTA_ID));
 			jCmdHandler.registerCommand(new CommandInvite(Starota.BOT_NAME,
 					Permissions.generatePermissionsNumber(DebugServer.getUsedPermissions())));
+			jCmdHandler.registerCommand(new CommandPing());
 
 			jCmdHandler.registerCommand("Administrative", new CommandStatus());
 			// jCmdHandler.registerCommand("Administrative", new
@@ -267,18 +224,15 @@ public class Starota {
 
 			jCmdHandler.registerCommand("Pokedex", new CommandPokedex());
 
-			jCmdHandler.registerCommand("Silph Road", new CommandSilphCard());
-
 			jCmdHandler.registerCommand("Raids", new CommandRaid());
 			jCmdHandler.registerCommand("Raids", new CommandSetRaidEChannel());
 			jCmdHandler.registerCommand("Raids", new CommandRaidBosses());
 
-			jCmdHandler.registerCommand("Events", new CommandEvents());
-
 			jCmdHandler.registerCommand("Search", new CommandSearchPoke());
 
-			jCmdHandler.registerCommand("Eggs", new CommandEggHatches());
-
+			jCmdHandler.registerCommand("Misc", new CommandSilphCard());
+			jCmdHandler.registerCommand("Misc", new CommandEvents());
+			jCmdHandler.registerCommand("Misc", new CommandEggHatches());
 			jCmdHandler.registerCommand("Misc", new CommandDitto());
 
 			CommandSettings.setDefaultValue(CommandChangelogChannel.CHANGES_CHANNEL,

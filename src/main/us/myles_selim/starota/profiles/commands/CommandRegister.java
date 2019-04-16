@@ -42,13 +42,6 @@ public class CommandRegister extends StarotaCommand {
 	}
 
 	@Override
-	public IRole requiredRole(StarotaServer server) {
-		if (server.getDiscordGuild().getLongID() == Starota.PVILLE_SERVER)
-			return server.getDiscordGuild().getRoleByID(314744756456521728l);
-		return super.requiredRole(server);
-	}
-
-	@Override
 	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
 		if (args.length != 5) {
 			channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName()
@@ -95,7 +88,7 @@ public class CommandRegister extends StarotaCommand {
 		IRole teamRole = MiscUtils.getTeamRole(server.getDiscordGuild(), team);
 		if (teamRole != null)
 			target.addRole(teamRole);
- 
+
 		channel.sendMessage("Sucessfully registered " + target.getName(), profile.toEmbed(server));
 		IPrivateChannel targetPm = target.getOrCreatePMChannel();
 		targetPm.sendMessage(String.format(REGISTERED_PM, server.getDiscordGuild().getName()));

@@ -7,6 +7,7 @@ import java.util.List;
 
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRole;
+import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumTeam;
 
@@ -165,6 +166,52 @@ public class MiscUtils {
 
 	private static int min(int... numbers) {
 		return Arrays.stream(numbers).min().orElse(Integer.MAX_VALUE);
+	}
+
+	public static EnumPermissionType getPermissionType(Permissions perm) {
+		switch (perm) {
+		case ADMINISTRATOR:
+		case VIEW_AUDIT_LOG:
+		case MANAGE_SERVER:
+		case MANAGE_ROLES:
+		case MANAGE_CHANNELS:
+		case KICK:
+		case BAN:
+		case CHANGE_NICKNAME:
+		case MANAGE_NICKNAMES:
+		case MANAGE_EMOJIS:
+		case VOICE_CONNECT:
+		case VOICE_SPEAK:
+		case VOICE_MUTE_MEMBERS:
+		case VOICE_DEAFEN_MEMBERS:
+		case VOICE_MOVE_MEMBERS:
+		case VOICE_USE_VAD:
+			return EnumPermissionType.SERVER;
+		case CREATE_INVITE:
+		case MANAGE_CHANNEL:
+		case MANAGE_PERMISSIONS:
+		case MANAGE_WEBHOOKS:
+		case READ_MESSAGES:
+		case SEND_MESSAGES:
+		case SEND_TTS_MESSAGES:
+		case MANAGE_MESSAGES:
+		case EMBED_LINKS:
+		case ATTACH_FILES:
+		case READ_MESSAGE_HISTORY:
+		case MENTION_EVERYONE:
+		case USE_EXTERNAL_EMOJIS:
+		case ADD_REACTIONS:
+			return EnumPermissionType.EITHER;
+		// return EnumPermissionType.CHANNEL;
+		default:
+			throw new IllegalArgumentException("permission " + perm + " not assinged");
+		}
+	}
+
+	private static enum EnumPermissionType {
+		CHANNEL,
+		SERVER,
+		EITHER;
 	}
 
 }

@@ -10,6 +10,7 @@ import sx.blah.discord.handle.obj.IPrivateChannel;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.commands.CommandPing;
 import us.myles_selim.starota.commands.registry.CommandHelp;
 import us.myles_selim.starota.commands.registry.ICommand;
 import us.myles_selim.starota.commands.registry.ICommandHandler;
@@ -33,6 +34,8 @@ public class SelimPMCommandHandler {
 		Starota.getClient().getDispatcher().registerListener(INSTANCE);
 		JAVA_HANDLER = new JavaCommandHandler();
 		INSTANCE.registerCommandHandler(JAVA_HANDLER);
+
+		registerCommand(new CommandPing());
 
 		registerCommand("Help", new CommandHelp());
 

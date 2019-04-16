@@ -101,17 +101,19 @@ public class CommandUpdateProfile extends StarotaCommand {
 			executed = true;
 			break;
 		case "alt":
-			if (args[2].length() != 12) {
-				channel.sendMessage("Code \"" + args[3] + "\" is an invalid trainer code");
-				return;
+			profile.getAlts().clear();
+			if (args[2].equalsIgnoreCase("null"))
+				break;
+			String[] altParts = args[2].split(":");
+			for (int i = 0; i < altParts.length; i += 2) {
+				String altName = altParts[i];
+				String altCode = altParts[i + 1];
+				if (altCode.length() != 12)
+					continue;
+				try {
+					profile.getAlts().put(altName, Long.valueOf(altCode));
+				} catch (NumberFormatException e) {}
 			}
-			long altTrainerCode;
-			try {
-				altTrainerCode = Long.parseLong(args[3]);
-			} catch (NumberFormatException e) {
-				altTrainerCode = -1;
-			}
-			profile.getAlts().put(args[2], altTrainerCode);
 			executed = true;
 			break;
 		}
