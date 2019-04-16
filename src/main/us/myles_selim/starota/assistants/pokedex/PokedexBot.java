@@ -25,6 +25,7 @@ import us.myles_selim.starota.commands.CommandChangelogChannel;
 import us.myles_selim.starota.commands.CommandCredits;
 import us.myles_selim.starota.commands.CommandInvite;
 import us.myles_selim.starota.commands.CommandSupportBot;
+import us.myles_selim.starota.commands.CommandVote;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 import us.myles_selim.starota.pokedex.CommandPokedex;
@@ -103,8 +104,9 @@ public class PokedexBot {
 		jCmdHandler.registerCommand(new CommandCredits());
 		jCmdHandler.registerCommand(
 				new CommandSupportBot(BOT_NAME, POKEDEX_CLIENT.getOurUser().getLongID()));
-		jCmdHandler.registerCommand(
-				new CommandInvite(BOT_NAME, Permissions.generatePermissionsNumber(USED_PERMISSIONS)));
+		jCmdHandler.registerCommand(new CommandInvite(BOT_NAME, POKEDEX_CLIENT.getOurUser().getLongID(),
+				Permissions.generatePermissionsNumber(USED_PERMISSIONS)));
+		jCmdHandler.registerCommand(new CommandVote(Starota.BOT_NAME, Starota.STAROTA_ID));
 
 		jCmdHandler.registerCommand("Administrative", new CommandChangelogChannel());
 

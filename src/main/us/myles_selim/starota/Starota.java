@@ -41,6 +41,7 @@ import us.myles_selim.starota.commands.CommandSettings;
 import us.myles_selim.starota.commands.CommandStatus;
 import us.myles_selim.starota.commands.CommandSupportBot;
 import us.myles_selim.starota.commands.CommandTest;
+import us.myles_selim.starota.commands.CommandVote;
 import us.myles_selim.starota.commands.pvp.CommandBattleReady;
 import us.myles_selim.starota.commands.pvp.CommandFindBattles;
 import us.myles_selim.starota.commands.pvp.CommandNotReady;
@@ -167,9 +168,10 @@ public class Starota {
 			jCmdHandler.registerCommand(new CommandChangelog());
 			jCmdHandler.registerCommand(new CommandCredits());
 			jCmdHandler.registerCommand(new CommandSupportBot(Starota.BOT_NAME, Starota.STAROTA_ID));
-			jCmdHandler.registerCommand(new CommandInvite(Starota.BOT_NAME,
+			jCmdHandler.registerCommand(new CommandInvite(Starota.BOT_NAME, Starota.STAROTA_ID,
 					Permissions.generatePermissionsNumber(DebugServer.getUsedPermissions())));
 			jCmdHandler.registerCommand(new CommandPing());
+			jCmdHandler.registerCommand(new CommandVote(Starota.BOT_NAME, Starota.STAROTA_ID));
 
 			jCmdHandler.registerCommand("Administrative", new CommandStatus());
 			// jCmdHandler.registerCommand("Administrative", new
