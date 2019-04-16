@@ -262,9 +262,8 @@ public class PokedexEntry extends ReactionMessage {
 
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withColor(entry.type1.getColor());
-		builder.withAuthorName("Pokémon Go Hub Database");
-		builder.withAuthorIcon("https://db.pokemongohub.net/images/icons/favicon-32x32.png");
-		builder.withAuthorUrl("https://db.pokemongohub.net/");
+		builder.withAuthorName("Pokémon Go Hub Database").withAuthorUrl("https://db.pokemongohub.net/")
+				.withAuthorIcon("https://db.pokemongohub.net/images/icons/favicon-32x32.png");
 		String pokeName = entry.name;
 		// if (entry.form == null && entry.forms.length > 1)
 		// entry.form = forms[0].value;
@@ -273,8 +272,8 @@ public class PokedexEntry extends ReactionMessage {
 			embForm = "Normal";
 		if (entry.forms.length > 1)
 			pokeName += String.format(" (%s)", embForm);
-		builder.withTitle(String.format("%s #%d", pokeName, entry.id));
-		builder.withUrl(String.format("https://db.pokemongohub.net/pokemon/%d", entry.id));
+		builder.withTitle(String.format("%s #%d", pokeName, entry.id))
+				.withUrl(String.format("https://db.pokemongohub.net/pokemon/%d", entry.id));
 		builder.withThumbnail(entry.getPokemon().getArtwork(formId));
 		builder.appendDesc(entry.getDescription());
 
@@ -314,19 +313,44 @@ public class PokedexEntry extends ReactionMessage {
 		builder.appendField("Type Weaknesses:", weakString, true);
 
 		// moves
-		String fastString = "";
-		for (DexMove m : entry.getFastMoves())
-			fastString += m.toString(entry) + "\n";
-		if (!fastString.isEmpty())
-			builder.appendField("Fast Moves:",
-					fastString.substring(0, fastString.length() > 1024 ? 1024 : fastString.length()),
-					true);
-		String chargedString = "";
-		for (DexMove m : entry.getChargedMoves())
-			chargedString += m.toString(entry) + "\n";
-		if (!chargedString.isEmpty())
-			builder.appendField("Charged Moves:", chargedString.substring(0,
-					chargedString.length() > 1024 ? 1024 : chargedString.length()), true);
+		List<String> fastStrings = new ArrayList<>();
+		String newFastString = "";
+		for (DexMove m : entry.getFastMoves()) {
+			String toString = m.toString(entry);
+			if (newFastString.length() + toString.length() + 1 < 1034)
+				newFastString += toString + "\n";
+			else {
+				fastStrings.add(newFastString);
+				newFastString = toString + "\n";
+			}
+		}
+		fastStrings.add(newFastString);
+		if (!fastStrings.isEmpty()) {
+			if (fastStrings.size() == 1)
+				builder.appendField("Fast Moves:", fastStrings.get(0), true);
+			else
+				for (int i = 0; i < fastStrings.size(); i++)
+					builder.appendField("Fast Moves (" + (i + 1) + "):", fastStrings.get(i), true);
+		}
+		List<String> chargedStrings = new ArrayList<>();
+		String newChargedString = "";
+		for (DexMove m : entry.getChargedMoves()) {
+			String toString = m.toString(entry);
+			if (newChargedString.length() + toString.length() + 1 < 1034)
+				newChargedString += toString + "\n";
+			else {
+				chargedStrings.add(newChargedString);
+				newChargedString = toString + "\n";
+			}
+		}
+		chargedStrings.add(newChargedString);
+		if (!chargedStrings.isEmpty()) {
+			if (chargedStrings.size() == 1)
+				builder.appendField("Charged Moves:", chargedStrings.get(0), true);
+			else
+				for (int i = 0; i < chargedStrings.size(); i++)
+					builder.appendField("Charged Moves (" + (i + 1) + "):", chargedStrings.get(i), true);
+		}
 
 		// movesets
 		String movesetString = "";
