@@ -20,6 +20,7 @@ public class PokedexEventHandler {
 	@EventSubscriber
 	public void onServerCreate(GuildCreateEvent event) {
 		Starota.submitStats();
+		PokedexBot.updateOwners();
 		IGuild server = event.getGuild();
 		if (!server.getUsers().contains(PokedexBot.POKEDEX_CLIENT.getOurUser()))
 			return;

@@ -2,6 +2,7 @@ package us.myles_selim.starota.assistants.pokedex;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Properties;
@@ -15,10 +16,12 @@ import sx.blah.discord.handle.obj.ActivityType;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IPrivateChannel;
+import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.DiscordException;
+import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.CommandChangelog;
 import us.myles_selim.starota.commands.CommandChangelogChannel;
@@ -138,6 +141,25 @@ public class PokedexBot {
 					.token(PROPERTIES.getProperty("dex_bot_list_token"))
 					.botId(POKEDEX_CLIENT.getOurUser().getStringID()).build();
 		return BOT_LIST;
+	}
+
+	public static void updateOwners() {
+		if (Starota.IS_DEV)
+			return;
+		IRole ownerRole = POKEDEX_CLIENT.getRoleByID(567718302491607050L);
+		List<IUser> currentOwners = new ArrayList<>();
+		for (IGuild g : POKEDEX_CLIENT.getGuilds()) {
+			IUser owner = POKEDEX_CLIENT.getGuildByID(Starota.SUPPORT_SERVER)
+					.getUserByID(g.getOwnerLongID());
+			if (owner == null)
+				continue;
+			if (!owner.hasRole(ownerRole))
+				RequestBuffer.request(() -> owner.addRole(ownerRole));
+			currentOwners.add(owner);
+		}
+		for (IUser u : POKEDEX_CLIENT.getGuildByID(Starota.SUPPORT_SERVER).getUsersByRole(ownerRole))
+			if (!currentOwners.contains(u))
+				u.removeRole(ownerRole);
 	}
 
 }
