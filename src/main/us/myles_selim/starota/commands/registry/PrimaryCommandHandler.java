@@ -113,7 +113,7 @@ public class PrimaryCommandHandler {
 					cmdFound = true;
 					continue;
 				}
-				new Thread(cmd.getName() + "Thread-" + (guild == null ? "PM" : guild.getName())) {
+				Starota.EXECUTOR.execute(new Runnable() {
 
 					@Override
 					public void run() {
@@ -123,7 +123,7 @@ public class PrimaryCommandHandler {
 							handleException(e, guild, channel, message);
 						}
 					}
-				}.start();
+				});
 				cmdFound = true;
 				continue;
 				// if (h.executeCommand(args, message, server, channel)) {

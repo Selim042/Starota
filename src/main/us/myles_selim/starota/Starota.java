@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.Timer;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Predicate;
 
 import org.discordbots.api.client.DiscordBotListAPI;
@@ -16,6 +18,7 @@ import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.IShard;
 import sx.blah.discord.api.events.EventDispatcher;
+import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.ActivityType;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
@@ -34,7 +37,6 @@ import us.myles_selim.starota.commands.CommandChangelog;
 import us.myles_selim.starota.commands.CommandChangelogChannel;
 import us.myles_selim.starota.commands.CommandCredits;
 import us.myles_selim.starota.commands.CommandGenerateCommandWiki;
-import us.myles_selim.starota.commands.CommandGetTop;
 import us.myles_selim.starota.commands.CommandInvite;
 import us.myles_selim.starota.commands.CommandPing;
 import us.myles_selim.starota.commands.CommandSettings;
@@ -61,6 +63,7 @@ import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.commands.CommandUploadScript;
 import us.myles_selim.starota.lua.commands.LuaCommandHandler;
 import us.myles_selim.starota.misc.data_types.ChannelDataType;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.TwitterHelper;
 import us.myles_selim.starota.misc.utils.WikiGenerator;
 import us.myles_selim.starota.modules.BaseModules;
@@ -76,7 +79,6 @@ import us.myles_selim.starota.raids.CommandRaid;
 import us.myles_selim.starota.raids.CommandRaidBosses;
 import us.myles_selim.starota.raids.CommandSetRaidEChannel;
 import us.myles_selim.starota.reaction_messages.ReactionMessageRegistry;
-import us.myles_selim.starota.research.ResearchTracker;
 import us.myles_selim.starota.role_management.commands.CommandAddGroup;
 import us.myles_selim.starota.role_management.commands.CommandGetGroups;
 import us.myles_selim.starota.role_management.commands.CommandRemoveGroup;
@@ -124,6 +126,7 @@ public class Starota {
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static PrimaryCommandHandler COMMAND_HANDLER;
+	public static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
 
 	public static void main(String[] args) {
 		try {
@@ -174,14 +177,11 @@ public class Starota {
 			jCmdHandler.registerCommand(new CommandVote(Starota.BOT_NAME, Starota.STAROTA_ID));
 
 			jCmdHandler.registerCommand("Administrative", new CommandStatus());
-			// jCmdHandler.registerCommand("Administrative", new
-			// CommandSetResearchChannel());
 			jCmdHandler.registerCommand("Administrative", new CommandChangelogChannel());
 			jCmdHandler.registerCommand("Administrative", new CommandInviteAssistants());
 			jCmdHandler.registerCommand("Administrative", new CommandVotePerks());
 			jCmdHandler.registerCommand("Administrative", new CommandSettings());
 			if (IS_DEV) {
-				jCmdHandler.registerCommand("Debug", new CommandGetTop());
 				jCmdHandler.registerCommand("Debug", new CommandTest());
 				jCmdHandler.registerCommand("Debug", new CommandGenerateCommandWiki());
 			}
@@ -251,9 +251,6 @@ public class Starota {
 			CLIENT.changePresence(StatusType.IDLE, ActivityType.PLAYING,
 					"starting threads and loading settings...");
 
-			// FormManager.init();
-			// ResearchTracker.init();
-
 			ReactionMessageRegistry reactionRegistry = new ReactionMessageRegistry();
 			dispatcher.registerListener(reactionRegistry);
 			dispatcher.registerListener(COMMAND_HANDLER);
@@ -263,20 +260,6 @@ public class Starota {
 			WebServer.init();
 			PokedexBot.start(reactionRegistry);
 			submitStats();
-
-			Thread saveThread = new Thread("ResearchFlusher") {
-
-				@Override
-				public void run() {
-					while (true) {
-						try {
-							Thread.sleep(36000);
-						} catch (InterruptedException e) {}
-						ResearchTracker.flush();
-					}
-				}
-			};
-			saveThread.start();
 
 			try {
 				Thread.sleep(2500);
@@ -301,7 +284,7 @@ public class Starota {
 			};
 			statusUpdater.start();
 
-			Thread changesThread = new Thread("ChangelogThread") {
+			EXECUTOR.execute(new Runnable() {
 
 				@Override
 				public void run() {
@@ -328,25 +311,23 @@ public class Starota {
 					if (!IS_DEV && sentToAll)
 						TwitterHelper.sendTweet(CHANGELOG);
 				}
-			};
-			changesThread.start();
+			});
 
 			LuaUtils.registerConverters();
 			dispatcher.registerListener(new LuaEventHandler());
 			COMMAND_HANDLER.registerCommandHandler(new LuaCommandHandler());
 
 			FULLY_STARTED = true;
-			// STATUS = EnumBotStatus.ONLINE;
 			DebugServer.update();
 
 			if (IS_DEV) {
-				new Thread("wikiGen") {
+				EXECUTOR.execute(new Runnable() {
 
 					@Override
 					public void run() {
 						WikiGenerator.generate();
 					}
-				}.start();
+				});
 			}
 
 			// register search operators for Pokemon
@@ -386,7 +367,7 @@ public class Starota {
 			f.test(null);
 
 			// migrate old settings to new system
-			new Thread() {
+			EXECUTOR.execute(new Runnable() {
 
 				@Override
 				public void run() {
@@ -405,7 +386,7 @@ public class Starota {
 						}
 					}
 				}
-			}.start();
+			});
 		} catch (Exception e) {
 			System.out.println("Starota failed to start properly. Printing exception then exiting");
 			e.printStackTrace();
@@ -625,6 +606,29 @@ public class Starota {
 		for (IUser u : getSupportServer().getUsersByRole(ownerRole))
 			if (!currentOwners.contains(u))
 				u.removeRole(ownerRole);
+	}
+
+	private static final Long[] SKIPPED_SERVERS = new Long[] { 408997776672948224L };
+
+	public static void sendOwnersMessage(String msg, EmbedObject embed) {
+		new Thread() {
+
+			@Override
+			public void run() {
+				for (IGuild g : CLIENT.getGuilds()) {
+					if (MiscUtils.arrContains(SKIPPED_SERVERS, g.getLongID()))
+						continue;
+					IUser owner = g.getOwner();
+					if ((msg == null || msg.isEmpty()) && embed != null)
+						RequestBuffer.request(() -> owner.getOrCreatePMChannel().sendMessage(embed));
+					else if ((msg != null && !msg.isEmpty()) && embed == null)
+						RequestBuffer.request(() -> owner.getOrCreatePMChannel().sendMessage(msg));
+					else if ((msg != null && !msg.isEmpty()) && embed != null)
+						RequestBuffer
+								.request(() -> owner.getOrCreatePMChannel().sendMessage(msg, embed));
+				}
+			}
+		}.start();
 	}
 
 }
