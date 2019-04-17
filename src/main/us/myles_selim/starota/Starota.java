@@ -129,6 +129,15 @@ public class Starota {
 	public static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
 
 	public static void main(String[] args) {
+		// register shutdown stuff
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+
+			@Override
+			public void run() {
+				EXECUTOR.shutdown();
+			}
+		});
+
 		try {
 			try {
 				PROPERTIES.load(new FileInputStream("starota.properties"));
@@ -608,17 +617,33 @@ public class Starota {
 				u.removeRole(ownerRole);
 	}
 
-	private static final Long[] SKIPPED_SERVERS = new Long[] { 408997776672948224L };
+	private static final Long[] SKIPPED_SERVERS = new Long[] { //
+			408997776672948224L, // Bot Emojis
+			264445053596991498L, // Discord Bot List
+	};
 
-	public static void sendOwnersMessage(String msg, EmbedObject embed) {
-		new Thread() {
+	public static void sendOwnersMessage(String msg, IUser author) {
+		sendOwnersMessage(msg, null, author);
+	}
+
+	public static void sendOwnersMessage(EmbedObject embed, IUser author) {
+		sendOwnersMessage(null, embed, author);
+	}
+
+	public static void sendOwnersMessage(String msg, EmbedObject embed, IUser author) {
+		EXECUTOR.execute(new Runnable() {
 
 			@Override
 			public void run() {
+				List<Long> alreadySent = new ArrayList<>();
 				for (IGuild g : CLIENT.getGuilds()) {
 					if (MiscUtils.arrContains(SKIPPED_SERVERS, g.getLongID()))
 						continue;
 					IUser owner = g.getOwner();
+					if (author.getLongID() == owner.getLongID()
+							|| alreadySent.contains(owner.getLongID()))
+						continue;
+					alreadySent.add(owner.getLongID());
 					if ((msg == null || msg.isEmpty()) && embed != null)
 						RequestBuffer.request(() -> owner.getOrCreatePMChannel().sendMessage(embed));
 					else if ((msg != null && !msg.isEmpty()) && embed == null)
@@ -626,9 +651,18 @@ public class Starota {
 					else if ((msg != null && !msg.isEmpty()) && embed != null)
 						RequestBuffer
 								.request(() -> owner.getOrCreatePMChannel().sendMessage(msg, embed));
+					RequestBuffer.request(
+							() -> owner.getOrCreatePMChannel().sendMessage(getAuthorEmbed(author)));
 				}
 			}
-		}.start();
+		});
+	}
+
+	private static EmbedObject getAuthorEmbed(IUser author) {
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.withFooterIcon(author.getAvatarURL()).withFooterText(author.getName());
+		builder.appendDesc("Sent by:");
+		return builder.build();
 	}
 
 }

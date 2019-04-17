@@ -55,7 +55,7 @@ public class VoteReminderThread extends TimerTask {
 			if (earned < used) {
 				// plus 3 days
 				long cutoff = currentTime + 259200000;
-				System.out.println(new Date(cutoff));
+				// System.out.println(new Date(cutoff));
 				// minus 0.5 days for a bit of wiggle-room
 				VOTE_PERK_CUTOFF.put(g.getLongID(), (long) (cutoff - 4.32e+7));
 				IPrivateChannel pm = g.getOwner().getOrCreatePMChannel();
