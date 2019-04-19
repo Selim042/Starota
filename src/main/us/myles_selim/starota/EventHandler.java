@@ -106,7 +106,7 @@ public class EventHandler {
 
 	@EventSubscriber
 	public void onServerLeave(GuildLeaveEvent event) {
-		StarotaServer.getServer(event.getGuild()).clearOptions();
+		StarotaServer.getServer(event.getGuild()).clearDataOptions();
 		Starota.updateOwners();
 	}
 

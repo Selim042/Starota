@@ -10,11 +10,11 @@ import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.Starota;
 
 // TODO: Optimize this
-public class DebugServer extends Thread {
+public class DebugServer /* extends Thread */ {
 
 	public static final long DEBUG_SERVER_ID = 517546213520965662L;
-	public static final IGuild DEBUG_SERVER;
 
+	private static IGuild DEBUG_SERVER;
 	private static EmbedObject NOT_READY_EMBED;
 	private static final EnumSet<Permissions> USED_PERMISSIONS = EnumSet.noneOf(Permissions.class);
 
@@ -23,7 +23,7 @@ public class DebugServer extends Thread {
 	// private static final IMessage PATREON_PERMS;
 	// private static final IMessage MODULES;
 
-	static {
+	public static void init() {
 		DEBUG_SERVER = Starota.getGuild(DEBUG_SERVER_ID);
 		IChannel ch;
 
@@ -74,17 +74,17 @@ public class DebugServer extends Thread {
 		return NOT_READY_EMBED;
 	}
 
-	@Override
-	public void run() {
-		while (true) {
-			update();
-			try {
-				Thread.sleep(300000); // 5 mins
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+	// @Override
+	// public void run() {
+	// while (true) {
+	// update();
+	// try {
+	// Thread.sleep(300000); // 5 mins
+	// } catch (InterruptedException e) {
+	// e.printStackTrace();
+	// }
+	// }
+	// }
 
 	public static void update() {
 		if (!Starota.getClient().isReady())

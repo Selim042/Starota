@@ -41,7 +41,7 @@ public class CommandSetRaidEChannel extends StarotaCommand {
 			channel.sendMessage("Channel not found");
 			return;
 		}
-		EBStorage options = server.getOptions();
+		EBStorage options = server.getData();
 		EBStorage channels = options.get(CHANNELS_KEY, EBStorage.class);
 		if (channels == null)
 			channels = new EBStorage().registerPrimitives();

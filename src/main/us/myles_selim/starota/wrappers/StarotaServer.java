@@ -56,7 +56,7 @@ public class StarotaServer {
 
 	private final IGuild guild;
 	public EBStorage profiles;
-	private EBStorage options;
+	private EBStorage data;
 	private EBList<TradeboardPost> tradeboard;
 	private EBStorage leaderboards;
 	private Map<String, Long> battleTimers = new ConcurrentHashMap<>();
@@ -141,40 +141,44 @@ public class StarotaServer {
 	}
 	// end profile stuffs
 
-	// start options stuffs
-	public EBStorage getOptions() {
-		return options;
+	// start data stuffs
+	public EBStorage getData() {
+		return data;
 	}
 
-	public boolean hasKey(String key) {
-		return options.containsKey(key);
+	public boolean hasDataKey(String key) {
+		return data.containsKey(key);
 	}
 
-	public boolean hasKey(String key, Class<?> type) {
-		return options.containsKey(key) && type != null && type.isInstance(options.get(key));
+	public boolean hasDataKey(String key, Class<?> type) {
+		return data.containsKey(key) && type != null && type.isInstance(data.get(key));
 	}
 
-	public Object getValue(String key) {
-		return options.get(key);
+	public Object getDataValue(String key) {
+		return data.get(key);
 	}
 
-	public void setValue(String key, Object val) {
-		options.set(key, val);
+	public void setDataValue(String key, Object val) {
+		data.set(key, val);
 	}
 
-	public void clearValue(String key) {
-		options.clearKey(key);
+	public void clearDataValue(String key) {
+		data.clearKey(key);
 	}
 
-	public void clearOptions() {
-		for (String key : options.getKeys())
-			options.clearKey(key);
+	public void clearDataOptions() {
+		for (String key : data.getKeys())
+			data.clearKey(key);
 		File optionsFile = new File(new File(Starota.DATA_FOLDER, "options"),
 				guild.getLongID() + IOHelper.EBS_EXTENSION);
 		if (optionsFile.exists())
 			optionsFile.delete();
 	}
-	// end options stuffs
+	// end data stuffs
+
+	// start settings stuffs
+	
+	// end settings stufs
 
 	// start tradeboard stuffs
 	public void addPost(PlayerProfile profile, TradeboardPost post) {
@@ -266,8 +270,8 @@ public class StarotaServer {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.TRADEBOARD))
 			return null;
 		int nextPostId = 1;
-		if (hasKey(TRADE_ID_KEY))
-			nextPostId = (int) getValue(TRADE_ID_KEY);
+		if (hasDataKey(TRADE_ID_KEY))
+			nextPostId = (int) getDataValue(TRADE_ID_KEY);
 		if (nextPostId >= 9999) {
 			IUser serverOwner = guild.getOwner();
 			System.out.println("Server " + guild.getName() + ", run by " + serverOwner.getName() + "#"
@@ -276,7 +280,7 @@ public class StarotaServer {
 		}
 		TradeboardPost post = new TradeboardPost(nextPostId, lookingFor, owner, pokemon, form, shiny,
 				gender, legacy);
-		setValue(TRADE_ID_KEY, nextPostId + 1);
+		setDataValue(TRADE_ID_KEY, nextPostId + 1);
 		tradeboard.addWrapped(post);
 		return post;
 	}
@@ -616,9 +620,9 @@ public class StarotaServer {
 	public static final String WEBHOOK_SECRET_KEY = "webhook_secret";
 
 	public String getWebhookSecret() {
-		if (!options.containsKey(WEBHOOK_SECRET_KEY))
+		if (!data.containsKey(WEBHOOK_SECRET_KEY))
 			return null;
-		return options.get(WEBHOOK_SECRET_KEY, String.class);
+		return data.get(WEBHOOK_SECRET_KEY, String.class);
 	}
 	// end other stuff
 
@@ -634,7 +638,7 @@ public class StarotaServer {
 
 		server.profiles = ServerDataHelper.getEBSFromFolder(guild, PROFILES)
 				.registerType(new PlayerProfile.DataTypePlayerProfile());
-		server.options = ServerDataHelper.getEBSFromFolder(guild, OPTIONS);
+		server.data = ServerDataHelper.getEBSFromFolder(guild, OPTIONS);
 		server.tradeboard = ServerDataHelper.getEBListFromFolder(guild, TRADEBOARD,
 				new TradeboardPost());
 		server.leaderboards = ServerDataHelper.getEBSFromFolder(guild, LEADERBOARDS)

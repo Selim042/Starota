@@ -118,9 +118,9 @@ public class CommandRaid extends StarotaCommand {
 	}
 
 	private static IChannel getSendChannel(StarotaServer server, IChannel msgChannel) {
-		if (!server.getOptions().containsKey(CommandSetRaidEChannel.CHANNELS_KEY))
+		if (!server.getData().containsKey(CommandSetRaidEChannel.CHANNELS_KEY))
 			return msgChannel;
-		EBStorage channels = server.getOptions().get(CommandSetRaidEChannel.CHANNELS_KEY,
+		EBStorage channels = server.getData().get(CommandSetRaidEChannel.CHANNELS_KEY,
 				EBStorage.class);
 		if (channels.containsKey(msgChannel.getStringID())) {
 			long channelId = channels.get(msgChannel.getStringID(), Long.class);

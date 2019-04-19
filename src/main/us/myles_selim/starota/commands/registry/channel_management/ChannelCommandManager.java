@@ -19,7 +19,7 @@ public class ChannelCommandManager {
 	public static boolean isAllowedHere(StarotaServer server, String category, IChannel channel) {
 		if (server == null)
 			return true;
-		EBStorage stor = (EBStorage) server.getValue(WHITELIST_KEY);
+		EBStorage stor = (EBStorage) server.getDataValue(WHITELIST_KEY);
 		if (stor == null)
 			return true;
 		EBList<String> whitelist = stor.get(category, EBList.class);
@@ -31,11 +31,11 @@ public class ChannelCommandManager {
 	@SuppressWarnings("unchecked")
 	public static void addWhitelist(StarotaServer server, String category, IChannel channel) {
 		EBStorage stor;
-		if (server.hasKey(WHITELIST_KEY))
-			stor = (EBStorage) server.getValue(WHITELIST_KEY);
+		if (server.hasDataKey(WHITELIST_KEY))
+			stor = (EBStorage) server.getDataValue(WHITELIST_KEY);
 		else {
 			stor = new EBStorage().registerPrimitives();
-			server.setValue(WHITELIST_KEY, stor);
+			server.setDataValue(WHITELIST_KEY, stor);
 		}
 		EBList<String> whitelist;
 		if (stor.containsKey(category))
@@ -53,8 +53,8 @@ public class ChannelCommandManager {
 	@SuppressWarnings("unchecked")
 	public static boolean removeWhitelist(StarotaServer server, String category, IChannel channel) {
 		EBStorage stor;
-		if (server.hasKey(WHITELIST_KEY))
-			stor = (EBStorage) server.getValue(WHITELIST_KEY);
+		if (server.hasDataKey(WHITELIST_KEY))
+			stor = (EBStorage) server.getDataValue(WHITELIST_KEY);
 		else
 			return false;
 		EBList<String> whitelist;
@@ -68,8 +68,8 @@ public class ChannelCommandManager {
 	@SuppressWarnings("unchecked")
 	public static List<IChannel> getWhitelist(StarotaServer server, String category) {
 		EBStorage stor;
-		if (server.hasKey(WHITELIST_KEY))
-			stor = (EBStorage) server.getValue(WHITELIST_KEY);
+		if (server.hasDataKey(WHITELIST_KEY))
+			stor = (EBStorage) server.getDataValue(WHITELIST_KEY);
 		else
 			return Collections.emptyList();
 		EBList<String> whitelist = null;

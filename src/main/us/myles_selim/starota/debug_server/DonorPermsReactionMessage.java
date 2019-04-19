@@ -69,7 +69,7 @@ public class DonorPermsReactionMessage extends PersistReactionMessage {
 		for (int i = 0; i < guilds.size() && displayed < SERVERS_PER_PAGE
 				&& (SERVERS_PER_PAGE * index) + i < guilds.size(); i++) {
 			IGuild g = guilds.get((SERVERS_PER_PAGE * index) + i);
-			if (EmojiServerHelper.isEmojiServer(g) || g.equals(DebugServer.DEBUG_SERVER))
+			if (EmojiServerHelper.isEmojiServer(g) || g.getLongID() == DebugServer.DEBUG_SERVER_ID)
 				continue;
 			List<EnumDonorPerm> perms = RolePermHelper.getDonorPerms(g);
 			boolean hasAll = true;

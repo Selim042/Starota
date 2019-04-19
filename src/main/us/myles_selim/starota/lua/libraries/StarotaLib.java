@@ -39,7 +39,7 @@ public class StarotaLib implements LuaLibrary {
 	@Override
 	public LuaValue add(LuaState state, LuaTable env) {
 		env.rawset("_STAROTA_VERSION", ValueFactory.valueOf(Starota.VERSION));
-		env.rawset("options", storageToValue(server.getOptions(), StarotaServer.TRADE_ID_KEY,
+		env.rawset("options", storageToValue(server.getData(), StarotaServer.TRADE_ID_KEY,
 				CommandChangelogChannel.CHANGES_CHANNEL, "changesVersion", StarotaModule.MODULE_KEY));
 		if (StarotaModule.isModuleEnabled(server, BaseModules.PROFILES)) {
 			env.rawset("getProfile", new OneArgFunction() {

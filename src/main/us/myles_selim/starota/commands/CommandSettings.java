@@ -40,7 +40,7 @@ public class CommandSettings extends StarotaCommand {
 			sendSettingsEmbed(server, channel);
 			return;
 		}
-		EBStorage settings = server.getOptions().get(SETTINGS_KEY, EBStorage.class);
+		EBStorage settings = server.getData().get(SETTINGS_KEY, EBStorage.class);
 		if (!settings.containsKey(args[1])) {
 			channel.sendMessage("Setting \"" + args[1] + "\" not found");
 			return;
@@ -56,11 +56,11 @@ public class CommandSettings extends StarotaCommand {
 
 	private void sendSettingsEmbed(StarotaServer server, IChannel channel) {
 		EmbedBuilder builder = new EmbedBuilder();
-		EBStorage settings = server.getOptions().get(SETTINGS_KEY, EBStorage.class);
+		EBStorage settings = server.getData().get(SETTINGS_KEY, EBStorage.class);
 		// EBStorage settings = server.getOptions();
 		if (settings == null) {
 			settings = getDefaultSettings();
-			server.getOptions().set(SETTINGS_KEY, settings);
+			server.getData().set(SETTINGS_KEY, settings);
 		}
 
 		builder.withTitle(server.getDiscordGuild().getName() + " Options:");

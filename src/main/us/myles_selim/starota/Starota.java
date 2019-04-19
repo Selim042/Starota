@@ -134,6 +134,7 @@ public class Starota {
 
 			@Override
 			public void run() {
+				System.out.println("running shutdown thread");
 				EXECUTOR.shutdown();
 			}
 		});
@@ -167,8 +168,9 @@ public class Starota {
 				e.printStackTrace();
 			}
 			BaseModules.registerModules();
-			DebugServer debug = new DebugServer();
-			debug.start();
+			// DebugServer debug = new DebugServer();
+			// debug.start();
+			DebugServer.init();
 
 			System.out.println("registering commands");
 			CLIENT.changePresence(StatusType.DND, ActivityType.PLAYING, "registering commands...");
@@ -303,17 +305,17 @@ public class Starota {
 						guilds.addAll(PokedexBot.POKEDEX_CLIENT.getGuilds());
 					for (IGuild g : guilds) {
 						StarotaServer server = StarotaServer.getServer(g);
-						if (!server.hasKey(CommandChangelogChannel.CHANGES_CHANNEL))
+						if (!server.hasDataKey(CommandChangelogChannel.CHANGES_CHANNEL))
 							continue;
 						IChannel changesChannel = CLIENT.getChannelByID(
-								(long) server.getValue(CommandChangelogChannel.CHANGES_CHANNEL));
+								(long) server.getDataValue(CommandChangelogChannel.CHANGES_CHANNEL));
 						if (changesChannel == null)
 							continue;
-						String latestChangelog = (String) server.getValue("changesVersion");
+						String latestChangelog = (String) server.getDataValue("changesVersion");
 						if (!VERSION.equalsIgnoreCase(latestChangelog)) {
 							RequestBuffer.request(
 									() -> changesChannel.sendMessage("```" + CHANGELOG + "```"));
-							server.setValue("changesVersion", VERSION);
+							server.setDataValue("changesVersion", VERSION);
 						} else
 							sentToAll = false;
 					}
@@ -382,7 +384,7 @@ public class Starota {
 				public void run() {
 					for (IGuild g : CLIENT.getGuilds()) {
 						StarotaServer server = StarotaServer.getServer(g);
-						EBStorage options = server.getOptions();
+						EBStorage options = server.getData();
 						if (options.containsKey(CommandChangelogChannel.CHANGES_CHANNEL)) {
 							EBStorage settings = options.get(CommandSettings.SETTINGS_KEY,
 									EBStorage.class);
@@ -397,7 +399,9 @@ public class Starota {
 				}
 			});
 		} catch (Exception e) {
-			System.out.println("Starota failed to start properly. Printing exception then exiting");
+			System.out.println("+-------------------------------------------------------------------+");
+			System.out.println("| Starota failed to start properly. Printing exception then exiting |");
+			System.out.println("+-------------------------------------------------------------------+");
 			e.printStackTrace();
 			Runtime.getRuntime().exit(0);
 		}

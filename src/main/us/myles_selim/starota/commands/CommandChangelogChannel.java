@@ -31,7 +31,7 @@ public class CommandChangelogChannel extends StarotaCommand {
 		}
 
 		if (args[1].contentEquals("none")) {
-			server.clearValue(CHANGES_CHANNEL);
+			server.clearDataValue(CHANGES_CHANNEL);
 			channel.sendMessage("Changelog channel cleared.");
 			return;
 		}
@@ -41,7 +41,7 @@ public class CommandChangelogChannel extends StarotaCommand {
 			channel.sendMessage("Channel \"" + args[1] + "\" not found");
 			return;
 		}
-		server.setValue(CHANGES_CHANNEL, target.getLongID());
+		server.setDataValue(CHANGES_CHANNEL, target.getLongID());
 		channel.sendMessage("Set changelog channel to \"" + target.mention() + "\".");
 	}
 

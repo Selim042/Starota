@@ -52,8 +52,8 @@ public class PrimaryCommandHandler {
 		if (guild == null)
 			return DEFAULT_PREFIX;
 		StarotaServer server = StarotaServer.getServer(guild);
-		if (server.hasKey(PREFIX_KEY))
-			return String.valueOf(server.getValue(PREFIX_KEY));
+		if (server.hasDataKey(PREFIX_KEY))
+			return String.valueOf(server.getDataValue(PREFIX_KEY));
 		return DEFAULT_PREFIX;
 	}
 
@@ -61,7 +61,7 @@ public class PrimaryCommandHandler {
 		if (guild == null)
 			return;
 		StarotaServer server = StarotaServer.getServer(guild);
-		server.setValue(PREFIX_KEY, prefix);
+		server.setDataValue(PREFIX_KEY, prefix);
 	}
 
 	public void registerCommandHandler(ICommandHandler handler) {

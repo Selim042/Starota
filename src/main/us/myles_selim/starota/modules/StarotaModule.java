@@ -17,10 +17,10 @@ public class StarotaModule {
 
 	@SuppressWarnings("unchecked")
 	private static List<StarotaModule> getDisabledModulesRaw(StarotaServer server) {
-		if (server == null || !server.hasKey(MODULE_KEY, EBList.class))
+		if (server == null || !server.hasDataKey(MODULE_KEY, EBList.class))
 			return new ArrayList<>();
 		List<StarotaModule> modules = new ArrayList<>();
-		for (String name : ((EBList<String>) server.getValue(MODULE_KEY)).values()) {
+		for (String name : ((EBList<String>) server.getDataValue(MODULE_KEY)).values()) {
 			StarotaModule module = getModule(name);
 			if (module != null)
 				modules.add(module);
@@ -29,27 +29,27 @@ public class StarotaModule {
 	}
 
 	private static boolean disableModuleRaw(StarotaServer server, StarotaModule module) {
-		if (server == null || !server.hasKey(MODULE_KEY, EBList.class))
-			server.setValue(MODULE_KEY, new EBList<>(new DataTypeString()));
+		if (server == null || !server.hasDataKey(MODULE_KEY, EBList.class))
+			server.setDataValue(MODULE_KEY, new EBList<>(new DataTypeString()));
 		@SuppressWarnings("unchecked")
-		EBList<String> modules = (EBList<String>) server.getValue(MODULE_KEY);
+		EBList<String> modules = (EBList<String>) server.getDataValue(MODULE_KEY);
 		if (modules.containsWrapped(module.name))
 			return false;
 		modules.addWrapped(module.name);
-		server.setValue(MODULE_KEY, modules);
+		server.setDataValue(MODULE_KEY, modules);
 		DebugServer.update();
 		return true;
 	}
 
 	private static boolean enableModuleRaw(StarotaServer server, StarotaModule module) {
-		if (server == null || !server.hasKey(MODULE_KEY))
+		if (server == null || !server.hasDataKey(MODULE_KEY))
 			return false;
 		@SuppressWarnings("unchecked")
-		EBList<String> modules = (EBList<String>) server.getValue(MODULE_KEY);
+		EBList<String> modules = (EBList<String>) server.getDataValue(MODULE_KEY);
 		if (!modules.containsWrapped(module.name))
 			return false;
 		modules.removeWrapped(module.name);
-		server.setValue(MODULE_KEY, modules);
+		server.setDataValue(MODULE_KEY, modules);
 		DebugServer.update();
 		return true;
 	}
@@ -84,7 +84,7 @@ public class StarotaModule {
 	}
 
 	public static boolean isCategoryEnabled(StarotaServer server, String category) {
-		if (server == null || !server.hasKey(MODULE_KEY, EBList.class))
+		if (server == null || !server.hasDataKey(MODULE_KEY, EBList.class))
 			return true;
 		List<StarotaModule> modules = getDisabledModulesRaw(server);
 		for (StarotaModule m : modules)
@@ -113,7 +113,7 @@ public class StarotaModule {
 	}
 
 	private static boolean isModuleEnabledShallow(StarotaServer server, StarotaModule module) {
-		if (server == null || !server.hasKey(MODULE_KEY, EBList.class))
+		if (server == null || !server.hasDataKey(MODULE_KEY, EBList.class))
 			return true;
 		List<StarotaModule> modules = getDisabledModulesRaw(server);
 		return !modules.contains(module);

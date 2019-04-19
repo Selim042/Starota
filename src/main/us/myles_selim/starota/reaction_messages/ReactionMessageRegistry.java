@@ -62,7 +62,7 @@ public class ReactionMessageRegistry {
 		ReactionMessage rMsg = MESSAGES.remove(stringId);
 		if (rMsg instanceof PersistReactionMessage) {
 			StarotaServer sserver = StarotaServer.getServer(event.getGuild());
-			EBStorage storage = sserver.getOptions();
+			EBStorage storage = sserver.getData();
 			if (!storage.containsKey(PERSIST_KEY))
 				return;
 			EBStorage persist = storage.get(PERSIST_KEY, EBStorage.class);
@@ -86,7 +86,7 @@ public class ReactionMessageRegistry {
 
 	protected static void serialize(StarotaServer server, IMessage message,
 			PersistReactionMessage rMessage) {
-		EBStorage storage = server.getOptions();
+		EBStorage storage = server.getData();
 		if (!storage.containsKey(PERSIST_KEY))
 			storage.set(PERSIST_KEY, new EBStorage().registerType(new DataTypePReactionMessage()));
 		EBStorage persist = storage.get(PERSIST_KEY, EBStorage.class);
@@ -95,7 +95,7 @@ public class ReactionMessageRegistry {
 	}
 
 	private static void deserializeAll(StarotaServer server) {
-		EBStorage storage = server.getOptions();
+		EBStorage storage = server.getData();
 		if (!storage.containsKey(PERSIST_KEY))
 			return;
 		EBStorage persist = storage.get(PERSIST_KEY, EBStorage.class);

@@ -67,14 +67,14 @@ public class StatusReactionMessage extends PersistReactionMessage {
 		for (int i = 0; i < guilds.size() && displayed < SERVERS_PER_PAGE
 				&& (SERVERS_PER_PAGE * index) + i < guilds.size(); i++) {
 			IGuild g = guilds.get((SERVERS_PER_PAGE * index) + i);
-			if (EmojiServerHelper.isEmojiServer(g) || g.equals(DebugServer.DEBUG_SERVER))
+			if (EmojiServerHelper.isEmojiServer(g) || g.getLongID() == DebugServer.DEBUG_SERVER_ID)
 				continue;
 			StarotaServer s = StarotaServer.getServer(g);
 			String text = "";
 			text += "Owner: " + g.getOwner().getName() + "#" + g.getOwner().getDiscriminator() + "\n";
 			text += "Users: " + g.getUsers().size() + "\n";
-			int tradeId = s.hasKey(StarotaServer.TRADE_ID_KEY)
-					? (int) s.getValue(StarotaServer.TRADE_ID_KEY)
+			int tradeId = s.hasDataKey(StarotaServer.TRADE_ID_KEY)
+					? (int) s.getDataValue(StarotaServer.TRADE_ID_KEY)
 					: 0;
 			text += "Trades: " + tradeId + "/9,999\n";
 			text += "Leaderboards: " + s.getLeaderboardCount() + "/"

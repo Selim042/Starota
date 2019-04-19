@@ -15,16 +15,16 @@ public class GroupManager {
 
 	@SuppressWarnings("unchecked")
 	public static boolean isGroup(StarotaServer server, IRole role) {
-		if (role == null || !server.hasKey(ROLES_KEY))
+		if (role == null || !server.hasDataKey(ROLES_KEY))
 			return false;
-		EBList<Long> roles = (EBList<Long>) server.getValue(ROLES_KEY);
+		EBList<Long> roles = (EBList<Long>) server.getDataValue(ROLES_KEY);
 		return roles.containsWrapped(role.getLongID());
 	}
 
 	@SuppressWarnings("unchecked")
 	public static List<IRole> getGroups(StarotaServer server) {
 		List<IRole> ret = new ArrayList<>();
-		EBList<Long> roles = (EBList<Long>) server.getValue(ROLES_KEY);
+		EBList<Long> roles = (EBList<Long>) server.getDataValue(ROLES_KEY);
 		if (roles == null)
 			return Collections.emptyList();
 		for (Long l : roles.values())
@@ -35,11 +35,11 @@ public class GroupManager {
 	@SuppressWarnings("unchecked")
 	public static void setAsGroup(StarotaServer server, IRole role, boolean isGroup) {
 		EBList<Long> roles;
-		if (server.hasKey(ROLES_KEY))
-			roles = (EBList<Long>) server.getValue(ROLES_KEY);
+		if (server.hasDataKey(ROLES_KEY))
+			roles = (EBList<Long>) server.getDataValue(ROLES_KEY);
 		else {
 			roles = new EBList<>(new DataTypeLong());
-			server.setValue(ROLES_KEY, roles);
+			server.setDataValue(ROLES_KEY, roles);
 		}
 		if (isGroup)
 			roles.addWrapped(role.getLongID());
