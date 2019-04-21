@@ -22,8 +22,8 @@ import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.assistants.StarotaAssistants;
-import us.myles_selim.starota.cache.ClearCache;
 import us.myles_selim.starota.debug_server.DebugServer;
+import us.myles_selim.starota.misc.data_types.cache.ClearCache;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class EventHandler {

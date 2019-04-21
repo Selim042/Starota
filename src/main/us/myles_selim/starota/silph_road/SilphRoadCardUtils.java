@@ -20,8 +20,8 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.cache.CachedData;
-import us.myles_selim.starota.cache.ClearCache;
+import us.myles_selim.starota.misc.data_types.cache.CachedData;
+import us.myles_selim.starota.misc.data_types.cache.ClearCache;
 import us.myles_selim.starota.silph_road.SilphCard.SilphCheckin;
 import us.myles_selim.starota.silph_road.SilphCard.SilphCheckinTime;
 

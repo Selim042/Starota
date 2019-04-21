@@ -1,4 +1,4 @@
-package us.myles_selim.starota.cache;
+package us.myles_selim.starota.misc.data_types.cache;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

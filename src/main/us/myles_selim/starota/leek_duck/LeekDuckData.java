@@ -14,9 +14,9 @@ import java.util.regex.Pattern;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.cache.CachedData;
-import us.myles_selim.starota.cache.ClearCache;
 import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.misc.data_types.cache.CachedData;
+import us.myles_selim.starota.misc.data_types.cache.ClearCache;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 

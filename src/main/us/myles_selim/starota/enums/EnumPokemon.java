@@ -11,8 +11,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.cache.CachedData;
-import us.myles_selim.starota.cache.ClearCache;
+import us.myles_selim.starota.misc.data_types.cache.CachedData;
+import us.myles_selim.starota.misc.data_types.cache.ClearCache;
 import us.myles_selim.starota.misc.utils.ImageHelper;
 import us.myles_selim.starota.trading.forms.FormSet;
 import us.myles_selim.starota.trading.forms.FormSet.Form;

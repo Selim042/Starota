@@ -1,4 +1,4 @@
-package us.myles_selim.starota.cache;
+package us.myles_selim.starota.misc.data_types.cache;
 
 public class CachedData<V> implements ICache {
 

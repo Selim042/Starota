@@ -13,9 +13,9 @@ import org.reflections.scanners.MethodAnnotationsScanner;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
-import us.myles_selim.starota.cache.ClearCache;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
+import us.myles_selim.starota.misc.data_types.cache.ClearCache;
 
 public class CommandCaches extends JavaCommand {
 
