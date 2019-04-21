@@ -38,6 +38,7 @@ public class PokedexBot {
 
 	public static IDiscordClient POKEDEX_CLIENT;
 	public static PrimaryCommandHandler COMMAND_HANDLER;
+	public static ReactionMessageRegistry REACTION_MESSAGES_REGISTRY;
 
 	public static final String BOT_NAME = "Pokedex";
 	public static final EnumSet<Permissions> USED_PERMISSIONS = EnumSet.of(Permissions.SEND_MESSAGES,
@@ -48,7 +49,7 @@ public class PokedexBot {
 	private static DiscordBotListAPI BOT_LIST;
 	private static boolean started = false;
 
-	public static void start(ReactionMessageRegistry reactionRegistry) {
+	public static void start() {
 		if (started || Starota.IS_DEV)
 			return;
 		started = true;
@@ -68,6 +69,12 @@ public class PokedexBot {
 			System.err.println("failed to start Pokedex bot");
 			return;
 		}
+		try {
+			while (!POKEDEX_CLIENT.isReady())
+				Thread.sleep(10);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		COMMAND_HANDLER = new PrimaryCommandHandler(POKEDEX_CLIENT, (IChannel ch) -> {
 			IUser starota = Starota.getUser(Starota.STAROTA_ID);
 			IUser starotaDev = Starota.getUser(Starota.STAROTA_DEV_ID);
@@ -76,12 +83,7 @@ public class PokedexBot {
 				return false;
 			return true;
 		});
-		try {
-			while (!POKEDEX_CLIENT.isReady())
-				Thread.sleep(10);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		REACTION_MESSAGES_REGISTRY = new ReactionMessageRegistry(POKEDEX_CLIENT);
 		Thread statusUpdater = new Thread("PokedexStatusUpdater") {
 
 			@Override
@@ -113,12 +115,12 @@ public class PokedexBot {
 
 		jCmdHandler.registerCommand("Administrative", new CommandChangelogChannel());
 
-		jCmdHandler.registerCommand(new CommandPokedex());
+		jCmdHandler.registerCommand(new CommandPokedex(REACTION_MESSAGES_REGISTRY));
 
 		EventDispatcher dispatcher = POKEDEX_CLIENT.getDispatcher();
 		dispatcher.registerListener(COMMAND_HANDLER);
+		dispatcher.registerListener(REACTION_MESSAGES_REGISTRY);
 		dispatcher.registerListener(new PokedexEventHandler());
-		dispatcher.registerListener(reactionRegistry);
 	}
 
 	public static IUser getOurUser() {

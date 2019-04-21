@@ -63,7 +63,8 @@ public class CommandRaid extends StarotaCommand {
 								"**Usage**: " + server.getPrefix() + this.getName() + " [time]");
 						return;
 					}
-					ReactionMessage rMsg = ReactionMessageRegistry.getMessage(key);
+					ReactionMessage rMsg = ReactionMessageRegistry.getRegistry(channel.getShard())
+							.getMessage(key);
 					if (rMsg instanceof WebhookRaidReactionMessage) {
 						WebhookRaid raidData = ((WebhookRaidReactionMessage) rMsg).getRaidData();
 						new RaidReactionMessage(raidData.getPokemon(), raidData.getForm(),
@@ -120,8 +121,7 @@ public class CommandRaid extends StarotaCommand {
 	private static IChannel getSendChannel(StarotaServer server, IChannel msgChannel) {
 		if (!server.getData().containsKey(CommandSetRaidEChannel.CHANNELS_KEY))
 			return msgChannel;
-		EBStorage channels = server.getData().get(CommandSetRaidEChannel.CHANNELS_KEY,
-				EBStorage.class);
+		EBStorage channels = server.getData().get(CommandSetRaidEChannel.CHANNELS_KEY, EBStorage.class);
 		if (channels.containsKey(msgChannel.getStringID())) {
 			long channelId = channels.get(msgChannel.getStringID(), Long.class);
 			if (channelId == -1)

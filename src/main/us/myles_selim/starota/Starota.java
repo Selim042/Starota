@@ -126,6 +126,7 @@ public class Starota {
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static PrimaryCommandHandler COMMAND_HANDLER;
+	public static ReactionMessageRegistry REACTION_MESSAGES_REGISTRY;
 	public static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
 
 	public static void main(String[] args) {
@@ -157,7 +158,6 @@ public class Starota {
 				System.err.println("Failed to login, exiting");
 				return;
 			}
-			COMMAND_HANDLER = new PrimaryCommandHandler(CLIENT);
 			StarotaAssistants.init();
 			IS_DEV = Boolean.parseBoolean(PROPERTIES.getProperty("is_dev"));
 			EventDispatcher dispatcher = CLIENT.getDispatcher();
@@ -167,6 +167,8 @@ public class Starota {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			COMMAND_HANDLER = new PrimaryCommandHandler(CLIENT);
+			REACTION_MESSAGES_REGISTRY = new ReactionMessageRegistry(CLIENT);
 			BaseModules.registerModules();
 			// DebugServer debug = new DebugServer();
 			// debug.start();
@@ -235,7 +237,8 @@ public class Starota {
 			jCmdHandler.registerCommand("PvP", new CommandNotReady());
 			jCmdHandler.registerCommand("PvP", new CommandFindBattles());
 
-			jCmdHandler.registerCommand("Pokedex", new CommandPokedex());
+			jCmdHandler.registerCommand("Pokedex",
+					new CommandPokedex(Starota.REACTION_MESSAGES_REGISTRY));
 
 			jCmdHandler.registerCommand("Raids", new CommandRaid());
 			jCmdHandler.registerCommand("Raids", new CommandSetRaidEChannel());
@@ -262,14 +265,13 @@ public class Starota {
 			CLIENT.changePresence(StatusType.IDLE, ActivityType.PLAYING,
 					"starting threads and loading settings...");
 
-			ReactionMessageRegistry reactionRegistry = new ReactionMessageRegistry();
-			dispatcher.registerListener(reactionRegistry);
 			dispatcher.registerListener(COMMAND_HANDLER);
+			dispatcher.registerListener(REACTION_MESSAGES_REGISTRY);
 			dispatcher.registerListener(new EventHandler());
 			dispatcher.registerListener(new WebhookEventHandler());
-			ReactionMessageRegistry.init();
+			// ReactionMessageRegistry.init();
 			WebServer.init();
-			PokedexBot.start(reactionRegistry);
+			PokedexBot.start();
 			submitStats();
 
 			try {
@@ -399,9 +401,9 @@ public class Starota {
 				}
 			});
 		} catch (Exception e) {
-			System.out.println("+-------------------------------------------------------------------+");
-			System.out.println("| Starota failed to start properly. Printing exception then exiting |");
-			System.out.println("+-------------------------------------------------------------------+");
+			System.err.println("+-------------------------------------------------------------------+");
+			System.err.println("| Starota failed to start properly. Printing exception then exiting |");
+			System.err.println("+-------------------------------------------------------------------+");
 			e.printStackTrace();
 			Runtime.getRuntime().exit(0);
 		}
