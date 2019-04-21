@@ -11,6 +11,46 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class StarotaModule {
 
+	private final String name;
+	private final String commandCategory;
+	private String description;
+	private final StarotaModule[] dependencies;
+
+	public StarotaModule(String name) {
+		this(name, null);
+	}
+
+	public StarotaModule(String name, String commandCategory) {
+		this(name, commandCategory, new StarotaModule[] {});
+	}
+
+	public StarotaModule(String name, String commandCategory, StarotaModule... dependencies) {
+		this.name = name;
+		this.commandCategory = commandCategory;
+		this.dependencies = dependencies;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public String getCommandCategory() {
+		return this.commandCategory;
+	}
+
+	public StarotaModule setDescription(String description) {
+		this.description = description;
+		return this;
+	}
+
+	public String getDescription() {
+		return this.description;
+	}
+
+	public StarotaModule[] getDependencies() {
+		return this.dependencies;
+	}
+
 	public static final String MODULE_KEY = "disabledModules";
 
 	private static final List<StarotaModule> MODULES = new ArrayList<>();
@@ -127,46 +167,6 @@ public class StarotaModule {
 			deps.add(d);
 		}
 		return deps;
-	}
-
-	private final String name;
-	private final String commandCategory;
-	private String description;
-	private final StarotaModule[] dependencies;
-
-	public StarotaModule(String name) {
-		this(name, null);
-	}
-
-	public StarotaModule(String name, String commandCategory) {
-		this(name, commandCategory, new StarotaModule[] {});
-	}
-
-	public StarotaModule(String name, String commandCategory, StarotaModule... dependencies) {
-		this.name = name;
-		this.commandCategory = commandCategory;
-		this.dependencies = dependencies;
-	}
-
-	public String getName() {
-		return this.name;
-	}
-
-	public String getCommandCategory() {
-		return this.commandCategory;
-	}
-
-	public StarotaModule setDescription(String description) {
-		this.description = description;
-		return this;
-	}
-
-	public String getDescription() {
-		return this.description;
-	}
-
-	public StarotaModule[] getDependencies() {
-		return this.dependencies;
 	}
 
 }

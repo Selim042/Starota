@@ -17,6 +17,8 @@ public class JavaCommand implements ICommand {
 
 	private final String name;
 	private final String description;
+	private String category;
+	private ICommandHandler handler;
 
 	public JavaCommand(String name) {
 		this(name, null);
@@ -93,8 +95,6 @@ public class JavaCommand implements ICommand {
 					String.format("**Usage**: %s%s %s", prefix, getName(), getGeneralUsage()));
 	}
 
-	private String category;
-
 	@Override
 	public final void setCategory(String category) {
 		if (this.category == null)
@@ -107,8 +107,6 @@ public class JavaCommand implements ICommand {
 			return PrimaryCommandHandler.DEFAULT_CATEGORY;
 		return this.category;
 	}
-
-	private ICommandHandler handler;
 
 	@Override
 	public final void setCommandHandler(ICommandHandler handler) {

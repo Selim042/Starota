@@ -179,77 +179,7 @@ public class Starota {
 
 			JavaCommandHandler jCmdHandler = new JavaCommandHandler();
 			COMMAND_HANDLER.registerCommandHandler(jCmdHandler);
-			jCmdHandler.registerDefaultCommands();
-
-			jCmdHandler.registerCommand(new CommandChangelog());
-			jCmdHandler.registerCommand(new CommandCredits());
-			jCmdHandler.registerCommand(new CommandSupportBot(Starota.BOT_NAME, Starota.STAROTA_ID));
-			jCmdHandler.registerCommand(new CommandInvite(Starota.BOT_NAME, Starota.STAROTA_ID,
-					Permissions.generatePermissionsNumber(DebugServer.getUsedPermissions())));
-			jCmdHandler.registerCommand(new CommandPing());
-			jCmdHandler.registerCommand(new CommandVote(Starota.BOT_NAME, Starota.STAROTA_ID));
-
-			jCmdHandler.registerCommand("Administrative", new CommandStatus());
-			jCmdHandler.registerCommand("Administrative", new CommandChangelogChannel());
-			jCmdHandler.registerCommand("Administrative", new CommandInviteAssistants());
-			jCmdHandler.registerCommand("Administrative", new CommandVotePerks());
-			jCmdHandler.registerCommand("Administrative", new CommandSettings());
-			if (IS_DEV) {
-				jCmdHandler.registerCommand("Debug", new CommandTest());
-				jCmdHandler.registerCommand("Debug", new CommandGenerateCommandWiki());
-			}
-
-			jCmdHandler.registerCommand("Profiles", new CommandRegister());
-			jCmdHandler.registerCommand("Profiles", new CommandUpdateProfile());
-			jCmdHandler.registerCommand("Profiles", new CommandProfile());
-			jCmdHandler.registerCommand("Profiles", new CommandSelfRegister());
-			jCmdHandler.registerCommand("Profiles", new CommandGetProfilelessPlayers());
-			jCmdHandler.registerCommand("Profiles", new CommandProfileHelp());
-
-			jCmdHandler.registerCommand("Groups", new CommandGetGroups());
-			jCmdHandler.registerCommand("Groups", new CommandAddGroup());
-			jCmdHandler.registerCommand("Groups", new CommandRemoveGroup());
-			jCmdHandler.registerCommand("Groups", new CommandSetAsGroup());
-
-			jCmdHandler.registerCommand("Tradeboard", new CommandTradeboardHelp());
-			if (IS_DEV) {
-				jCmdHandler.registerCommand("Debug", new CommandGetForms());
-				jCmdHandler.registerCommand("Debug", new CommandGetShinies());
-			}
-			jCmdHandler.registerCommand("Tradeboard", new CommandForTrade());
-			jCmdHandler.registerCommand("Tradeboard", new CommandGetUserTrades());
-			jCmdHandler.registerCommand("Tradeboard", new CommandFindTrade());
-			jCmdHandler.registerCommand("Tradeboard", new CommandGetTrade());
-			jCmdHandler.registerCommand("Tradeboard", new CommandLookingFor());
-			jCmdHandler.registerCommand("Tradeboard", new CommandRemoveTrade());
-
-			jCmdHandler.registerCommand("Lua", new CommandUploadScript());
-
-			jCmdHandler.registerCommand("Leaderboard", new CommandEditLeaderboard());
-			jCmdHandler.registerCommand("Leaderboard", new CommandUpdateLeaderboard());
-			jCmdHandler.registerCommand("Leaderboard", new CommandNewLeaderboard());
-			jCmdHandler.registerCommand("Leaderboard", new CommandGetLeaderboard());
-			jCmdHandler.registerCommand("Leaderboard", new CommandListLeaderboards());
-
-			jCmdHandler.registerCommand("Modules", new CommandModules());
-
-			jCmdHandler.registerCommand("PvP", new CommandBattleReady());
-			jCmdHandler.registerCommand("PvP", new CommandNotReady());
-			jCmdHandler.registerCommand("PvP", new CommandFindBattles());
-
-			jCmdHandler.registerCommand("Pokedex",
-					new CommandPokedex(Starota.REACTION_MESSAGES_REGISTRY));
-
-			jCmdHandler.registerCommand("Raids", new CommandRaid());
-			jCmdHandler.registerCommand("Raids", new CommandSetRaidEChannel());
-			jCmdHandler.registerCommand("Raids", new CommandRaidBosses());
-
-			jCmdHandler.registerCommand("Search", new CommandSearchPoke());
-
-			jCmdHandler.registerCommand("Misc", new CommandSilphCard());
-			jCmdHandler.registerCommand("Misc", new CommandEvents());
-			jCmdHandler.registerCommand("Misc", new CommandEggHatches());
-			jCmdHandler.registerCommand("Misc", new CommandDitto());
+			registerCommands(jCmdHandler);
 
 			CommandSettings.setDefaultValue(CommandChangelogChannel.CHANGES_CHANNEL,
 					new ChannelDataType(), ChannelDataType.NULL_CHANNEL);
@@ -407,6 +337,79 @@ public class Starota {
 			e.printStackTrace();
 			Runtime.getRuntime().exit(0);
 		}
+	}
+
+	private static void registerCommands(JavaCommandHandler jCmdHandler) {
+		jCmdHandler.registerDefaultCommands();
+
+		jCmdHandler.registerCommand(new CommandChangelog());
+		jCmdHandler.registerCommand(new CommandCredits());
+		jCmdHandler.registerCommand(new CommandSupportBot(Starota.BOT_NAME, Starota.STAROTA_ID));
+		jCmdHandler.registerCommand(new CommandInvite(Starota.BOT_NAME, Starota.STAROTA_ID,
+				Permissions.generatePermissionsNumber(DebugServer.getUsedPermissions())));
+		jCmdHandler.registerCommand(new CommandPing());
+		jCmdHandler.registerCommand(new CommandVote(Starota.BOT_NAME, Starota.STAROTA_ID));
+
+		jCmdHandler.registerCommand("Administrative", new CommandStatus());
+		jCmdHandler.registerCommand("Administrative", new CommandChangelogChannel());
+		jCmdHandler.registerCommand("Administrative", new CommandInviteAssistants());
+		jCmdHandler.registerCommand("Administrative", new CommandVotePerks());
+		jCmdHandler.registerCommand("Administrative", new CommandSettings());
+		if (IS_DEV) {
+			jCmdHandler.registerCommand("Debug", new CommandTest());
+			jCmdHandler.registerCommand("Debug", new CommandGenerateCommandWiki());
+		}
+
+		jCmdHandler.registerCommand("Profiles", new CommandRegister());
+		jCmdHandler.registerCommand("Profiles", new CommandUpdateProfile());
+		jCmdHandler.registerCommand("Profiles", new CommandProfile());
+		jCmdHandler.registerCommand("Profiles", new CommandSelfRegister());
+		jCmdHandler.registerCommand("Profiles", new CommandGetProfilelessPlayers());
+		jCmdHandler.registerCommand("Profiles", new CommandProfileHelp());
+
+		jCmdHandler.registerCommand("Groups", new CommandGetGroups());
+		jCmdHandler.registerCommand("Groups", new CommandAddGroup());
+		jCmdHandler.registerCommand("Groups", new CommandRemoveGroup());
+		jCmdHandler.registerCommand("Groups", new CommandSetAsGroup());
+
+		jCmdHandler.registerCommand("Tradeboard", new CommandTradeboardHelp());
+		if (IS_DEV) {
+			jCmdHandler.registerCommand("Debug", new CommandGetForms());
+			jCmdHandler.registerCommand("Debug", new CommandGetShinies());
+		}
+		jCmdHandler.registerCommand("Tradeboard", new CommandForTrade());
+		jCmdHandler.registerCommand("Tradeboard", new CommandGetUserTrades());
+		jCmdHandler.registerCommand("Tradeboard", new CommandFindTrade());
+		jCmdHandler.registerCommand("Tradeboard", new CommandGetTrade());
+		jCmdHandler.registerCommand("Tradeboard", new CommandLookingFor());
+		jCmdHandler.registerCommand("Tradeboard", new CommandRemoveTrade());
+
+		jCmdHandler.registerCommand("Lua", new CommandUploadScript());
+
+		jCmdHandler.registerCommand("Leaderboard", new CommandEditLeaderboard());
+		jCmdHandler.registerCommand("Leaderboard", new CommandUpdateLeaderboard());
+		jCmdHandler.registerCommand("Leaderboard", new CommandNewLeaderboard());
+		jCmdHandler.registerCommand("Leaderboard", new CommandGetLeaderboard());
+		jCmdHandler.registerCommand("Leaderboard", new CommandListLeaderboards());
+
+		jCmdHandler.registerCommand("Modules", new CommandModules());
+
+		jCmdHandler.registerCommand("PvP", new CommandBattleReady());
+		jCmdHandler.registerCommand("PvP", new CommandNotReady());
+		jCmdHandler.registerCommand("PvP", new CommandFindBattles());
+
+		jCmdHandler.registerCommand("Pokedex", new CommandPokedex(Starota.REACTION_MESSAGES_REGISTRY));
+
+		jCmdHandler.registerCommand("Raids", new CommandRaid());
+		jCmdHandler.registerCommand("Raids", new CommandSetRaidEChannel());
+		jCmdHandler.registerCommand("Raids", new CommandRaidBosses());
+
+		jCmdHandler.registerCommand("Search", new CommandSearchPoke());
+
+		jCmdHandler.registerCommand("Misc", new CommandSilphCard());
+		jCmdHandler.registerCommand("Misc", new CommandEvents());
+		jCmdHandler.registerCommand("Misc", new CommandEggHatches());
+		jCmdHandler.registerCommand("Misc", new CommandDitto());
 	}
 
 	public static IDiscordClient getClient() {

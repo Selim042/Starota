@@ -54,7 +54,6 @@ public class CommandProfile extends StarotaCommand {
 			return;
 		}
 		channel.sendMessage("User " + target.getName() + " does not have a profile");
-		return;
 	}
 
 }

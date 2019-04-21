@@ -267,16 +267,16 @@ public class PrimaryCommandHandler {
 				argsL.add(arg);
 			else if (arg.startsWith("\""))
 				longArg += arg;
-			else if (longArg != "" && arg.endsWith("\"")) {
+			else if (!longArg.isEmpty() && arg.endsWith("\"")) {
 				String longArgFull = longArg + " " + arg;
 				argsL.add(longArgFull.substring(1, longArgFull.length() - 1));
 				longArg = "";
-			} else if (longArg != "")
+			} else if (!longArg.isEmpty())
 				longArg += " " + arg;
 			else
 				argsL.add(arg);
 		}
-		if (longArg != "")
+		if (!longArg.isEmpty())
 			for (String s : longArg.split(" "))
 				argsL.add(s);
 		return argsL.toArray(new String[0]);

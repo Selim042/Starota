@@ -119,7 +119,7 @@ public class PokedexEntry extends ReactionMessage {
 	private Map<String, PokedexEntry> formData = new ConcurrentHashMap<>();
 
 	public PokedexEntry getFormData(String form) {
-		if (form.equals("Normal") && !getPokemon().equals(EnumPokemon.ARCEUS))
+		if ("Normal".equals(form) && !getPokemon().equals(EnumPokemon.ARCEUS))
 			return this;
 		if (formData.containsKey(form))
 			return formData.get(form);
