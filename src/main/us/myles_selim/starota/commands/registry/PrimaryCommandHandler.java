@@ -84,7 +84,8 @@ public class PrimaryCommandHandler {
 		IMessage message = event.getMessage();
 		String cmdS = message.getContent();
 		String prefix = getPrefix(guild);
-		if (!cmdS.startsWith(prefix))
+		if (!cmdS.startsWith(prefix)
+				&& !cmdS.startsWith(client.getOurUser().mention().replaceAll("@!", "@") + " "))
 			return;
 		String[] args = getArgs(message, guild);
 		IUser ourUser = Starota.getOurUser();
@@ -257,7 +258,9 @@ public class PrimaryCommandHandler {
 	private String[] getArgs(IMessage message, IGuild guild) {
 		String cmdS = message.getContent();
 		String prefix = getPrefix(guild);
-		if (!cmdS.startsWith(prefix))
+		boolean mentionPrefix = cmdS
+				.startsWith(client.getOurUser().mention().replaceAll("@!", "@") + " ");
+		if (!mentionPrefix && !cmdS.startsWith(prefix))
 			return new String[0];
 		cmdS = cmdS.substring(prefix.length());
 		List<String> argsL = new ArrayList<>();
@@ -279,6 +282,8 @@ public class PrimaryCommandHandler {
 		if (!longArg.isEmpty())
 			for (String s : longArg.split(" "))
 				argsL.add(s);
+		if (mentionPrefix && !argsL.isEmpty())
+			argsL.remove(0);
 		return argsL.toArray(new String[0]);
 	}
 
