@@ -39,17 +39,16 @@ import us.myles_selim.starota.commands.CommandCredits;
 import us.myles_selim.starota.commands.CommandGenerateCommandWiki;
 import us.myles_selim.starota.commands.CommandInvite;
 import us.myles_selim.starota.commands.CommandPing;
-import us.myles_selim.starota.commands.CommandSettings;
 import us.myles_selim.starota.commands.CommandStatus;
 import us.myles_selim.starota.commands.CommandSupportBot;
 import us.myles_selim.starota.commands.CommandTest;
 import us.myles_selim.starota.commands.CommandVote;
-import us.myles_selim.starota.commands.pvp.CommandBattleReady;
-import us.myles_selim.starota.commands.pvp.CommandFindBattles;
-import us.myles_selim.starota.commands.pvp.CommandNotReady;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 import us.myles_selim.starota.commands.selim_pm.SelimPMCommandHandler;
+import us.myles_selim.starota.commands.settings.CommandSettings;
+import us.myles_selim.starota.commands.settings.types.SettingChannel;
+import us.myles_selim.starota.commands.tutorial.commands.CommandTutorial;
 import us.myles_selim.starota.debug_server.DebugServer;
 import us.myles_selim.starota.leaderboards.commands.CommandEditLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandGetLeaderboard;
@@ -62,8 +61,9 @@ import us.myles_selim.starota.lua.LuaEventHandler;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.commands.CommandUploadScript;
 import us.myles_selim.starota.lua.commands.LuaCommandHandler;
-import us.myles_selim.starota.misc.data_types.ChannelDataType;
 import us.myles_selim.starota.misc.utils.MiscUtils;
+import us.myles_selim.starota.misc.utils.StatusUpdater;
+import us.myles_selim.starota.misc.utils.StatusUpdater.PresenceData;
 import us.myles_selim.starota.misc.utils.TwitterHelper;
 import us.myles_selim.starota.misc.utils.WikiGenerator;
 import us.myles_selim.starota.modules.BaseModules;
@@ -75,6 +75,9 @@ import us.myles_selim.starota.profiles.commands.CommandProfileHelp;
 import us.myles_selim.starota.profiles.commands.CommandRegister;
 import us.myles_selim.starota.profiles.commands.CommandSelfRegister;
 import us.myles_selim.starota.profiles.commands.CommandUpdateProfile;
+import us.myles_selim.starota.pvp.CommandBattleReady;
+import us.myles_selim.starota.pvp.CommandFindBattles;
+import us.myles_selim.starota.pvp.CommandNotReady;
 import us.myles_selim.starota.raids.CommandRaid;
 import us.myles_selim.starota.raids.CommandRaidBosses;
 import us.myles_selim.starota.raids.CommandSetRaidEChannel;
@@ -167,8 +170,15 @@ public class Starota {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+
+			// default server settings, do this before anything else with
+			// StartaServer
+			StarotaServer
+					.setDefaultValue(new SettingChannel(null, CommandChangelogChannel.CHANGES_CHANNEL));
+
 			COMMAND_HANDLER = new PrimaryCommandHandler(CLIENT);
 			REACTION_MESSAGES_REGISTRY = new ReactionMessageRegistry(CLIENT);
+
 			BaseModules.registerModules();
 			// DebugServer debug = new DebugServer();
 			// debug.start();
@@ -180,9 +190,6 @@ public class Starota {
 			JavaCommandHandler jCmdHandler = new JavaCommandHandler();
 			COMMAND_HANDLER.registerCommandHandler(jCmdHandler);
 			registerCommands(jCmdHandler);
-
-			CommandSettings.setDefaultValue(CommandChangelogChannel.CHANGES_CHANNEL,
-					new ChannelDataType(), ChannelDataType.NULL_CHANNEL);
 
 			SelimPMCommandHandler.init();
 
@@ -210,21 +217,11 @@ public class Starota {
 				e.printStackTrace();
 			}
 			System.out.println("v" + VERSION + (DEBUG || IS_DEV ? "d" : ""));
-			Thread statusUpdater = new Thread("StarotaStatusUpdater") {
-
-				@Override
-				public void run() {
-					while (true) {
-						CLIENT.changePresence(StatusType.ONLINE, ActivityType.PLAYING,
-								"v" + VERSION + (DEBUG || IS_DEV ? "d" : ""));
-						try {
-							Thread.sleep(3600000); // 1 hour
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			};
+			StatusUpdater statusUpdater = new StatusUpdater(CLIENT);
+			statusUpdater.addPresence(new PresenceData(StatusType.ONLINE, ActivityType.PLAYING,
+					"v" + VERSION + (DEBUG || IS_DEV ? "d" : "")));
+			statusUpdater.addPresence(new PresenceData(StatusType.ONLINE, ActivityType.WATCHING,
+					"people organize raids with `raid`"));
 			statusUpdater.start();
 
 			EXECUTOR.execute(new Runnable() {
@@ -318,14 +315,9 @@ public class Starota {
 						StarotaServer server = StarotaServer.getServer(g);
 						EBStorage options = server.getData();
 						if (options.containsKey(CommandChangelogChannel.CHANGES_CHANNEL)) {
-							EBStorage settings = options.get(CommandSettings.SETTINGS_KEY,
-									EBStorage.class);
-							if (settings == null) {
-								settings = CommandSettings.getDefaultSettings();
-								options.set(CommandSettings.SETTINGS_KEY, settings);
-							}
-							settings.set(CommandChangelogChannel.CHANGES_CHANNEL, g.getChannelByID(
+							server.setSetting(CommandChangelogChannel.CHANGES_CHANNEL, g.getChannelByID(
 									options.get(CommandChangelogChannel.CHANGES_CHANNEL, long.class)));
+							options.clearKey(CommandChangelogChannel.CHANGES_CHANNEL);
 						}
 					}
 				}
@@ -410,6 +402,8 @@ public class Starota {
 		jCmdHandler.registerCommand("Misc", new CommandEvents());
 		jCmdHandler.registerCommand("Misc", new CommandEggHatches());
 		jCmdHandler.registerCommand("Misc", new CommandDitto());
+
+		jCmdHandler.registerCommand("Tutorial", new CommandTutorial());
 	}
 
 	public static IDiscordClient getClient() {

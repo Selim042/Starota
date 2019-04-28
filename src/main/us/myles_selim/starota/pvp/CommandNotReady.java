@@ -1,4 +1,4 @@
-package us.myles_selim.starota.commands.pvp;
+package us.myles_selim.starota.pvp;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;

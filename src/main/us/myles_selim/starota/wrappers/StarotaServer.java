@@ -11,6 +11,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
+
+import javax.annotation.Nonnull;
 
 import org.discordbots.api.client.entity.SimpleUser;
 
@@ -24,6 +27,12 @@ import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.ebs.IOHelper;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
+import us.myles_selim.starota.commands.settings.Setting;
+import us.myles_selim.starota.commands.settings.SettingSet;
+import us.myles_selim.starota.commands.settings.SettingSet.DataTypeSettingSet;
+import us.myles_selim.starota.commands.settings.SettingSet.EnumReturnSetStatus;
+import us.myles_selim.starota.commands.settings.types.SettingBoolean;
+import us.myles_selim.starota.commands.settings.types.SettingString;
 import us.myles_selim.starota.enums.EnumDonorPerm;
 import us.myles_selim.starota.enums.EnumGender;
 import us.myles_selim.starota.enums.EnumPokemon;
@@ -158,6 +167,10 @@ public class StarotaServer {
 		return data.get(key);
 	}
 
+	public <V> V getDataValue(String key, Class<V> type) {
+		return data.get(key, type);
+	}
+
 	public void setDataValue(String key, Object val) {
 		data.set(key, val);
 	}
@@ -177,7 +190,7 @@ public class StarotaServer {
 	// end data stuffs
 
 	// start settings stuffs
-	
+
 	// end settings stufs
 
 	// start tradeboard stuffs
@@ -616,6 +629,48 @@ public class StarotaServer {
 	// }
 	// end usage stuff
 
+	// start settings stuff
+	public static final String SETTINGS_KEY = "setting_set";
+
+	private SettingSet getSettings() {
+		if (!this.hasDataKey(SETTINGS_KEY, SettingSet.class))
+			this.setDataValue(SETTINGS_KEY, getDefaultSettings(this));
+		return (SettingSet) this.getDataValue(SETTINGS_KEY);
+	}
+
+	public void forEachSetting(Consumer<Setting<?>> consumer) {
+		for (Setting<?> s : getSettings())
+			consumer.accept(s);
+	}
+
+	public <V> V getSetting(String name) {
+		return getSettings().getSetting(name);
+	}
+
+	public EnumReturnSetStatus setSetting(String name, String value) {
+		return getSettings().setSetting(name, value);
+	}
+
+	public <T> EnumReturnSetStatus setSetting(String name, T value) {
+		return getSettings().setSetting(name, value);
+	}
+
+	// static settings stuff
+	private final static SettingSet DEFAULT_SETTINGS = new SettingSet();
+
+	public static <V> void setDefaultValue(Setting<V> setting) {
+		DEFAULT_SETTINGS.addSetting(setting);
+	}
+
+	public static SettingSet getDefaultSettings() {
+		return new SettingSet(DEFAULT_SETTINGS);
+	}
+
+	public static SettingSet getDefaultSettings(StarotaServer server) {
+		return new SettingSet(server, DEFAULT_SETTINGS);
+	}
+	// end settings stuff
+
 	// start other stuff
 	public static final String WEBHOOK_SECRET_KEY = "webhook_secret";
 
@@ -638,7 +693,8 @@ public class StarotaServer {
 
 		server.profiles = ServerDataHelper.getEBSFromFolder(guild, PROFILES)
 				.registerType(new PlayerProfile.DataTypePlayerProfile());
-		server.data = ServerDataHelper.getEBSFromFolder(guild, OPTIONS);
+		server.data = ServerDataHelper.getEBSFromFolder(guild, OPTIONS)
+				.registerType(new DataTypeServerSettings());
 		server.tradeboard = ServerDataHelper.getEBListFromFolder(guild, TRADEBOARD,
 				new TradeboardPost());
 		server.leaderboards = ServerDataHelper.getEBSFromFolder(guild, LEADERBOARDS)
@@ -658,6 +714,51 @@ public class StarotaServer {
 		StarotaUser sUser = new StarotaUser(this, user);
 
 		return sUser;
+	}
+
+	public static void main(String... args) {
+		System.out.println("\ndefaults before adding defaults");
+		for (Setting<?> s : StarotaServer.DEFAULT_SETTINGS) {
+			System.out.println(s.getName() + ": " + s.getValue());
+		}
+		StarotaServer.setDefaultValue(new SettingString("testString", "value1"));
+		StarotaServer.setDefaultValue(new SettingBoolean("testBoolean", false));
+		System.out.println("\ndefaults after adding defaults");
+		for (Setting<?> s : StarotaServer.DEFAULT_SETTINGS) {
+			System.out.println(s.getName() + ": " + s.getValue());
+		}
+		SettingSet set1 = StarotaServer.getDefaultSettings();
+		set1.setSetting("testBoolean", true);
+		System.out.println("\nset1 after changing testBoolean");
+		for (Setting<?> s : set1) {
+			System.out.println(s.getName() + ": " + s.getValue());
+		}
+
+		EBStorage ebs1 = new EBStorage().registerType(new DataTypeServerSettings());
+		ebs1.set(SETTINGS_KEY, set1);
+		byte[] serEbs1 = ebs1.serialize();
+		EBStorage ebs2 = EBStorage.deserialize(serEbs1);
+		System.out.println("\nebs2 after deserialize");
+		for (Setting<?> s : ebs2.get(SETTINGS_KEY, SettingSet.class)) {
+			System.out.println(s.getName() + ": " + s.getValue());
+		}
+	}
+
+	public static class DataTypeServerSettings extends DataTypeSettingSet {
+
+		public DataTypeServerSettings() {
+			super();
+		}
+
+		public DataTypeServerSettings(@Nonnull SettingSet settings) {
+			super(settings);
+		}
+
+		@Override
+		protected SettingSet getDefaultSettings() {
+			return StarotaServer.getDefaultSettings();
+		}
+
 	}
 
 }

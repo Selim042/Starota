@@ -1,0 +1,164 @@
+package us.myles_selim.starota.leek_duck.events;
+
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+
+import us.myles_selim.starota.enums.EnumPokemon;
+
+public class StarotaEvent {
+
+	public String name;
+	public String description;
+	public String link;
+	public String linkTitle;
+	public String image;
+	public int color;
+
+	public long startTime;
+	public long endTime;
+	public boolean longTerm;
+
+	public boolean localized;
+	public boolean regional;
+	public String location;
+
+	public boolean raidsChanged;
+	public boolean raidOriented;
+
+	public int[] featuredPokemon;
+	public int[] featuredTypes;
+	public int[] newShinies;
+
+	public boolean newSpecialResearch;
+	public EventFieldResearch[] fieldResearch;
+	public String[] bonuses;
+	public EventTieredBonus[] tierdBonuses;
+
+	public boolean isOver() {
+		return endTime <= System.currentTimeMillis();
+	}
+
+	public boolean hasStarted() {
+		return startTime <= System.currentTimeMillis();
+	}
+
+	public String getTimeLeft() {
+		String output = null;
+		long diff = this.endTime - System.currentTimeMillis();
+		if (this.endTime == 0) {
+			if (this.startTime == 0)
+				return "Event has not started yet";
+			output = "Starts in ";
+			diff = this.startTime - System.currentTimeMillis();
+		}
+		if (output == null)
+			output = "Ends in ";
+		long diffMinutes = diff / (60 * 1000) % 60;
+		long diffHours = diff / (60 * 60 * 1000) % 24;
+		long diffDays = diff / (24 * 60 * 60 * 1000);
+		if (diffDays > 0)
+			output += diffDays + (diffDays == 1 ? " day " : " days ");
+		if (diffHours > 0)
+			output += diffHours + (diffHours == 1 ? " hour " : " hours ");
+		if (diffMinutes > 0)
+			output += diffMinutes + (diffMinutes == 1 ? " minute " : " minutes ");
+		if (output.endsWith("in "))
+			return null;
+		return output;
+	}
+
+	public static class EventFieldResearch {
+
+		public final String name;
+		public final List<ResearchReward> rewards;
+
+		public EventFieldResearch(String name, Enumeration<ResearchReward> rewards) {
+			this.name = name;
+			this.rewards = Collections.unmodifiableList(Collections.list(rewards));
+		}
+
+		@Override
+		public String toString() {
+			String ret = name + ": ";
+			for (ResearchReward r : rewards)
+				ret += r + ", ";
+			return ret.substring(0, ret.length() - 2);
+		}
+	}
+
+	public static class ResearchReward {
+
+		public static ResearchReward getReward(String input) {
+			if (input.endsWith("Encounter") || input.endsWith("Encounter, Shinyable")) {
+				EnumPokemon pokemon = EnumPokemon
+						.getPokemon(input.substring(0, input.indexOf("Encounter") - 1));
+				return new PokemonEntry(pokemon, input.endsWith(", Shinyable"));
+			} else if (input.matches(".*?x[0-9]{1,6}"))
+				return new ItemReward(input.substring(0, input.indexOf("x") - 1),
+						Integer.parseInt(input.substring(input.indexOf("x") + 1)));
+			else
+				return null;
+		}
+
+	}
+
+	public static class PokemonEntry extends ResearchReward {
+
+		public final EnumPokemon pokemon;
+		public boolean shiny;
+
+		public PokemonEntry(EnumPokemon pokemon) {
+			this(pokemon, false);
+		}
+
+		public PokemonEntry(EnumPokemon pokemon, boolean newShiny) {
+			this.pokemon = pokemon;
+			this.shiny = newShiny;
+		}
+
+		@Override
+		public String toString() {
+			if (!shiny)
+				return pokemon.toString();
+			return pokemon.toString() + ", shiny";
+		}
+	}
+
+	public static class ItemReward extends ResearchReward {
+
+		public final String itemName;
+		public final int num;
+
+		public ItemReward(String itemName, int num) {
+			this.itemName = itemName;
+			this.num = num;
+		}
+
+		@Override
+		public String toString() {
+			return itemName + " x" + num;
+		}
+	}
+
+	public static class EventTieredBonus {
+
+		public final String name;
+		public final List<String> bonuses;
+
+		public EventTieredBonus(String name, Enumeration<String> bonuses) {
+			this.name = name;
+			this.bonuses = Collections.unmodifiableList(Collections.list(bonuses));
+		}
+
+		@Override
+		public String toString() {
+			String ret = name + ": ";
+			for (String b : bonuses)
+				ret += b + ",";
+			ret = ret.substring(0, ret.length() - 1);
+			return ret;
+		}
+	}
+
+}

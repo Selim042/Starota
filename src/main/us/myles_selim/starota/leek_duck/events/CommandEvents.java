@@ -24,9 +24,9 @@ public class CommandEvents extends StarotaCommand {
 	@Override
 	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
 			throws Exception {
-		if (!LeekDuckData.areEventsLoaded())
+		if (!EventData.areEventsLoaded())
 			new EventReactionMessage().editMessage(channel,
-					channel.sendMessage(LeekDuckData.LOADING_EMBED));
+					channel.sendMessage(EventData.LOADING_EMBED));
 		else
 			new EventReactionMessage().sendMessage(channel);
 	}
