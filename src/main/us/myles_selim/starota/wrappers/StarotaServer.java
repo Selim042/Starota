@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
@@ -41,6 +42,7 @@ import us.myles_selim.starota.geofence.GeoRegion;
 import us.myles_selim.starota.geofence.GeoRegion.DataTypeGeoRegion;
 import us.myles_selim.starota.leaderboards.Leaderboard;
 import us.myles_selim.starota.misc.data_types.Pair;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.RolePermHelper;
 import us.myles_selim.starota.misc.utils.ServerDataHelper;
 import us.myles_selim.starota.modules.BaseModules;
@@ -653,6 +655,16 @@ public class StarotaServer {
 
 	public <T> EnumReturnSetStatus setSetting(String name, T value) {
 		return getSettings().setSetting(name, value);
+	}
+
+	private static final String TIMEZONE = "timezone";
+
+	public TimeZone getTimezone() {
+		SettingSet settings = getSettings();
+		if (settings.isEmpty(TIMEZONE)) {
+			return MiscUtils.getTimezone(guild.getRegion());
+		}
+		return null;
 	}
 
 	// static settings stuff

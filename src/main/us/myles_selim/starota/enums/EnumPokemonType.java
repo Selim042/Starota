@@ -60,4 +60,10 @@ public enum EnumPokemonType {
 		return EMOJI_SERVER.getEmojiByName(emojiName);
 	}
 
+	public static EnumPokemonType fromOrdinal(int ordinal) {
+		if (ordinal < 0 || ordinal >= values().length)
+			return null;
+		return EnumPokemonType.values()[ordinal];
+	}
+
 }

@@ -3,8 +3,11 @@ package us.myles_selim.starota.leek_duck.events;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.TimeZone;
 
+import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.misc.utils.EmojiServerHelper;
 
 public class StarotaEvent {
 
@@ -43,17 +46,44 @@ public class StarotaEvent {
 		return startTime <= System.currentTimeMillis();
 	}
 
-	public String getTimeLeft() {
+	public long getAdjustedStart(TimeZone timezone) {
+		if (startTime == 0)
+			return 0;
+		if (localized)
+			return startTime + timezone.getOffset(startTime) + timezone.getDSTSavings();
+		return startTime;
+	}
+
+	public long getAdjustedEnd(TimeZone timezone) {
+		if (endTime == 0)
+			return 0;
+		if (localized)
+			return endTime + timezone.getOffset(endTime) + timezone.getDSTSavings();
+		return endTime;
+	}
+
+	public String getTimeLeft(TimeZone timezone) {
 		String output = null;
-		long diff = this.endTime - System.currentTimeMillis();
-		if (this.endTime == 0) {
-			if (this.startTime == 0)
-				return "Event has not started yet";
-			output = "Starts in ";
+		long diff;
+		if (this.localized)
+			diff = getAdjustedStart(timezone) - System.currentTimeMillis();
+		else if (this.regional) {
+			output += "Regional, countdown not fully implemented...\n";
 			diff = this.startTime - System.currentTimeMillis();
+		} else
+			diff = this.startTime - System.currentTimeMillis();
+		if (!this.hasStarted()) {
+			if (output == null)
+				output = "";
+			output += "Starts in ";
 		}
-		if (output == null)
-			output = "Ends in ";
+		// diff -= 60 * 60 * 1000; // TODO: subtract an hour? (maybe dst)
+		if (output == null || output.endsWith("\n")) {
+			if (output == null)
+				output = "";
+			output += "Ends in ";
+			diff = getAdjustedEnd(timezone) - System.currentTimeMillis();
+		}
 		long diffMinutes = diff / (60 * 1000) % 60;
 		long diffHours = diff / (60 * 60 * 1000) % 24;
 		long diffDays = diff / (24 * 60 * 60 * 1000);
@@ -87,7 +117,7 @@ public class StarotaEvent {
 		}
 	}
 
-	public static class ResearchReward {
+	public abstract static class ResearchReward {
 
 		public static ResearchReward getReward(String input) {
 			if (input.endsWith("Encounter") || input.endsWith("Encounter, Shinyable")) {
@@ -119,6 +149,13 @@ public class StarotaEvent {
 
 		@Override
 		public String toString() {
+			if (pokemon == null)
+				return "null";
+			if (Starota.FULLY_STARTED) {
+				if (!shiny)
+					return pokemon.toString();
+				return pokemon.toString() + " " + EmojiServerHelper.getEmoji("shiny");
+			}
 			if (!shiny)
 				return pokemon.toString();
 			return pokemon.toString() + ", shiny";

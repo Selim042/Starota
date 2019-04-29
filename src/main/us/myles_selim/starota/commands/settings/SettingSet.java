@@ -76,6 +76,13 @@ public class SettingSet implements Iterable<Setting<?>> {
 		return settings.containsKey(name);
 	}
 
+	public boolean isEmpty(String name) {
+		Setting<?> setting = settings.get(name);
+		if (setting == null)
+			return true;
+		return setting.getValue().equals(setting.getEmptyValue());
+	}
+
 	@Override
 	public Iterator<Setting<?>> iterator() {
 		return new SettingSetIterator();

@@ -4,10 +4,13 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.TimeZone;
 
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IRegion;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.Permissions;
+import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumTeam;
 
@@ -24,6 +27,13 @@ public class MiscUtils {
 		return codeS.substring(0, 4) + " " + codeS.substring(4, 8) + " " + codeS.substring(8, 12);
 	}
 
+	public static boolean arrContains(int[] tt, int tv) {
+		for (int t : tt)
+			if (t == tv)
+				return true;
+		return false;
+	}
+
 	public static <T> boolean arrContains(T[] tt, T tv) {
 		for (T t : tt)
 			if (t != null && t.equals(tv))
@@ -37,6 +47,24 @@ public class MiscUtils {
 				return r;
 		}
 		return null;
+	}
+
+	// TODO: update when adding new regions
+	public static TimeZone getTimezone(IRegion region) {
+		switch (region.getID()) {
+		case "us-central":
+			return TimeZone.getTimeZone("US/Central");
+		case "us-east":
+			return TimeZone.getTimeZone("US/Eastern");
+		case "us-west":
+			return TimeZone.getTimeZone("US/Pacific");
+		default:
+			TwitterHelper.sendDirectMessage("Selim_042", "Region " + region.getID() + " not configured");
+			if (Starota.IS_DEV)
+				for (String id : TimeZone.getAvailableIDs())
+					System.out.println("timezone id: " + id);
+			return TimeZone.getDefault();
+		}
 	}
 
 	public static EnumPokemon[] getSuggestedPokemon(String input, int count) {
