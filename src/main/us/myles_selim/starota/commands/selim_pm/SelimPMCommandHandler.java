@@ -42,7 +42,6 @@ public class SelimPMCommandHandler {
 		registerCommand("Admin", new CommandCaches());
 		registerCommand("Admin", new CommandServerInfo());
 		registerCommand("Admin", new CommandChannelInfo());
-		registerCommand("Admin", new CommandPreviewOwnerMessage());
 		registerCommand("Admin", new CommandOwnerMessage());
 	}
 

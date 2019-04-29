@@ -48,9 +48,15 @@ public class ReactionMessageRegistry {
 		IMessage msg = event.getMessage();
 		if (!messages.containsKey(msg.getStringID()))
 			return;
+		// Starota.EXECUTOR.execute(new Runnable() {
+		//
+		// @Override
+		// public void run() {
 		ReactionMessage rMsg = messages.get(msg.getStringID());
 		rMsg.onReactionAdded(StarotaServer.getServer(event.getGuild()), event.getChannel(), msg,
 				event.getUser(), event.getReaction());
+		// }
+		// });
 	}
 
 	@EventSubscriber
@@ -60,9 +66,15 @@ public class ReactionMessageRegistry {
 		IMessage msg = event.getMessage();
 		if (!messages.containsKey(msg.getStringID()))
 			return;
+		// Starota.EXECUTOR.execute(new Runnable() {
+		//
+		// @Override
+		// public void run() {
 		ReactionMessage rMsg = messages.get(msg.getStringID());
 		rMsg.onReactionRemoved(StarotaServer.getServer(event.getGuild()), event.getChannel(), msg,
 				event.getUser(), event.getReaction());
+		// }
+		// });
 	}
 
 	@EventSubscriber

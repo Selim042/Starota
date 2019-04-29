@@ -638,7 +638,22 @@ public class Starota {
 
 			@Override
 			public void run() {
+				final EmbedObject fEmbed = embed == null || embed.equals(new EmbedObject()) ? null
+						: embed;
 				List<Long> alreadySent = new ArrayList<>();
+
+				if (IS_DEV) {
+					// testing channel on bot test server
+					IChannel ch = CLIENT.getChannelByID(504089729143406595L);
+					if ((msg == null || msg.isEmpty()) && fEmbed != null)
+						RequestBuffer.request(() -> ch.sendMessage(fEmbed)).get();
+					else if ((msg != null && !msg.isEmpty()) && fEmbed == null)
+						RequestBuffer.request(() -> ch.sendMessage(msg)).get();
+					else if ((msg != null && !msg.isEmpty()) && fEmbed != null)
+						RequestBuffer.request(() -> ch.sendMessage(msg, fEmbed)).get();
+					RequestBuffer.request(() -> ch.sendMessage(getAuthorEmbed(author)));
+				}
+
 				for (IGuild g : CLIENT.getGuilds()) {
 					if (MiscUtils.arrContains(SKIPPED_SERVERS, g.getLongID()))
 						continue;
@@ -647,13 +662,15 @@ public class Starota {
 							|| alreadySent.contains(owner.getLongID()))
 						continue;
 					alreadySent.add(owner.getLongID());
-					if ((msg == null || msg.isEmpty()) && embed != null)
-						RequestBuffer.request(() -> owner.getOrCreatePMChannel().sendMessage(embed));
-					else if ((msg != null && !msg.isEmpty()) && embed == null)
-						RequestBuffer.request(() -> owner.getOrCreatePMChannel().sendMessage(msg));
-					else if ((msg != null && !msg.isEmpty()) && embed != null)
+					if ((msg == null || msg.isEmpty()) && fEmbed != null)
+						RequestBuffer.request(() -> owner.getOrCreatePMChannel().sendMessage(fEmbed))
+								.get();
+					else if ((msg != null && !msg.isEmpty()) && fEmbed == null)
+						RequestBuffer.request(() -> owner.getOrCreatePMChannel().sendMessage(msg)).get();
+					else if ((msg != null && !msg.isEmpty()) && fEmbed != null)
 						RequestBuffer
-								.request(() -> owner.getOrCreatePMChannel().sendMessage(msg, embed));
+								.request(() -> owner.getOrCreatePMChannel().sendMessage(msg, fEmbed))
+								.get();
 					RequestBuffer.request(
 							() -> owner.getOrCreatePMChannel().sendMessage(getAuthorEmbed(author)));
 				}
