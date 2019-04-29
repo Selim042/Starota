@@ -100,7 +100,7 @@ public class PrimaryCommandHandler {
 			if (!hasPerms.contains(Permissions.SEND_MESSAGES))
 				return;
 			for (ICommandHandler h : COMMAND_HANDLERS) {
-				ICommand cmd = h.findCommand(guild, args[0]);
+				ICommand cmd = h.findCommand(guild, message, args[0]);
 				if (cmd == null
 						|| !ChannelCommandManager.isAllowedHere(StarotaServer.getServer(guild),
 								cmd.getCategory(), channel)
@@ -139,7 +139,7 @@ public class PrimaryCommandHandler {
 		if (!cmdFound) {
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.withTitle("Did you mean...?");
-			for (ICommand cmd : getSuggestions(guild, channel, args[0], 5)) {
+			for (ICommand cmd : getSuggestions(guild, message, args[0], 5)) {
 				if (cmd == null
 						|| !ChannelCommandManager.isAllowedHere(StarotaServer.getServer(guild),
 								cmd.getCategory(), channel)
@@ -208,9 +208,9 @@ public class PrimaryCommandHandler {
 		return ret;
 	}
 
-	public ICommand findCommand(IGuild guild, String name) {
+	public ICommand findCommand(IGuild guild, IMessage msg, String name) {
 		for (ICommandHandler h : COMMAND_HANDLERS) {
-			ICommand c = h.findCommand(guild, name);
+			ICommand c = h.findCommand(guild, msg, name);
 			if (c != null)
 				return c;
 		}
@@ -225,16 +225,20 @@ public class PrimaryCommandHandler {
 		return getSuggestions(guild, null, input, count);
 	}
 
-	public ICommand[] getSuggestions(IGuild guild, IChannel channel, String input) {
-		return getSuggestions(guild, channel, input, DEFAULT_SUGGESTION_COUNT);
+	public ICommand[] getSuggestions(IGuild guild, IMessage message, String input) {
+		return getSuggestions(guild, message, input, DEFAULT_SUGGESTION_COUNT);
 	}
 
-	public ICommand[] getSuggestions(IGuild guild, IChannel channel, String input, int count) {
+	public ICommand[] getSuggestions(IGuild guild, IMessage message, String input, int count) {
 		List<DistancedCommand> suggestions = new ArrayList<>();
+		IChannel channel = message.getChannel();
 		for (ICommandHandler ch : COMMAND_HANDLERS) {
 			for (ICommand cmd : ch.getAllCommands(guild)) {
 				if (channel != null && !ChannelCommandManager
 						.isAllowedHere(StarotaServer.getServer(guild), cmd.getCategory(), channel))
+					continue;
+				if (!cmd.hasRequiredRole(guild, message.getAuthor())
+						|| !cmd.isRequiredChannel(guild, message.getChannel()))
 					continue;
 				for (String a : cmd.getAliases()) {
 					DistancedCommand dc = new DistancedCommand(calculateDistance(a, input), cmd);

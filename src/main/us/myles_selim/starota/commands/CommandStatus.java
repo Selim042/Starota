@@ -15,7 +15,7 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 public class CommandStatus extends StarotaCommand {
 
 	public CommandStatus() {
-		super("status");
+		super("status", "Gets Starota status information.");
 	}
 
 	@Override

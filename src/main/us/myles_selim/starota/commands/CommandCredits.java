@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.Starota;
@@ -33,8 +34,16 @@ public class CommandCredits extends JavaCommand {
 		builder.appendDesc("**Pokemon Go Database**: [Pokemon Go Hub](https://pokemongohub.net/)\n");
 		builder.appendDesc(
 				"**Raid Boss, Field Research, and Egg Information**: [The Silph Road](https://thesilphroad.com/)\n");
-		builder.appendDesc("**Event Information**: [Leek Duck](https://leekduck.com)\n");
+		builder.appendDesc("**Ditto Information**: [Leek Duck](https://leekduck.com)\n");
 		builder.appendDesc("**Maps**: [MapBox](https://www.mapbox.com/)\n");
+
+		StringBuilder editors = new StringBuilder();
+		editors.append("**Article Editors**:\n");
+		IGuild supportServer = Starota.getSupportServer();
+		for (IUser u : supportServer
+				.getUsersByRole(supportServer.getRoleByID(StarotaConstants.EDITOR_ROLE_ID)))
+			editors.append(String.format(" - %s#%s\n", u.getName(), u.getDiscriminator()));
+		builder.appendDesc(editors.toString());
 
 		channel.sendMessage(builder.build());
 	}

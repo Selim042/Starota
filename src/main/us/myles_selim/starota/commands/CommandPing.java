@@ -5,12 +5,13 @@ import java.util.EnumSet;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
+import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandPing extends StarotaCommand {
 
 	public CommandPing() {
-		super("ping");
+		super("ping", "Gets " + Starota.BOT_NAME + "s approx. ping to the Discord API.");
 	}
 
 	@Override

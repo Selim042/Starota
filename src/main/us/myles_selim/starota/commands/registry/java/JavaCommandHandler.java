@@ -29,7 +29,7 @@ public class JavaCommandHandler implements ICommandHandler {
 
 	public void registerDefaultCommands() {
 		DebugServer.addPermission(Permissions.READ_MESSAGES);
-		
+
 		registerCommand("Help", new CommandHelp());
 
 		registerCommand("Commands", new CommandAddChannelWhitelist());
@@ -57,7 +57,7 @@ public class JavaCommandHandler implements ICommandHandler {
 	@Override
 	public boolean executeCommand(String[] args, IMessage message, IGuild guild, IChannel channel)
 			throws Exception {
-		ICommand cmd = findCommand(guild, args[0]);
+		ICommand cmd = findCommand(guild, message, args[0]);
 		if (cmd == null)
 			return false;
 		if (!ChannelCommandManager.isAllowedHere(StarotaServer.getServer(guild), cmd.getCategory(),
@@ -98,15 +98,18 @@ public class JavaCommandHandler implements ICommandHandler {
 	}
 
 	@Override
-	public ICommand findCommand(IGuild server, String name) {
+	public ICommand findCommand(IGuild server, IMessage msg, String name) {
 		for (JavaCommand c : COMMANDS) {
 			if (!StarotaModule.isCategoryEnabled(StarotaServer.getServer(server), c.getCategory()))
 				continue;
-			if (c != null && c.getName() != null && c.getName().equalsIgnoreCase(name))
-				return c;
-			for (String a : c.getAliases())
-				if (a != null && a.equalsIgnoreCase(name))
+			if (c.hasRequiredRole(server, msg.getAuthor())
+					&& c.isRequiredChannel(server, msg.getChannel())) {
+				if (c != null && c.getName() != null && c.getName().equalsIgnoreCase(name))
 					return c;
+				for (String a : c.getAliases())
+					if (a != null && a.equalsIgnoreCase(name))
+						return c;
+			}
 		}
 		return null;
 	}

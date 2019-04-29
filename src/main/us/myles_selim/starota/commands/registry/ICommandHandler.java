@@ -17,6 +17,6 @@ public interface ICommandHandler {
 
 	public List<String> getAllCategories(IGuild server);
 
-	public ICommand findCommand(IGuild server, String name);
+	public ICommand findCommand(IGuild server, IMessage msg, String name);
 
 }

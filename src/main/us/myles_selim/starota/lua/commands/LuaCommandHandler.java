@@ -26,7 +26,7 @@ public class LuaCommandHandler implements ICommandHandler {
 			throws Exception {
 		if (args.length < 1)
 			return false;
-		ICommand cmd = findCommand(guild, args[0]);
+		ICommand cmd = findCommand(guild, message, args[0]);
 		if (cmd == null)
 			return false;
 		cmd.execute(args, message, guild, channel);
@@ -50,7 +50,7 @@ public class LuaCommandHandler implements ICommandHandler {
 	}
 
 	@Override
-	public ICommand findCommand(IGuild server, String name) {
+	public ICommand findCommand(IGuild server, IMessage message, String name) {
 		for (ICommand c : getAllCommands(server))
 			if (c.getName().equalsIgnoreCase(name))
 				return c;
@@ -110,6 +110,11 @@ public class LuaCommandHandler implements ICommandHandler {
 
 		@Override
 		public IRole requiredRole(IGuild guild) {
+			return null;
+		}
+
+		@Override
+		public IChannel requiredChannel(IGuild guild) {
 			return null;
 		}
 

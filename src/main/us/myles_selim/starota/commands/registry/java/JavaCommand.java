@@ -50,6 +50,11 @@ public class JavaCommand implements ICommand {
 	}
 
 	@Override
+	public IChannel requiredChannel(IGuild guild) {
+		return null;
+	}
+
+	@Override
 	public final String getName() {
 		return this.name;
 	}

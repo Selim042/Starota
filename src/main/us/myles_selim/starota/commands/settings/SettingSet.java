@@ -83,6 +83,16 @@ public class SettingSet implements Iterable<Setting<?>> {
 		return setting.getValue().equals(setting.getEmptyValue());
 	}
 
+	public SettingSet setServer(StarotaServer server) {
+		iterator().forEachRemaining((Setting<?> setting) -> {
+			if (setting instanceof ServerSetting)
+				this.settings.put(setting.getName(), ((ServerSetting<?>) setting).clone(server));
+			else
+				this.settings.put(setting.getName(), setting.clone());
+		});
+		return this;
+	}
+
 	@Override
 	public Iterator<Setting<?>> iterator() {
 		return new SettingSetIterator();

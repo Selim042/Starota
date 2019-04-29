@@ -30,12 +30,14 @@ public class SettingChannel extends ServerSetting<IChannel> {
 
 	@Override
 	public boolean setValue(String str) {
+		if (this.getServer() == null)
+			throw new IllegalArgumentException("server isn't set?");
 		if (str.startsWith("#")) {
 			for (IChannel ch : this.getServer().getDiscordGuild()
 					.getChannelsByName(str.substring(1, str.length()))) {
 				return this.setValue(ch);
 			}
-		} else if (str.matches("<#[0-8]{18}>")) {
+		} else if (str.matches("<#[0-9]{18}>")) {
 			try {
 				return this.setValue(this.getServer().getDiscordGuild()
 						.getChannelByID(Long.parseLong(str.substring(2, str.length() - 1))));

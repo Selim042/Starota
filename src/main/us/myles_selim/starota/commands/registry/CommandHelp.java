@@ -41,7 +41,7 @@ public class CommandHelp extends JavaCommand {
 		IUser author = message.getAuthor();
 
 		if (args.length >= 2) {
-			ICommand cmd = this.getCommandHandler().findCommand(guild, args[1]);
+			ICommand cmd = this.getCommandHandler().findCommand(guild, message, args[1]);
 			if (cmd != null) {
 				EmbedBuilder builder = new EmbedBuilder();
 				builder.withTitle("Help: " + cmd.getName());
@@ -108,12 +108,11 @@ public class CommandHelp extends JavaCommand {
 		for (ICommand cmd : cmds) {
 			if (guild == null)
 				disp.add(cmd);
-			if (guild != null
-					&& (author.getPermissionsForGuild(guild).contains(Permissions.ADMINISTRATOR)
-							|| ((author.getPermissionsForGuild(guild).contains(cmd.requiredUsePermission())
-									|| cmd.requiredUsePermission() == null)
-									&& (author.getRolesForGuild(guild).contains(cmd.requiredRole(guild))
-											|| cmd.requiredRole(guild) == null))))
+			if (guild != null && (author.getPermissionsForGuild(guild)
+					.contains(Permissions.ADMINISTRATOR)
+					|| ((author.getPermissionsForGuild(guild).contains(cmd.requiredUsePermission())
+							|| cmd.requiredUsePermission() == null) && cmd.hasRequiredRole(guild, author)
+							&& cmd.isRequiredChannel(guild, channel))))
 				disp.add(cmd);
 		}
 		disp.sort(null);

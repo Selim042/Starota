@@ -638,7 +638,7 @@ public class StarotaServer {
 	private SettingSet getSettings() {
 		if (!this.hasDataKey(SETTINGS_KEY, SettingSet.class))
 			this.setDataValue(SETTINGS_KEY, getDefaultSettings(this));
-		return (SettingSet) this.getDataValue(SETTINGS_KEY);
+		return ((SettingSet) this.getDataValue(SETTINGS_KEY)).setServer(this);
 	}
 
 	public void forEachSetting(Consumer<Setting<?>> consumer) {
@@ -651,11 +651,15 @@ public class StarotaServer {
 	}
 
 	public EnumReturnSetStatus setSetting(String name, String value) {
-		return getSettings().setSetting(name, value);
+		EnumReturnSetStatus status = getSettings().setSetting(name, value);
+		data.markDirty();
+		return status;
 	}
 
 	public <T> EnumReturnSetStatus setSetting(String name, T value) {
-		return getSettings().setSetting(name, value);
+		EnumReturnSetStatus status = getSettings().setSetting(name, value);
+		data.markDirty();
+		return status;
 	}
 
 	private static final String TIMEZONE = "timezone";
