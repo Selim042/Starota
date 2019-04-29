@@ -9,6 +9,7 @@ import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.misc.utils.StarotaConstants;
 
 public class PokedexEventHandler {
 
@@ -24,7 +25,7 @@ public class PokedexEventHandler {
 		IGuild server = event.getGuild();
 		if (!server.getUsers().contains(PokedexBot.POKEDEX_CLIENT.getOurUser()))
 			return;
-		IUser selimUser = PokedexBot.POKEDEX_CLIENT.fetchUser(Starota.SELIM_USER_ID);
+		IUser selimUser = PokedexBot.POKEDEX_CLIENT.fetchUser(StarotaConstants.SELIM_USER_ID);
 		RequestBuffer.request(() -> {
 			IPrivateChannel selimPm = selimUser.getOrCreatePMChannel();
 			selimPm.sendMessage(PokedexBot.BOT_NAME + " was added to the server: " + server.getName());
@@ -37,7 +38,7 @@ public class PokedexEventHandler {
 			builder.withTitle("Thanks for using " + ourName + "!");
 			builder.appendDesc("If you need any assistance with " + ourName
 					+ " or it's features, feel free to join our support server at "
-					+ Starota.SUPPORT_SERVER_LINK);
+					+ StarotaConstants.SUPPORT_SERVER_LINK);
 			ownerPm.sendMessage(builder.build());
 		});
 		if (!PokedexBot.POKEDEX_CLIENT.getOurUser().getPermissionsForGuild(server)

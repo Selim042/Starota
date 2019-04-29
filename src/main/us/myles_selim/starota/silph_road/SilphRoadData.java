@@ -22,6 +22,7 @@ import us.myles_selim.starota.misc.data_types.ResearchTask;
 import us.myles_selim.starota.misc.data_types.cache.CachedData;
 import us.myles_selim.starota.misc.data_types.cache.ClearCache;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
+import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 
 public class SilphRoadData {
@@ -52,7 +53,7 @@ public class SilphRoadData {
 		try {
 			URL url = new URL(BOSSES_URL);
 			URLConnection conn = url.openConnection();
-			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
+			conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
 			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			String html = "";
 			String line = null;
@@ -177,7 +178,7 @@ public class SilphRoadData {
 		try {
 			URL url = new URL(EGGS_URL);
 			URLConnection conn = url.openConnection();
-			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
+			conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
 			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			String html = "";
 			String line = null;
@@ -316,7 +317,7 @@ public class SilphRoadData {
 		try {
 			URL url = new URL(TASKS_URL);
 			URLConnection conn = url.openConnection();
-			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
+			conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
 			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			String html = "";
 			String line = null;

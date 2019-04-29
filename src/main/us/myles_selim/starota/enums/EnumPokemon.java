@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.misc.data_types.cache.CachedData;
 import us.myles_selim.starota.misc.data_types.cache.ClearCache;
 import us.myles_selim.starota.misc.utils.ImageHelper;
+import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.trading.forms.FormSet;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 import us.myles_selim.starota.trading.forms.FormSetAlolan;
@@ -1306,7 +1306,7 @@ public enum EnumPokemon {
 			try {
 				URL url = new URL(SILPH_DEX);
 				URLConnection conn = url.openConnection();
-				conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
+				conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
 				BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 				String html = "";
 				String line = null;

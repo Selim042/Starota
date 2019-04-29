@@ -31,6 +31,7 @@ import us.myles_selim.starota.commands.CommandSupportBot;
 import us.myles_selim.starota.commands.CommandVote;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
+import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.pokedex.CommandPokedex;
 import us.myles_selim.starota.reaction_messages.ReactionMessageRegistry;
 
@@ -76,8 +77,8 @@ public class PokedexBot {
 			e.printStackTrace();
 		}
 		COMMAND_HANDLER = new PrimaryCommandHandler(POKEDEX_CLIENT, (IChannel ch) -> {
-			IUser starota = Starota.getUser(Starota.STAROTA_ID);
-			IUser starotaDev = Starota.getUser(Starota.STAROTA_DEV_ID);
+			IUser starota = Starota.getUser(StarotaConstants.STAROTA_ID);
+			IUser starotaDev = Starota.getUser(StarotaConstants.STAROTA_DEV_ID);
 			List<IUser> users = ch.getUsersHere();
 			if (ch instanceof IPrivateChannel || users.contains(starota) || users.contains(starotaDev))
 				return false;
@@ -89,8 +90,8 @@ public class PokedexBot {
 			@Override
 			public void run() {
 				while (true) {
-					POKEDEX_CLIENT.changePresence(StatusType.ONLINE, ActivityType.PLAYING,
-							"v" + Starota.VERSION + (Starota.DEBUG || Starota.IS_DEV ? "d" : ""));
+					POKEDEX_CLIENT.changePresence(StatusType.ONLINE, ActivityType.PLAYING, "v"
+							+ StarotaConstants.VERSION + (Starota.DEBUG || Starota.IS_DEV ? "d" : ""));
 					try {
 						Thread.sleep(3600000); // 1 hour
 					} catch (InterruptedException e) {
@@ -111,7 +112,7 @@ public class PokedexBot {
 				new CommandSupportBot(BOT_NAME, POKEDEX_CLIENT.getOurUser().getLongID()));
 		jCmdHandler.registerCommand(new CommandInvite(BOT_NAME, POKEDEX_CLIENT.getOurUser().getLongID(),
 				Permissions.generatePermissionsNumber(USED_PERMISSIONS)));
-		jCmdHandler.registerCommand(new CommandVote(Starota.BOT_NAME, Starota.STAROTA_ID));
+		jCmdHandler.registerCommand(new CommandVote(Starota.BOT_NAME, StarotaConstants.STAROTA_ID));
 
 		jCmdHandler.registerCommand("Administrative", new CommandChangelogChannel());
 
@@ -151,7 +152,7 @@ public class PokedexBot {
 		IRole ownerRole = POKEDEX_CLIENT.getRoleByID(567718302491607050L);
 		List<IUser> currentOwners = new ArrayList<>();
 		for (IGuild g : POKEDEX_CLIENT.getGuilds()) {
-			IUser owner = POKEDEX_CLIENT.getGuildByID(Starota.SUPPORT_SERVER)
+			IUser owner = POKEDEX_CLIENT.getGuildByID(StarotaConstants.SUPPORT_SERVER)
 					.getUserByID(g.getOwnerLongID());
 			if (owner == null)
 				continue;
@@ -159,7 +160,8 @@ public class PokedexBot {
 				RequestBuffer.request(() -> owner.addRole(ownerRole));
 			currentOwners.add(owner);
 		}
-		for (IUser u : POKEDEX_CLIENT.getGuildByID(Starota.SUPPORT_SERVER).getUsersByRole(ownerRole))
+		for (IUser u : POKEDEX_CLIENT.getGuildByID(StarotaConstants.SUPPORT_SERVER)
+				.getUsersByRole(ownerRole))
 			if (!currentOwners.contains(u))
 				u.removeRole(ownerRole);
 	}

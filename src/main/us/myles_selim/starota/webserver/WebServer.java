@@ -8,7 +8,7 @@ import java.util.Properties;
 
 import com.sun.net.httpserver.HttpServer;
 
-import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.webserver.webhooks.other.HttpHandlerWebhooks;
 
 // https://www.reddit.com/r/discordapp/comments/82p8i6/a_basic_tutorial_on_how_to_get_the_most_out_of/
@@ -16,7 +16,7 @@ import us.myles_selim.starota.webserver.webhooks.other.HttpHandlerWebhooks;
 public class WebServer {
 
 	public static int PORT = 7366;
-	public static final String USER_AGENT = "Starota HTTP Access/" + Starota.VERSION;
+	public static final String USER_AGENT = "Starota HTTP Access/" + StarotaConstants.VERSION;
 	// "Mozilla/5.0";
 
 	private static boolean inited = false;

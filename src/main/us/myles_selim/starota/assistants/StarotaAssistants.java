@@ -23,6 +23,7 @@ import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.DiscordException;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.misc.utils.StarotaConstants;
 
 public class StarotaAssistants {
 
@@ -41,9 +42,9 @@ public class StarotaAssistants {
 		inited = true;
 
 		if (Starota.IS_DEV)
-			CLIENT_MAP.put(Starota.STAROTA_DEV_ID, Starota.getClient());
+			CLIENT_MAP.put(StarotaConstants.STAROTA_DEV_ID, Starota.getClient());
 		else
-			CLIENT_MAP.put(Starota.STAROTA_ID, Starota.getClient());
+			CLIENT_MAP.put(StarotaConstants.STAROTA_ID, Starota.getClient());
 		Properties properties = new Properties();
 		try {
 			properties.load(new FileInputStream("starota.properties"));

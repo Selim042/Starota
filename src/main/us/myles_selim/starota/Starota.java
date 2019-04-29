@@ -62,6 +62,7 @@ import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.commands.CommandUploadScript;
 import us.myles_selim.starota.lua.commands.LuaCommandHandler;
 import us.myles_selim.starota.misc.utils.MiscUtils;
+import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.misc.utils.StatusUpdater;
 import us.myles_selim.starota.misc.utils.StatusUpdater.PresenceData;
 import us.myles_selim.starota.misc.utils.TwitterHelper;
@@ -112,19 +113,11 @@ public class Starota {
 	// private static Socket MANAGER_SOCKET;
 	private static final Properties PROPERTIES = new Properties();
 
-	public static final long STAROTA_ID = 489245655710040099L;
-	public static final long STAROTA_DEV_ID = 504088307148521475L;
-	public static final long SELIM_USER_ID = 134855940938661889L;
-	public static final long SUPPORT_SERVER = 436614503606779914L;
-	public static final String SUPPORT_SERVER_LINK = "https://discord.gg/NxverNw";
-	public static final String HTTP_USER_AGENT = "Mozilla/5.0; Starota/" + Starota.VERSION;
-
 	public final static boolean DEBUG = false;
 	public static boolean IS_DEV;
 	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
-	public final static String VERSION = "2.8.2";
-	public final static String CHANGELOG = "Changelog for v" + VERSION + "\n" + "Public changes:\n"
+	public final static String CHANGELOG = "Changelog for v" + StarotaConstants.VERSION + "\n" + "Public changes:\n"
 			+ " + Registering a profile now auto assigns a team role if found";
 	public final static File DATA_FOLDER = new File("starotaData");
 
@@ -216,10 +209,10 @@ public class Starota {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			System.out.println("v" + VERSION + (DEBUG || IS_DEV ? "d" : ""));
+			System.out.println("v" + StarotaConstants.VERSION + (DEBUG || IS_DEV ? "d" : ""));
 			StatusUpdater statusUpdater = new StatusUpdater(CLIENT);
 			statusUpdater.addPresence(new PresenceData(StatusType.ONLINE, ActivityType.PLAYING,
-					"v" + VERSION + (DEBUG || IS_DEV ? "d" : "")));
+					"v" + StarotaConstants.VERSION + (DEBUG || IS_DEV ? "d" : "")));
 			statusUpdater.addPresence(new PresenceData(StatusType.ONLINE, ActivityType.WATCHING,
 					"people organize raids with `raid`"));
 			statusUpdater.start();
@@ -241,10 +234,10 @@ public class Starota {
 						if (changesChannel == null)
 							continue;
 						String latestChangelog = (String) server.getDataValue("changesVersion");
-						if (!VERSION.equalsIgnoreCase(latestChangelog)) {
+						if (!StarotaConstants.VERSION.equalsIgnoreCase(latestChangelog)) {
 							RequestBuffer.request(
 									() -> changesChannel.sendMessage("```" + CHANGELOG + "```"));
-							server.setDataValue("changesVersion", VERSION);
+							server.setDataValue("changesVersion", StarotaConstants.VERSION);
 						} else
 							sentToAll = false;
 					}
@@ -336,11 +329,11 @@ public class Starota {
 
 		jCmdHandler.registerCommand(new CommandChangelog());
 		jCmdHandler.registerCommand(new CommandCredits());
-		jCmdHandler.registerCommand(new CommandSupportBot(Starota.BOT_NAME, Starota.STAROTA_ID));
-		jCmdHandler.registerCommand(new CommandInvite(Starota.BOT_NAME, Starota.STAROTA_ID,
+		jCmdHandler.registerCommand(new CommandSupportBot(Starota.BOT_NAME, StarotaConstants.STAROTA_ID));
+		jCmdHandler.registerCommand(new CommandInvite(Starota.BOT_NAME, StarotaConstants.STAROTA_ID,
 				Permissions.generatePermissionsNumber(DebugServer.getUsedPermissions())));
 		jCmdHandler.registerCommand(new CommandPing());
-		jCmdHandler.registerCommand(new CommandVote(Starota.BOT_NAME, Starota.STAROTA_ID));
+		jCmdHandler.registerCommand(new CommandVote(Starota.BOT_NAME, StarotaConstants.STAROTA_ID));
 
 		jCmdHandler.registerCommand("Administrative", new CommandStatus());
 		jCmdHandler.registerCommand("Administrative", new CommandChangelogChannel());
@@ -540,7 +533,7 @@ public class Starota {
 	}
 
 	public static IGuild getSupportServer() {
-		return getGuild(SUPPORT_SERVER);
+		return getGuild(StarotaConstants.SUPPORT_SERVER);
 	}
 
 	public static void submitError(Throwable e) {

@@ -45,6 +45,7 @@ import us.myles_selim.starota.misc.data_types.Pair;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.RolePermHelper;
 import us.myles_selim.starota.misc.utils.ServerDataHelper;
+import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.modules.BaseModules;
 import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.profiles.PlayerProfile;
@@ -486,7 +487,7 @@ public class StarotaServer {
 		try {
 			Calendar today = Calendar.getInstance();
 			List<SimpleUser> voters = Starota.getBotListAPI()
-					.getVoters(Long.toString(Starota.STAROTA_ID)).toCompletableFuture().get();
+					.getVoters(Long.toString(StarotaConstants.STAROTA_ID)).toCompletableFuture().get();
 			int numVoters = 0;
 			for (SimpleUser su : voters) {
 				List<IUser> user = guild.getUsersByName(su.getUsername());

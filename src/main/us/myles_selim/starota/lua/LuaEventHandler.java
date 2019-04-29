@@ -2,7 +2,7 @@ package us.myles_selim.starota.lua;
 
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.GuildEvent;
-import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.misc.utils.StarotaConstants;
 
 public class LuaEventHandler {
 
@@ -10,7 +10,7 @@ public class LuaEventHandler {
 
 	@EventSubscriber
 	public void onDiscordEvent(GuildEvent event) {
-		if (event.getGuild() == null || event.getGuild().getLongID() == Starota.SUPPORT_SERVER)
+		if (event.getGuild() == null || event.getGuild().getLongID() == StarotaConstants.SUPPORT_SERVER)
 			return;
 		// if (event instanceof MessageReceivedEvent)
 		// if (((MessageReceivedEvent)

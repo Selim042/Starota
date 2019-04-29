@@ -19,11 +19,11 @@ import com.google.gson.JsonParseException;
 
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.misc.data_types.cache.CachedData;
 import us.myles_selim.starota.misc.data_types.cache.ClearCache;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
+import us.myles_selim.starota.misc.utils.StarotaConstants;
 
 public class EventData {
 
@@ -72,7 +72,7 @@ public class EventData {
 		try {
 			URL url = new URL(EVENTS_URL);
 			URLConnection conn = url.openConnection();
-			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
+			conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
 			conn.setRequestProperty("Cache-Control", "no-cache,no-store,must-revalidate");
 			StarotaEvent[] events = GSON.fromJson(new InputStreamReader(conn.getInputStream()),
 					StarotaEvent[].class);

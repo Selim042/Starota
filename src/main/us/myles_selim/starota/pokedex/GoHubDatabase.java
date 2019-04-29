@@ -19,13 +19,13 @@ import com.google.gson.JsonParser;
 
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
 import us.myles_selim.starota.enums.EnumWeather;
 import us.myles_selim.starota.misc.data_types.cache.CachedData;
 import us.myles_selim.starota.misc.data_types.cache.ClearCache;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
+import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.pokedex.PokedexEntry.DexCounter;
 import us.myles_selim.starota.pokedex.PokedexEntry.DexMove;
 import us.myles_selim.starota.pokedex.PokedexEntry.DexMoveset;
@@ -136,7 +136,7 @@ public class GoHubDatabase {
 			else
 				url = new URL(POKEMON_API + pokemon.getId() + "?form=" + form);
 			URLConnection conn = url.openConnection();
-			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
+			conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
 			PokedexEntry entry = GSON.fromJson(
 					PARSER.parse(new InputStreamReader(conn.getInputStream())), PokedexEntry.class);
 			POKEMON_CACHE.put(key, new CachedData<>(entry));
@@ -162,7 +162,7 @@ public class GoHubDatabase {
 			else
 				url = new URL(POKEMON_MOVES_API + pokemon.getId() + "?form=" + form);
 			URLConnection conn = url.openConnection();
-			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
+			conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
 			DexMove[] moves = GSON.fromJson(PARSER.parse(new InputStreamReader(conn.getInputStream())),
 					DexMove[].class);
 			POKEMON_MOVES_CACHE.put(key, new CachedData<>(moves));
@@ -179,7 +179,7 @@ public class GoHubDatabase {
 		try {
 			URL url = new URL(MOVES_API + moveId);
 			URLConnection conn = url.openConnection();
-			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
+			conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
 			DexMove move = GSON.fromJson(PARSER.parse(new InputStreamReader(conn.getInputStream())),
 					DexMove.class);
 			MOVE_CACHE.put(moveId, new CachedData<>(move));
@@ -221,7 +221,7 @@ public class GoHubDatabase {
 			else
 				url = new URL(MOVESETS_API + pokemon.getId() + "?form=" + form);
 			URLConnection conn = url.openConnection();
-			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
+			conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
 			DexMoveset[] movesets = GSON.fromJson(
 					PARSER.parse(new InputStreamReader(conn.getInputStream())), DexMoveset[].class);
 			MOVESET_CACHE.put(key, new CachedData<>(movesets));
@@ -247,7 +247,7 @@ public class GoHubDatabase {
 			else
 				url = new URL(COUNTERS_API + pokemon.getId() + "?form=" + form);
 			URLConnection conn = url.openConnection();
-			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
+			conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
 			DexCounter[] counters = GSON.fromJson(
 					PARSER.parse(new InputStreamReader(conn.getInputStream())), DexCounter[].class);
 			COUNTER_CACHE.put(key, new CachedData<>(counters));

@@ -19,9 +19,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
-import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.misc.data_types.cache.CachedData;
 import us.myles_selim.starota.misc.data_types.cache.ClearCache;
+import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.silph_road.SilphCard.SilphCheckin;
 import us.myles_selim.starota.silph_road.SilphCard.SilphCheckinTime;
 
@@ -87,7 +87,7 @@ public class SilphRoadCardUtils {
 		try {
 			URL url = new URL(API_URL + pogoName + ".json");
 			URLConnection conn = url.openConnection();
-			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
+			conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
 			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			String json = "";
 			String line = null;
@@ -106,7 +106,7 @@ public class SilphRoadCardUtils {
 		try {
 			URL url = new URL(API_URL + pogoName + ".json");
 			URLConnection conn = url.openConnection();
-			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
+			conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
 			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			String json = "";
 			String line = null;
@@ -136,7 +136,7 @@ public class SilphRoadCardUtils {
 		try {
 			URL url = new URL(API_URL + pogoName + ".json");
 			URLConnection conn = url.openConnection();
-			conn.setRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
+			conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
 			SilphCard card = GSON.fromJson(PARSER.parse(new InputStreamReader(conn.getInputStream())),
 					SilphCard.class);
 			CARD_CACHE.put(pogoName, new CachedData<>(card));

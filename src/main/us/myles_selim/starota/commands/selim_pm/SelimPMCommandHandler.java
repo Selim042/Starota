@@ -17,6 +17,7 @@ import us.myles_selim.starota.commands.registry.ICommandHandler;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
+import us.myles_selim.starota.misc.utils.StarotaConstants;
 
 public class SelimPMCommandHandler {
 
@@ -61,8 +62,8 @@ public class SelimPMCommandHandler {
 	}
 
 	public static boolean isSelimPM(IChannel channel) {
-		if (channel instanceof IPrivateChannel
-				&& ((IPrivateChannel) channel).getRecipient().getLongID() == Starota.SELIM_USER_ID)
+		if (channel instanceof IPrivateChannel && ((IPrivateChannel) channel).getRecipient()
+				.getLongID() == StarotaConstants.SELIM_USER_ID)
 			return true;
 		return false;
 	}

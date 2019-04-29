@@ -70,7 +70,7 @@ public class EmojiServerHelper {
 				return emoji;
 			}
 		}
-		Starota.getUser(Starota.SELIM_USER_ID).getOrCreatePMChannel().sendMessage(
+		Starota.getUser(StarotaConstants.SELIM_USER_ID).getOrCreatePMChannel().sendMessage(
 				"Emoji servers are full, trying to upload " + name + " with image " + fallback);
 		return null;
 	}
@@ -79,7 +79,7 @@ public class EmojiServerHelper {
 		try {
 			URL url2 = new URL(url);
 			URLConnection conn = url2.openConnection();
-			conn.addRequestProperty("User-Agent", Starota.HTTP_USER_AGENT);
+			conn.addRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
 			return Image.forStream(name, conn.getInputStream());
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -24,6 +24,7 @@ import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.assistants.StarotaAssistants;
 import us.myles_selim.starota.debug_server.DebugServer;
 import us.myles_selim.starota.misc.data_types.cache.ClearCache;
+import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class EventHandler {
@@ -34,7 +35,7 @@ public class EventHandler {
 
 	@EventSubscriber
 	public void onMessageRecieved(MessageReceivedEvent event) {
-		if (event.getGuild() == null || event.getGuild().getLongID() == Starota.SUPPORT_SERVER)
+		if (event.getGuild() == null || event.getGuild().getLongID() == StarotaConstants.SUPPORT_SERVER)
 			return;
 		if (Starota.DEBUG)
 			System.out.println("Channel: " + event.getChannel() + ", Author: " + event.getAuthor()
@@ -80,7 +81,7 @@ public class EventHandler {
 		IGuild server = event.getGuild();
 		if (!server.getUsers().contains(Starota.getClient().getOurUser()))
 			return;
-		IUser selimUser = Starota.getUser(Starota.SELIM_USER_ID);
+		IUser selimUser = Starota.getUser(StarotaConstants.SELIM_USER_ID);
 		RequestBuffer.request(() -> {
 			IPrivateChannel selimPm = selimUser.getOrCreatePMChannel();
 			selimPm.sendMessage("Starota was added to the server: " + server.getName());
@@ -93,7 +94,7 @@ public class EventHandler {
 			builder.withTitle("Thanks for using " + ourName + "!");
 			builder.appendDesc("If you need any assistance with " + ourName
 					+ " or it's features, feel free to join our support server at "
-					+ Starota.SUPPORT_SERVER_LINK);
+					+ StarotaConstants.SUPPORT_SERVER_LINK);
 			ownerPm.sendMessage(builder.build());
 		});
 		if (!Starota.getOurUser().getPermissionsForGuild(server).contains(Permissions.SEND_MESSAGES)) {
@@ -173,7 +174,7 @@ public class EventHandler {
 	// update Patreon perms on debug server
 	@EventSubscriber
 	public void roleChange(RoleUpdateEvent event) {
-		if (event.getGuild().getLongID() == Starota.SUPPORT_SERVER)
+		if (event.getGuild().getLongID() == StarotaConstants.SUPPORT_SERVER)
 			DebugServer.update();
 	}
 

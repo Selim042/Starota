@@ -9,6 +9,7 @@ import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
+import us.myles_selim.starota.misc.utils.StarotaConstants;
 
 public class CommandCredits extends JavaCommand {
 
@@ -24,7 +25,7 @@ public class CommandCredits extends JavaCommand {
 	@Override
 	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.withTitle("Credits for " + Starota.BOT_NAME + " v" + Starota.VERSION);
+		builder.withTitle("Credits for " + Starota.BOT_NAME + " v" + StarotaConstants.VERSION);
 
 		builder.appendDesc("**General Development**: Selim_042: [GitHub](http://github.com/Selim042) | "
 				+ "[Twitter](http://twitter.com/Selim_042)\n");
