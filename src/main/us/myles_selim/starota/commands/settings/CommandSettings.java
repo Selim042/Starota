@@ -47,7 +47,7 @@ public class CommandSettings extends StarotaCommand {
 			channel.sendMessage("Setting \"" + args[1] + "\" not set, did you provide a valid value?");
 			break;
 		case SUCCESS:
-			channel.sendMessage("Setting \"" + args[1] + "\" set to " + args[2]);
+			channel.sendMessage("Setting \"" + args[1] + "\" set to " + server.getSetting(args[1]));
 			break;
 		}
 	}

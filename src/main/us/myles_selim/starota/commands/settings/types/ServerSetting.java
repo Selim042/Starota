@@ -37,14 +37,19 @@ public abstract class ServerSetting<V> extends Setting<V> {
 
 	@Override
 	public void toBytes(Storage stor) {
-		stor.writeLong(getServer().getDiscordGuild().getLongID());
+		if (getServer() == null)
+			stor.writeLong(-1);
+		else
+			stor.writeLong(getServer().getDiscordGuild().getLongID());
 	}
 
 	@Override
 	public void fromBytes(Storage stor) {
 		// TODO: this probably shouldn't be hard coded to Starota, will fail
 		// with other bots
-		this.server = StarotaServer.getServer(Starota.getGuild(stor.readLong()));
+		long id = stor.readLong();
+		if (id != -1)
+			this.server = StarotaServer.getServer(Starota.getGuild(id));
 	}
 
 	@SuppressWarnings("unchecked")

@@ -707,6 +707,7 @@ public class StarotaServer {
 		if (SERVERS.containsKey(guild.getLongID()))
 			return SERVERS.get(guild.getLongID());
 		StarotaServer server = new StarotaServer(guild);
+		SERVERS.put(guild.getLongID(), server);
 
 		server.profiles = ServerDataHelper.getEBSFromFolder(guild, PROFILES)
 				.registerType(new PlayerProfile.DataTypePlayerProfile());
@@ -719,7 +720,6 @@ public class StarotaServer {
 		server.regions = ServerDataHelper.getEBSFromFolder(guild, REGIONS)
 				.registerType(new DataTypeGeoRegion());
 
-		SERVERS.put(guild.getLongID(), server);
 		return server;
 	}
 

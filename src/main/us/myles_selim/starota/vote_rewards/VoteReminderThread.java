@@ -61,6 +61,11 @@ public class VoteReminderThread extends TimerTask {
 				RequestBuffer.request(() -> pm.sendMessage(String.format(WARNING_TEMPLATE, g.getName(),
 						earned, used, DATE_FORMAT.format(cutoff))));
 			}
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
 		}
 	}
 

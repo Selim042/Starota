@@ -170,7 +170,10 @@ public class SettingSet implements Iterable<Setting<?>> {
 		public void fromBytes(Storage stor) {
 			int size = stor.readInt();
 			for (int i = 0; i < size; i++) {
-				Setting<?> setting = value.settings.get(stor.readString());
+				String settingName = stor.readString();
+				if (!value.settings.containsKey(settingName))
+					continue;
+				Setting<?> setting = value.settings.get(settingName);
 				setting.fromBytes(stor);
 			}
 		}

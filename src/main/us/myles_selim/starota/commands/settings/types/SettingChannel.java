@@ -56,17 +56,20 @@ public class SettingChannel extends ServerSetting<IChannel> {
 	@Override
 	public void toBytes(Storage stor) {
 		super.toBytes(stor);
-		stor.writeLong(getValue().getLongID());
+		if (getValue().equals(NullChannel.NULL_CHANNEL))
+			stor.writeLong(-1);
+		else
+			stor.writeLong(getValue().getLongID());
 	}
 
 	@Override
 	public void fromBytes(Storage stor) {
 		super.fromBytes(stor);
 		long ch = stor.readLong();
-		if (ch == 0)
+		if (ch == -1)
 			this.setValue(NullChannel.NULL_CHANNEL);
 		else
-			this.setValue(this.getServer().getDiscordGuild().getCategoryByID(stor.readLong()));
+			this.setValue(this.getServer().getDiscordGuild().getChannelByID(ch));
 	}
 
 }

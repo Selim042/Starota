@@ -33,6 +33,7 @@ import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.assistants.CommandInviteAssistants;
 import us.myles_selim.starota.assistants.StarotaAssistants;
 import us.myles_selim.starota.assistants.pokedex.PokedexBot;
+import us.myles_selim.starota.commands.CommandArticleMessage;
 import us.myles_selim.starota.commands.CommandChangelog;
 import us.myles_selim.starota.commands.CommandChangelogChannel;
 import us.myles_selim.starota.commands.CommandCredits;
@@ -117,8 +118,8 @@ public class Starota {
 	public static boolean IS_DEV;
 	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
-	public final static String CHANGELOG = "Changelog for v" + StarotaConstants.VERSION + "\n" + "Public changes:\n"
-			+ " + Registering a profile now auto assigns a team role if found";
+	public final static String CHANGELOG = "Changelog for v" + StarotaConstants.VERSION + "\n"
+			+ "Public changes:\n" + " + Registering a profile now auto assigns a team role if found";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static PrimaryCommandHandler COMMAND_HANDLER;
@@ -144,6 +145,7 @@ public class Starota {
 			}
 			ClientBuilder clientBuilder = new ClientBuilder();
 			clientBuilder.withToken(PROPERTIES.getProperty("token"));
+			IS_DEV = Boolean.parseBoolean(PROPERTIES.getProperty("is_dev"));
 			CLIENT = null;
 			try {
 				CLIENT = clientBuilder.login();
@@ -155,7 +157,6 @@ public class Starota {
 				return;
 			}
 			StarotaAssistants.init();
-			IS_DEV = Boolean.parseBoolean(PROPERTIES.getProperty("is_dev"));
 			EventDispatcher dispatcher = CLIENT.getDispatcher();
 			try {
 				while (!CLIENT.isReady())
@@ -164,10 +165,15 @@ public class Starota {
 				e.printStackTrace();
 			}
 
-			// default server settings, do this before anything else with
-			// StartaServer
+			// default settings, do this before anything else with StarotaServer
 			StarotaServer
 					.setDefaultValue(new SettingChannel(null, CommandChangelogChannel.CHANGES_CHANNEL));
+			StarotaServer
+					.setDefaultValue(new SettingChannel(null, StarotaConstants.Settings.NEWS_CHANNEL));
+
+			// load all StarotaServer data
+			for (IGuild g : CLIENT.getGuilds())
+				StarotaServer.getServer(g);
 
 			COMMAND_HANDLER = new PrimaryCommandHandler(CLIENT);
 			REACTION_MESSAGES_REGISTRY = new ReactionMessageRegistry(CLIENT);
@@ -329,7 +335,8 @@ public class Starota {
 
 		jCmdHandler.registerCommand(new CommandChangelog());
 		jCmdHandler.registerCommand(new CommandCredits());
-		jCmdHandler.registerCommand(new CommandSupportBot(Starota.BOT_NAME, StarotaConstants.STAROTA_ID));
+		jCmdHandler
+				.registerCommand(new CommandSupportBot(Starota.BOT_NAME, StarotaConstants.STAROTA_ID));
 		jCmdHandler.registerCommand(new CommandInvite(Starota.BOT_NAME, StarotaConstants.STAROTA_ID,
 				Permissions.generatePermissionsNumber(DebugServer.getUsedPermissions())));
 		jCmdHandler.registerCommand(new CommandPing());
@@ -395,6 +402,7 @@ public class Starota {
 		jCmdHandler.registerCommand("Misc", new CommandEvents());
 		jCmdHandler.registerCommand("Misc", new CommandEggHatches());
 		jCmdHandler.registerCommand("Misc", new CommandDitto());
+		jCmdHandler.registerCommand("Misc", new CommandArticleMessage());
 
 		jCmdHandler.registerCommand("Tutorial", new CommandTutorial());
 	}
@@ -666,6 +674,40 @@ public class Starota {
 								.get();
 					RequestBuffer.request(
 							() -> owner.getOrCreatePMChannel().sendMessage(getAuthorEmbed(author)));
+				}
+			}
+		});
+	}
+
+	public static void sendArticle(String msg, IUser author) {
+		sendOwnersMessage(msg, null, author);
+	}
+
+	public static void sendArticle(EmbedObject embed, IUser author) {
+		sendOwnersMessage(null, embed, author);
+	}
+
+	public static void sendArticle(String msg, EmbedObject embed, IUser author) {
+		EXECUTOR.execute(new Runnable() {
+
+			@Override
+			public void run() {
+				final EmbedObject fEmbed = embed == null || embed.equals(new EmbedObject()) ? null
+						: embed;
+				for (IGuild g : CLIENT.getGuilds()) {
+					if (MiscUtils.arrContains(SKIPPED_SERVERS, g.getLongID()))
+						continue;
+					StarotaServer server = StarotaServer.getServer(g);
+					IChannel ch = server.getSetting(StarotaConstants.Settings.NEWS_CHANNEL);
+					if (ch == null)
+						continue;
+					if ((msg == null || msg.isEmpty()) && fEmbed != null)
+						RequestBuffer.request(() -> ch.sendMessage(fEmbed)).get();
+					else if ((msg != null && !msg.isEmpty()) && fEmbed == null)
+						RequestBuffer.request(() -> ch.sendMessage(msg)).get();
+					else if ((msg != null && !msg.isEmpty()) && fEmbed != null)
+						RequestBuffer.request(() -> ch.sendMessage(msg, fEmbed)).get();
+					RequestBuffer.request(() -> ch.sendMessage(getAuthorEmbed(author)));
 				}
 			}
 		});
