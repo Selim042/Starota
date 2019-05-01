@@ -38,6 +38,7 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.commands.settings.SettingSet;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.leaderboards.Leaderboard;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
@@ -89,6 +90,7 @@ public class LuaUtils {
 		ConversionHandler.registerAutoConverter(EnumPokemon.class);
 		ConversionHandler.registerAutoConverter(Leaderboard.class);
 		ConversionHandler.registerAutoConverter(StarotaServer.class);
+		ConversionHandler.registerAutoConverter(SettingSet.class);
 
 		ConversionHandler.registerAutoConverter(ICategory.class);
 		ConversionHandler.registerAutoConverter(IChannel.class);

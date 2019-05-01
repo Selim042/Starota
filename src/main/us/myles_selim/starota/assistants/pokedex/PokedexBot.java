@@ -24,7 +24,6 @@ import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.CommandChangelog;
-import us.myles_selim.starota.commands.CommandChangelogChannel;
 import us.myles_selim.starota.commands.CommandCredits;
 import us.myles_selim.starota.commands.CommandInvite;
 import us.myles_selim.starota.commands.CommandSupportBot;
@@ -114,7 +113,9 @@ public class PokedexBot {
 				Permissions.generatePermissionsNumber(USED_PERMISSIONS)));
 		jCmdHandler.registerCommand(new CommandVote(Starota.BOT_NAME, StarotaConstants.STAROTA_ID));
 
-		jCmdHandler.registerCommand("Administrative", new CommandChangelogChannel());
+		// TODO: add this ability back in for Pokedex
+		// jCmdHandler.registerCommand("Administrative", new
+		// CommandChangelogChannel());
 
 		jCmdHandler.registerCommand(new CommandPokedex(REACTION_MESSAGES_REGISTRY));
 

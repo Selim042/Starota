@@ -26,7 +26,10 @@ public class StarotaConstants {
 
 	public static class Settings {
 
+		/** News publishing channel */
 		public static final String NEWS_CHANNEL = "newsChannel";
+		/** Changelog logging channel */
+		public static final String CHANGES_CHANNEL = "changesChannel";
 
 	}
 

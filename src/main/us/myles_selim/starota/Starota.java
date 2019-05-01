@@ -35,7 +35,6 @@ import us.myles_selim.starota.assistants.StarotaAssistants;
 import us.myles_selim.starota.assistants.pokedex.PokedexBot;
 import us.myles_selim.starota.commands.CommandArticleMessage;
 import us.myles_selim.starota.commands.CommandChangelog;
-import us.myles_selim.starota.commands.CommandChangelogChannel;
 import us.myles_selim.starota.commands.CommandCredits;
 import us.myles_selim.starota.commands.CommandGenerateCommandWiki;
 import us.myles_selim.starota.commands.CommandInvite;
@@ -62,6 +61,7 @@ import us.myles_selim.starota.lua.LuaEventHandler;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.commands.CommandUploadScript;
 import us.myles_selim.starota.lua.commands.LuaCommandHandler;
+import us.myles_selim.starota.misc.data_types.NullChannel;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.misc.utils.StatusUpdater;
@@ -167,7 +167,7 @@ public class Starota {
 
 			// default settings, do this before anything else with StarotaServer
 			StarotaServer
-					.setDefaultValue(new SettingChannel(null, CommandChangelogChannel.CHANGES_CHANNEL,
+					.setDefaultValue(new SettingChannel(null, StarotaConstants.Settings.CHANGES_CHANNEL,
 							"Channel where " + BOT_NAME + " prints out changelogs each update."));
 			StarotaServer.setDefaultValue(new SettingChannel(null,
 					StarotaConstants.Settings.NEWS_CHANNEL,
@@ -235,11 +235,9 @@ public class Starota {
 						guilds.addAll(PokedexBot.POKEDEX_CLIENT.getGuilds());
 					for (IGuild g : guilds) {
 						StarotaServer server = StarotaServer.getServer(g);
-						if (!server.hasDataKey(CommandChangelogChannel.CHANGES_CHANNEL))
-							continue;
-						IChannel changesChannel = CLIENT.getChannelByID(
-								(long) server.getDataValue(CommandChangelogChannel.CHANGES_CHANNEL));
-						if (changesChannel == null)
+						IChannel changesChannel = server
+								.getSetting(StarotaConstants.Settings.CHANGES_CHANNEL);
+						if (!changesChannel.equals(NullChannel.NULL_CHANNEL))
 							continue;
 						String latestChangelog = (String) server.getDataValue("changesVersion");
 						if (!StarotaConstants.VERSION.equalsIgnoreCase(latestChangelog)) {
@@ -315,10 +313,11 @@ public class Starota {
 					for (IGuild g : CLIENT.getGuilds()) {
 						StarotaServer server = StarotaServer.getServer(g);
 						EBStorage options = server.getData();
-						if (options.containsKey(CommandChangelogChannel.CHANGES_CHANNEL)) {
-							server.setSetting(CommandChangelogChannel.CHANGES_CHANNEL, g.getChannelByID(
-									options.get(CommandChangelogChannel.CHANGES_CHANNEL, long.class)));
-							options.clearKey(CommandChangelogChannel.CHANGES_CHANNEL);
+						if (options.containsKey(StarotaConstants.Settings.CHANGES_CHANNEL)) {
+							server.setSetting(StarotaConstants.Settings.CHANGES_CHANNEL,
+									g.getChannelByID(options.get(
+											StarotaConstants.Settings.CHANGES_CHANNEL, long.class)));
+							options.clearKey(StarotaConstants.Settings.CHANGES_CHANNEL);
 						}
 					}
 				}
@@ -345,7 +344,6 @@ public class Starota {
 		jCmdHandler.registerCommand(new CommandVote(Starota.BOT_NAME, StarotaConstants.STAROTA_ID));
 
 		jCmdHandler.registerCommand("Administrative", new CommandStatus());
-		jCmdHandler.registerCommand("Administrative", new CommandChangelogChannel());
 		jCmdHandler.registerCommand("Administrative", new CommandInviteAssistants());
 		jCmdHandler.registerCommand("Administrative", new CommandVotePerks());
 		jCmdHandler.registerCommand("Administrative", new CommandSettings());
