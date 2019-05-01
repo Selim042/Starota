@@ -12,24 +12,20 @@ public class PokemonOperators {
 
 	public static final SearchOperator<EnumPokemon> AVAILABLE = new LlambadaSearchOperator<EnumPokemon>(
 			EnumPokemon.class, p -> !p.isAvailable(), "available");
-
 	public static final SearchOperator<EnumPokemon> SHINYABLE = new LlambadaSearchOperator<EnumPokemon>(
 			EnumPokemon.class, p -> !p.isShinyable(), "shiny", "shinyable");
-
 	public static final SearchOperator<EnumPokemon> TRADABLE = new LlambadaSearchOperator<EnumPokemon>(
 			EnumPokemon.class, p -> !p.isTradable(), "canTrade", "tradable", "trade");
-
 	public static final SearchOperator<EnumPokemon> LEGENDARY = new LlambadaSearchOperator<>(
 			EnumPokemon.class, p -> !p.isLegendary(), "legend", "legendary");
-
 	public static final SearchOperator<EnumPokemon> MYTHICAL = new LlambadaSearchOperator<>(
 			EnumPokemon.class, p -> !p.isMythical(), "mythic", "mythical");
-
 	public static final SearchOperator<EnumPokemon> STARTER = new LlambadaSearchOperator<>(
 			EnumPokemon.class, p -> !p.isStarter(), "starter");
-
 	public static final SearchOperator<EnumPokemon> BABY = new LlambadaSearchOperator<>(
 			EnumPokemon.class, p -> !p.isBaby(), "baby");
+	public static final SearchOperator<EnumPokemon> ITEM_EVOLVE = new LlambadaSearchOperator<>(
+			EnumPokemon.class, p -> !p.evolvesWithItem(), "item");
 
 	public static final Map<EnumPokemonType, SearchOperator<EnumPokemon>> TYPING = new HashMap<>();
 

@@ -1255,6 +1255,46 @@ public enum EnumPokemon {
 		}
 	}
 
+	// TODO: update when new evolutions come out
+	public boolean evolvesWithItem() {
+		switch (this) {
+		// gen 1
+		case GLOOM:
+		case POLIWHIRL:
+		case SLOWPOKE:
+		case ONIX:
+		case LICKITUNG:
+		case RHYDON:
+		case TANGELA:
+		case SEADRA:
+		case SCYTHER:
+		case ELECTABUZZ:
+		case MAGMAR:
+		case PORYGON:
+			return true;
+		// gen 2
+		case TOGETIC:
+		case AIPOM:
+		case SUNKERN:
+		case YANMA:
+		case MURKROW:
+		case MISDREAVUS:
+		case GLIGAR:
+		case SNEASEL:
+		case PORYGON2:
+			return true;
+		// gen 3
+		case KIRLIA:
+		case ROSELIA:
+		case DUSCLOPS:
+		case SNORUNT:
+		case MAMOSWINE:
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	public String getArtwork(int formId) {
 		switch (this) {
 		case WORMADAM:
@@ -1376,4 +1416,5 @@ public enum EnumPokemon {
 		// if (FormManager.isShinyable(p.getId()))
 		// System.out.println(p + " is shinyable");
 	}
+
 }
