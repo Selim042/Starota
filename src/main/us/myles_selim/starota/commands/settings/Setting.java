@@ -9,25 +9,43 @@ import us.myles_selim.ebs.Storage;
 public abstract class Setting<V> {
 
 	private final String name;
+	private final String desc;
 	private V value;
 
 	public Setting(String name) {
-		this(name, null);
+		this(name, (V) null);
+	}
+
+	public Setting(String name, String desc) {
+		this(name, desc, null);
 	}
 
 	public Setting(String name, V value) {
 		this.name = name;
+		this.desc = null;
+		if (!this.setValue(value))
+			throw new IllegalArgumentException("value " + value + "not accepted");
+	}
+
+	public Setting(String name, String desc, V value) {
+		this.name = name;
+		this.desc = desc;
 		if (!this.setValue(value))
 			throw new IllegalArgumentException("value " + value + "not accepted");
 	}
 
 	public Setting(Setting<V> setting) {
 		this.name = setting.name;
+		this.desc = setting.desc;
 		this.value = setting.value;
 	}
 
 	public String getName() {
 		return name;
+	}
+
+	public String getDescription() {
+		return this.desc;
 	}
 
 	@Nonnull

@@ -167,9 +167,11 @@ public class Starota {
 
 			// default settings, do this before anything else with StarotaServer
 			StarotaServer
-					.setDefaultValue(new SettingChannel(null, CommandChangelogChannel.CHANGES_CHANNEL));
-			StarotaServer
-					.setDefaultValue(new SettingChannel(null, StarotaConstants.Settings.NEWS_CHANNEL));
+					.setDefaultValue(new SettingChannel(null, CommandChangelogChannel.CHANGES_CHANNEL,
+							"Channel where " + BOT_NAME + " prints out changelogs each update."));
+			StarotaServer.setDefaultValue(new SettingChannel(null,
+					StarotaConstants.Settings.NEWS_CHANNEL,
+					"Channel where " + BOT_NAME + " prints out news articles when they are published."));
 
 			// load all StarotaServer data
 			for (IGuild g : CLIENT.getGuilds())

@@ -56,8 +56,14 @@ public class CommandSettings extends StarotaCommand {
 		EmbedBuilder builder = new EmbedBuilder();
 
 		builder.withTitle(server.getDiscordGuild().getName() + " Options:");
-		server.forEachSetting((setting) -> builder.appendDesc(
-				String.format(" - %s: %s\n", setting.getName(), setting.getValue().toString())));
+		server.forEachSetting((setting) -> {
+			builder.appendDesc(
+					String.format(" - %s: %s\n", setting.getName(), setting.getValue().toString()));
+			if (setting.getDescription() != null)
+				builder.appendDesc(String.format("%s\n\n", setting.getDescription()));
+			else
+				builder.appendDesc("\n");
+		});
 
 		channel.sendMessage(builder.build());
 	}

@@ -11,7 +11,15 @@ public class SettingChannel extends ServerSetting<IChannel> {
 		super(server, name);
 	}
 
+	public SettingChannel(StarotaServer server, String name, String desc) {
+		super(server, name, desc);
+	}
+
 	public SettingChannel(StarotaServer server, String name, IChannel value) {
+		super(server, name, value);
+	}
+
+	public SettingChannel(StarotaServer server, String name, String desc, IChannel value) {
 		super(server, name, value);
 	}
 

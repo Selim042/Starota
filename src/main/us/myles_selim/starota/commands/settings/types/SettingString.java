@@ -12,11 +12,15 @@ public class SettingString extends Setting<String> {
 	}
 
 	public SettingString(String name, String value) {
-		super(name, value);
+		super(name, null, value);
+	}
+
+	public SettingString(String name, String desc, String value) {
+		super(name, desc, value);
 	}
 
 	public SettingString(SettingString setting) {
-		super(setting.getName(), new String(setting.getValue()));
+		super(setting.getName(), setting.getDescription(), new String(setting.getValue()));
 	}
 
 	@Override

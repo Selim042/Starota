@@ -16,8 +16,18 @@ public abstract class ServerSetting<V> extends Setting<V> {
 		this.server = server;
 	}
 
+	public ServerSetting(StarotaServer server, String name, String desc) {
+		super(name, desc);
+		this.server = server;
+	}
+
 	public ServerSetting(StarotaServer server, String name, V value) {
 		super(name, value);
+		this.server = server;
+	}
+
+	public ServerSetting(StarotaServer server, String name, String desc, V value) {
+		super(name, desc, value);
 		this.server = server;
 	}
 
