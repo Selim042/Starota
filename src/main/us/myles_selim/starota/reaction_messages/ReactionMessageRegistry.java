@@ -12,6 +12,7 @@ import sx.blah.discord.handle.impl.events.guild.channel.message.reaction.Reactio
 import sx.blah.discord.handle.impl.events.guild.channel.message.reaction.ReactionRemoveEvent;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.IUser;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.reaction_messages.PersistReactionMessage.DataTypePReactionMessage;
@@ -24,6 +25,7 @@ public class ReactionMessageRegistry {
 	private static final Map<Long, ReactionMessageRegistry> REGISTRIES = new HashMap<>();
 
 	protected final HashMap<String, ReactionMessage> messages = new HashMap<>();
+	protected final IUser bot;
 
 	public static ReactionMessageRegistry getRegistry(IShard shard) {
 		return getRegistry(shard.getClient().getOurUser().getLongID());
@@ -36,7 +38,8 @@ public class ReactionMessageRegistry {
 	}
 
 	public ReactionMessageRegistry(IDiscordClient client) {
-		REGISTRIES.put(client.getOurUser().getLongID(), this);
+		this.bot = client.getOurUser();
+		REGISTRIES.put(this.bot.getLongID(), this);
 		for (IGuild g : Starota.getClient().getGuilds())
 			deserializeAll(StarotaServer.getServer(g));
 	}
@@ -105,6 +108,10 @@ public class ReactionMessageRegistry {
 			return;
 		serialize(StarotaServer.getServer(event.getGuild()), event.getMessage(),
 				(PersistReactionMessage) rMessage);
+	}
+
+	public IUser getBot() {
+		return bot;
 	}
 
 	protected void serialize(StarotaServer server, IMessage message, PersistReactionMessage rMessage) {
