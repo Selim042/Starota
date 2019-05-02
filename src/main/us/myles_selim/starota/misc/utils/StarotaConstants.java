@@ -3,7 +3,7 @@ package us.myles_selim.starota.misc.utils;
 public class StarotaConstants {
 
 	/** Starota version */
-	public final static String VERSION = "2.8.2";
+	public final static String VERSION = "2.9.0";
 
 	/** Starota user ID */
 	public static final long STAROTA_ID = 489245655710040099L;

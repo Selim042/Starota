@@ -121,7 +121,18 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
 	public final static String CHANGELOG = "Changelog for v" + StarotaConstants.VERSION + "\n"
-			+ "Public changes:\n" + " + Registering a profile now auto assigns a team role if found";
+			+ "Public changes:\n" + " + Brand new, searchable, enhanced event system\n"
+			+ " * Fix the 'e' in Pokemon in more places\n" + " + Mentioning " + BOT_NAME
+			+ " now works as a command prefix\n" + " + Add \"vote\" command\n"
+			+ " * Fix Pokedex cutting off moves for Pokemon with large movesets, like Mew\n"
+			+ " * Fixes updateProfile having trouble when setting alt account data\n"
+			+ " * Starota will now automatically update trainer level if it can find a Silph Road card with higher level\n"
+			+ " * Remove emoji from egg hatch tier command\n"
+			+ " * Correct types for Zapdos and Moltres\n"
+			+ " * Raid embeds now display nickname and Discord username/discriminator\n"
+			+ "\nAdministrative changes:\n"
+			+ " + Added system to message all server owners to easily inform of new features\n"
+			+ " + Brand new settings system, pulls the changelog channel command into here";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static PrimaryCommandHandler COMMAND_HANDLER;
