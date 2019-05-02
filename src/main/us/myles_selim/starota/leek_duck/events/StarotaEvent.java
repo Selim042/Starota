@@ -151,7 +151,7 @@ public class StarotaEvent {
 
 		StringBuilder bonuses = new StringBuilder();
 		for (String b : this.bonuses)
-			bonuses.append(b + ", ");
+			bonuses.append(String.format(" - %s\n", b));
 		if (bonuses.length() != 0)
 			builder.appendField("Bonuses:", bonuses.toString().substring(0, bonuses.length() - 2),
 					false);

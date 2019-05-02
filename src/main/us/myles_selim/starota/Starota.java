@@ -243,7 +243,7 @@ public class Starota {
 						StarotaServer server = StarotaServer.getServer(g);
 						IChannel changesChannel = server
 								.getSetting(StarotaConstants.Settings.CHANGES_CHANNEL);
-						if (!changesChannel.equals(NullChannel.NULL_CHANNEL))
+						if (changesChannel.equals(NullChannel.NULL_CHANNEL))
 							continue;
 						String latestChangelog = (String) server.getDataValue("changesVersion");
 						if (!StarotaConstants.VERSION.equalsIgnoreCase(latestChangelog)) {
