@@ -397,7 +397,7 @@ public class Starota {
 		jCmdHandler.registerCommand("PvP", new CommandNotReady());
 		jCmdHandler.registerCommand("PvP", new CommandFindBattles());
 
-		jCmdHandler.registerCommand("Pokedex", new CommandPokedex(Starota.REACTION_MESSAGES_REGISTRY));
+		jCmdHandler.registerCommand("Pokedex", new CommandPokedex());
 
 		jCmdHandler.registerCommand("Raids", new CommandRaid());
 		jCmdHandler.registerCommand("Raids", new CommandSetRaidEChannel());

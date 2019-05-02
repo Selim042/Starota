@@ -117,7 +117,7 @@ public class PokedexBot {
 		// jCmdHandler.registerCommand("Administrative", new
 		// CommandChangelogChannel());
 
-		jCmdHandler.registerCommand(new CommandPokedex(REACTION_MESSAGES_REGISTRY));
+		jCmdHandler.registerCommand("Pokedex", new CommandPokedex());
 
 		EventDispatcher dispatcher = POKEDEX_CLIENT.getDispatcher();
 		dispatcher.registerListener(COMMAND_HANDLER);

@@ -15,11 +15,8 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandPokedex extends StarotaCommand {
 
-	private final ReactionMessageRegistry registry;
-
-	public CommandPokedex(ReactionMessageRegistry registry) {
+	public CommandPokedex() {
 		super("pokedex", "Displays Pokedex information about the given Pokemon.");
-		this.registry = registry;
 	}
 
 	@Override
