@@ -14,6 +14,7 @@ import java.util.function.Predicate;
 public abstract class SearchOperator<T> {
 
 	private static final Map<Class<?>, Set<SearchOperator<?>>> OPERATORS = new HashMap<>();
+	private static final Map<Class<?>, SearchOperator<?>> DEFAULT_OPERATORS = new HashMap<>();
 
 	@SuppressWarnings("unchecked")
 	public static <T> SearchOperator<T> getOperator(Class<T> type, String search) {
@@ -48,6 +49,9 @@ public abstract class SearchOperator<T> {
 				}
 			}
 		}
+		if (DEFAULT_OPERATORS.containsKey(type))
+			return new DefaultSearchOperatorWrapper<>(
+					(DefaultSearchOperator<T>) DEFAULT_OPERATORS.get(type), search);
 		return null;
 	}
 
@@ -55,7 +59,7 @@ public abstract class SearchOperator<T> {
 		List<String[]> ret = new ArrayList<>();
 		Set<SearchOperator<?>> ops = OPERATORS.get(type);
 		if (ops == null)
-			Collections.emptyList();
+			return Collections.emptyList();
 		for (SearchOperator<?> op : ops)
 			ret.add(op.getSearchTerms());
 		return ret;
@@ -191,6 +195,48 @@ public abstract class SearchOperator<T> {
 		@Override
 		public boolean isCaseSensitive() {
 			return this.caseSensitive;
+		}
+
+	}
+
+	public static abstract class DefaultSearchOperator<T> extends SearchOperator<T> {
+
+		public DefaultSearchOperator(Class<T> type) {
+			super(type);
+		}
+
+		@Override
+		public final void filter(Collection<T> vals, Collection<T> filtered) {}
+
+		public abstract void filter(String term, Collection<T> vals, Collection<T> filtered);
+
+		@Override
+		public final String[] getSearchTerms() {
+			return null;
+		}
+
+	}
+
+	public static final class DefaultSearchOperatorWrapper<T> extends SearchOperator<T> {
+
+		private final DefaultSearchOperator<T> op;
+		private final String term;
+
+		public DefaultSearchOperatorWrapper(DefaultSearchOperator<T> op, String term) {
+			// pass null so it isn't added to the op map
+			super(null);
+			this.op = op;
+			this.term = term;
+		}
+
+		@Override
+		public void filter(Collection<T> vals, Collection<T> filtered) {
+			op.filter(term, vals, filtered);
+		}
+
+		@Override
+		public String[] getSearchTerms() {
+			return null;
 		}
 
 	}

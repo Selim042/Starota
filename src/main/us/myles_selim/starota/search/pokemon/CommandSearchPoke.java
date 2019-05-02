@@ -1,21 +1,19 @@
-package us.myles_selim.starota.search;
+package us.myles_selim.starota.search.pokemon;
 
 import java.util.Collection;
 import java.util.EnumSet;
 
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.impl.obj.ReactionEmoji;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IReaction;
-import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.RequestBuffer;
-import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.misc.utils.IndexHolder;
 import us.myles_selim.starota.reaction_messages.ReactionMessage;
+import us.myles_selim.starota.search.SearchEngine;
+import us.myles_selim.starota.search.SearchOperator;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandSearchPoke extends StarotaCommand {
@@ -33,7 +31,7 @@ public class CommandSearchPoke extends StarotaCommand {
 	@Override
 	public String getDescription() {
 		String desc = super.getDescription();
-		desc += "\n\nSearch Operators:\n```\n";
+		desc += "_\n\nSearch Operators:\n```\n";
 		for (String[] ops : SearchOperator.getOperatorTerms(EnumPokemon.class)) {
 			if (ops.length == 0)
 				continue;
@@ -46,7 +44,7 @@ public class CommandSearchPoke extends StarotaCommand {
 				opString += op + ", ";
 			desc += opString.substring(0, opString.length() - 2) + "\n";
 		}
-		desc += "\n```";
+		desc += "\n```_";
 		return desc;
 	}
 
@@ -70,11 +68,9 @@ public class CommandSearchPoke extends StarotaCommand {
 
 	private class SearchResultReactionMessage extends ReactionMessage {
 
-		private static final String LEFT_EMOJI = "⬅";
-		private static final String RIGHT_EMOJI = "➡";
 		private static final int RESULTS_PER_PAGE = 10;
 
-		private int pageIndex = 0;
+		private IndexHolder pageIndex = new IndexHolder();
 
 		private final Collection<EnumPokemon> results;
 
@@ -86,45 +82,19 @@ public class CommandSearchPoke extends StarotaCommand {
 		public void onSend(StarotaServer server, IChannel channel, IMessage msg) {
 			if (results.size() / RESULTS_PER_PAGE == 0)
 				return;
-			RequestBuffer.request(() -> msg.addReaction(ReactionEmoji.of(LEFT_EMOJI))).get();
-			RequestBuffer.request(() -> msg.addReaction(ReactionEmoji.of(RIGHT_EMOJI)));
-		}
-
-		@Override
-		public void onReactionAdded(StarotaServer server, IChannel channel, IMessage msg, IUser user,
-				IReaction react) {
-			if (!react.getUserReacted(Starota.getOurUser()))
-				return;
-			int totalPages = results.size() / RESULTS_PER_PAGE;
-			boolean changed = false;
-			if (react.getEmoji().getName().equals(LEFT_EMOJI)) {
-				if (pageIndex <= 0)
-					pageIndex = totalPages;
-				else
-					pageIndex--;
-				changed = true;
-			} else if (react.getEmoji().getName().equals(RIGHT_EMOJI)) {
-				if (pageIndex >= totalPages)
-					pageIndex = 0;
-				else
-					pageIndex++;
-				changed = true;
-			}
-			if (changed)
-				RequestBuffer.request(() -> this.editMessage(channel, msg));
-			RequestBuffer.request(() -> msg.removeReaction(user, react));
+			this.addPageButtons(pageIndex, results.size() / RESULTS_PER_PAGE);
 		}
 
 		@Override
 		protected EmbedObject getEmbed(StarotaServer server) {
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.withTitle(String.format("Search results: (%d)", results.size()));
-			int maxVal = Math.min(pageIndex * RESULTS_PER_PAGE + RESULTS_PER_PAGE, results.size());
+			int maxVal = Math.min(pageIndex.value * RESULTS_PER_PAGE + RESULTS_PER_PAGE, results.size());
 			int i = 0;
 			for (EnumPokemon p : results) {
 				if (i >= maxVal)
 					break;
-				if (i >= pageIndex * RESULTS_PER_PAGE) {
+				if (i >= pageIndex.value * RESULTS_PER_PAGE) {
 					String typeString = p.getType1().getEmoji().toString();
 					if (p.getType2() != null)
 						typeString += p.getType2().getEmoji();
@@ -132,8 +102,8 @@ public class CommandSearchPoke extends StarotaCommand {
 				}
 				i++;
 			}
-			builder.withFooterText(
-					String.format("Page: %d/%d", pageIndex + 1, results.size() / RESULTS_PER_PAGE + 1));
+			builder.withFooterText(String.format("Page: %d/%d", pageIndex.value + 1,
+					results.size() / RESULTS_PER_PAGE + 1));
 			return builder.build();
 		}
 

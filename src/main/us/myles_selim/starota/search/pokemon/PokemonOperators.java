@@ -1,4 +1,4 @@
-package us.myles_selim.starota.search;
+package us.myles_selim.starota.search.pokemon;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,6 +6,7 @@ import java.util.Map;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
 import us.myles_selim.starota.enums.EnumWeather;
+import us.myles_selim.starota.search.SearchOperator;
 import us.myles_selim.starota.search.SearchOperator.LlambadaSearchOperator;
 
 public class PokemonOperators {

@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Set;
 
 import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.search.SearchOperator.DefaultSearchOperatorWrapper;
+import us.myles_selim.starota.search.pokemon.PokemonOperators;
 
 public class SearchEngine {
 
@@ -43,8 +45,12 @@ public class SearchEngine {
 	@SafeVarargs
 	public static <T> Collection<T> search(Collection<T> values, SearchOperator<T>... operators) {
 		Set<T> filtered = new HashSet<>();
-		for (SearchOperator<T> op : operators)
-			op.filter(values, filtered);
+		for (SearchOperator<T> op : operators) {
+			if (op instanceof DefaultSearchOperatorWrapper)
+				((DefaultSearchOperatorWrapper<T>) op).filter(values, filtered);
+			else
+				op.filter(values, filtered);
+		}
 		values.removeAll(filtered);
 		return values;
 	}

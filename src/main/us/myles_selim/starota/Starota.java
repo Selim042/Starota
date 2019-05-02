@@ -88,8 +88,10 @@ import us.myles_selim.starota.role_management.commands.CommandAddGroup;
 import us.myles_selim.starota.role_management.commands.CommandGetGroups;
 import us.myles_selim.starota.role_management.commands.CommandRemoveGroup;
 import us.myles_selim.starota.role_management.commands.CommandSetAsGroup;
-import us.myles_selim.starota.search.CommandSearchPoke;
-import us.myles_selim.starota.search.PokemonOperators;
+import us.myles_selim.starota.search.events.CommandSearchEvents;
+import us.myles_selim.starota.search.events.EventOperators;
+import us.myles_selim.starota.search.pokemon.CommandSearchPoke;
+import us.myles_selim.starota.search.pokemon.PokemonOperators;
 import us.myles_selim.starota.silph_road.CommandSilphCard;
 import us.myles_selim.starota.silph_road.eggs.CommandEggHatches;
 import us.myles_selim.starota.trading.commands.CommandFindTrade;
@@ -223,6 +225,10 @@ public class Starota {
 					"v" + StarotaConstants.VERSION + (DEBUG || IS_DEV ? "d" : "")));
 			statusUpdater.addPresence(new PresenceData(StatusType.ONLINE, ActivityType.WATCHING,
 					"people organize raids with `raid`"));
+			statusUpdater.addPresence(new PresenceData(StatusType.ONLINE, ActivityType.LISTENING,
+					"to people search for events and Pokemon"));
+			statusUpdater.addPresence(new PresenceData(StatusType.ONLINE, ActivityType.PLAYING,
+					"with the new event system"));
 			statusUpdater.start();
 
 			EXECUTOR.execute(new Runnable() {
@@ -269,8 +275,9 @@ public class Starota {
 				});
 			}
 
-			// register search operators for Pokemon
+			// register search operators
 			PokemonOperators.registerOperators();
+			EventOperators.registerOperators();
 
 			Thread discord4JWatchdog = new Thread("D4JWatchdog") {
 
@@ -397,6 +404,7 @@ public class Starota {
 		jCmdHandler.registerCommand("Raids", new CommandRaidBosses());
 
 		jCmdHandler.registerCommand("Search", new CommandSearchPoke());
+		jCmdHandler.registerCommand("Search", new CommandSearchEvents());
 
 		jCmdHandler.registerCommand("Misc", new CommandSilphCard());
 		jCmdHandler.registerCommand("Misc", new CommandEvents());
