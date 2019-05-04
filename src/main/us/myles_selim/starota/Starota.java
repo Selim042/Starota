@@ -322,24 +322,6 @@ public class Starota {
 				return false;
 			};
 			f.test(null);
-
-			// migrate old settings to new system
-			EXECUTOR.execute(new Runnable() {
-
-				@Override
-				public void run() {
-					for (IGuild g : CLIENT.getGuilds()) {
-						StarotaServer server = StarotaServer.getServer(g);
-						EBStorage options = server.getData();
-						if (options.containsKey(StarotaConstants.Settings.CHANGES_CHANNEL)) {
-							server.setSetting(StarotaConstants.Settings.CHANGES_CHANNEL,
-									g.getChannelByID(options.get(
-											StarotaConstants.Settings.CHANGES_CHANNEL, long.class)));
-							options.clearKey(StarotaConstants.Settings.CHANGES_CHANNEL);
-						}
-					}
-				}
-			});
 		} catch (Exception e) {
 			System.err.println("+-------------------------------------------------------------------+");
 			System.err.println("| Starota failed to start properly. Printing exception then exiting |");

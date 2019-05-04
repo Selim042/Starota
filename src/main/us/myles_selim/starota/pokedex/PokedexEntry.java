@@ -13,38 +13,30 @@ import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
 import us.myles_selim.starota.enums.EnumWeather;
+import us.myles_selim.starota.misc.data_types.EggEntry;
+import us.myles_selim.starota.misc.data_types.RaidBoss;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
 import us.myles_selim.starota.misc.utils.ImageHelper;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.reaction_messages.ReactionMessage;
+import us.myles_selim.starota.silph_road.SilphRoadData;
+import us.myles_selim.starota.trading.forms.FormSet;
 
 public class PokedexEntry extends ReactionMessage {
 
-	// private static final float[] LVL_MULT = { 0.094f, 0.135137432f,
-	// 0.16639787f, 0.192650919f,
-	// 0.21573247f, 0.236572661f, 0.25572005f, 0.273530381f, 0.29024988f,
-	// 0.306057377f, 0.3210876f,
-	// 0.335445036f, 0.34921268f, 0.362457751f, 0.37523559f, 0.387592406f,
-	// 0.39956728f,
-	// 0.411193551f, 0.42250001f, 0.432926419f, 0.44310755f, 0.4530599578f,
-	// 0.46279839f,
-	// 0.472336083f, 0.48168495f, 0.4908558f, 0.49985844f, 0.508701765f,
-	// 0.51739395f, 0.525942511f,
-	// 0.53435433f, 0.542635767f, 0.55079269f, 0.558830576f, 0.56675452f,
-	// 0.574569153f, 0.58227891f,
-	// 0.589887917f, 0.59740001f, 0.604818814f, 0.61215729f, 0.619399365f,
-	// 0.62656713f,
-	// 0.633644533f, 0.64065295f, 0.647576426f, 0.65443563f, 0.661214806f,
-	// 0.667934f, 0.674577537f,
-	// 0.68116492f, 0.687680648f, 0.69414365f, 0.700538673f, 0.70688421f,
-	// 0.713164996f, 0.71939909f,
-	// 0.725571552f, 0.7317f, 0.734741009f, 0.73776948f, 0.740785574f,
-	// 0.74378943f, 0.746781211f,
-	// 0.74976104f, 0.752729087f, 0.75568551f, 0.758630378f, 0.76156384f,
-	// 0.764486065f, 0.76739717f,
-	// 0.770297266f, 0.7731865f, 0.776064962f, 0.77893275f, 0.781790055f,
-	// 0.78463697f, 0.787473578f,
-	// 0.79030001f };
+	private static final float[] LVL_MULT = { 0.094f, 0.135137432f, 0.16639787f, 0.192650919f,
+			0.21573247f, 0.236572661f, 0.25572005f, 0.273530381f, 0.29024988f, 0.306057377f, 0.3210876f,
+			0.335445036f, 0.34921268f, 0.362457751f, 0.37523559f, 0.387592406f, 0.39956728f,
+			0.411193551f, 0.42250001f, 0.432926419f, 0.44310755f, 0.4530599578f, 0.46279839f,
+			0.472336083f, 0.48168495f, 0.4908558f, 0.49985844f, 0.508701765f, 0.51739395f, 0.525942511f,
+			0.53435433f, 0.542635767f, 0.55079269f, 0.558830576f, 0.56675452f, 0.574569153f, 0.58227891f,
+			0.589887917f, 0.59740001f, 0.604818814f, 0.61215729f, 0.619399365f, 0.62656713f,
+			0.633644533f, 0.64065295f, 0.647576426f, 0.65443563f, 0.661214806f, 0.667934f, 0.674577537f,
+			0.68116492f, 0.687680648f, 0.69414365f, 0.700538673f, 0.70688421f, 0.713164996f, 0.71939909f,
+			0.725571552f, 0.7317f, 0.734741009f, 0.73776948f, 0.740785574f, 0.74378943f, 0.746781211f,
+			0.74976104f, 0.752729087f, 0.75568551f, 0.758630378f, 0.76156384f, 0.764486065f, 0.76739717f,
+			0.770297266f, 0.7731865f, 0.776064962f, 0.77893275f, 0.781790055f, 0.78463697f, 0.787473578f,
+			0.79030001f };
 
 	// general stats
 	public int id;
@@ -57,6 +49,14 @@ public class PokedexEntry extends ReactionMessage {
 	public int atk;
 	public int sta;
 	public int def;
+
+	public int getCP(float level, int atkIV, int defIV, int staIV) {
+		double a = atkIV + atk;
+		double d = Math.sqrt(defIV + def);
+		double s = Math.sqrt(staIV + sta);
+		double l = Math.pow(LVL_MULT[(int) Math.floor(level * 2) - 2], 2);
+		return (int) ((a * d * s * l) / 10);
+	}
 
 	public int isMythical;
 	public int isLegendary;
@@ -301,6 +301,25 @@ public class PokedexEntry extends ReactionMessage {
 				true);
 		builder.appendField("Stats:", String.format("Max CP: %d\nAttack: %d\nDefense: %d\nStamina: %d",
 				entry.maxcp, entry.atk, entry.def, entry.sta), true);
+
+		// egg & raid cp stuff
+		FormSet.Form formS = null;
+		if (entry.getPokemon().getFormSet() != null)
+			formS = entry.getPokemon().getFormSet().getForm(embForm);
+		StringBuilder cps = new StringBuilder();
+		RaidBoss boss = SilphRoadData.getBoss(entry.getPokemon(), formS);
+		if (boss != null) {
+			cps.append(String.format("Raid Catch Min/Max: %d-%d CP\n", getCP(20, 10, 10, 10),
+					getCP(20, 15, 15, 15)));
+			cps.append(String.format("Raid Boosted Min/Max: %d-%d CP\n", getCP(25, 10, 10, 10),
+					getCP(25, 15, 15, 15)));
+		}
+		EggEntry egg = SilphRoadData.getEgg(entry.getPokemon(), formS);
+		if (egg != null)
+			cps.append(String.format("Egg Hatch Min/Max: %d-%d CP\n", getCP(20, 10, 10, 10),
+					getCP(20, 15, 15, 15)));
+		if (cps.length() != 0)
+			builder.appendField("Important CPs:", cps.toString(), false);
 
 		// types
 		String resistString = "";
