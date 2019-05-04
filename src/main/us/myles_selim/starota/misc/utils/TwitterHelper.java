@@ -2,8 +2,12 @@ package us.myles_selim.starota.misc.utils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
+import twitter4j.Status;
+import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -80,7 +84,16 @@ public class TwitterHelper {
 
 	public static void sendTweet(String tweet) {
 		try {
-			TWITTER.updateStatus(tweet);
+			Status status = null;
+			for (String t : splitIntoTweets(tweet)) {
+				if (status == null)
+					status = TWITTER.updateStatus(t);
+				else {
+					StatusUpdate newStatus = new StatusUpdate(t);
+					newStatus.inReplyToStatusId(status.getId());
+					status = TWITTER.updateStatus(newStatus);
+				}
+			}
 		} catch (TwitterException e) {
 			e.printStackTrace();
 		}
@@ -94,6 +107,42 @@ public class TwitterHelper {
 		}
 	}
 
-	public static void main(String... args) {}
+	private static String[] splitIntoTweets(String tweet) {
+		if (tweet.length() <= 280)
+			return new String[] { tweet };
+		String[] lines = tweet.split("\n");
+		int lineIndex = 0;
+		int tweetIndex = 1;
+		List<String> ret = new ArrayList<>();
+		StringBuilder t = new StringBuilder();
+		while (lineIndex < lines.length) {
+			while (lineIndex < lines.length && t.length() + lines[lineIndex].length() < 250)
+				t.append(lines[lineIndex++] + "\n");
+			t.append(String.format("\n(%d/", tweetIndex++));
+			ret.add(t.toString());
+			t = new StringBuilder();
+		}
+		for (int i = 0; i < ret.size(); i++)
+			ret.set(i, ret.get(i) + (tweetIndex - 1) + ")");
+		return ret.toArray(new String[0]);
+	}
+
+	public static void main(String... args) {
+		String bigMessage = "Duplicate Changelog, Testing:\n\nChangelog for v2.9.0\r\n"
+				+ "Public changes:\r\n" + " + Brand new, searchable, enhanced event system\r\n"
+				+ " * Fix the 'e' in Pokemon in more places\r\n"
+				+ " + Mentioning Starota now works as a command prefix\r\n"
+				+ " + Add \"vote\" command\r\n"
+				+ " * Fix Pokedex cutting off moves for Pokemon with large movesets, like Mew\r\n"
+				+ " * Fixes updateProfile having trouble when setting alt account data\r\n"
+				+ " * Starota will now automatically update trainer level if it can find a Silph Road card with higher level\r\n"
+				+ " * Remove emoji from egg hatch tier command\r\n"
+				+ " * Correct types for Zapdos and Moltres\r\n"
+				+ " * Raid embeds now display nickname and Discord username/discriminator\r\n" + "\r\n"
+				+ "Administrative changes:\r\n"
+				+ " + Added system to message all server owners to easily inform of new features\r\n"
+				+ " + Brand new settings system, pulls the changelog channel command into here";
+		sendTweet(bigMessage);
+	}
 
 }
