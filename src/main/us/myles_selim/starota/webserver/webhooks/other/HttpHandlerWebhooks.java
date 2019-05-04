@@ -24,7 +24,6 @@ import us.myles_selim.starota.misc.utils.RolePermHelper;
 import us.myles_selim.starota.webserver.webhooks.EnumWebhookType;
 import us.myles_selim.starota.webserver.webhooks.WebhookClass;
 import us.myles_selim.starota.webserver.webhooks.WebhookData;
-import us.myles_selim.starota.webserver.webhooks.WebhookEvent;
 import us.myles_selim.starota.webserver.webhooks.WebhookQuest;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -121,7 +120,9 @@ public class HttpHandlerWebhooks implements HttpHandler {
 				if (hookC.secret == null)
 					hookC.secret = secret;
 				if (hookC.type != null && (serverSecret == null || hookC.secret.equals(serverSecret))) {
-					Starota.getClient().getDispatcher().dispatch(new WebhookEvent(guild, hookC));
+					// TODO: fire webhook events in my own system
+					// Starota.getClient().getDispatcher().dispatch(new
+					// WebhookEvent(guild, hookC));
 				}
 			}
 
