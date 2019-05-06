@@ -38,6 +38,7 @@ import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
+import reactor.core.publisher.Mono;
 import us.myles_selim.starota.assistants.CommandInviteAssistants;
 import us.myles_selim.starota.assistants.StarotaAssistants;
 import us.myles_selim.starota.assistants.pokedex.PokedexBot;
@@ -119,7 +120,6 @@ public class Starota {
 
 	private static DiscordClient CLIENT;
 	private static DiscordBotListAPI BOT_LIST;
-	// private static Socket MANAGER_SOCKET;
 	private static final Properties PROPERTIES = new Properties();
 
 	public final static boolean DEBUG = false;
@@ -166,19 +166,19 @@ public class Starota {
 					PROPERTIES.getProperty("token"));
 			IS_DEV = Boolean.parseBoolean(PROPERTIES.getProperty("is_dev"));
 			CLIENT = clientBuilder.build();
-			CLIENT.login();
+			Mono<Void> finalMono = CLIENT.login().doOnError((t) -> t.printStackTrace());
 			if (CLIENT == null) {
 				System.err.println("Failed to login, exiting");
 				return;
 			}
 			StarotaAssistants.init();
 			EventDispatcher dispatcher = CLIENT.getEventDispatcher();
-			try {
-				while (!CLIENT.isConnected())
-					Thread.sleep(10);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			// try {
+			// while (!CLIENT.isConnected())
+			// Thread.sleep(10);
+			// } catch (InterruptedException e) {
+			// e.printStackTrace();
+			// }
 
 			// default settings, do this before anything else with StarotaServer
 			StarotaServer
@@ -309,24 +309,24 @@ public class Starota {
 			PokemonOperators.registerOperators();
 			EventOperators.registerOperators();
 
-			Thread discord4JWatchdog = new Thread("D4JWatchdog") {
-
-				private boolean isReady = CLIENT.isConnected();
-
-				@Override
-				public void run() {
-					while (true) {
-						boolean inReady = CLIENT.isConnected();
-						if (!isReady && !inReady)
-							System.exit(1);
-						isReady = inReady;
-						try {
-							Thread.sleep(60000); // 1 min
-						} catch (InterruptedException e) {}
-					}
-				}
-			};
-			discord4JWatchdog.start();
+			// Thread discord4JWatchdog = new Thread("D4JWatchdog") {
+			//
+			// private boolean isReady = CLIENT.isConnected();
+			//
+			// @Override
+			// public void run() {
+			// while (true) {
+			// boolean inReady = CLIENT.isConnected();
+			// if (!isReady && !inReady)
+			// System.exit(1);
+			// isReady = inReady;
+			// try {
+			// Thread.sleep(60000); // 1 min
+			// } catch (InterruptedException e) {}
+			// }
+			// }
+			// };
+			// discord4JWatchdog.start();
 
 			updateOwners();
 
@@ -341,11 +341,15 @@ public class Starota {
 				return false;
 			};
 			f.apply(null);
+			finalMono.block();
 		} catch (Exception e) {
 			System.err.println("+-------------------------------------------------------------------+");
 			System.err.println("| Starota failed to start properly. Printing exception then exiting |");
 			System.err.println("+-------------------------------------------------------------------+");
 			e.printStackTrace();
+			try {
+				Thread.sleep(1000);
+			} catch (Exception e2) {}
 			Runtime.getRuntime().exit(0);
 		}
 	}

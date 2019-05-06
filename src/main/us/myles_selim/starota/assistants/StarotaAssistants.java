@@ -62,12 +62,12 @@ public class StarotaAssistants {
 			client = clientBuilder.build();
 			client.login();
 			if (client != null) {
-				try {
-					while (!client.isConnected())
-						Thread.sleep(10);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+//				try {
+//					while (!client.isConnected())
+//						Thread.sleep(10);
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
 				// client.changeAvatar(Image.forUser(Starota.getSelf().block()));
 				if (Starota.IS_DEV)
 					client.updatePresence(Presence.idle(Activity.listening(Starota.BOT_NAME)));
