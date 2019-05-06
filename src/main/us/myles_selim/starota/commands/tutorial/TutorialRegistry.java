@@ -2,9 +2,10 @@ package us.myles_selim.starota.commands.tutorial;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.spec.EmbedCreateSpec;
+import us.myles_selim.starota.misc.data_types.EmbedBuilder;
 
 public class TutorialRegistry {
 
@@ -23,13 +24,13 @@ public class TutorialRegistry {
 		return ret;
 	}
 
-	public static EmbedObject getTableEmbed() {
+	public static Consumer<EmbedCreateSpec> getTableEmbed() {
 		return getTableEmbed(false);
 	}
 
-	public static EmbedObject getTableEmbed(boolean includeAdmin) {
+	public static Consumer<EmbedCreateSpec> getTableEmbed(boolean includeAdmin) {
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.withTitle("Tutorial Table of Contents:");
+		builder.setTitle("Tutorial Table of Contents:");
 		List<TutorialChapter> chs = getTutorials(includeAdmin);
 		if (chs.isEmpty())
 			builder.appendDesc("No tutorial chapters available.");

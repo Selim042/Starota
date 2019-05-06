@@ -1,10 +1,9 @@
 package us.myles_selim.starota.vote_rewards;
 
-import java.util.EnumSet;
-
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -15,24 +14,24 @@ public class CommandVotePerks extends StarotaCommand {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS,
-				Permissions.USE_EXTERNAL_EMOJIS, Permissions.ADD_REACTIONS, Permissions.MANAGE_MESSAGES);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS,
+				Permission.USE_EXTERNAL_EMOJIS, Permission.ADD_REACTIONS, Permission.MANAGE_MESSAGES);
 	}
 
 	@Override
-	public Permissions requiredUsePermission() {
-		return Permissions.ADMINISTRATOR;
+	public Permission requiredUsePermission() {
+		return Permission.ADMINISTRATOR;
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
+	public void execute(String[] args, Message message, StarotaServer server, TextChannel channel)
 			throws Exception {
-		if (server.getDiscordGuild().getOwnerLongID() != message.getAuthor().getLongID()) {
-			channel.sendMessage("Only the server owner can allocate vote points.");
+		if (server.getDiscordGuild().getOwnerId().equals(message.getAuthor().get().getId())) {
+			channel.createMessage("Only the server owner can allocate vote points.");
 			return;
 		}
-		new VoteRewardsReactionMessage().sendMessage(channel);
+		new VoteRewardsReactionMessage().createMessage(channel);
 	}
 
 }

@@ -1,12 +1,10 @@
 package us.myles_selim.starota.commands;
 
-import java.util.EnumSet;
-
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.misc.utils.RolePermHelper;
@@ -19,28 +17,29 @@ public class CommandStatus extends StarotaCommand {
 	}
 
 	@Override
-	public Permissions requiredUsePermission() {
-		return Permissions.ADMINISTRATOR;
+	public Permission requiredUsePermission() {
+		return Permission.ADMINISTRATOR;
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS);
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
-		IUser sender = message.getAuthor();
-		if (sender.getPermissionsForGuild(server.getDiscordGuild())
-				.contains(Permissions.ADMINISTRATOR)) {
-			EmbedBuilder builder = new EmbedBuilder();
-			builder.withTitle(Starota.getClient().getOurUser().getDisplayName(server.getDiscordGuild())
-					+ " Status");
-			builder.appendField("Discord:", Starota.getClient().isReady() ? "Online" : "Offline", true);
-			if (RolePermHelper.canUseLua(server.getDiscordGuild()))
-				builder.appendField("Lua:",
-						LuaUtils.isInitialized(server) ? "Initialized" : "Uninitalized", true);
-			channel.sendMessage(builder.build());
+	public void execute(String[] args, Message message, StarotaServer server, TextChannel channel) {
+		User sender = message.getAuthor().get();
+		if (sender.asMember(server.getDiscordGuild().getId()).block().getBasePermissions().block()
+				.contains(Permission.ADMINISTRATOR)) {
+			channel.createEmbed((e) -> {
+				e.setTitle(
+						Starota.getClient().getSelf().block().asMember(server.getDiscordGuild().getId())
+								.block().getDisplayName() + " Status");
+				e.addField("Discord:", Starota.getClient().isConnected() ? "Online" : "Offline", true);
+				if (RolePermHelper.canUseLua(server.getDiscordGuild()))
+					e.addField("Lua:", LuaUtils.isInitialized(server) ? "Initialized" : "Uninitalized",
+							true);
+			});
 		}
 	}
 

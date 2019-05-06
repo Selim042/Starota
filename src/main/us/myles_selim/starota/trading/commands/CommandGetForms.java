@@ -1,13 +1,12 @@
 package us.myles_selim.starota.trading.commands;
 
-import java.util.EnumSet;
-
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.misc.data_types.EmbedBuilder;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -18,23 +17,23 @@ public class CommandGetForms extends StarotaCommand {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS);
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
+	public void execute(String[] args, Message message, StarotaServer server, TextChannel channel) {
 		if (args.length != 2) {
-			channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName() + " [Pokemon]");
+			channel.createMessage("**Usage**: " + server.getPrefix() + this.getName() + " [Pokemon]");
 			return;
 		}
 		EnumPokemon pokemon = EnumPokemon.getPokemon(args[1]);
 		if (pokemon == null) {
-			channel.sendMessage("Pokemon \"" + args[1] + "\" cannot be found");
+			channel.createMessage("Pokemon \"" + args[1] + "\" cannot be found");
 			return;
 		}
 		if (!pokemon.isAvailable()) {
-			channel.sendMessage("Pokemon \"" + pokemon + "\" is not yet available");
+			channel.createMessage("Pokemon \"" + pokemon + "\" is not yet available");
 			return;
 		}
 		EmbedBuilder builder = new EmbedBuilder();
@@ -117,7 +116,7 @@ public class CommandGetForms extends StarotaCommand {
 		}
 		builder.appendDesc("**" + pokemon.getName() + "** has " + numForms + " available form"
 				+ (numForms == 1 ? "" : "s") + ":\n" + text);
-		channel.sendMessage(builder.build());
+		channel.createEmbed(builder.build());
 	}
 
 }

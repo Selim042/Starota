@@ -6,14 +6,15 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IEmoji;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.GuildEmoji;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
 import us.myles_selim.starota.enums.EnumWeather;
 import us.myles_selim.starota.misc.data_types.EggEntry;
+import us.myles_selim.starota.misc.data_types.EmbedBuilder;
 import us.myles_selim.starota.misc.data_types.RaidBoss;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
 import us.myles_selim.starota.misc.utils.ImageHelper;
@@ -240,7 +241,7 @@ public class PokedexEntry extends ReactionMessage {
 	}
 
 	// embeds
-	private final Map<String, EmbedObject> embeds = new ConcurrentHashMap<>();
+	private final Map<String, Consumer<EmbedCreateSpec>> embeds = new ConcurrentHashMap<>();
 
 	public boolean hasEmbedPrepared(String form) {
 		if (form == null)
@@ -248,11 +249,11 @@ public class PokedexEntry extends ReactionMessage {
 		return embeds.containsKey(form);
 	}
 
-	public EmbedObject toEmbed() {
+	public Consumer<EmbedCreateSpec> toEmbed() {
 		return toEmbed("Normal");
 	}
 
-	public EmbedObject toEmbed(String form) {
+	public Consumer<EmbedCreateSpec> toEmbed(String form) {
 		if (form == null)
 			form = "Normal";
 		if (embeds.containsKey(form))
@@ -272,34 +273,34 @@ public class PokedexEntry extends ReactionMessage {
 			embForm = "Normal";
 		if (entry.forms.length > 1)
 			pokeName += String.format(" (%s)", embForm);
-		builder.withTitle(String.format("%s #%d", pokeName, entry.id))
+		builder.setTitle(String.format("%s #%d", pokeName, entry.id))
 				.withUrl(String.format("https://db.pokemongohub.net/pokemon/%d", entry.id));
 		builder.withThumbnail(entry.getPokemon().getArtwork(formId));
 		builder.appendDesc(entry.getDescription());
 
 		// stats
-		builder.appendField("Type:",
+		builder.addField("Type:",
 				(entry.type2 != null ? entry.type1.getEmoji() + "" + entry.type2.getEmoji()
 						: entry.type1.getEmoji() + ""),
 				true);
 		String weatherString = "";
 		for (EnumWeather w : entry.weatherInfluences)
 			weatherString += w.getEmoji();
-		builder.appendField("Weather Boosts:", weatherString, true);
+		builder.addField("Weather Boosts:", weatherString, true);
 		if (entry.forms.length != 1) {
 			String formString = "";
 			for (int i = 0; i < entry.forms.length; i++) {
 				DexForm f = entry.forms[i];
 				formString += f.name + ", ";
 			}
-			builder.appendField("Forms:", formString.substring(0, formString.length() - 2), false);
+			builder.addField("Forms:", formString.substring(0, formString.length() - 2), false);
 		}
-		builder.appendField("Details:",
+		builder.addField("Details:",
 				String.format("Generation: %d\nCatch Rate: %d%%\nFlee Rate: %d%%\nBuddy Distance: %dkm",
 						entry.generation, (int) (entry.baseCaptureRate * 100),
 						(int) (entry.baseFleeRate * 100), entry.kmBuddyDistance),
 				true);
-		builder.appendField("Stats:", String.format("Max CP: %d\nAttack: %d\nDefense: %d\nStamina: %d",
+		builder.addField("Stats:", String.format("Max CP: %d\nAttack: %d\nDefense: %d\nStamina: %d",
 				entry.maxcp, entry.atk, entry.def, entry.sta), true);
 
 		// egg & raid cp stuff
@@ -319,17 +320,17 @@ public class PokedexEntry extends ReactionMessage {
 			cps.append(String.format("Egg Hatch Min/Max: %d-%d CP\n", getCP(20, 10, 10, 10),
 					getCP(20, 15, 15, 15)));
 		if (cps.length() != 0)
-			builder.appendField("Important CPs:", cps.toString(), false);
+			builder.addField("Important CPs:", cps.toString(), false);
 
 		// types
 		String resistString = "";
 		for (DexTypeEffectiveness te : entry.getResistances())
 			resistString += te + "\n";
-		builder.appendField("Type Resistances:", resistString, true);
+		builder.addField("Type Resistances:", resistString, true);
 		String weakString = "";
 		for (DexTypeEffectiveness te : entry.getWeaknesses())
 			weakString += te + "\n";
-		builder.appendField("Type Weaknesses:", weakString, true);
+		builder.addField("Type Weaknesses:", weakString, true);
 
 		// moves
 		List<String> fastStrings = new ArrayList<>();
@@ -346,10 +347,10 @@ public class PokedexEntry extends ReactionMessage {
 		fastStrings.add(newFastString);
 		if (!fastStrings.isEmpty()) {
 			if (fastStrings.size() == 1)
-				builder.appendField("Fast Moves:", fastStrings.get(0), true);
+				builder.addField("Fast Moves:", fastStrings.get(0), true);
 			else
 				for (int i = 0; i < fastStrings.size(); i++)
-					builder.appendField("Fast Moves (" + (i + 1) + "):", fastStrings.get(i), true);
+					builder.addField("Fast Moves (" + (i + 1) + "):", fastStrings.get(i), true);
 		}
 		List<String> chargedStrings = new ArrayList<>();
 		String newChargedString = "";
@@ -365,10 +366,10 @@ public class PokedexEntry extends ReactionMessage {
 		chargedStrings.add(newChargedString);
 		if (!chargedStrings.isEmpty()) {
 			if (chargedStrings.size() == 1)
-				builder.appendField("Charged Moves:", chargedStrings.get(0), true);
+				builder.addField("Charged Moves:", chargedStrings.get(0), true);
 			else
 				for (int i = 0; i < chargedStrings.size(); i++)
-					builder.appendField("Charged Moves (" + (i + 1) + "):", chargedStrings.get(i), true);
+					builder.addField("Charged Moves (" + (i + 1) + "):", chargedStrings.get(i), true);
 		}
 
 		// movesets
@@ -376,7 +377,7 @@ public class PokedexEntry extends ReactionMessage {
 		for (DexMoveset ms : entry.getTopMovesets())
 			movesetString += ms.toString(entry) + "\n";
 		if (!movesetString.isEmpty())
-			builder.appendField("Best Movesets:", movesetString.substring(0,
+			builder.addField("Best Movesets:", movesetString.substring(0,
 					movesetString.length() > 1024 ? 1024 : movesetString.length()), false);
 
 		// counters
@@ -386,18 +387,18 @@ public class PokedexEntry extends ReactionMessage {
 			if (c != null)
 				counterString += String.format("#%d %s", rank++, c);
 		if (!counterString.isEmpty())
-			builder.appendField("Counters:", counterString, false);
+			builder.addField("Counters:", counterString, false);
 
 		builder.withFooterText(DexMove.STAB_MARKER.replaceAll("\\\\", "") + " denotes a STAB move, "
 				+ DexMove.LEGACY_MARKER.replaceAll("\\\\", "") + " for legacy moves, and "
 				+ DexMove.EXCLUSIVE_MARKER.replaceAll("\\\\", "") + " for exclusive moves");
 
 		if (entry.forms.length > 1)
-			builder.appendField("Reaction Usage:",
+			builder.addField("Reaction Usage:",
 					"React with a form of the Pokemon shown to get information about the given form.",
 					false);
 
-		EmbedObject embed = builder.build();
+		Consumer<EmbedCreateSpec> embed = builder.build();
 		embeds.put(form, embed);
 		return embed;
 	}
@@ -417,7 +418,7 @@ public class PokedexEntry extends ReactionMessage {
 		public String name;
 		public String value;
 
-		public IEmoji getEmoji(PokedexEntry entry) {
+		public GuildEmoji getEmoji(PokedexEntry entry) {
 			if (entry.getPokemon().equals(EnumPokemon.ARCEUS)) {
 				EnumPokemonType type = EnumPokemonType.valueOf(name.toUpperCase());
 				return type.getEmoji();

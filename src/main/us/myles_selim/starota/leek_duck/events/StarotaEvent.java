@@ -1,12 +1,13 @@
 package us.myles_selim.starota.leek_duck.events;
 
+import java.awt.Color;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
@@ -105,80 +106,80 @@ public class StarotaEvent {
 		return output;
 	}
 
-	public EmbedObject toEmbed(int index, int max, StarotaServer server) {
-		EmbedBuilder builder = new EmbedBuilder();
+	public Consumer<EmbedCreateSpec> toEmbed(int index, int max, StarotaServer server) {
+		return (e) -> {
+			StringBuilder desc = new StringBuilder();
+			e.setColor(new Color(this.color)).setImage(this.image);
+			e.setTitle(
+					this.location != null && !this.location.isEmpty() ? this.name + ": " + this.location
+							: this.name);
+			desc.append(this.description);
+			String timeLeft = this.getTimeLeft(server.getTimezone());
+			if (timeLeft != null)
+				desc.append("\n\n**" + timeLeft + "**");
+			if (this.link != null)
+				desc.append(String.format("\n\n[%s](%s)", this.linkTitle, this.link));
 
-		builder.withColor(this.color).withImage(this.image);
-		builder.withTitle(
-				this.location != null && !this.location.isEmpty() ? this.name + ": " + this.location
-						: this.name)
-				.withDesc(this.description);
-		String timeLeft = this.getTimeLeft(server.getTimezone());
-		if (timeLeft != null)
-			builder.appendDesc("\n\n**" + timeLeft + "**");
-		if (this.link != null)
-			builder.appendDesc(String.format("\n\n[%s](%s)", this.linkTitle, this.link));
-
-		if (this.featuredPokemon.length == 1)
-			builder.withThumbnail(
-					ImageHelper.getOfficalArtwork(EnumPokemon.getPokemon(this.featuredPokemon[0])));
-		StringBuilder featPoke = new StringBuilder();
-		for (int id : this.featuredPokemon) {
-			EnumPokemon poke = EnumPokemon.getPokemon(id);
-			if (MiscUtils.arrContains(this.newShinies, id))
-				featPoke.append(poke.getName() + " " + EmojiServerHelper.getEmoji("shiny") + ", ");
-			else
-				featPoke.append(poke.getName() + ", ");
-		}
-		if (featPoke.length() != 0)
-			builder.appendField("Featured Pokemon:", featPoke.substring(0, featPoke.length() - 2),
-					false);
-
-		StringBuilder featType = new StringBuilder();
-		for (int id : this.featuredTypes) {
-			EnumPokemonType type = EnumPokemonType.fromOrdinal(id);
-			featType.append(type.name().substring(0, 1) + type.name().toLowerCase().substring(1) + ", ");
-		}
-		if (featType.length() != 0)
-			builder.appendField("Featured Types:", featType.substring(0, featType.length() - 2), false);
-
-		if (this.raidsChanged || this.raidOriented) {
-			builder.appendField("Raids:",
-					"Raids Changed: " + EmojiConstants.getBooleanEmoji(this.raidsChanged)
-							+ "\nRaid Oriented: " + EmojiConstants.getBooleanEmoji(this.raidOriented),
-					false);
-		}
-
-		StringBuilder bonuses = new StringBuilder();
-		for (String b : this.bonuses)
-			bonuses.append(String.format(" - %s\n", b));
-		if (bonuses.length() != 0)
-			builder.appendField("Bonuses:", bonuses.toString().substring(0, bonuses.length() - 2),
-					false);
-
-		StringBuilder tieredBonuses = new StringBuilder();
-		for (EventTieredBonus tb : this.tierdBonuses) {
-			tieredBonuses.append("**" + tb.name + "**:\n");
-			for (String b : tb.bonuses)
-				tieredBonuses.append(" - " + b + "\n");
-		}
-		if (tieredBonuses.length() != 0)
-			builder.appendField("Tiered Bonuses:", tieredBonuses.toString(), false);
-
-		StringBuilder research = new StringBuilder();
-		for (EventFieldResearch fr : this.fieldResearch) {
-			research.append("**" + fr.name + "**:\n");
-			for (ResearchReward b : fr.rewards) {
-				research.append(" - " + b + "\n");
+			if (this.featuredPokemon.length == 1)
+				e.setThumbnail(
+						ImageHelper.getOfficalArtwork(EnumPokemon.getPokemon(this.featuredPokemon[0])));
+			StringBuilder featPoke = new StringBuilder();
+			for (int id : this.featuredPokemon) {
+				EnumPokemon poke = EnumPokemon.getPokemon(id);
+				if (MiscUtils.arrContains(this.newShinies, id))
+					featPoke.append(poke.getName() + " " + EmojiServerHelper.getEmoji("shiny") + ", ");
+				else
+					featPoke.append(poke.getName() + ", ");
 			}
-		}
-		if (research.length() != 0)
-			builder.appendField("Field Research:", research.toString(), false);
+			if (featPoke.length() != 0)
+				e.addField("Featured Pokemon:", featPoke.substring(0, featPoke.length() - 2), false);
 
-		if (index != -1)
-			builder.withFooterText("Event " + index + "/" + max + " | Last updated")
-					.withTimestamp(EventData.getEventsCacheTime());
-		return builder.build();
+			StringBuilder featType = new StringBuilder();
+			for (int id : this.featuredTypes) {
+				EnumPokemonType type = EnumPokemonType.fromOrdinal(id);
+				featType.append(
+						type.name().substring(0, 1) + type.name().toLowerCase().substring(1) + ", ");
+			}
+			if (featType.length() != 0)
+				e.addField("Featured Types:", featType.substring(0, featType.length() - 2), false);
+
+			if (this.raidsChanged || this.raidOriented) {
+				e.addField("Raids:",
+						"Raids Changed: " + EmojiConstants.getBooleanEmoji(this.raidsChanged)
+								+ "\nRaid Oriented: "
+								+ EmojiConstants.getBooleanEmoji(this.raidOriented),
+						false);
+			}
+
+			StringBuilder bonuses = new StringBuilder();
+			for (String b : this.bonuses)
+				bonuses.append(String.format(" - %s\n", b));
+			if (bonuses.length() != 0)
+				e.addField("Bonuses:", bonuses.toString().substring(0, bonuses.length() - 2), false);
+
+			StringBuilder tieredBonuses = new StringBuilder();
+			for (EventTieredBonus tb : this.tierdBonuses) {
+				tieredBonuses.append("**" + tb.name + "**:\n");
+				for (String b : tb.bonuses)
+					tieredBonuses.append(" - " + b + "\n");
+			}
+			if (tieredBonuses.length() != 0)
+				e.addField("Tiered Bonuses:", tieredBonuses.toString(), false);
+
+			StringBuilder research = new StringBuilder();
+			for (EventFieldResearch fr : this.fieldResearch) {
+				research.append("**" + fr.name + "**:\n");
+				for (ResearchReward b : fr.rewards) {
+					research.append(" - " + b + "\n");
+				}
+			}
+			if (research.length() != 0)
+				e.addField("Field Research:", research.toString(), false);
+
+			if (index != -1)
+				e.setFooter("Event " + index + "/" + max + " | Last updated", null)
+						.setTimestamp(EventData.getEventsCacheTime());
+		};
 	}
 
 	public static class EventFieldResearch {

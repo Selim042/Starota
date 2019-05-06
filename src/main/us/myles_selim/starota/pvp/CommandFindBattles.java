@@ -1,15 +1,15 @@
 package us.myles_selim.starota.pvp;
 
-import java.util.EnumSet;
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
+import us.myles_selim.starota.misc.data_types.EmbedBuilder;
 import us.myles_selim.starota.misc.data_types.Pair;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -23,12 +23,12 @@ public class CommandFindBattles extends StarotaCommand {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS);
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
+	public void execute(String[] args, Message message, StarotaServer server, TextChannel channel)
 			throws Exception {
 		int page = 1;
 		if (args.length > 1) {
@@ -37,22 +37,22 @@ public class CommandFindBattles extends StarotaCommand {
 			} catch (NumberFormatException e) {}
 		}
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.withTitle("Available Trainers:");
+		builder.setTitle("Available Trainers:");
 		List<Pair<PlayerProfile, Long>> battlers = server.findBattle();
 		if (battlers.isEmpty()) {
 			builder.withDesc("There are not currently any trainers available for battle.");
-			channel.sendMessage(builder.build());
+			channel.createEmbed(builder.build());
 			return;
 		}
 		for (int i = page - 1; i < page * PLAYERS_PER_PAGE && i < battlers.size(); i++) {
 			Pair<PlayerProfile, Long> battler = battlers.get(i);
 			PlayerProfile profile = battler.left;
 			builder.appendDesc("**" + profile.getPoGoName() + "**\n");
-			IUser user = profile.getDiscordUser();
-			String nickname = user.getNicknameForGuild(server.getDiscordGuild());
-			builder.appendDesc(" - **Discord**: "
-					+ (nickname == null ? user.getName() + "#" + user.getDiscriminator()
-							: nickname + " (_" + user.getName() + "#" + user.getDiscriminator() + "_)")
+			Member user = profile.getDiscordUser().asMember(server.getDiscordGuild().getId()).block();
+			String nickname = user.getDisplayName();
+			builder.appendDesc(" - **Discord**: " + (nickname == null
+					? user.getUsername() + "#" + user.getDiscriminator()
+					: nickname + " (_" + user.getUsername() + "#" + user.getDiscriminator() + "_)")
 					+ "\n");
 			if (profile.getTrainerCode() != -1)
 				builder.appendDesc(" - **Trainer Code**: " + profile.getTrainerCodeString() + "\n");
@@ -67,7 +67,7 @@ public class CommandFindBattles extends StarotaCommand {
 					+ PrimaryCommandHandler.getPrefix(server.getDiscordGuild()) + getName() + " "
 					+ (page + 1) + "`");
 		builder.appendDesc("\n**Page**: " + page + "/" + ((battlers.size() / PLAYERS_PER_PAGE) + 1));
-		channel.sendMessage(builder.build());
+		channel.createEmbed(builder.build());
 	}
 
 }

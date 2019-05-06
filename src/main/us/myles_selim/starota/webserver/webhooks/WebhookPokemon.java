@@ -1,8 +1,10 @@
 package us.myles_selim.starota.webserver.webhooks;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
+import java.util.function.Consumer;
+
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.misc.data_types.EmbedBuilder;
 import us.myles_selim.starota.pokedex.GoHubDatabase;
 import us.myles_selim.starota.pokedex.PokedexEntry.DexMove;
 import us.myles_selim.starota.webserver.webhooks.types.ILocationWebhook;
@@ -111,7 +113,7 @@ public class WebhookPokemon extends WebhookData implements ILocationWebhook, ISp
 	}
 
 	@Override
-	public EmbedObject toEmbed() {
+	public Consumer<EmbedCreateSpec> toEmbed() {
 		return new EmbedBuilder().build();
 	}
 

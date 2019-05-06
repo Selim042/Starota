@@ -1,6 +1,6 @@
 package us.myles_selim.starota.leaderboards;
 
-import sx.blah.discord.handle.obj.IUser;
+import discord4j.core.object.entity.User;
 import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.Starota;
@@ -10,8 +10,8 @@ public class LeaderboardEntry implements Comparable<LeaderboardEntry> {
 	private final long discordId;
 	private long value;
 
-	public LeaderboardEntry(IUser user, long value) {
-		this(user.getLongID(), value);
+	public LeaderboardEntry(User user, long value) {
+		this(user.getId().asLong(), value);
 	}
 
 	public LeaderboardEntry(long discordId, long value) {
@@ -23,7 +23,7 @@ public class LeaderboardEntry implements Comparable<LeaderboardEntry> {
 		return this.discordId;
 	}
 
-	public IUser getDiscordUser() {
+	public User getDiscordUser() {
 		return Starota.getUser(this.discordId);
 	}
 

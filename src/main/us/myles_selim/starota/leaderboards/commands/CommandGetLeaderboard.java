@@ -1,11 +1,11 @@
 package us.myles_selim.starota.leaderboards.commands;
 
-import java.util.EnumSet;
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.leaderboards.Leaderboard;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -17,8 +17,8 @@ public class CommandGetLeaderboard extends StarotaCommand {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS);
 	}
 
 	@Override
@@ -35,10 +35,10 @@ public class CommandGetLeaderboard extends StarotaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
+	public void execute(String[] args, Message message, StarotaServer server, TextChannel channel)
 			throws Exception {
 		if (args.length < 2) {
-			channel.sendMessage(
+			channel.createMessage(
 					"**Usage**: " + server.getPrefix() + getName() + " " + getGeneralUsage());
 			return;
 		}
@@ -48,17 +48,17 @@ public class CommandGetLeaderboard extends StarotaCommand {
 				page = Integer.parseInt(args[1]) - 1;
 			} catch (NumberFormatException e) {}
 		Leaderboard board;
-		if (message.getAuthor().getPermissionsForGuild(server.getDiscordGuild())
-				.contains(Permissions.ADMINISTRATOR)) {
+		if (message.getAuthor().get().asMember(server.getDiscordGuild().getId()).block()
+				.getBasePermissions().block().contains(Permission.ADMINISTRATOR)) {
 			board = server.getLeaderboard(args[1]);
 			if (board != null && !board.isActive())
-				channel.sendMessage("**NOTE**: This board is inactive");
+				channel.createMessage("**NOTE**: This board is inactive");
 		} else
 			board = server.getLeaderboardActive(args[1]);
 		if (board != null)
-			channel.sendMessage(board.toEmbed(page));
+			channel.createEmbed(board.toEmbed(page));
 		else
-			channel.sendMessage("Leaderboard \"" + args[1] + "\" not found");
+			channel.createMessage("Leaderboard \"" + args[1] + "\" not found");
 	}
 
 }

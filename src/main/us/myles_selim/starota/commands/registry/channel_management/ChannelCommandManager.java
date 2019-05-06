@@ -4,7 +4,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
+import discord4j.core.object.entity.Channel;
+import discord4j.core.object.util.Snowflake;
 import us.myles_selim.ebs.EBList;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.ebs.data_types.DataTypeEBList;
@@ -16,7 +17,7 @@ public class ChannelCommandManager {
 	private static final String WHITELIST_KEY = "commandChannelWhitelist";
 
 	@SuppressWarnings({ "unchecked" })
-	public static boolean isAllowedHere(StarotaServer server, String category, IChannel channel) {
+	public static boolean isAllowedHere(StarotaServer server, String category, Channel channel) {
 		if (server == null)
 			return true;
 		EBStorage stor = (EBStorage) server.getDataValue(WHITELIST_KEY);
@@ -25,11 +26,11 @@ public class ChannelCommandManager {
 		EBList<String> whitelist = stor.get(category, EBList.class);
 		if (whitelist == null)
 			return true;
-		return whitelist.isEmpty() || whitelist.containsWrapped(channel.getStringID());
+		return whitelist.isEmpty() || whitelist.containsWrapped(channel.getId().asString());
 	}
 
 	@SuppressWarnings("unchecked")
-	public static void addWhitelist(StarotaServer server, String category, IChannel channel) {
+	public static void addWhitelist(StarotaServer server, String category, Channel channel) {
 		EBStorage stor;
 		if (server.hasDataKey(WHITELIST_KEY))
 			stor = (EBStorage) server.getDataValue(WHITELIST_KEY);
@@ -46,12 +47,12 @@ public class ChannelCommandManager {
 				stor.registerType(new DataTypeEBList());
 			stor.set(category, whitelist);
 		}
-		if (!whitelist.containsWrapped(channel.getStringID()))
-			whitelist.addWrapped(channel.getStringID());
+		if (!whitelist.containsWrapped(channel.getId().asString()))
+			whitelist.addWrapped(channel.getId().asString());
 	}
 
 	@SuppressWarnings("unchecked")
-	public static boolean removeWhitelist(StarotaServer server, String category, IChannel channel) {
+	public static boolean removeWhitelist(StarotaServer server, String category, Channel channel) {
 		EBStorage stor;
 		if (server.hasDataKey(WHITELIST_KEY))
 			stor = (EBStorage) server.getDataValue(WHITELIST_KEY);
@@ -62,11 +63,11 @@ public class ChannelCommandManager {
 			whitelist = stor.get(category, EBList.class);
 		else
 			return false;
-		return whitelist.removeWrapped(channel.getStringID());
+		return whitelist.removeWrapped(channel.getId().asString());
 	}
 
 	@SuppressWarnings("unchecked")
-	public static List<IChannel> getWhitelist(StarotaServer server, String category) {
+	public static List<Channel> getWhitelist(StarotaServer server, String category) {
 		EBStorage stor;
 		if (server.hasDataKey(WHITELIST_KEY))
 			stor = (EBStorage) server.getDataValue(WHITELIST_KEY);
@@ -77,9 +78,9 @@ public class ChannelCommandManager {
 			whitelist = stor.get(category, EBList.class);
 		if (whitelist == null)
 			return Collections.emptyList();
-		List<IChannel> ret = new LinkedList<>();
+		List<Channel> ret = new LinkedList<>();
 		for (String c : whitelist.values())
-			ret.add(server.getDiscordGuild().getChannelByID(Long.parseLong(c)));
+			ret.add(server.getDiscordGuild().getChannelById(Snowflake.of(c)).block());
 		return Collections.unmodifiableList(ret);
 	}
 

@@ -2,14 +2,15 @@ package us.myles_selim.starota.lua.commands;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Channel;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.registry.ICommand;
 import us.myles_selim.starota.commands.registry.ICommandHandler;
 import us.myles_selim.starota.lua.ScriptManager;
@@ -22,7 +23,7 @@ public class LuaCommandHandler implements ICommandHandler {
 	private static final String CATEGORY = "Lua";
 
 	@Override
-	public boolean executeCommand(String[] args, IMessage message, IGuild guild, IChannel channel)
+	public boolean executeCommand(String[] args, Message message, Guild guild, TextChannel channel)
 			throws Exception {
 		if (args.length < 1)
 			return false;
@@ -34,7 +35,7 @@ public class LuaCommandHandler implements ICommandHandler {
 	}
 
 	@Override
-	public List<ICommand> getAllCommands(IGuild guild) {
+	public List<ICommand> getAllCommands(Guild guild) {
 		StarotaServer server = StarotaServer.getServer(guild);
 		if (!StarotaModule.isModuleEnabled(server, BaseModules.LUA))
 			return Collections.emptyList();
@@ -45,12 +46,12 @@ public class LuaCommandHandler implements ICommandHandler {
 	}
 
 	@Override
-	public List<ICommand> getCommandsByCategory(IGuild server, String category) {
+	public List<ICommand> getCommandsByCategory(Guild server, String category) {
 		return getAllCommands(server);
 	}
 
 	@Override
-	public ICommand findCommand(IGuild server, IMessage message, String name) {
+	public ICommand findCommand(Guild server, Message message, String name) {
 		for (ICommand c : getAllCommands(server))
 			if (c.getName().equalsIgnoreCase(name))
 				return c;
@@ -58,7 +59,7 @@ public class LuaCommandHandler implements ICommandHandler {
 	}
 
 	@Override
-	public List<String> getAllCategories(IGuild server) {
+	public List<String> getAllCategories(Guild server) {
 		return Collections.singletonList(CATEGORY);
 	}
 
@@ -73,7 +74,7 @@ public class LuaCommandHandler implements ICommandHandler {
 		}
 
 		@Override
-		public void execute(String[] args, IMessage message, IGuild guild, IChannel channel)
+		public void execute(String[] args, Message message, Guild guild, TextChannel channel)
 				throws Exception {
 			ScriptManager.executeCommandScript(this.server, this.name, message, channel, args);
 		}
@@ -99,22 +100,22 @@ public class LuaCommandHandler implements ICommandHandler {
 		}
 
 		@Override
-		public Permissions requiredUsePermission() {
+		public Permission requiredUsePermission() {
 			return null;
 		}
 
 		@Override
-		public EnumSet<Permissions> getCommandPermissions() {
+		public PermissionSet getCommandPermission() {
 			return null;
 		}
 
 		@Override
-		public IRole requiredRole(IGuild guild) {
+		public Role requiredRole(Guild guild) {
 			return null;
 		}
 
 		@Override
-		public IChannel requiredChannel(IGuild guild) {
+		public Channel requiredChannel(Guild guild) {
 			return null;
 		}
 

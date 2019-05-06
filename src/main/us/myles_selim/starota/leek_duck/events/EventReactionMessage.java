@@ -1,11 +1,12 @@
 package us.myles_selim.starota.leek_duck.events;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.impl.obj.ReactionEmoji;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.RequestBuffer;
+import java.util.function.Consumer;
+
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.reaction.ReactionEmoji;
+import discord4j.core.spec.EmbedCreateSpec;
+import us.myles_selim.starota.misc.data_types.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.IndexHolder;
 import us.myles_selim.starota.reaction_messages.ReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -19,23 +20,24 @@ public class EventReactionMessage extends ReactionMessage {
 	public EventReactionMessage() {}
 
 	@Override
-	public void onSend(StarotaServer server, IChannel channel, IMessage msg) {
+	public void onSend(StarotaServer server, TextChannel channel, Message msg) {
 		this.addPageButtons(eventIndex, EventData.getRunningUpcomingEvents().length);
-		this.addButton(new ReactionButton(ReactionEmoji.of(REFRESH_EMOJI), (message, user, added) -> {
-			RequestBuffer.request(() -> this.editMessage(channel, msg));
-			RequestBuffer.request(() -> msg.removeReaction(user, ReactionEmoji.of(REFRESH_EMOJI)));
-			return true;
-		}));
-		RequestBuffer.request(() -> msg.addReaction(ReactionEmoji.of(REFRESH_EMOJI)));
+		this.addButton(
+				new ReactionButton(ReactionEmoji.unicode(REFRESH_EMOJI), (message, user, added) -> {
+					this.editMessage(channel, msg);
+					msg.removeReaction(ReactionEmoji.unicode(REFRESH_EMOJI), user.getId());
+					return true;
+				}));
+		msg.addReaction(ReactionEmoji.unicode(REFRESH_EMOJI));
 	}
 
 	@Override
-	public void onEdit(StarotaServer server, IChannel channel, IMessage msg) {
+	public void onEdit(StarotaServer server, TextChannel channel, Message msg) {
 		onSend(server, channel, msg);
 	}
 
 	@Override
-	protected EmbedObject getEmbed(StarotaServer server) {
+	protected Consumer<EmbedCreateSpec> getEmbed(StarotaServer server) {
 		StarotaEvent[] events = EventData.getRunningUpcomingEvents();
 		if (events.length == 0) {
 			EmbedBuilder builder = new EmbedBuilder();

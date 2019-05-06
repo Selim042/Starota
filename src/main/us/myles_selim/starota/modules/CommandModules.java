@@ -1,13 +1,13 @@
 package us.myles_selim.starota.modules;
 
-import java.util.EnumSet;
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.misc.data_types.EmbedBuilder;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandModules extends StarotaCommand {
@@ -17,13 +17,13 @@ public class CommandModules extends StarotaCommand {
 	}
 
 	@Override
-	public Permissions requiredUsePermission() {
-		return Permissions.ADMINISTRATOR;
+	public Permission requiredUsePermission() {
+		return Permission.ADMINISTRATOR;
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS);
 	}
 
 	@Override
@@ -39,11 +39,11 @@ public class CommandModules extends StarotaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
+	public void execute(String[] args, Message message, StarotaServer server, TextChannel channel)
 			throws Exception {
 		if (args.length == 2 && args[1].equalsIgnoreCase("info")) {
 			EmbedBuilder builder = new EmbedBuilder();
-			builder.withTitle("Modules:");
+			builder.setTitle("Modules:");
 			for (StarotaModule m : StarotaModule.getAllModules()) {
 				String out = "";
 				if (m.getCommandCategory() != null)
@@ -58,19 +58,19 @@ public class CommandModules extends StarotaCommand {
 				}
 				if (out.isEmpty())
 					out += "no info to display";
-				builder.appendField(m.getName(), out, false);
+				builder.addField(m.getName(), out, false);
 			}
-			channel.sendMessage(builder.build());
+			channel.createEmbed(builder.build());
 			return;
 		}
 		if (args.length < 3) {
-			channel.sendMessage(
+			channel.createMessage(
 					"**Usage**: " + server.getPrefix() + getName() + " " + getGeneralUsage());
 			return;
 		}
 		StarotaModule module = StarotaModule.getModule(args[2]);
 		if (module == null) {
-			channel.sendMessage("Module \"" + args[2] + "\" not found");
+			channel.createMessage("Module \"" + args[2] + "\" not found");
 			return;
 		}
 		boolean status;
@@ -79,20 +79,20 @@ public class CommandModules extends StarotaCommand {
 		case "on":
 			status = StarotaModule.enableModule(server, module);
 			if (status)
-				channel.sendMessage("Enabled the \"" + module.getName() + "\" module.");
+				channel.createMessage("Enabled the \"" + module.getName() + "\" module.");
 			else
-				channel.sendMessage("The \"" + module.getName() + "\" module is already enabled.");
+				channel.createMessage("The \"" + module.getName() + "\" module is already enabled.");
 			break;
 		case "disable":
 		case "off":
 			status = StarotaModule.disableModule(server, module);
 			if (status)
-				channel.sendMessage("Disabled the \"" + module.getName() + "\" module.");
+				channel.createMessage("Disabled the \"" + module.getName() + "\" module.");
 			else
-				channel.sendMessage("The \"" + module.getName() + "\" module is already disabled.");
+				channel.createMessage("The \"" + module.getName() + "\" module is already disabled.");
 			break;
 		default:
-			channel.sendMessage(
+			channel.createMessage(
 					"**Usage**: " + server.getPrefix() + getName() + " " + getGeneralUsage());
 			break;
 		}

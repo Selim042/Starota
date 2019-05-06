@@ -1,25 +1,18 @@
 package us.myles_selim.starota.lua;
 
-import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.guild.GuildEvent;
-import us.myles_selim.starota.misc.utils.StarotaConstants;
+import discord4j.core.event.domain.guild.GuildEvent;
+import us.myles_selim.starota.misc.utils.EventListener;
 
-public class LuaEventHandler {
+public class LuaEventHandler implements EventListener<GuildEvent> {
 
-	// private boolean handle = true;
-
-	@EventSubscriber
-	public void onDiscordEvent(GuildEvent event) {
-		if (event.getGuild() == null || event.getGuild().getLongID() == StarotaConstants.SUPPORT_SERVER)
-			return;
-		// if (event instanceof MessageReceivedEvent)
-		// if (((MessageReceivedEvent)
-		// event).getMessage().getContent().equals("toggle"))
-		// handle = !handle;
-		// if (!handle)
-		// return;
-		// DiscordEventLib.handleEvent(event);
+	@Override
+	public void execute(GuildEvent event) {
 		LuaUtils.handleEvent(event);
+	}
+
+	@Override
+	public Class<GuildEvent> getEventType() {
+		return GuildEvent.class;
 	}
 
 }

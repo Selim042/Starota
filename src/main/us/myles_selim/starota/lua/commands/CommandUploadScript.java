@@ -1,13 +1,13 @@
 package us.myles_selim.starota.lua.commands;
 
 import java.io.File;
-import java.util.List;
+import java.util.Set;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IMessage.Attachment;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Attachment;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.ScriptManager;
@@ -21,18 +21,8 @@ public class CommandUploadScript extends StarotaCommand {
 	}
 
 	@Override
-	public Permissions requiredUsePermission() {
-		return Permissions.ADMINISTRATOR;
-	}
-
-	@Override
-	public IRole requiredRole(StarotaServer server) {
-		if (server.getDiscordGuild().getLongID() == 481646364716040202L) // test
-																			// server
-			return server.getDiscordGuild().getRoleByID(489249119311888385L); // Starota
-																				// test
-																				// role
-		return super.requiredRole(server);
+	public Permission requiredUsePermission() {
+		return Permission.ADMINISTRATOR;
 	}
 
 	@Override
@@ -41,13 +31,13 @@ public class CommandUploadScript extends StarotaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
+	public void execute(String[] args, Message message, StarotaServer server, TextChannel channel) {
 		if (!RolePermHelper.canUseLua(server.getDiscordGuild())) {
-			channel.sendMessage("This server cannot use Lua as it is a paid feature.");
+			channel.createMessage("This server cannot use Lua as it is a paid feature.");
 			return;
 		}
 		if (args.length < 2) {
-			channel.sendMessage(
+			channel.createMessage(
 					"**Usage**: " + server.getPrefix() + getName() + " " + getGeneralUsage());
 			return;
 		}
@@ -64,7 +54,7 @@ public class CommandUploadScript extends StarotaCommand {
 		case "cmd":
 		case "c":
 			if (args.length < 3) {
-				channel.sendMessage(
+				channel.createMessage(
 						"**Usage**: " + server.getPrefix() + getName() + " command [cmdName]");
 				return;
 			}
@@ -77,7 +67,7 @@ public class CommandUploadScript extends StarotaCommand {
 		case "rem":
 		case "del":
 			if (args.length < 3) {
-				channel.sendMessage(
+				channel.createMessage(
 						"**Usage**: " + server.getPrefix() + getName() + " remove [event/cmdName]");
 				return;
 			}
@@ -92,35 +82,39 @@ public class CommandUploadScript extends StarotaCommand {
 				break;
 			}
 			if (ScriptManager.removeScript(server, scriptName + ScriptManager.LUA_EXENSION)) {
-				channel.sendMessage("Successfully deleted script \"" + scriptName + "\"");
+				channel.createMessage("Successfully deleted script \"" + scriptName + "\"");
 				if (scriptName.equalsIgnoreCase("eventHandler"))
 					LuaUtils.clearEventHandlers(server);
 				return;
 			} else {
-				channel.sendMessage("Failed to remove script \"" + scriptName + "\"");
+				channel.createMessage("Failed to remove script \"" + scriptName + "\"");
 				return;
 			}
 		default:
-			channel.sendMessage(
+			channel.createMessage(
 					"**Usage**: " + server.getPrefix() + getName() + " " + getGeneralUsage());
 			return;
 		}
 		if (uploaded) {
-			channel.sendMessage("Saved your new script");
+			channel.createMessage("Saved your new script");
 			ScriptManager.executeEventScript(server);
 		} else
-			channel.sendMessage("Failed to save your script");
+			channel.createMessage("Failed to save your script");
 	}
 
-	private Attachment getAttachment(IChannel channel, IMessage message) {
-		List<Attachment> attachS = message.getAttachments();
+	private Attachment getAttachment(MessageChannel channel, Message message) {
+		Set<Attachment> attachS = message.getAttachments();
 		if (attachS == null || attachS.size() != 1) {
-			channel.sendMessage("Only uploading one script at a time is supported");
+			channel.createMessage("Only uploading one script at a time is supported");
 			return null;
 		}
-		Attachment attach = attachS.get(0);
+		Attachment attach = null;
+		for (Attachment a : attachS) {
+			attach = a;
+			break;
+		}
 		if (!attach.getFilename().toLowerCase().endsWith(ScriptManager.LUA_EXENSION)) {
-			channel.sendMessage("Only `.lua` files are accepted");
+			channel.createMessage("Only `.lua` files are accepted");
 			return null;
 		}
 		return attach;

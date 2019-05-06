@@ -1,11 +1,13 @@
 package us.myles_selim.starota.commands.settings.types;
 
-import sx.blah.discord.handle.obj.IChannel;
+import discord4j.core.object.entity.Channel;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Snowflake;
 import us.myles_selim.ebs.Storage;
-import us.myles_selim.starota.misc.data_types.NullChannel;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class SettingChannel extends ServerSetting<IChannel> {
+public class SettingChannel extends ServerSetting<TextChannel> {
 
 	public SettingChannel(StarotaServer server, String name) {
 		super(server, name);
@@ -15,11 +17,11 @@ public class SettingChannel extends ServerSetting<IChannel> {
 		super(server, name, desc);
 	}
 
-	public SettingChannel(StarotaServer server, String name, IChannel value) {
+	public SettingChannel(StarotaServer server, String name, TextChannel value) {
 		super(server, name, value);
 	}
 
-	public SettingChannel(StarotaServer server, String name, String desc, IChannel value) {
+	public SettingChannel(StarotaServer server, String name, String desc, TextChannel value) {
 		super(server, name, value);
 	}
 
@@ -32,8 +34,8 @@ public class SettingChannel extends ServerSetting<IChannel> {
 	}
 
 	@Override
-	protected IChannel getEmptyValue() {
-		return NullChannel.NULL_CHANNEL;
+	protected TextChannel getEmptyValue() {
+		return null;
 	}
 
 	@Override
@@ -41,14 +43,14 @@ public class SettingChannel extends ServerSetting<IChannel> {
 		if (this.getServer() == null)
 			throw new IllegalArgumentException("server isn't set?");
 		if (str.startsWith("#")) {
-			for (IChannel ch : this.getServer().getDiscordGuild()
-					.getChannelsByName(str.substring(1, str.length()))) {
+			for (Channel ch : MiscUtils.getChannelByName(this.getServer().getDiscordGuild(),
+					str.substring(1, str.length()))) {
 				return this.setValue(ch);
 			}
 		} else if (str.matches("<#[0-9]{18}>")) {
 			try {
 				return this.setValue(this.getServer().getDiscordGuild()
-						.getChannelByID(Long.parseLong(str.substring(2, str.length() - 1))));
+						.getChannelById(Snowflake.of(str.substring(2, str.length() - 1))));
 			} catch (NumberFormatException e) {
 				return false;
 			}
@@ -57,17 +59,17 @@ public class SettingChannel extends ServerSetting<IChannel> {
 	}
 
 	@Override
-	public Class<IChannel> getType() {
-		return IChannel.class;
+	public Class<TextChannel> getType() {
+		return TextChannel.class;
 	}
 
 	@Override
 	public void toBytes(Storage stor) {
 		super.toBytes(stor);
-		if (getValue().equals(NullChannel.NULL_CHANNEL))
+		if (getValue() == null)
 			stor.writeLong(-1);
 		else
-			stor.writeLong(getValue().getLongID());
+			stor.writeLong(getValue().getId().asLong());
 	}
 
 	@Override
@@ -75,9 +77,9 @@ public class SettingChannel extends ServerSetting<IChannel> {
 		super.fromBytes(stor);
 		long ch = stor.readLong();
 		if (ch == -1)
-			this.setValue(NullChannel.NULL_CHANNEL);
+			this.setValue(null);
 		else
-			this.setValue(this.getServer().getDiscordGuild().getChannelByID(ch));
+			this.setValue(this.getServer().getDiscordGuild().getChannelById(Snowflake.of(ch)));
 	}
 
 }

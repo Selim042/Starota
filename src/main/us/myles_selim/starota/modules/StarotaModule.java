@@ -77,7 +77,6 @@ public class StarotaModule {
 			return false;
 		modules.addWrapped(module.name);
 		server.setDataValue(MODULE_KEY, modules);
-		DebugServer.update();
 		return true;
 	}
 
@@ -90,7 +89,6 @@ public class StarotaModule {
 			return false;
 		modules.removeWrapped(module.name);
 		server.setDataValue(MODULE_KEY, modules);
-		DebugServer.update();
 		return true;
 	}
 

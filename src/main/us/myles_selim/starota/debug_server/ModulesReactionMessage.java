@@ -1,16 +1,15 @@
 package us.myles_selim.starota.debug_server;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.impl.obj.ReactionEmoji;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IReaction;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.RequestBuffer;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.reaction.ReactionEmoji;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
@@ -28,74 +27,74 @@ public class ModulesReactionMessage extends PersistReactionMessage {
 	private int index = 0;
 
 	@Override
-	public void onSend(StarotaServer server, IChannel channel, IMessage msg) {
-		RequestBuffer.request(() -> msg.addReaction(ReactionEmoji.of(LEFT_EMOJI))).get();
-		RequestBuffer.request(() -> msg.addReaction(ReactionEmoji.of(RIGHT_EMOJI))).get();
-		RequestBuffer.request(() -> msg.addReaction(ReactionEmoji.of(REFRESH_EMOJI))).get();
+	public void onSend(StarotaServer server, TextChannel channel, Message msg) {
+		msg.addReaction(ReactionEmoji.unicode(LEFT_EMOJI));
+		msg.addReaction(ReactionEmoji.unicode(RIGHT_EMOJI));
+		msg.addReaction(ReactionEmoji.unicode(REFRESH_EMOJI));
 	}
 
 	@Override
-	public void onReactionAdded(StarotaServer server, IChannel channel, IMessage msg, IUser user,
-			IReaction react) {
-		int numPages = (Starota.getClient().getGuilds().size() - EmojiServerHelper.getNumberServers()
-				- 1) / SERVERS_PER_PAGE;
-		if (react.getEmoji().getName().equals(LEFT_EMOJI)) {
+	public void onReactionAdded(StarotaServer server, TextChannel channel, Message msg, Member member,
+			ReactionEmoji react) {
+		int numPages = (Starota.getClient().getGuilds().collectList().block().size()
+				- EmojiServerHelper.getNumberServers() - 1) / SERVERS_PER_PAGE;
+		if (react.toString().equals(LEFT_EMOJI)) {
 			if (index <= 0)
 				index = numPages;
 			else
 				index--;
-		} else if (react.getEmoji().getName().equals(RIGHT_EMOJI)) {
+		} else if (react.toString().equals(RIGHT_EMOJI)) {
 			if (index >= numPages)
 				index = 0;
 			else
 				index++;
 		}
-		RequestBuffer.request(() -> this.editMessage(channel, msg));
-		RequestBuffer.request(() -> msg.removeReaction(user, react));
+		this.editMessage(channel, msg);
+		msg.removeReaction(react, member.getId());
 	}
 
 	@Override
-	protected EmbedObject getEmbed(StarotaServer server) {
+	protected Consumer<EmbedCreateSpec> getEmbed(StarotaServer server) {
 		if (!Starota.FULLY_STARTED)
-			return DebugServer.getNotReadyEmbed();
-		EmbedBuilder builder = new EmbedBuilder();
-		List<IGuild> guilds = Starota.getClient().getGuilds();
-		int numGuilds = Starota.getClient().getGuilds().size() - EmojiServerHelper.getNumberServers()
-				- 1;
-		builder.withTitle(
-				"Disabled Modules: (" + (index + 1) + "/" + (numGuilds / SERVERS_PER_PAGE + 1) + ")");
-		int displayed = 0;
-		for (int i = 0; i < guilds.size() && displayed < SERVERS_PER_PAGE
-				&& (SERVERS_PER_PAGE * index) + i < guilds.size(); i++) {
-			IGuild g = guilds.get((SERVERS_PER_PAGE * index) + i);
-			if (EmojiServerHelper.isEmojiServer(g) || g.getLongID() == DebugServer.DEBUG_SERVER_ID)
-				continue;
-			StarotaServer s = StarotaServer.getServer(g);
-			List<StarotaModule> modules = StarotaModule.getEnabledModules(s);
-			boolean hasAll = true;
-			for (StarotaModule m : StarotaModule.getAllModules()) {
-				if (!modules.contains(m)) {
-					hasAll = false;
-					break;
+			return DebugServer.NOT_READY_EMBED;
+		return (e) -> {
+			List<Guild> guilds = Starota.getClient().getGuilds().collectList().block();
+			int numGuilds = guilds.size() - EmojiServerHelper.getNumberServers() - 1;
+			e.setTitle("Disabled Modules: (" + (index + 1) + "/" + (numGuilds / SERVERS_PER_PAGE + 1)
+					+ ")");
+			int displayed = 0;
+			for (int i = 0; i < guilds.size() && displayed < SERVERS_PER_PAGE
+					&& (SERVERS_PER_PAGE * index) + i < guilds.size(); i++) {
+				Guild g = guilds.get((SERVERS_PER_PAGE * index) + i);
+				if (EmojiServerHelper.isEmojiServer(g)
+						|| g.getId().asLong() == DebugServer.DEBUG_SERVER_ID)
+					continue;
+				StarotaServer s = StarotaServer.getServer(g);
+				List<StarotaModule> modules = StarotaModule.getEnabledModules(s);
+				boolean hasAll = true;
+				for (StarotaModule m : StarotaModule.getAllModules()) {
+					if (!modules.contains(m)) {
+						hasAll = false;
+						break;
+					}
 				}
+				if (hasAll) {
+					e.addField(g.getName(), " - All modules enabled", true);
+					continue;
+				} else if (modules == null || modules.isEmpty()) {
+					e.addField(g.getName(), " - No modules enabled", true);
+					continue;
+				} else {
+					String text = "";
+					for (StarotaModule p : modules)
+						text += " - " + p + "\n";
+					e.addField(g.getName(), text, true);
+				}
+				displayed++;
 			}
-			if (hasAll) {
-				builder.appendField(g.getName(), " - All modules enabled", true);
-				continue;
-			} else if (modules == null || modules.isEmpty()) {
-				builder.appendField(g.getName(), " - No modules enabled", true);
-				continue;
-			} else {
-				String text = "";
-				for (StarotaModule p : modules)
-					text += " - " + p + "\n";
-				builder.appendField(g.getName(), text, true);
-			}
-			displayed++;
-		}
-		builder.withFooterText("Last updated");
-		builder.withTimestamp(System.currentTimeMillis());
-		return builder.build();
+			e.setFooter("Last updated", null);
+			e.setTimestamp(Instant.ofEpochMilli(System.currentTimeMillis()));
+		};
 	}
 
 	@Override

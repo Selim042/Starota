@@ -3,18 +3,19 @@ package us.myles_selim.starota.reaction_messages;
 import java.util.HashMap;
 import java.util.Map;
 
-import sx.blah.discord.api.IDiscordClient;
-import sx.blah.discord.api.IShard;
-import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.guild.channel.message.MessageDeleteEvent;
-import sx.blah.discord.handle.impl.events.guild.channel.message.MessageEditEvent;
-import sx.blah.discord.handle.impl.events.guild.channel.message.reaction.ReactionAddEvent;
-import sx.blah.discord.handle.impl.events.guild.channel.message.reaction.ReactionRemoveEvent;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
+import discord4j.core.DiscordClient;
+import discord4j.core.event.domain.message.MessageDeleteEvent;
+import discord4j.core.event.domain.message.MessageUpdateEvent;
+import discord4j.core.event.domain.message.ReactionAddEvent;
+import discord4j.core.event.domain.message.ReactionRemoveEvent;
+import discord4j.core.object.entity.Channel;
+import discord4j.core.object.entity.GuildChannel;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.User;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.reaction_messages.PersistReactionMessage.DataTypePReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -25,10 +26,10 @@ public class ReactionMessageRegistry {
 	private static final Map<Long, ReactionMessageRegistry> REGISTRIES = new HashMap<>();
 
 	protected final HashMap<String, ReactionMessage> messages = new HashMap<>();
-	protected final IUser bot;
+	protected final User bot;
 
-	public static ReactionMessageRegistry getRegistry(IShard shard) {
-		return getRegistry(shard.getClient().getOurUser().getLongID());
+	public static ReactionMessageRegistry getRegistry(DiscordClient client) {
+		return getRegistry(client.getSelf().block().getId().asLong());
 	}
 
 	public static ReactionMessageRegistry getRegistry(long botId) {
@@ -37,57 +38,58 @@ public class ReactionMessageRegistry {
 		return REGISTRIES.get(botId);
 	}
 
-	public ReactionMessageRegistry(IDiscordClient client) {
-		this.bot = client.getOurUser();
-		REGISTRIES.put(this.bot.getLongID(), this);
-		for (IGuild g : Starota.getClient().getGuilds())
-			deserializeAll(StarotaServer.getServer(g));
+	public ReactionMessageRegistry(DiscordClient client) {
+		this.bot = client.getSelf().block();
+		REGISTRIES.put(this.bot.getId().asLong(), this);
+		MiscUtils.forEach(Starota.getClient().getGuilds(),
+				(g) -> deserializeAll(StarotaServer.getServer(g)));
 	}
 
-	@EventSubscriber
 	public void onReactAdd(ReactionAddEvent event) {
-		if (event.getUser().isBot())
+		if (event.getUser().block().isBot())
 			return;
-		IMessage msg = event.getMessage();
-		if (!messages.containsKey(msg.getStringID()))
+		Message msg = event.getMessage().block();
+		if (!messages.containsKey(msg.getId().asString()))
 			return;
 		// Starota.EXECUTOR.execute(new Runnable() {
 		//
 		// @Override
 		// public void run() {
-		ReactionMessage rMsg = messages.get(msg.getStringID());
-		rMsg.onReactionAdded(StarotaServer.getServer(event.getGuild()), event.getChannel(), msg,
-				event.getUser(), event.getReaction());
+		ReactionMessage rMsg = messages.get(msg.getId().asString());
+		rMsg.onReactionAdded(StarotaServer.getServer(event.getGuild().block()),
+				(TextChannel) event.getChannel().block(), msg,
+				event.getUser().block().asMember(event.getGuildId().get()).block(), event.getEmoji());
 		// }
 		// });
 	}
 
-	@EventSubscriber
 	public void onReactRemove(ReactionRemoveEvent event) {
-		if (event.getUser().isBot())
+		if (event.getUser().block().isBot())
 			return;
-		IMessage msg = event.getMessage();
-		if (!messages.containsKey(msg.getStringID()))
+		Message msg = event.getMessage().block();
+		if (!messages.containsKey(msg.getId().asString()))
 			return;
 		// Starota.EXECUTOR.execute(new Runnable() {
 		//
 		// @Override
 		// public void run() {
-		ReactionMessage rMsg = messages.get(msg.getStringID());
-		rMsg.onReactionRemoved(StarotaServer.getServer(event.getGuild()), event.getChannel(), msg,
-				event.getUser(), event.getReaction());
+		ReactionMessage rMsg = messages.get(msg.getId().asString());
+		rMsg.onReactionRemoved(StarotaServer.getServer(event.getGuild().block()),
+				(TextChannel) event.getChannel().block(), msg,
+				event.getUser().block().asMember(event.getGuildId().get()).block(), event.getEmoji());
 		// }
 		// });
 	}
 
-	@EventSubscriber
 	public void onDelete(MessageDeleteEvent event) {
-		String stringId = Long.toString(event.getMessageID());
+		String stringId = event.getMessageId().toString();
 		if (!messages.containsKey(stringId))
 			return;
 		ReactionMessage rMsg = messages.remove(stringId);
-		if (rMsg instanceof PersistReactionMessage) {
-			StarotaServer sserver = StarotaServer.getServer(event.getGuild());
+		if (rMsg instanceof PersistReactionMessage
+				&& event.getChannel().block().getType().equals(Channel.Type.GUILD_TEXT)) {
+			StarotaServer sserver = StarotaServer
+					.getServer(((GuildChannel) event.getChannel().block()).getGuild().block());
 			EBStorage storage = sserver.getData();
 			if (!storage.containsKey(PERSIST_KEY))
 				return;
@@ -99,27 +101,26 @@ public class ReactionMessageRegistry {
 		}
 	}
 
-	@EventSubscriber
-	public void onEdit(MessageEditEvent event) {
-		if (!messages.containsKey(event.getMessage().getStringID()))
+	public void onEdit(MessageUpdateEvent event) {
+		if (!messages.containsKey(event.getMessage().block().getId().asString()))
 			return;
-		ReactionMessage rMessage = messages.get(event.getMessage().getStringID());
+		ReactionMessage rMessage = messages.get(event.getMessage().block().getId().asString());
 		if (!(rMessage instanceof PersistReactionMessage))
 			return;
-		serialize(StarotaServer.getServer(event.getGuild()), event.getMessage(),
+		serialize(StarotaServer.getServer(event.getGuild().block()), event.getMessage().block(),
 				(PersistReactionMessage) rMessage);
 	}
 
-	public IUser getBot() {
+	public User getBot() {
 		return bot;
 	}
 
-	protected void serialize(StarotaServer server, IMessage message, PersistReactionMessage rMessage) {
+	protected void serialize(StarotaServer server, Message message, PersistReactionMessage rMessage) {
 		EBStorage storage = server.getData();
 		if (!storage.containsKey(PERSIST_KEY))
 			storage.set(PERSIST_KEY, new EBStorage().registerType(new DataTypePReactionMessage()));
 		EBStorage persist = storage.get(PERSIST_KEY, EBStorage.class);
-		persist.set(message.getStringID(), rMessage);
+		persist.set(message.getId().asString(), rMessage);
 		storage.set(PERSIST_KEY, persist);
 	}
 

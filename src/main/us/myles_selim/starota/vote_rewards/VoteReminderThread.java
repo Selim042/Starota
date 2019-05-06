@@ -8,9 +8,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimerTask;
 
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IPrivateChannel;
-import sx.blah.discord.util.RequestBuffer;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.PrivateChannel;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumDonorPerm;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -32,22 +31,21 @@ public class VoteReminderThread extends TimerTask {
 		for (Entry<Long, Long> e : VOTE_PERK_CUTOFF.entrySet()) {
 			if (currentTime < e.getValue())
 				continue;
-			IGuild guild = Starota.getGuild(e.getKey());
+			Guild guild = Starota.getGuild(e.getKey());
 			StarotaServer server = StarotaServer.getServer(guild);
 			int earned = server.getEarnedVotePoints();
 			int used = server.getUsedVotePoints();
 			if (earned < used) {
 				for (EnumDonorPerm p : EnumDonorPerm.values())
 					server.removeVoteReward(p);
-				IPrivateChannel pm = guild.getOwner().getOrCreatePMChannel();
-				RequestBuffer.request(() -> pm
-						.sendMessage(String.format(DISABLED_TEMPLATE, guild.getName(), earned, used)));
+				PrivateChannel pm = guild.getOwner().block().getPrivateChannel().block();
+				pm.createMessage(String.format(DISABLED_TEMPLATE, guild.getName(), earned, used));
 			}
 			toRemove.add(e.getKey());
 		}
 		for (long l : toRemove)
 			VOTE_PERK_CUTOFF.remove(l);
-		for (IGuild g : Starota.getClient().getGuilds()) {
+		for (Guild g : Starota.getClient().getGuilds().collectList().block()) {
 			StarotaServer server = StarotaServer.getServer(g);
 			int earned = server.getEarnedVotePoints();
 			int used = server.getUsedVotePoints();
@@ -56,10 +54,10 @@ public class VoteReminderThread extends TimerTask {
 				long cutoff = currentTime + 259200000;
 				// System.out.println(new Date(cutoff));
 				// minus 0.5 days for a bit of wiggle-room
-				VOTE_PERK_CUTOFF.put(g.getLongID(), (long) (cutoff - 4.32e+7));
-				IPrivateChannel pm = g.getOwner().getOrCreatePMChannel();
-				RequestBuffer.request(() -> pm.sendMessage(String.format(WARNING_TEMPLATE, g.getName(),
-						earned, used, DATE_FORMAT.format(cutoff))));
+				VOTE_PERK_CUTOFF.put(g.getId().asLong(), (long) (cutoff - 4.32e+7));
+				PrivateChannel pm = g.getOwner().block().getPrivateChannel().block();
+				pm.createMessage(String.format(WARNING_TEMPLATE, g.getName(), earned, used,
+						DATE_FORMAT.format(cutoff)));
 			}
 			try {
 				Thread.sleep(1000);

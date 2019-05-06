@@ -7,11 +7,11 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.misc.data_types.cache.CachedData;
@@ -21,13 +21,8 @@ import us.myles_selim.starota.misc.utils.StarotaConstants;
 
 public class LeekDuckData {
 
-	public static final EmbedObject LOADING_EMBED;
-
-	static {
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.appendDesc("Loading Leek Duck... " + EmojiServerHelper.getEmoji("loading"));
-		LOADING_EMBED = builder.build();
-	}
+	public static final Consumer<EmbedCreateSpec> LOADING_EMBED = (e) -> e
+			.setDescription("Loading Leek Duck... " + EmojiServerHelper.getEmoji("loading"));
 
 	private static final String LEEK_URL = "https://leekduck.com";
 	private static final String DITTO_URL = "https://leekduck.com/FindDitto/";

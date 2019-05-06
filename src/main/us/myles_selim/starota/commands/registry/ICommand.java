@@ -1,14 +1,16 @@
 package us.myles_selim.starota.commands.registry;
 
-import java.util.EnumSet;
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Channel;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 
 public interface ICommand extends Comparable<ICommand> {
 
@@ -18,31 +20,31 @@ public interface ICommand extends Comparable<ICommand> {
 
 	public String getDescription();
 
-	public Permissions requiredUsePermission();
+	public Permission requiredUsePermission();
 
-	public EnumSet<Permissions> getCommandPermissions();
+	public PermissionSet getCommandPermission();
 
 	/**
 	 * @deprecated Override, don't call. Use
-	 *             {@link ICommand#hasRequiredRole(IGuild, IUser)} instead.
+	 *             {@link ICommand#hasRequiredRole(Guild, User)} instead.
 	 */
 	@Deprecated
-	public IRole requiredRole(IGuild guild);
+	public Role requiredRole(Guild guild);
 
-	public default boolean hasRequiredRole(IGuild guild, IUser user) {
-		IRole reqRole = requiredRole(guild);
-		return reqRole == null || guild.getRolesForUser(user).contains(reqRole);
+	public default boolean hasRequiredRole(Guild guild, Member member) {
+		Role reqRole = requiredRole(guild);
+		return reqRole == null || member.getRoles().collectList().block().contains(reqRole);
 	}
 
 	/**
 	 * @deprecated Override, don't call. Use
-	 *             {@link ICommand#isRequiredChannel(IGuild, IUser)} instead.
+	 *             {@link ICommand#isRequiredChannel(Guild, User)} instead.
 	 */
 	@Deprecated
-	public IChannel requiredChannel(IGuild guild);
+	public Channel requiredChannel(Guild guild);
 
-	public default boolean isRequiredChannel(IGuild guild, IChannel ch) {
-		IChannel reqCh = requiredChannel(guild);
+	public default boolean isRequiredChannel(Guild guild, Channel ch) {
+		Channel reqCh = requiredChannel(guild);
 		return reqCh == null || requiredChannel(guild).equals(ch);
 	}
 
@@ -54,7 +56,7 @@ public interface ICommand extends Comparable<ICommand> {
 
 	public String getAdminUsage();
 
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel)
+	public void execute(String[] args, Message message, Guild guild, TextChannel channel)
 			throws Exception;
 
 	public void setCommandHandler(ICommandHandler handler);

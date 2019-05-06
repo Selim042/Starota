@@ -4,7 +4,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import sx.blah.discord.handle.obj.IRole;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.util.Snowflake;
 import us.myles_selim.starota.Starota;
 
 public enum EnumDonorPerm {
@@ -31,8 +32,8 @@ public enum EnumDonorPerm {
 		return MAX_POINTS;
 	}
 
-	public static EnumDonorPerm getPermForRole(IRole role) {
-		return ROLE_MAP.get(role.getLongID());
+	public static EnumDonorPerm getPermForRole(Role role) {
+		return ROLE_MAP.get(role.getId().asLong());
 	}
 
 	private long roleId;
@@ -57,8 +58,8 @@ public enum EnumDonorPerm {
 		return this.roleId;
 	}
 
-	public IRole getRole() {
-		return Starota.getClient().getRoleByID(this.roleId);
+	public Role getRole() {
+		return Starota.getSupportServer().getRoleById(Snowflake.of(this.roleId)).block();
 	}
 
 	public int getPointsRequired() {

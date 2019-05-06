@@ -2,28 +2,34 @@ package us.myles_selim.starota.webserver.webhooks.reaction_messages;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TimeZone;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.IDiscordClient;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.impl.obj.ReactionEmoji;
-import sx.blah.discord.handle.obj.ICategory;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IReaction;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.RequestBuffer;
+import discord4j.core.DiscordClient;
+import discord4j.core.object.PermissionOverwrite;
+import discord4j.core.object.entity.Category;
+import discord4j.core.object.entity.Channel;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.GuildChannel;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.reaction.ReactionEmoji;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.assistants.StarotaAssistants;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumWeather;
+import us.myles_selim.starota.misc.data_types.EmbedBuilder;
 import us.myles_selim.starota.misc.data_types.RaidBoss;
 import us.myles_selim.starota.misc.utils.ImageHelper;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.modules.BaseModules;
 import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.pokedex.GoHubDatabase;
@@ -43,8 +49,8 @@ public class WebhookRaidReactionMessage extends ReactionMessage {
 	private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("hh:mm");
 
 	private WebhookRaid raidData;
-	private IChannel channel;
-	private IRole role;
+	private TextChannel channel;
+	private Role role;
 	private EnumPokemon pokemon;
 	private Form form;
 
@@ -60,110 +66,117 @@ public class WebhookRaidReactionMessage extends ReactionMessage {
 	}
 
 	@Override
-	public void onSend(StarotaServer server, IChannel channel, IMessage msg) {
-		RequestBuffer.request(() -> msg.addReaction(ReactionEmoji.of("✅")));
+	public void onSend(StarotaServer server, TextChannel channel, Message msg) {
+		msg.addReaction(ReactionEmoji.unicode("✅"));
 	}
 
 	@Override
-	public void onReactionAdded(StarotaServer server, IChannel channel, IMessage msg, IUser user,
-			IReaction react) {
-		if (react.getEmoji().getName().equals("✅")) {
-			handleStarotaAddReaction(server, channel, msg, user, react);
-			handleAssistantAddReaction(server, channel, msg, user, react);
+	public void onReactionAdded(StarotaServer server, TextChannel channel, Message msg, Member member,
+			ReactionEmoji react) {
+		if (react.toString().equals("✅")) {
+			handleStarotaAddReaction(server, channel, msg, member, react);
+			handleAssistantAddReaction(server, channel, msg, member, react);
 		}
 	}
 
-	private void handleStarotaAddReaction(StarotaServer server, IChannel channel, IMessage msg,
-			IUser user, IReaction react) {
-		channel = server.getDiscordGuild().getChannelByID(channel.getLongID());
-		msg = server.getDiscordGuild().getMessageByID(msg.getLongID());
-		user = server.getDiscordGuild().getUserByID(user.getLongID());
-		IGuild guild = server.getDiscordGuild();
+	private void handleStarotaAddReaction(StarotaServer server, Channel channel, Message msg, User user,
+			ReactionEmoji react) {
+		channel = server.getDiscordGuild().getChannelById(channel.getId()).block();
+		msg = server.getDiscordGuild().getClient()
+				.getMessageById(server.getDiscordGuild().getId(), msg.getId()).block();
+		Member member = server.getDiscordGuild().getMemberById(user.getId()).block();
+		Guild guild = server.getDiscordGuild();
 		String name = getRoleName();
 
 		if (this.channel == null) {
-			ICategory category = null;
-			for (ICategory c : guild.getCategoriesByName(CATEGORY_NAME)) {
+			Category category = null;
+			for (Category c : MiscUtils.getCategoryByName(guild, CATEGORY_NAME)) {
 				category = c;
 				break;
 			}
 			if (category == null) {
-				category = guild.createCategory(CATEGORY_NAME);
-				category.overrideRolePermissions(guild.getEveryoneRole(),
-						EnumSet.noneOf(Permissions.class), EnumSet.of(Permissions.READ_MESSAGES));
-				category.overrideUserPermissions(
-						Starota.getOurUser(), EnumSet.of(Permissions.MANAGE_CHANNEL,
-								Permissions.MANAGE_PERMISSIONS, Permissions.READ_MESSAGES),
-						EnumSet.noneOf(Permissions.class));
+				category = guild.createCategory((c) -> {
+					c.setName(CATEGORY_NAME);
+					Set<PermissionOverwrite> perms = new HashSet<>();
+					perms.add(PermissionOverwrite.forRole(guild.getEveryoneRole().block().getId(),
+							PermissionSet.none(), PermissionSet.of(Permission.VIEW_CHANNEL)));
+					perms.add(PermissionOverwrite.forMember(Starota.getSelf().getId(),
+							PermissionSet.of(Permission.VIEW_CHANNEL), PermissionSet.none()));
+					c.setPermissionOverwrites(perms);
+				}).block();
 			}
-			for (IChannel c : guild.getChannelsByName(name)) {
-				this.channel = c;
+			for (GuildChannel c : MiscUtils.getChannelByName(guild, name)) {
+				this.channel = (TextChannel) c;
 				break;
 			}
+			// TODO: fix this, not put in category and fix topic
 			if (this.channel == null)
-				this.channel = category.createChannel(name);
-			this.channel.changeTopic(String.format(TOPIC_TEMPLATE, raidData.getPokemon().getName(),
-					raidData.getGymName(), getMessage().getLongID()));
+				this.channel = guild.createTextChannel((c) -> c.setName(name)).block();
+			// this.channel.changeTopic(String.format(TOPIC_TEMPLATE,
+			// raidData.getPokemon().getName(),
+			// raidData.getGymName(), getMessage().getId().asLong()));
 		}
 		if (this.role == null) {
-			for (IRole r : guild.getRolesByName(name)) {
+			for (Role r : MiscUtils.getRoleByName(guild, name)) {
 				this.role = r;
 				break;
 			}
 			if (this.role == null) {
-				this.role = guild.createRole();
-				this.role.changePermissions(EnumSet.noneOf(Permissions.class));
-				this.role.changeName(name);
-				this.channel.overrideRolePermissions(this.role,
-						EnumSet.of(Permissions.READ_MESSAGE_HISTORY, Permissions.READ_MESSAGES),
-						EnumSet.noneOf(Permissions.class));
+				this.role = guild.createRole((r) -> {
+					r.setName(name);
+					r.setPermissions(PermissionSet.none());
+				}).block();
+				this.channel.addRoleOverwrite(this.role.getId(),
+						PermissionOverwrite.forRole(this.role.getId(), PermissionSet
+								.of(Permission.READ_MESSAGE_HISTORY, Permission.VIEW_CHANNEL),
+								PermissionSet.none()));
 			}
 		}
-		user.addRole(this.role);
+		member.addRole(this.role.getId());
 	}
 
-	private void handleAssistantAddReaction(StarotaServer server, IChannel channel, IMessage msg,
-			IUser user, IReaction react) {
-		IDiscordClient client = StarotaAssistants.getResponsibleClient(msg);
-		channel = client.getChannelByID(channel.getLongID());
-		msg = client.getMessageByID(msg.getLongID());
-		user = client.getUserByID(user.getLongID());
+	private void handleAssistantAddReaction(StarotaServer server, TextChannel channel, Message msg,
+			Member user, ReactionEmoji react) {
+		DiscordClient client = StarotaAssistants.getResponsibleClient(msg);
+		channel = (TextChannel) client.getChannelById(channel.getId()).block();
+		msg = client.getMessageById(server.getDiscordGuild().getId(), msg.getId()).block();
+		user = client.getMemberById(server.getDiscordGuild().getId(), user.getId()).block();
 
 		this.editMessage(channel, msg);
-		this.channel.sendMessage(user + " was added.");
+		this.channel.createMessage(user + " was added.");
 	}
 
 	@Override
-	public void onReactionRemoved(StarotaServer server, IChannel channel, IMessage msg, IUser user,
-			IReaction react) {
-		if (react.getEmoji().getName().equals("✅")) {
-			handleStarotaRemoveReaction(server, channel, msg, user, react);
-			handleAssistantRemoveReaction(server, channel, msg, user, react);
+	public void onReactionRemoved(StarotaServer server, TextChannel channel, Message msg, Member member,
+			ReactionEmoji react) {
+		if (react.toString().equals("✅")) {
+			handleStarotaRemoveReaction(server, channel, msg, member, react);
+			handleAssistantRemoveReaction(server, channel, msg, member, react);
 		}
 	}
 
-	private void handleStarotaRemoveReaction(StarotaServer server, IChannel channel, IMessage msg,
-			IUser user, IReaction react) {
-		channel = server.getDiscordGuild().getChannelByID(channel.getLongID());
-		msg = server.getDiscordGuild().getMessageByID(msg.getLongID());
-		user = server.getDiscordGuild().getUserByID(user.getLongID());
+	private void handleStarotaRemoveReaction(StarotaServer server, TextChannel channel, Message msg,
+			Member user, ReactionEmoji react) {
+		channel = (TextChannel) server.getDiscordGuild().getChannelById(channel.getId()).block();
+		msg = Starota.getClient().getMessageById(server.getDiscordGuild().getId(), msg.getId()).block();
+		user = server.getDiscordGuild().getMemberById(user.getId()).block();
 
-		user.removeRole(this.role);
+		user.removeRole(this.role.getId());
 	}
 
-	private void handleAssistantRemoveReaction(StarotaServer server, IChannel channel, IMessage msg,
-			IUser user, IReaction react) {
-		IDiscordClient client = StarotaAssistants.getResponsibleClient(msg);
-		channel = client.getChannelByID(channel.getLongID());
-		msg = client.getMessageByID(msg.getLongID());
-		user = client.getUserByID(user.getLongID());
+	private void handleAssistantRemoveReaction(StarotaServer server, TextChannel channel, Message msg,
+			User user, ReactionEmoji react) {
+		DiscordClient client = StarotaAssistants.getResponsibleClient(msg);
+		channel = (TextChannel) client.getChannelById(channel.getId()).block();
+		msg = client.getMessageById(server.getDiscordGuild().getId(), msg.getId()).block();
+		user = client.getMemberById(server.getDiscordGuild().getId(), user.getId()).block();
 
-		this.channel.sendMessage(user + " was removed.");
+		this.channel.createMessage(user + " was removed.");
 		this.editMessage(channel, msg);
 	}
 
 	@Override
-	protected EmbedObject getEmbed(StarotaServer server) {
+	protected Consumer<EmbedCreateSpec> getEmbed(StarotaServer server) {
 		// if (raidData != null)
 		// return raidData.toEmbed();
 		EmbedBuilder builder = new EmbedBuilder();
@@ -180,12 +193,12 @@ public class WebhookRaidReactionMessage extends ReactionMessage {
 			// if (boss.getTier() == 6)
 			// titleString += EmojiServerHelper.getEmoji(EX_RAID_EMOJI);
 			// else {
-			// IEmoji raidEmoji =
+			// GuildEmoji raidEmoji =
 			// EmojiServerHelper.getEmoji(RAID_EMOJI);
 			// for (int i = 0; i < boss.getTier(); i++)
 			// titleString += raidEmoji;
 			// }
-			builder.withTitle(titleString + "at " + raidData.gym_name);
+			builder.setTitle(titleString + "at " + raidData.gym_name);
 			builder.withThumbnail(ImageHelper.getOfficalArtwork(pokemon, raidData.form));
 			if (entry != null) {
 				String boostedString = "";
@@ -204,15 +217,15 @@ public class WebhookRaidReactionMessage extends ReactionMessage {
 			builder.appendDesc("\n**Raid Channel**: " + channel);
 		if (role != null)
 			builder.appendDesc("\n**Raid Role**: " + role);
-		// builder.appendField("Time:", time, true);
-		// builder.appendField("Location:", location, true);
+		// builder.addField("Time:", time, true);
+		// builder.addField("Location:", location, true);
 
 		if (this.role != null) {
 			String interestString = "";
-			for (IUser o : channel.getGuild().getUsersByRole(this.role))
-				interestString += o.getName() + "\n";
+			for (User o : MiscUtils.getMemberByRole(channel.getGuild().block(), this.role.getId()))
+				interestString += o.getUsername() + "\n";
 			if (!interestString.isEmpty())
-				builder.appendField("Interested:", interestString, false);
+				builder.addField("Interested:", interestString, false);
 		}
 
 		if (entry != null) {
@@ -222,7 +235,7 @@ public class WebhookRaidReactionMessage extends ReactionMessage {
 					+ "\n";
 			cpsString += "**Boosted Catch CP**: " + entry.CPs.raidCaptureBoostMin + "-"
 					+ entry.CPs.raidCaptureBoostMax;
-			builder.appendField("Important CPs:", cpsString, false);
+			builder.addField("Important CPs:", cpsString, false);
 
 			// disable counters to embed smaller, less scrolling on small
 			// screens
@@ -231,24 +244,24 @@ public class WebhookRaidReactionMessage extends ReactionMessage {
 			// for (Counter c : entry.getTopCounters())
 			// counterString += String.format("#%d %s", rank++, c);
 			// if (!counterString.isEmpty())
-			// builder.appendField("Counters:", counterString, false);
+			// builder.addField("Counters:", counterString, false);
 		}
 
 		if (raidData.move_1 != 0 && raidData.move_2 != 0) {
 			DexMoveset set = raidData.getMoveset();
 			if (entry == null)
-				builder.appendField("Moveset:", set.toString(), false);
+				builder.addField("Moveset:", set.toString(), false);
 			else
-				builder.appendField("Moveset:", set.toString(entry), false);
+				builder.addField("Moveset:", set.toString(entry), false);
 		}
 
-		builder.appendField("Directions:",
+		builder.addField("Directions:",
 				String.format(
 						"[Google Maps](https://www.google.com/maps/search/?api=1&query=%1$f,%2$f) | "
 								+ "[Apple Maps](http://maps.apple.com/?daddr=%1$f,%2$f)",
 						raidData.latitude, raidData.longitude),
 				false);
-		builder.appendField("Reaction Usage:",
+		builder.addField("Reaction Usage:",
 				"React with ✅ to indicate your interest and be added to the raid channel.", false);
 		builder.withImage(String.format(
 				"https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/pin-s+%06X(%2$f,%3$f)/%2$f,%3$f,16.5,0,0/600x300@2x?logo=false&access_token=pk.eyJ1Ijoic2VsaW0wNDIiLCJhIjoiY2pyOXpmM2g1MG16cTQzbndqZXk5dHNndCJ9.vsh20BzsPBgTcBBcKWBqQw",

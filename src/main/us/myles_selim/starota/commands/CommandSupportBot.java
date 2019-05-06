@@ -1,30 +1,29 @@
 package us.myles_selim.starota.commands;
 
-import java.util.EnumSet;
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.RequestBuffer;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
+import discord4j.core.object.util.Snowflake;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
 
 public class CommandSupportBot extends JavaCommand {
 
 	private String botName;
-	private long botId;
+	private Snowflake botId;
 
-	public CommandSupportBot(String botName, long botId) {
+	public CommandSupportBot(String botName, Snowflake botId) {
 		super("support" + botName, "Information on how to help support " + botName + ".");
 		this.botName = botName;
 		this.botId = botId;
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS);
 	}
 
 	@Override
@@ -35,17 +34,15 @@ public class CommandSupportBot extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.appendDesc("Thank you for your interest in helping support " + this.botName + "!\n"
-				+ "If you visit the Patreon below you can support " + this.botName
+	public void execute(String[] args, Message message, Guild guild, TextChannel channel) {
+		channel.createEmbed((e) -> e.setDescription("Thank you for your interest in helping support "
+				+ this.botName + "!\n" + "If you visit the Patreon below you can support " + this.botName
 				+ " and its developers.\n"
 				+ "Every penny counts, but don't feel like you must donate if you use the bot.\n"
 				+ "Supporting Starota may allow access to additional features.  More information on Patreon.\n"
 				+ "https://patreon.com/Selim_042\n\n" + "You can also support " + this.botName
 				+ " by voting for it to raise it in the rankings.\n" + "https://discordbots.org/bot/"
-				+ this.botId);
-		RequestBuffer.request(() -> channel.sendMessage(builder.build()));
+				+ this.botId));
 	}
 
 }

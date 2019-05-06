@@ -17,3 +17,4 @@ starotaData/regions/*
 starota_dump*
 
 /target/
+/bin/

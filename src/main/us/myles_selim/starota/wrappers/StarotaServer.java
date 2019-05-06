@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -18,11 +19,12 @@ import javax.annotation.Nonnull;
 
 import org.discordbots.api.client.entity.SimpleUser;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.RequestBuffer;
+import discord4j.core.object.entity.Channel;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.entity.User;
+import reactor.core.publisher.Mono;
 import us.myles_selim.ebs.EBList;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.ebs.IOHelper;
@@ -66,7 +68,7 @@ public class StarotaServer {
 
 	public static final String TRADE_ID_KEY = "trade_id";
 
-	private final IGuild guild;
+	private final Guild guild;
 	public EBStorage profiles;
 	private EBStorage data;
 	private EBList<TradeboardPost> tradeboard;
@@ -79,12 +81,12 @@ public class StarotaServer {
 	// private Map<EnumUsageType, int[]> avgUsage;
 	// private Map<EnumUsageType, int[]> todayUsage;
 
-	private StarotaServer(IGuild server) {
+	private StarotaServer(Guild server) {
 		this.guild = server;
 	}
 
-	public IGuild getDiscordGuild() {
-		return Starota.getGuild(this.guild.getLongID());
+	public Guild getDiscordGuild() {
+		return Starota.getGuild(this.guild.getId().asLong());
 		// return this.guild;
 	}
 
@@ -93,27 +95,31 @@ public class StarotaServer {
 	}
 
 	// start profile stuffs
-	public boolean hasProfile(IUser user) {
+	public boolean hasProfile(User user) {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.PROFILES))
 			return false;
-		return profiles.containsKey(user.getStringID());
+		return profiles.containsKey(user.getId().asString());
 	}
 
-	public PlayerProfile getProfile(IUser user) {
+	public PlayerProfile getProfile(Optional<User> oUser) {
+		return getProfile(oUser.orElse(null));
+	}
+
+	public PlayerProfile getProfile(User user) {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.PROFILES))
 			return null;
 		if (hasProfile(user)) {
-			PlayerProfile profile = profiles.get(user.getStringID(), PlayerProfile.class);
+			PlayerProfile profile = profiles.get(user.getId().asString(), PlayerProfile.class);
 			updateLevel(profile);
 			return profile;
 		}
 		return null;
 	}
 
-	public PlayerProfile setProfile(IUser user, PlayerProfile profile) {
+	public PlayerProfile setProfile(User user, PlayerProfile profile) {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.PROFILES))
 			return null;
-		profiles.set(user.getStringID(), profile);
+		profiles.set(user.getId().asString(), profile);
 		return profile;
 	}
 
@@ -186,7 +192,7 @@ public class StarotaServer {
 		for (String key : data.getKeys())
 			data.clearKey(key);
 		File optionsFile = new File(new File(Starota.DATA_FOLDER, "options"),
-				guild.getLongID() + IOHelper.EBS_EXTENSION);
+				guild.getId().asLong() + IOHelper.EBS_EXTENSION);
 		if (optionsFile.exists())
 			optionsFile.delete();
 	}
@@ -209,7 +215,7 @@ public class StarotaServer {
 		return tradeboard.values();
 	}
 
-	public List<TradeboardPost> findPosts(boolean lookingFor, IGuild server, EnumPokemon pokemon) {
+	public List<TradeboardPost> findPosts(boolean lookingFor, Guild server, EnumPokemon pokemon) {
 		return findPosts(lookingFor, pokemon, false);
 	}
 
@@ -289,9 +295,9 @@ public class StarotaServer {
 		if (hasDataKey(TRADE_ID_KEY))
 			nextPostId = (int) getDataValue(TRADE_ID_KEY);
 		if (nextPostId >= 9999) {
-			IUser serverOwner = guild.getOwner();
-			System.out.println("Server " + guild.getName() + ", run by " + serverOwner.getName() + "#"
-					+ serverOwner.getDiscriminator() + " has hit the 9,999 trade post limit");
+			User serverOwner = guild.getOwner().block();
+			System.out.println("Server " + guild.getName() + ", run by " + serverOwner.getUsername()
+					+ "#" + serverOwner.getDiscriminator() + " has hit the 9,999 trade post limit");
 			return null;
 		}
 		TradeboardPost post = new TradeboardPost(nextPostId, lookingFor, owner, pokemon, form, shiny,
@@ -312,12 +318,12 @@ public class StarotaServer {
 		return null;
 	}
 
-	public List<TradeboardPost> getPosts(IUser user) {
+	public List<TradeboardPost> getPosts(User user) {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.TRADEBOARD))
 			return null;
 		List<TradeboardPost> posts = new LinkedList<>();
 		for (TradeboardPost t : tradeboard.values())
-			if (t != null && t.getOwner() == user.getLongID())
+			if (t != null && t.getOwner() == user.getId().asLong())
 				posts.add(t);
 		return Collections.unmodifiableList(posts);
 	}
@@ -457,7 +463,7 @@ public class StarotaServer {
 		return null;
 	}
 
-	public IChannel getChannel(EnumWebhookType type, GeoPoint point) {
+	public Channel getChannel(EnumWebhookType type, GeoPoint point) {
 		for (String key : regions.getKeys()) {
 			GeoRegion region = regions.get(key, GeoRegion.class);
 			long channelId = region.getHookChannel(type);
@@ -487,14 +493,14 @@ public class StarotaServer {
 		try {
 			Calendar today = Calendar.getInstance();
 			List<SimpleUser> voters = Starota.getBotListAPI()
-					.getVoters(Long.toString(StarotaConstants.STAROTA_ID)).toCompletableFuture().get();
+					.getVoters(StarotaConstants.STAROTA_ID.asString()).toCompletableFuture().get();
 			int numVoters = 0;
 			for (SimpleUser su : voters) {
-				List<IUser> user = guild.getUsersByName(su.getUsername());
-				if (user != null && !user.isEmpty())
+				List<Member> mem = MiscUtils.getMemberByName(guild, su.getUsername());
+				if (mem != null && !mem.isEmpty())
 					numVoters++;
 			}
-			return numVoters * 100.0f / (guild.getUsers().size() * today.get(Calendar.DATE));
+			return numVoters * 100.0f / (guild.getMemberCount().orElse(0) * today.get(Calendar.DATE));
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		}
@@ -502,10 +508,10 @@ public class StarotaServer {
 	}
 
 	public int getEarnedVotePoints() {
-		IUser owner = guild.getOwner();
+		Mono<Member> owner = guild.getOwner();
 		int sum = 0;
 		int vals = 0;
-		for (IGuild g : Starota.getClient().getGuilds()) {
+		for (Guild g : Starota.getClient().getGuilds().collectList().block()) {
 			if (g.getOwner().equals(owner)) {
 				sum += StarotaServer.getServer(g).getEarnedVotePointsInternal();
 				vals++;
@@ -538,8 +544,8 @@ public class StarotaServer {
 
 	public List<EnumDonorPerm> getVoteRewards() {
 		List<EnumDonorPerm> donorPerms = new ArrayList<>();
-		for (IRole role : Starota.getSupportServer()
-				.getRolesForUser(this.getDiscordGuild().getOwner())) {
+		for (Role role : Starota.getSupportServer().getOwner().block().getRoles().collectList()
+				.block()) {
 			EnumDonorPerm perm = EnumDonorPerm.getPermForRole(role);
 			if (perm != null)
 				donorPerms.add(perm);
@@ -553,11 +559,12 @@ public class StarotaServer {
 	public boolean addVoteReward(EnumDonorPerm perm) {
 		int currentPoints = getUsedVotePoints();
 		int earnedPoints = getEarnedVotePoints();
-		if (this.getDiscordGuild().getOwner().hasRole(perm.getRole()) || perm.getPointsRequired() < 0
+		if (this.getDiscordGuild().getOwner().block().getRoles().any((r) -> r.equals(perm.getRole()))
+				.block() || perm.getPointsRequired() < 0
 				|| currentPoints + perm.getPointsRequired() > earnedPoints
 				|| !hasRequiredVoteRewards(perm))
 			return false;
-		RequestBuffer.request(() -> this.getDiscordGuild().getOwner().addRole(perm.getRole())).get();
+		this.getDiscordGuild().getOwner().block().addRole(perm.getRole().getId());
 		return true;
 	}
 
@@ -565,9 +572,10 @@ public class StarotaServer {
 	 * Returns if reward was removed
 	 */
 	public boolean removeVoteReward(EnumDonorPerm perm) {
-		if (getUsedVotePoints() <= 0 || !this.getDiscordGuild().getOwner().hasRole(perm.getRole()))
+		if (getUsedVotePoints() <= 0 || !this.getDiscordGuild().getOwner().block().getRoles()
+				.any((r) -> r.equals(perm.getRole())).block())
 			return false;
-		RequestBuffer.request(() -> this.getDiscordGuild().getOwner().removeRole(perm.getRole())).get();
+		this.getDiscordGuild().getOwner().block().removeRole(perm.getRole().getId());
 		List<EnumDonorPerm> toRemove = new ArrayList<>();
 		for (EnumDonorPerm p : getVoteRewards())
 			if (!hasRequiredVoteRewards(p))
@@ -666,9 +674,8 @@ public class StarotaServer {
 
 	public TimeZone getTimezone() {
 		SettingSet settings = getSettings();
-		if (settings.isEmpty(TIMEZONE)) {
-			return MiscUtils.getTimezone(guild.getRegion());
-		}
+		if (settings.isEmpty(TIMEZONE))
+			return MiscUtils.getTimezone(guild.getRegion().block());
 		return null;
 	}
 
@@ -701,13 +708,13 @@ public class StarotaServer {
 	private static final Map<Long, StarotaServer> SERVERS = new ConcurrentHashMap<>();
 	private static final Map<Long, StarotaUser> USERS = new ConcurrentHashMap<>();
 
-	public static StarotaServer getServer(IGuild guild) {
+	public static StarotaServer getServer(Guild guild) {
 		if (guild == null)
 			return null;
-		if (SERVERS.containsKey(guild.getLongID()))
-			return SERVERS.get(guild.getLongID());
+		if (SERVERS.containsKey(guild.getId().asLong()))
+			return SERVERS.get(guild.getId().asLong());
 		StarotaServer server = new StarotaServer(guild);
-		SERVERS.put(guild.getLongID(), server);
+		SERVERS.put(guild.getId().asLong(), server);
 
 		server.profiles = ServerDataHelper.getEBSFromFolder(guild, PROFILES)
 				.registerType(new PlayerProfile.DataTypePlayerProfile());
@@ -723,11 +730,11 @@ public class StarotaServer {
 		return server;
 	}
 
-	public StarotaUser getUser(IUser user) {
+	public StarotaUser getUser(User user) {
 		if (user == null)
 			return null;
-		if (USERS.containsKey(user.getLongID()))
-			return USERS.get(user.getLongID());
+		if (USERS.containsKey(user.getId().asLong()))
+			return USERS.get(user.getId().asLong());
 		StarotaUser sUser = new StarotaUser(this, user);
 
 		return sUser;

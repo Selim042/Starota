@@ -3,9 +3,9 @@ package us.myles_selim.starota.embed_converter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.embed_converter.annotations.EmbedAuthorIcon;
 import us.myles_selim.starota.embed_converter.annotations.EmbedAuthorName;
 import us.myles_selim.starota.embed_converter.annotations.EmbedAuthorURL;
@@ -18,16 +18,17 @@ import us.myles_selim.starota.embed_converter.annotations.EmbedThumbnail;
 import us.myles_selim.starota.embed_converter.annotations.EmbedTimestamp;
 import us.myles_selim.starota.embed_converter.annotations.EmbedTitle;
 import us.myles_selim.starota.embed_converter.annotations.EmbedURL;
+import us.myles_selim.starota.misc.data_types.EmbedBuilder;
 import us.myles_selim.starota.misc.data_types.Pair;
 
 public class EmbedConverter {
 
-	public static EmbedObject toEmbed(Object obj) {
+	public static Consumer<EmbedCreateSpec> toEmbed(Object obj) {
 		EmbedBuilder builder = new EmbedBuilder();
 		Class<?> clazz = obj.getClass();
 
 		if (obj.getClass().isAnnotationPresent(EmbedTitle.class))
-			builder.withTitle(getEmbedName(obj, clazz.getAnnotation(EmbedTitle.class).value()));
+			builder.setTitle(getEmbedName(obj, clazz.getAnnotation(EmbedTitle.class).value()));
 		if (obj.getClass().isAnnotationPresent(EmbedColor.class)) {
 			EmbedColor color = clazz.getAnnotation(EmbedColor.class);
 			if (color.value() != -1)
@@ -268,7 +269,7 @@ public class EmbedConverter {
 				val = getMethodValue(obj, (Method) fm);
 			if (val == null)
 				continue;
-			builder.appendField(name.value(), val.toString(), name.isInline());
+			builder.addField(name.value(), val.toString(), name.isInline());
 		}
 
 		return builder.build();

@@ -5,9 +5,11 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLConnection;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -17,8 +19,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.misc.data_types.cache.CachedData;
 import us.myles_selim.starota.misc.data_types.cache.ClearCache;
@@ -27,13 +28,8 @@ import us.myles_selim.starota.misc.utils.StarotaConstants;
 
 public class EventData {
 
-	public static final EmbedObject LOADING_EMBED;
-
-	static {
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.appendDesc("Loading event data... " + EmojiServerHelper.getEmoji("loading"));
-		LOADING_EMBED = builder.build();
-	}
+	public static final Consumer<EmbedCreateSpec> LOADING_EMBED = (e) -> e
+			.setDescription("Loading event data... " + EmojiServerHelper.getEmoji("loading"));
 
 	private static final Gson GSON;
 
@@ -109,10 +105,10 @@ public class EventData {
 		return false;
 	}
 
-	public static long getEventsCacheTime() {
+	public static Instant getEventsCacheTime() {
 		if (EVENT_CACHE == null)
-			return -1;
-		return EVENT_CACHE.getCreationTime();
+			return null;
+		return Instant.ofEpochMilli(EVENT_CACHE.getCreationTime());
 	}
 
 	@ClearCache("events")

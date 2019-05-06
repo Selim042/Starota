@@ -1,8 +1,9 @@
 package us.myles_selim.starota.commands.registry.channel_management;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Channel;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -14,14 +15,14 @@ public class CommandAddChannelWhitelist extends StarotaCommand {
 	}
 
 	@Override
-	public Permissions requiredUsePermission() {
-		return Permissions.ADMINISTRATOR;
+	public Permission requiredUsePermission() {
+		return Permission.ADMINISTRATOR;
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
+	public void execute(String[] args, Message message, StarotaServer server, TextChannel channel) {
 		if (args.length < 3) {
-			channel.sendMessage(
+			channel.createMessage(
 					"**Usage**: " + server.getPrefix() + this.getName() + " <cmdCategory> <channel>");
 			return;
 		}
@@ -35,16 +36,17 @@ public class CommandAddChannelWhitelist extends StarotaCommand {
 			}
 		}
 		if (cmdCategory == null || !found) {
-			channel.sendMessage("Unknown category \"" + args[1] + "\"");
+			channel.createMessage("Unknown category \"" + args[1] + "\"");
 			return;
 		}
-		IChannel target = Starota.findChannel(server.getDiscordGuild().getLongID(), args[2]);
+		Channel target = Starota.findChannel(server.getDiscordGuild().getId().asLong(), args[2]);
 		if (target == null) {
-			channel.sendMessage("Channel \"" + args[2] + "\" not found");
+			channel.createMessage("Channel \"" + args[2] + "\" not found");
 			return;
 		}
 		ChannelCommandManager.addWhitelist(server, cmdCategory, target);
-		channel.sendMessage("Added " + target.mention() + " to whitelist for \"" + cmdCategory + "\".");
+		channel.createMessage(
+				"Added " + target.getMention() + " to whitelist for \"" + cmdCategory + "\".");
 	}
 
 }

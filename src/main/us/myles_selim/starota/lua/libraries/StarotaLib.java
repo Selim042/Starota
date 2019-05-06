@@ -15,7 +15,7 @@ import org.squiddev.cobalt.function.TwoArgFunction;
 import org.squiddev.cobalt.function.ZeroArgFunction;
 import org.squiddev.cobalt.lib.LuaLibrary;
 
-import sx.blah.discord.handle.obj.IUser;
+import discord4j.core.object.entity.User;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.commands.settings.SettingSet;
 import us.myles_selim.starota.enums.EnumPokemon;
@@ -47,9 +47,9 @@ public class StarotaLib implements LuaLibrary {
 				@Override
 				public LuaValue call(LuaState state, LuaValue arg) throws LuaError {
 					if (arg == Constants.NIL || !(arg instanceof LuaUserdata)
-							|| !(((LuaUserdata) arg).instance instanceof IUser))
+							|| !(((LuaUserdata) arg).instance instanceof User))
 						throw new LuaError("arg must be a user");
-					PlayerProfile prof = server.getProfile((IUser) ((LuaUserdata) arg).instance);
+					PlayerProfile prof = server.getProfile((User) ((LuaUserdata) arg).instance);
 					if (prof == null)
 						return Constants.NIL;
 					return ConversionHandler.convertToLua(state, prof);

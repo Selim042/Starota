@@ -3,13 +3,22 @@ package us.myles_selim.starota.misc.utils;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.TimeZone;
 
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IRegion;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.DiscordClient;
+import discord4j.core.object.Region;
+import discord4j.core.object.entity.Category;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.GuildChannel;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
+import discord4j.core.object.util.Snowflake;
+import reactor.core.publisher.Flux;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumTeam;
@@ -41,8 +50,8 @@ public class MiscUtils {
 		return false;
 	}
 
-	public static IRole getTeamRole(IGuild guild, EnumTeam team) {
-		for (IRole r : guild.getRoles()) {
+	public static Role getTeamRole(Guild guild, EnumTeam team) {
+		for (Role r : guild.getRoles().collectList().block()) {
 			if (team.name().equalsIgnoreCase(r.getName().replaceAll(" ", "_")))
 				return r;
 		}
@@ -50,8 +59,8 @@ public class MiscUtils {
 	}
 
 	// TODO: update when adding new regions
-	public static TimeZone getTimezone(IRegion region) {
-		switch (region.getID()) {
+	public static TimeZone getTimezone(Region region) {
+		switch (region.getId()) {
 		case "us-central":
 			return TimeZone.getTimeZone("US/Central");
 		case "us-east":
@@ -59,12 +68,78 @@ public class MiscUtils {
 		case "us-west":
 			return TimeZone.getTimeZone("US/Pacific");
 		default:
-			TwitterHelper.sendDirectMessage("Selim_042", "Region " + region.getID() + " not configured");
+			TwitterHelper.sendDirectMessage("Selim_042", "Region " + region.getId() + " not configured");
 			if (Starota.IS_DEV)
 				for (String id : TimeZone.getAvailableIDs())
 					System.out.println("timezone id: " + id);
 			return TimeZone.getDefault();
 		}
+	}
+
+	public static <T> void forEach(Flux<T> flux, ForEachCaller<T> caller) {
+		flux.all((t) -> {
+			caller.call(t);
+			return true;
+		});
+	}
+
+	public static interface ForEachCaller<T> {
+
+		public void call(T t);
+
+	}
+
+	public static List<GuildChannel> getChannelByName(Guild guild, String name) {
+		return guild.getChannels().filter((c) -> c.getName().equalsIgnoreCase(name)).collectList()
+				.block();
+	}
+
+	public static List<Member> getMemberByName(Guild guild, String name) {
+		return guild.getMembers().filter((m) -> m.getUsername().equalsIgnoreCase(name)
+				|| m.getDisplayName().equalsIgnoreCase(name)).collectList().block();
+	}
+
+	public static List<Member> getMemberByRole(Guild guild, Snowflake id) {
+		return guild.getMembers().filter((m) -> m.getRoleIds().contains(id)).collectList().block();
+	}
+
+	public static List<User> getUserByName(DiscordClient client, String name) {
+		return client.getUsers().filter((u) -> u.getUsername().equalsIgnoreCase(name)).collectList()
+				.block();
+	}
+
+	public static List<Role> getRoleByName(Guild guild, String name) {
+		return guild.getRoles().filter((r) -> r.getName().equalsIgnoreCase(name)).collectList().block();
+	}
+
+	public static List<Category> getCategoryByName(Guild guild, String name) {
+		return guild.getChannels().ofType(Category.class)
+				.filter((c) -> c.getName().equalsIgnoreCase(name)).collectList().block();
+	}
+
+	public static <S extends P, P> List<P> listSubClassToParent(List<S> in) {
+		List<P> ret = new ArrayList<>();
+		for (S s : in)
+			ret.add((P) s);
+		return ret;
+	}
+
+	public static int generatePermissionNumber(EnumSet<Permission> permissions) {
+		if (permissions == null)
+			permissions = EnumSet.noneOf(Permission.class);
+		int number = 0;
+		for (Permission permission : permissions)
+			number |= (1 << permission.getValue());
+		return number;
+	}
+
+	public static int generatePermissionNumber(PermissionSet permissions) {
+		if (permissions == null)
+			permissions = PermissionSet.none();
+		int number = 0;
+		for (Permission permission : permissions)
+			number |= (1 << permission.getValue());
+		return number;
 	}
 
 	public static EnumPokemon[] getSuggestedPokemon(String input, int count) {
@@ -196,30 +271,31 @@ public class MiscUtils {
 		return Arrays.stream(numbers).min().orElse(Integer.MAX_VALUE);
 	}
 
-	public static EnumPermissionType getPermissionType(Permissions perm) {
+	public static EnumPermissionType getPermissionType(Permission perm) {
 		switch (perm) {
 		case ADMINISTRATOR:
 		case VIEW_AUDIT_LOG:
-		case MANAGE_SERVER:
+		case MANAGE_GUILD:
 		case MANAGE_ROLES:
 		case MANAGE_CHANNELS:
-		case KICK:
-		case BAN:
+		case KICK_MEMBERS:
+		case BAN_MEMBERS:
 		case CHANGE_NICKNAME:
 		case MANAGE_NICKNAMES:
 		case MANAGE_EMOJIS:
-		case VOICE_CONNECT:
-		case VOICE_SPEAK:
-		case VOICE_MUTE_MEMBERS:
-		case VOICE_DEAFEN_MEMBERS:
-		case VOICE_MOVE_MEMBERS:
-		case VOICE_USE_VAD:
+		case CONNECT:
+		case SPEAK:
+		case MUTE_MEMBERS:
+		case DEAFEN_MEMBERS:
+		case MOVE_MEMBERS:
+		case USE_VAD:
 			return EnumPermissionType.SERVER;
-		case CREATE_INVITE:
-		case MANAGE_CHANNEL:
-		case MANAGE_PERMISSIONS:
+		case CREATE_INSTANT_INVITE:
+			// TODO: Figure out what happened to these
+			// case MANAGE_CHANNEL:
+			// case MANAGE_PERMISSIONS:
 		case MANAGE_WEBHOOKS:
-		case READ_MESSAGES:
+		case VIEW_CHANNEL:
 		case SEND_MESSAGES:
 		case SEND_TTS_MESSAGES:
 		case MANAGE_MESSAGES:

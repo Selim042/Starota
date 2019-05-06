@@ -3,7 +3,7 @@ package us.myles_selim.starota.geofence;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import sx.blah.discord.handle.obj.IChannel;
+import discord4j.core.object.entity.Channel;
 import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.webserver.webhooks.EnumWebhookType;
@@ -26,8 +26,8 @@ public class GeoRegion {
 		return hookChannels.get(type);
 	}
 
-	public GeoRegion setHookChannel(EnumWebhookType type, IChannel channel) {
-		return setHookChannel(type, channel.getLongID());
+	public GeoRegion setHookChannel(EnumWebhookType type, Channel channel) {
+		return setHookChannel(type, channel.getId().asLong());
 	}
 
 	public GeoRegion setHookChannel(EnumWebhookType type, long channel) {

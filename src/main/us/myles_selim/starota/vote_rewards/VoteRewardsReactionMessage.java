@@ -1,16 +1,15 @@
 package us.myles_selim.starota.vote_rewards;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.impl.obj.ReactionEmoji;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IReaction;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.RequestBuffer;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.reaction.ReactionEmoji;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.enums.EnumDonorPerm;
+import us.myles_selim.starota.misc.data_types.EmbedBuilder;
 import us.myles_selim.starota.misc.data_types.Pair;
 import us.myles_selim.starota.reaction_messages.ReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -25,14 +24,14 @@ public class VoteRewardsReactionMessage extends ReactionMessage {
 	private Pair<ReactionEmoji, EnumDonorPerm>[] displayedPerms;
 
 	@Override
-	public void onReactionAdded(StarotaServer server, IChannel channel, IMessage msg, IUser user,
-			IReaction react) {
-		RequestBuffer.request(() -> msg.removeReaction(user, react)).get();
-		if (server.getDiscordGuild().getOwnerLongID() != user.getLongID())
+	public void onReactionAdded(StarotaServer server, TextChannel channel, Message msg, Member member,
+			ReactionEmoji react) {
+		msg.removeReaction(react, member.getId());
+		if (server.getDiscordGuild().getOwnerId().equals(member.getId()))
 			return;
 		EnumDonorPerm perm = null;
 		for (Pair<ReactionEmoji, EnumDonorPerm> p : displayedPerms) {
-			if (p != null && p.left.equals(react.getEmoji())) {
+			if (p != null && p.left.equals(react)) {
 				perm = p.right;
 				break;
 			}
@@ -56,26 +55,26 @@ public class VoteRewardsReactionMessage extends ReactionMessage {
 	}
 
 	@Override
-	public void onSend(StarotaServer server, IChannel channel, IMessage msg) {
+	public void onSend(StarotaServer server, TextChannel channel, Message msg) {
 		for (Pair<ReactionEmoji, EnumDonorPerm> e : displayedPerms)
 			if (e != null)
-				RequestBuffer.request(() -> msg.addReaction(e.left)).get();
+				msg.addReaction(e.left);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected EmbedObject getEmbed(StarotaServer server) {
+	protected Consumer<EmbedCreateSpec> getEmbed(StarotaServer server) {
 		displayedPerms = new Pair[EnumDonorPerm.values().length];
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.withTitle("Choose your vote perks:");
+		builder.setTitle("Choose your vote perks:");
 		int index = 0;
 		List<EnumDonorPerm> enabledPerms = server.getVoteRewards();
 		for (EnumDonorPerm p : EnumDonorPerm.values()) {
 			if (index >= EMOJI.length || p.getPointsRequired() < 0)
 				continue;
-			ReactionEmoji emoji = ReactionEmoji.of(EMOJI[index]);
+			ReactionEmoji emoji = ReactionEmoji.unicode(EMOJI[index]);
 			builder.appendDesc(emoji + ": " + p + " (" + p.getPointsRequired() + " points) "
-					+ ReactionEmoji.of(enabledPerms.contains(p) ? ENABLED : DISABLED) + "\n");
+					+ ReactionEmoji.unicode(enabledPerms.contains(p) ? ENABLED : DISABLED) + "\n");
 			displayedPerms[index] = new Pair<>(emoji, p);
 
 			index++;

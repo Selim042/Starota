@@ -3,12 +3,13 @@ package us.myles_selim.starota.commands.selim_pm;
 import java.util.Collections;
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IPrivateChannel;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Channel;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.PrivateChannel;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.CommandPing;
 import us.myles_selim.starota.commands.registry.CommandHelp;
@@ -31,8 +32,9 @@ public class SelimPMCommandHandler {
 			return;
 		inited = true;
 
-		INSTANCE = new PrimaryCommandHandler(Starota.getClient(), (IChannel c) -> isSelimPM(c));
-		Starota.getClient().getDispatcher().registerListener(INSTANCE);
+		INSTANCE = new PrimaryCommandHandler(Starota.getClient(), (c) -> isSelimPM(c));
+		Starota.getClient().getEventDispatcher().on(INSTANCE.getEventType())
+				.subscribe(INSTANCE::execute);
 		JAVA_HANDLER = new JavaCommandHandler();
 		INSTANCE.registerCommandHandler(JAVA_HANDLER);
 
@@ -61,9 +63,9 @@ public class SelimPMCommandHandler {
 		JAVA_HANDLER.registerCommand(category, cmd);
 	}
 
-	public static boolean isSelimPM(IChannel channel) {
-		if (channel instanceof IPrivateChannel && ((IPrivateChannel) channel).getRecipient()
-				.getLongID() == StarotaConstants.SELIM_USER_ID)
+	public static boolean isSelimPM(Channel channel) {
+		if (channel instanceof PrivateChannel && !((PrivateChannel) channel).getRecipientIds()
+				.contains(StarotaConstants.SELIM_USER_ID))
 			return true;
 		return false;
 	}
@@ -100,12 +102,12 @@ public class SelimPMCommandHandler {
 		}
 
 		@Override
-		public final Permissions requiredUsePermission() {
+		public final Permission requiredUsePermission() {
 			return null;
 		}
 
 		@Override
-		public final IRole requiredRole(IGuild guild) {
+		public final Role requiredRole(Guild guild) {
 			return null;
 		}
 
@@ -130,7 +132,7 @@ public class SelimPMCommandHandler {
 		}
 
 		@Override
-		public abstract void execute(String[] args, IMessage message, IGuild guild, IChannel channel)
+		public abstract void execute(String[] args, Message message, Guild guild, TextChannel channel)
 				throws Exception;
 
 		@Override

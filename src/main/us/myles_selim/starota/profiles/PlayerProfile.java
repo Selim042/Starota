@@ -1,14 +1,16 @@
 package us.myles_selim.starota.profiles;
 
+import java.awt.Color;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Snowflake;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.EventFactory;
@@ -103,8 +105,8 @@ public class PlayerProfile {
 		return this.discordId;
 	}
 
-	public IUser getDiscordUser() {
-		return Starota.getClient().getUserByID(this.discordId);
+	public User getDiscordUser() {
+		return Starota.getClient().getUserById(Snowflake.of(this.discordId)).block();
 	}
 
 	public PlayerProfile setDiscordId(long id) {
@@ -125,33 +127,33 @@ public class PlayerProfile {
 	}
 
 	public String getDonorRoleName() {
-		IRole donorRole = RolePermHelper.getDonorRole(Starota.getUser(this.discordId));
+		Role donorRole = RolePermHelper.getDonorRole(Starota.getUser(this.discordId));
 		if (donorRole != null)
 			return donorRole.getName();
 		return null;
 	}
 
-	public EmbedObject toEmbed(StarotaServer server) {
+	public Consumer<EmbedCreateSpec> toEmbed(StarotaServer server) {
 		return toEmbed(EventFactory.fireProfileEvent(server, this));
 	}
 
-	private EmbedObject toEmbed(GetProfileEvent event) {
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.withAuthorIcon(Starota.getUser(this.discordId).getAvatarURL());
-		builder.withAuthorName(Starota.getUser(this.discordId).getName());
-		builder.withTitle("Profile for " + this.poGoName + ":");
-		for (ExtraField f : event.getFields()) {
-			if (f == null)
-				continue;
-			builder.appendField(f.title, f.value, f.inline);
-		}
+	private Consumer<EmbedCreateSpec> toEmbed(GetProfileEvent event) {
+		return (e) -> {
+			e.setAuthor(Starota.getUser(this.discordId).getUsername(), null,
+					Starota.getUser(this.discordId).getAvatarUrl());
+			e.setTitle("Profile for " + this.poGoName + ":");
+			for (ExtraField f : event.getFields()) {
+				if (f == null)
+					continue;
+				e.addField(f.title, f.value, f.inline);
+			}
 
-		builder.withColor(event.getColor());
-		builder.withThumbnail(event.getThumbnail());
+			e.setColor(new Color(event.getColor()));
+			e.setThumbnail(event.getThumbnail());
 
-		builder.withFooterText("Profile last updated");
-		builder.withTimestamp(getLastUpdated());
-		return builder.build();
+			e.setFooter("Profile last updated", null);
+			e.setTimestamp(getLastUpdated());
+		};
 	}
 
 	public String getSilphRoadCard() {

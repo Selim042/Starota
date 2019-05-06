@@ -27,9 +27,9 @@ import org.squiddev.cobalt.ValueFactory;
 import org.squiddev.cobalt.compiler.CompileException;
 import org.squiddev.cobalt.compiler.LoadState;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IMessage.Attachment;
+import discord4j.core.object.entity.Attachment;
+import discord4j.core.object.entity.Channel;
+import discord4j.core.object.entity.Message;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.lua.conversion.ConversionHandler;
 import us.myles_selim.starota.modules.BaseModules;
@@ -54,7 +54,7 @@ public class ScriptManager {
 		if (server == null || attach == null || !StarotaModule.isModuleEnabled(server, BaseModules.LUA))
 			return false;
 		String contents = getAttachmentContents(attach.getUrl());
-		File folder = new File(SCRIPT_FOLDER, server.getDiscordGuild().getStringID());
+		File folder = new File(SCRIPT_FOLDER, server.getDiscordGuild().getId().asString());
 		long folderSize = folderSize(folder.toPath());
 		if (folderSize + contents.getBytes().length >= FOLDER_SIZE_LIMIT)
 			return false;
@@ -76,7 +76,7 @@ public class ScriptManager {
 	public static boolean removeScript(StarotaServer server, String name) {
 		if (server == null)
 			return false;
-		File folder = new File(SCRIPT_FOLDER, server.getDiscordGuild().getStringID());
+		File folder = new File(SCRIPT_FOLDER, server.getDiscordGuild().getId().asString());
 		File script = new File(folder, name);
 		// if (script.exists() && !script.isDirectory())
 		try {
@@ -92,16 +92,16 @@ public class ScriptManager {
 		// return false;
 	}
 
-	public static boolean executeCommandScript(StarotaServer server, String name, IMessage message,
-			IChannel channel) throws LuaError, IOException, CompileException {
+	public static boolean executeCommandScript(StarotaServer server, String name, Message message,
+			Channel channel) throws LuaError, IOException, CompileException {
 		return executeCommandScript(server, name, message, channel, new String[0]);
 	}
 
-	public static boolean executeCommandScript(StarotaServer server, String name, IMessage message,
-			IChannel channel, String[] args) throws LuaError, IOException, CompileException {
+	public static boolean executeCommandScript(StarotaServer server, String name, Message message,
+			Channel channel, String[] args) throws LuaError, IOException, CompileException {
 		if (server == null || !StarotaModule.isModuleEnabled(server, BaseModules.LUA))
 			return false;
-		File folder = new File(SCRIPT_FOLDER, server.getDiscordGuild().getStringID());
+		File folder = new File(SCRIPT_FOLDER, server.getDiscordGuild().getId().asString());
 		LuaState state = LuaUtils.getState(server);
 		// state.stdout = System.out;
 		LuaTable _G = state.getMainThread().getfenv();
@@ -117,7 +117,7 @@ public class ScriptManager {
 		scriptFile.close();
 		return true;
 		// } catch (LuaError e) {
-		// channel.sendMessage("An error was encountered when executing your )
+		// channel.createMessage("An error was encountered when executing your )
 		// return true;
 		// } catch (CompileException | IOException e) {
 		// e.printStackTrace();
@@ -132,7 +132,7 @@ public class ScriptManager {
 	public static boolean executeEventScript(LuaState state, StarotaServer server) {
 		if (server == null || !StarotaModule.isModuleEnabled(server, BaseModules.LUA))
 			return false;
-		File folder = new File(SCRIPT_FOLDER, server.getDiscordGuild().getStringID());
+		File folder = new File(SCRIPT_FOLDER, server.getDiscordGuild().getId().asString());
 		// state.stdout = System.out;
 		LuaTable _G = state.getMainThread().getfenv();
 		try {
@@ -156,7 +156,7 @@ public class ScriptManager {
 			return Collections.emptyList();
 		List<String> ret = new ArrayList<>();
 		File folder = new File(SCRIPT_FOLDER,
-				server.getDiscordGuild().getStringID() + File.separator + "commands");
+				server.getDiscordGuild().getId().asString() + File.separator + "commands");
 		if (folder.listFiles(LUA_FILTER) == null)
 			return Collections.emptyList();
 		for (File f : folder.listFiles(LUA_FILTER)) {

@@ -1,7 +1,9 @@
 package us.myles_selim.starota.webserver.webhooks;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
+import java.util.function.Consumer;
+
+import discord4j.core.spec.EmbedCreateSpec;
+import us.myles_selim.starota.misc.data_types.EmbedBuilder;
 import us.myles_selim.starota.webserver.webhooks.types.IGymWebhook;
 
 public class WebhookGym extends WebhookData implements IGymWebhook {
@@ -55,7 +57,7 @@ public class WebhookGym extends WebhookData implements IGymWebhook {
 	}
 
 	@Override
-	public EmbedObject toEmbed() {
+	public Consumer<EmbedCreateSpec> toEmbed() {
 		return new EmbedBuilder().build();
 	}
 

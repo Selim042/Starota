@@ -1,11 +1,10 @@
 package us.myles_selim.starota.assistants;
 
-import sx.blah.discord.api.IDiscordClient;
-import sx.blah.discord.util.RateLimitException;
-import sx.blah.discord.util.RequestBuffer;
+import discord4j.core.DiscordClient;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.misc.utils.TwitterHelper;
 
+// TODO: work this out better, need to worry about rate limiting even though Discord4J handles it themselves
 public class AssistantRequest {
 
 	private static long TWITTER_REPORT_TIME = 0;
@@ -15,15 +14,15 @@ public class AssistantRequest {
 		boolean executed = false;
 		boolean hasNoAssistants = StarotaAssistants.getClients().isEmpty();
 		if (hasNoAssistants && Starota.IS_DEV)
-			return RequestBuffer.request(() -> request.request(Starota.getClient())).get();
+			return request.request(Starota.getClient());
 		if (hasNoAssistants)
 			throw new IllegalArgumentException("there are no assistants defined");
-		for (IDiscordClient client : StarotaAssistants.getClients()) {
-			try {
+		for (DiscordClient client : StarotaAssistants.getClients()) {
+//			try {
 				ret = request.request(client);
 				executed = true;
-				break;
-			} catch (RateLimitException e) {}
+//				break;
+//			} catch (RateLimitException e) {}
 		}
 		if (!executed) {
 			try {
@@ -41,7 +40,7 @@ public class AssistantRequest {
 	}
 
 	public static void request(IVoidAssistantRequest request) {
-		request((IDiscordClient client) -> {
+		request((DiscordClient client) -> {
 			request.doRequest(client);
 			return null;
 		});
@@ -50,14 +49,14 @@ public class AssistantRequest {
 	@FunctionalInterface
 	public interface IAssistantRequest<T> {
 
-		T request(IDiscordClient client);
+		T request(DiscordClient client);
 
 	}
 
 	@FunctionalInterface
 	public interface IVoidAssistantRequest {
 
-		void doRequest(IDiscordClient client);
+		void doRequest(DiscordClient client);
 
 	}
 

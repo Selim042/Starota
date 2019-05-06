@@ -1,12 +1,10 @@
 package us.myles_selim.starota.assistants;
 
-import java.util.EnumSet;
-
-import sx.blah.discord.api.IDiscordClient;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.DiscordClient;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -17,25 +15,27 @@ public class CommandInviteAssistants extends StarotaCommand {
 	}
 
 	@Override
-	public Permissions requiredUsePermission() {
-		return Permissions.ADMINISTRATOR;
+	public Permission requiredUsePermission() {
+		return Permission.ADMINISTRATOR;
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS);
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
+	public void execute(String[] args, Message message, StarotaServer server, TextChannel channel)
 			throws Exception {
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.withTitle("Use the following links to invite all assistants");
-		for (IDiscordClient client : StarotaAssistants.getClients())
-			builder.appendDesc(String.format("[%s](%s)\n", client.getOurUser().getName(),
-					String.format("https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot",
-							client.getApplicationClientID())));
-		channel.sendMessage(builder.build());
+		channel.createEmbed((e) -> {
+			e.setTitle("Use the following links to invite all assistants");
+			StringBuilder desc = new StringBuilder();
+			for (DiscordClient client : StarotaAssistants.getClients())
+				desc.append(String.format("[%s](%s)\n", client.getSelf().block().getUsername(),
+						String.format("https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot",
+								client.getSelf().block().getId().asString())));
+			e.setDescription(desc.toString());
+		});
 	}
 
 }

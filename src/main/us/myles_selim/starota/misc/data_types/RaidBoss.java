@@ -1,9 +1,15 @@
 package us.myles_selim.starota.misc.data_types;
 
+import java.awt.Color;
+
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 
 public class RaidBoss {
+
+	private static final Color TIER_1_2 = new Color(0xf79eee);
+	private static final Color TIER_3_4 = new Color(0xfbee74);
+	private static final Color TIER_5_6 = new Color(0xa9a2de);
 
 	private final EnumPokemon pokemon;
 	private final Form form;
@@ -37,24 +43,24 @@ public class RaidBoss {
 		return this.shinyable;
 	}
 
-	public final int getColor() {
+	public final Color getColor() {
 		return getColor(tier, pokemon);
 	}
 
-	public static int getColor(int tier, EnumPokemon pokemon) {
+	public static Color getColor(int tier, EnumPokemon pokemon) {
 		switch (tier) {
 		case 6:
 		case 5:
-			return 0xa9a2de;
+			return TIER_5_6;
 		case 4:
 		case 3:
-			return 0xfbee74;
+			return TIER_3_4;
 		case 2:
 		case 1:
-			return 0xf79eee;
+			return TIER_1_2;
 		default:
 			if (pokemon == null)
-				return 0x000000;
+				return null;
 			return pokemon.getType1().getColor();
 		}
 	}

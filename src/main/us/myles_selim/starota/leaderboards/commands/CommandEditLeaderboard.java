@@ -1,11 +1,11 @@
 package us.myles_selim.starota.leaderboards.commands;
 
-import java.util.EnumSet;
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.leaderboards.Leaderboard;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -28,13 +28,13 @@ public class CommandEditLeaderboard extends StarotaCommand {
 	}
 
 	@Override
-	public Permissions requiredUsePermission() {
-		return Permissions.ADMINISTRATOR;
+	public Permission requiredUsePermission() {
+		return Permission.ADMINISTRATOR;
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS);
 	}
 
 	@Override
@@ -43,27 +43,27 @@ public class CommandEditLeaderboard extends StarotaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
+	public void execute(String[] args, Message message, StarotaServer server, TextChannel channel) {
 		if (args.length == 2 && args[1].equalsIgnoreCase("options")) {
-			channel.sendMessage(OPTIONS);
+			channel.createMessage(OPTIONS);
 			return;
 		}
 		if (args.length == 3 && args[2].equalsIgnoreCase("view")) {
 			Leaderboard board = server.getLeaderboard(args[1]);
 			if (board == null)
-				channel.sendMessage("Leaderboard \"" + args[1] + "\" not found");
+				channel.createMessage("Leaderboard \"" + args[1] + "\" not found");
 			else
-				channel.sendMessage(board.toEmbedOptions());
+				channel.createEmbed(board.toEmbedOptions());
 			return;
 		}
 		if (args.length < 4) {
-			channel.sendMessage(
+			channel.createMessage(
 					"**Usage**: " + server.getPrefix() + getName() + " " + getGeneralUsage());
 			return;
 		}
 		Leaderboard board = server.getLeaderboard(args[1]);
 		if (board == null) {
-			channel.sendMessage("Leaderboard \"" + args[1] + "\" not found");
+			channel.createMessage("Leaderboard \"" + args[1] + "\" not found");
 			return;
 		}
 		switch (args[2].toLowerCase()) {
@@ -91,10 +91,11 @@ public class CommandEditLeaderboard extends StarotaCommand {
 				board.setColor(color);
 			break;
 		default:
-			channel.sendMessage("Unknown option \"" + args[2] + "\", valid options are:\n" + OPTIONS);
+			channel.createMessage("Unknown option \"" + args[2] + "\", valid options are:\n" + OPTIONS);
 			return;
 		}
-		channel.sendMessage("Updated options for " + board.getDisplayName(), board.toEmbedOptions());
+		channel.createMessage((m) -> m.setContent("Updated options for " + board.getDisplayName())
+				.setEmbed(board.toEmbedOptions()));
 		server.setLeaderboard(board.getDisplayName(), board);
 	}
 

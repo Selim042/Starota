@@ -1,8 +1,9 @@
 package us.myles_selim.starota.raids;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Channel;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.StarotaCommand;
@@ -19,8 +20,8 @@ public class CommandSetRaidEChannel extends StarotaCommand {
 	}
 
 	@Override
-	public Permissions requiredUsePermission() {
-		return Permissions.ADMINISTRATOR;
+	public Permission requiredUsePermission() {
+		return Permission.ADMINISTRATOR;
 	}
 
 	@Override
@@ -29,16 +30,16 @@ public class CommandSetRaidEChannel extends StarotaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
+	public void execute(String[] args, Message message, StarotaServer server, TextChannel channel)
 			throws Exception {
 		if (args.length < 3) {
 			this.sendUsage(server.getPrefix(), channel);
 			return;
 		}
-		IChannel targetChannel = Starota.findChannel(server.getDiscordGuild().getLongID(), args[1]);
-		IChannel embedChannel = Starota.findChannel(server.getDiscordGuild().getLongID(), args[2]);
+		Channel targetChannel = Starota.findChannel(server.getDiscordGuild().getId().asLong(), args[1]);
+		Channel embedChannel = Starota.findChannel(server.getDiscordGuild().getId().asLong(), args[2]);
 		if (targetChannel == null || (embedChannel == null && !args[2].equals("-1"))) {
-			channel.sendMessage("Channel not found");
+			channel.createMessage("Channel not found");
 			return;
 		}
 		EBStorage options = server.getData();
@@ -46,11 +47,11 @@ public class CommandSetRaidEChannel extends StarotaCommand {
 		if (channels == null)
 			channels = new EBStorage().registerPrimitives();
 		if (args[2].equals("-1")) {
-			channels.clearKey(targetChannel.getStringID());
-			channel.sendMessage("Cleared embed channel for " + targetChannel);
+			channels.clearKey(targetChannel.getId().asString());
+			channel.createMessage("Cleared embed channel for " + targetChannel);
 		} else {
-			channels.set(targetChannel.getStringID(), embedChannel.getLongID());
-			channel.sendMessage("Set embed channel for " + targetChannel + " to " + embedChannel);
+			channels.set(targetChannel.getId().asString(), embedChannel.getId().asLong());
+			channel.createMessage("Set embed channel for " + targetChannel + " to " + embedChannel);
 		}
 		options.set(CHANNELS_KEY, channels);
 	}

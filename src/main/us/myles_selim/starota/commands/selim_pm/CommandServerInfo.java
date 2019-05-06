@@ -2,11 +2,11 @@ package us.myles_selim.starota.commands.selim_pm;
 
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Image;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
@@ -26,7 +26,7 @@ public class CommandServerInfo extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel)
+	public void execute(String[] args, Message message, Guild guild, TextChannel channel)
 			throws Exception {
 		if (args.length < 2) {
 			this.sendUsage(PrimaryCommandHandler.DEFAULT_PREFIX, channel);
@@ -34,7 +34,7 @@ public class CommandServerInfo extends JavaCommand {
 		}
 		String enteredServerName = "";
 		boolean byName = true;
-		IGuild targetGuild = null;
+		Guild targetGuild = null;
 		try {
 			targetGuild = Starota.getGuild(Long.parseLong(args[1]));
 			byName = false;
@@ -42,7 +42,7 @@ public class CommandServerInfo extends JavaCommand {
 			for (int i = 1; i < args.length; i++)
 				enteredServerName += args[i] + " ";
 			enteredServerName = enteredServerName.substring(0, enteredServerName.length() - 1);
-			for (IGuild g : Starota.getClient().getGuilds()) {
+			for (Guild g : Starota.getClient().getGuilds().collectList().block()) {
 				if (g.getName().equalsIgnoreCase(enteredServerName)) {
 					targetGuild = g;
 					break;
@@ -50,44 +50,45 @@ public class CommandServerInfo extends JavaCommand {
 			}
 		}
 		if (targetGuild == null && byName) {
-			List<IGuild> guilds = Starota.getClient().getGuilds();
+			List<Guild> guilds = Starota.getClient().getGuilds().collectList().block();
 			String[] possibleGuilds = new String[guilds.size()];
 			for (int i = 0; i < guilds.size(); i++)
 				possibleGuilds[i] = guilds.get(i).getName();
 			String[] suggestions = MiscUtils.getSuggestions(possibleGuilds, enteredServerName, 5);
-			EmbedBuilder builder = new EmbedBuilder();
-			builder.withTitle("Did you mean...?");
-			for (String s : suggestions)
-				builder.appendDesc(" - " + s + "\n");
-			channel.sendMessage(builder.build());
+			channel.createEmbed((e) -> {
+				e.setTitle("Did you mean...?");
+				StringBuilder desc = new StringBuilder();
+				for (String s : suggestions)
+					desc.append(" - " + s + "\n");
+				e.setDescription(desc.toString());
+			});
 			return;
 		}
 		if (targetGuild == null) {
-			channel.sendMessage("Guild with id \"" + args[1] + "\" not found.");
+			channel.createMessage("Guild with id \"" + args[1] + "\" not found.");
 			return;
 		}
 
+		final Guild fTargetGuild = targetGuild;
 		StarotaServer server = StarotaServer.getServer(targetGuild);
-		EmbedBuilder builder = new EmbedBuilder();
+		channel.createEmbed((e) -> {
+			Member targetOwner = fTargetGuild.getOwner().block();
+			e.setAuthor(targetOwner.getUsername(), null, targetOwner.getAvatarUrl());
+			e.setTitle(fTargetGuild.getName());
+			e.setThumbnail(fTargetGuild.getIconUrl(Image.Format.PNG).orElse(null));
 
-		IUser targetOwner = targetGuild.getOwner();
-		builder.withAuthorIcon(targetOwner.getAvatarURL()).withAuthorName(targetOwner.getName());
-		builder.withTitle(targetGuild.getName());
-		builder.withThumbnail(targetGuild.getIconURL());
+			e.addField("Users:", Integer.toString(fTargetGuild.getMemberCount().orElse(-1)), true);
+			e.addField("Voter Ratio:", server.getVoterPercent() + "%", true);
 
-		builder.appendField("Users:", Integer.toString(targetGuild.getTotalMemberCount()), true);
-		builder.appendField("Voter Ratio:", server.getVoterPercent() + "%", true);
-
-		String modulesString = "";
-		for (StarotaModule m : StarotaModule.getDisabledModules(server))
-			modulesString += m.getName() + ", ";
-		if (!modulesString.isEmpty())
-			builder.appendField("Disabled Modules:",
-					modulesString.substring(0, modulesString.length() - 2), false);
-		else
-			builder.appendField("Disabled Modules:", "None", false);
-
-		channel.sendMessage(builder.build());
+			String modulesString = "";
+			for (StarotaModule m : StarotaModule.getDisabledModules(server))
+				modulesString += m.getName() + ", ";
+			if (!modulesString.isEmpty())
+				e.addField("Disabled Modules:", modulesString.substring(0, modulesString.length() - 2),
+						false);
+			else
+				e.addField("Disabled Modules:", "None", false);
+		});
 	}
 
 }

@@ -7,6 +7,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -17,8 +18,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
 import us.myles_selim.starota.enums.EnumWeather;
@@ -32,14 +32,8 @@ import us.myles_selim.starota.pokedex.PokedexEntry.DexMoveset;
 
 public class GoHubDatabase {
 
-	public static final EmbedObject LOADING_EMBED;
-
-	static {
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.appendDesc(
-				"Loading Pokémon Go Hub Database... " + EmojiServerHelper.getEmoji("loading"));
-		LOADING_EMBED = builder.build();
-	}
+	public static final Consumer<EmbedCreateSpec> LOADING_EMBED = (e) -> e.setDescription(
+			"Loading Pokémon Go Hub Database... " + EmojiServerHelper.getEmoji("loading"));
 
 	private static final String POKEMON_API = "https://db.pokemongohub.net/api/pokemon/";
 	private static final String POKEMON_MOVES_API = "https://db.pokemongohub.net/api/moves/with-pokemon/";

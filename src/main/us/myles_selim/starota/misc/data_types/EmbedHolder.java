@@ -1,6 +1,8 @@
 package us.myles_selim.starota.misc.data_types;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
+import java.util.function.Consumer;
+
+import discord4j.core.spec.EmbedCreateSpec;
 
 /**
  * Only really used to turn JSON from
@@ -16,6 +18,10 @@ public class EmbedHolder {
 	public EmbedHolder(String content, EmbedObject embed) {
 		this.content = content;
 		this.embed = embed;
+	}
+
+	public Consumer<EmbedCreateSpec> getConsumerEmbed() {
+		return new EmbedBuilder(embed).build();
 	}
 
 }

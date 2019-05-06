@@ -1,16 +1,15 @@
 package us.myles_selim.starota.commands.registry;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
 
 public class CommandHelp extends JavaCommand {
@@ -22,8 +21,8 @@ public class CommandHelp extends JavaCommand {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS);
 	}
 
 	@Override
@@ -37,54 +36,36 @@ public class CommandHelp extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
-		IUser author = message.getAuthor();
+	public void execute(String[] args, Message message, Guild guild, TextChannel channel) {
+		Member author = message.getAuthor().get().asMember(guild.getId()).block();
 
 		if (args.length >= 2) {
 			ICommand cmd = this.getCommandHandler().findCommand(guild, message, args[1]);
 			if (cmd != null) {
-				EmbedBuilder builder = new EmbedBuilder();
-				builder.withTitle("Help: " + cmd.getName());
-				builder.appendField("Category:", cmd.getCategory(), true);
+				channel.createEmbed((e) -> {
+					e.setTitle("Help: " + cmd.getName());
+					e.addField("Category:", cmd.getCategory(), true);
 
-				if (cmd.getGeneralUsage() != null && !cmd.getGeneralUsage().isEmpty())
-					builder.appendField("Usage:", cmd.getGeneralUsage(), true);
-				if (cmd.getAdminUsage() != null && !cmd.getAdminUsage().isEmpty()
-						&& channel.getModifiedPermissions(author).contains(Permissions.ADMINISTRATOR))
-					builder.appendField("Admin Usage:", cmd.getAdminUsage(), true);
+					if (cmd.getGeneralUsage() != null && !cmd.getGeneralUsage().isEmpty())
+						e.addField("Usage:", cmd.getGeneralUsage(), true);
+					if (cmd.getAdminUsage() != null && !cmd.getAdminUsage().isEmpty()
+							&& channel.getEffectivePermissions(author.getId()).block()
+									.contains(Permission.ADMINISTRATOR))
+						e.addField("Admin Usage:", cmd.getAdminUsage(), true);
 
-				if (cmd.getDescription() != null && !cmd.getDescription().isEmpty())
-					builder.appendField("Description:", cmd.getDescription(), true);
-				List<String> aliases = cmd.getAliases();
-				if (aliases.size() != 1) {
-					String aliasesS = "";
-					for (int i = 0; i < aliases.size(); i++) {
-						String alias = aliases.get(i);
-						if (!alias.equalsIgnoreCase(cmd.getName()))
-							aliasesS += alias + ", ";
+					if (cmd.getDescription() != null && !cmd.getDescription().isEmpty())
+						e.addField("Description:", cmd.getDescription(), true);
+					List<String> aliases = cmd.getAliases();
+					if (aliases.size() != 1) {
+						String aliasesS = "";
+						for (int i = 0; i < aliases.size(); i++) {
+							String alias = aliases.get(i);
+							if (!alias.equalsIgnoreCase(cmd.getName()))
+								aliasesS += alias + ", ";
+						}
+						e.addField("Aliases:", aliasesS.substring(0, aliasesS.length() - 2), false);
 					}
-					builder.appendField("Aliases:", aliasesS.substring(0, aliasesS.length() - 2), false);
-				}
-				// IMessage helpMessage =
-				channel.sendMessage(builder.build());
-
-				// Thread deleteHelp = new Thread() {
-				//
-				// @Override
-				// public void run() {
-				// try {
-				// Thread.sleep(10000);
-				// } catch (InterruptedException e) {
-				// e.printStackTrace();
-				// }
-				// message.delete();
-				// helpMessage.delete();
-				// }
-				//
-				// };
-				// if (Starota.getOurUser().getPermissionsForGuild(guild)
-				// .contains(Permissions.MANAGE_MESSAGES))
-				// deleteHelp.start();
+				});
 				return;
 			}
 		}
@@ -108,9 +89,8 @@ public class CommandHelp extends JavaCommand {
 		for (ICommand cmd : cmds) {
 			if (guild == null)
 				disp.add(cmd);
-			if (guild != null && (author.getPermissionsForGuild(guild)
-					.contains(Permissions.ADMINISTRATOR)
-					|| ((author.getPermissionsForGuild(guild).contains(cmd.requiredUsePermission())
+			if (guild != null && (author.getBasePermissions().block().contains(Permission.ADMINISTRATOR)
+					|| ((author.getBasePermissions().block().contains(cmd.requiredUsePermission())
 							|| cmd.requiredUsePermission() == null) && cmd.hasRequiredRole(guild, author)
 							&& cmd.isRequiredChannel(guild, channel))))
 				disp.add(cmd);
@@ -119,50 +99,34 @@ public class CommandHelp extends JavaCommand {
 		if (page > disp.size() / CMDS_PER_PAGE)
 			page = 0;
 
-		// IMessage helpMessage;
 		if (disp.isEmpty())
-			// helpMessage =
-			channel.sendMessage("No commands found");
+			channel.createMessage("No commands found");
 		else {
-			String prevCategory = null;
-			EmbedBuilder builder = new EmbedBuilder().appendDescription("**Available Commands:**\n\n");
-			String prefix = PrimaryCommandHandler.getPrefix(guild);
-			for (int i = 0; i < CMDS_PER_PAGE && (CMDS_PER_PAGE * page) + i < disp.size(); i++) {
-				ICommand cmd = disp.get((CMDS_PER_PAGE * page) + i);
-				if (prevCategory == null || !prevCategory.equals(cmd.getCategory())) {
-					builder.appendDesc("**" + cmd.getCategory() + "**" + "\n");
-					prevCategory = cmd.getCategory();
+			final int fPage = page;
+			channel.createEmbed((e) -> {
+				String prevCategory = null;
+				StringBuilder desc = new StringBuilder();
+				desc.append("**Available Commands:**\n\n");
+				String prefix = PrimaryCommandHandler.getPrefix(guild);
+				for (int i = 0; i < CMDS_PER_PAGE && (CMDS_PER_PAGE * fPage) + i < disp.size(); i++) {
+					ICommand cmd = disp.get((CMDS_PER_PAGE * fPage) + i);
+					if (prevCategory == null || !prevCategory.equals(cmd.getCategory())) {
+						desc.append("**" + cmd.getCategory() + "**" + "\n");
+						prevCategory = cmd.getCategory();
+					}
+					if (cmd != null) {
+						String desciption = cmd.getDescription();
+						desc.append("- " + prefix + cmd.getName()
+								+ (desciption == null ? "" : ", _" + cmd.getDescription() + "_") + "\n");
+					}
 				}
-				if (cmd != null) {
-					String desciption = cmd.getDescription();
-					builder.appendDesc("- " + prefix + cmd.getName()
-							+ (desciption == null ? "" : ", _" + cmd.getDescription() + "_") + "\n");
-				}
-			}
-			if (page < disp.size() / CMDS_PER_PAGE)
-				builder.appendDesc("\nTo view the next page, use `"
-						+ PrimaryCommandHandler.getPrefix(guild) + getName() + " " + (page + 2) + "`");
-			builder.appendDesc("\n**Page**: " + (page + 1) + "/" + ((disp.size() / CMDS_PER_PAGE) + 1));
-			// helpMessage =
-			channel.sendMessage(builder.build());
+				if (fPage < disp.size() / CMDS_PER_PAGE)
+					desc.append("\nTo view the next page, use `" + PrimaryCommandHandler.getPrefix(guild)
+							+ getName() + " " + (fPage + 2) + "`");
+				desc.append("\n**Page**: " + (fPage + 1) + "/" + ((disp.size() / CMDS_PER_PAGE) + 1));
+				e.setDescription(desc.toString());
+			});
 		}
-		// Thread deleteHelp = new Thread() {
-		//
-		// @Override
-		// public void run() {
-		// try {
-		// Thread.sleep(10000);
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// }
-		// message.delete();
-		// helpMessage.delete();
-		// }
-		//
-		// };
-		// if
-		// (Starota.getOurUser().getPermissionsForGuild(guild).contains(Permissions.MANAGE_MESSAGES))
-		// deleteHelp.start();
 	}
 
 }

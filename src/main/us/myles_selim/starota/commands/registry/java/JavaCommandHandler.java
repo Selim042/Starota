@@ -5,10 +5,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
 import us.myles_selim.starota.commands.registry.CommandHelp;
 import us.myles_selim.starota.commands.registry.CommandSetPrefix;
 import us.myles_selim.starota.commands.registry.ICommand;
@@ -28,7 +28,7 @@ public class JavaCommandHandler implements ICommandHandler {
 	private final List<String> CATEGORIES = new CopyOnWriteArrayList<>();
 
 	public void registerDefaultCommands() {
-		DebugServer.addPermission(Permissions.READ_MESSAGES);
+		DebugServer.addPermission(Permission.VIEW_CHANNEL);
 
 		registerCommand("Help", new CommandHelp());
 
@@ -49,28 +49,29 @@ public class JavaCommandHandler implements ICommandHandler {
 			cmd.setCommandHandler(this);
 			if (!CATEGORIES.contains(category))
 				CATEGORIES.add(category);
-			for (Permissions p : cmd.getCommandPermissions())
+			for (Permission p : cmd.getCommandPermission())
 				DebugServer.addPermission(p);
 		}
 	}
 
 	@Override
-	public boolean executeCommand(String[] args, IMessage message, IGuild guild, IChannel channel)
+	public boolean executeCommand(String[] args, Message message, Guild guild, TextChannel channel)
 			throws Exception {
 		ICommand cmd = findCommand(guild, message, args[0]);
 		if (cmd == null)
 			return false;
 		if (!ChannelCommandManager.isAllowedHere(StarotaServer.getServer(guild), cmd.getCategory(),
 				channel)
-				|| (cmd.requiredUsePermission() != null && guild != null && !message.getAuthor()
-						.getPermissionsForGuild(guild).contains(cmd.requiredUsePermission())))
+				|| (cmd.requiredUsePermission() != null && guild != null
+						&& !message.getAuthor().get().asMember(guild.getId()).block()
+								.getBasePermissions().block().contains(cmd.requiredUsePermission())))
 			return false;
 		cmd.execute(args, message, guild, channel);
 		return true;
 	}
 
 	@Override
-	public List<ICommand> getAllCommands(IGuild server) {
+	public List<ICommand> getAllCommands(Guild server) {
 		List<ICommand> toRemove = new ArrayList<>();
 		for (ICommand c : COMMANDS)
 			if (!StarotaModule.isCategoryEnabled(StarotaServer.getServer(server), c.getCategory()))
@@ -85,7 +86,7 @@ public class JavaCommandHandler implements ICommandHandler {
 	}
 
 	@Override
-	public List<ICommand> getCommandsByCategory(IGuild guild, String category) {
+	public List<ICommand> getCommandsByCategory(Guild guild, String category) {
 		if (category == null)
 			return getAllCommands(null);
 		if (!StarotaModule.isCategoryEnabled(StarotaServer.getServer(guild), category))
@@ -98,12 +99,12 @@ public class JavaCommandHandler implements ICommandHandler {
 	}
 
 	@Override
-	public ICommand findCommand(IGuild server, IMessage msg, String name) {
+	public ICommand findCommand(Guild server, Message msg, String name) {
 		for (JavaCommand c : COMMANDS) {
 			if (!StarotaModule.isCategoryEnabled(StarotaServer.getServer(server), c.getCategory()))
 				continue;
-			if (c.hasRequiredRole(server, msg.getAuthor())
-					&& c.isRequiredChannel(server, msg.getChannel())) {
+			if (c.hasRequiredRole(server, msg.getAuthor().get().asMember(server.getId()).block())
+					&& c.isRequiredChannel(server, msg.getChannel().block())) {
 				if (c != null && c.getName() != null && c.getName().equalsIgnoreCase(name))
 					return c;
 				for (String a : c.getAliases())
@@ -115,7 +116,7 @@ public class JavaCommandHandler implements ICommandHandler {
 	}
 
 	@Override
-	public List<String> getAllCategories(IGuild server) {
+	public List<String> getAllCategories(Guild server) {
 		return getAllCategories();
 	}
 

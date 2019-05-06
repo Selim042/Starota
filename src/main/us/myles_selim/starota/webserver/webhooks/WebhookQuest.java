@@ -1,7 +1,9 @@
 package us.myles_selim.starota.webserver.webhooks;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
+import java.util.function.Consumer;
+
+import discord4j.core.spec.EmbedCreateSpec;
+import us.myles_selim.starota.misc.data_types.EmbedBuilder;
 import us.myles_selim.starota.webserver.webhooks.types.ILocationWebhook;
 
 public class WebhookQuest extends WebhookData implements ILocationWebhook {
@@ -36,7 +38,7 @@ public class WebhookQuest extends WebhookData implements ILocationWebhook {
 	public String data;
 
 	@Override
-	public EmbedObject toEmbed() {
+	public Consumer<EmbedCreateSpec> toEmbed() {
 		return new EmbedBuilder().build();
 	}
 

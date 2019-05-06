@@ -1,15 +1,13 @@
 package us.myles_selim.starota.misc.utils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-import sx.blah.discord.handle.obj.IEmoji;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.Image;
-import sx.blah.discord.util.RequestBuffer;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.GuildEmoji;
+import discord4j.core.object.util.Image;
 import us.myles_selim.starota.Starota;
 
 public class EmojiServerHelper {
@@ -26,52 +24,46 @@ public class EmojiServerHelper {
 			561385227977752578L, // Emoji Server #5
 	};
 
-	public static boolean isEmojiServer(IGuild guild) {
-		return arrCont(EMOJI_SERVERS, guild.getLongID());
+	public static boolean isEmojiServer(Guild guild) {
+		return arrCont(EMOJI_SERVERS, guild.getId().asLong());
 	}
 
 	public static int getNumberServers() {
 		return EMOJI_SERVERS.length;
 	}
 
-	public static IEmoji getEmoji(String name) {
+	public static GuildEmoji getEmoji(String name) {
 		final String name2 = name.replaceAll("-", "_");
 		for (long id : EMOJI_SERVERS) {
-			IGuild guild = Starota.getGuild(id);
-			IEmoji emoji = RequestBuffer.request(() -> guild.getEmojiByName(name2)).get();
+			Guild guild = Starota.getGuild(id);
+			GuildEmoji emoji = guild.getEmojis().filter((e) -> e.getName().equalsIgnoreCase(name2))
+					.blockFirst();
 			if (emoji != null)
 				return emoji;
 		}
 		return null;
 	}
 
-	public static IEmoji getEmoji(String name, String fallback) {
-		name = name.replaceAll("-", "_");
-		IEmoji emoji = getEmoji(name);
+	public static GuildEmoji getEmoji(String name, String fallback) {
+		final String name2 = name.replaceAll("-", "_");
+		GuildEmoji emoji = getEmoji(name);
 		if (emoji != null)
 			return emoji;
 		Image img = getImage(name, fallback);
 		for (int i = 0; i < EMOJI_SERVERS.length; i++) {
 			if (arrCont(NO_UPLOAD, EMOJI_SERVERS[i]))
 				continue;
-			IGuild guild = Starota.getGuild(EMOJI_SERVERS[i]);
-			try {
-				emoji = guild.createEmoji(name, img, new IRole[0]);
-			} catch (DiscordException e) {
-				if (e.getErrorMessage().contains("Maximum number of emojis reached")) {
-					img = getImage(name, fallback);
-					continue;
-				} else
-					throw e;
-			}
+			Guild guild = Starota.getGuild(EMOJI_SERVERS[i]);
+			emoji = guild.createEmoji((e) -> e.setName(name2).setImage(img)).block();
 			if (emoji != null) {
 				System.out.println(
 						"uploading missing emoji " + name + " to " + guild.getName() + ", " + fallback);
 				return emoji;
 			}
 		}
-		Starota.getUser(StarotaConstants.SELIM_USER_ID).getOrCreatePMChannel().sendMessage(
-				"Emoji servers are full, trying to upload " + name + " with image " + fallback);
+		Starota.getUser(StarotaConstants.SELIM_USER_ID.asLong()).getPrivateChannel().block()
+				.createMessage(
+						"Emoji servers are full, trying to upload " + name + " with image " + fallback);
 		return null;
 	}
 
@@ -80,7 +72,7 @@ public class EmojiServerHelper {
 			URL url2 = new URL(url);
 			URLConnection conn = url2.openConnection();
 			conn.addRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
-			return Image.forStream(name, conn.getInputStream());
+			return Image.ofRaw(toByteArray(conn.getInputStream()), getImageFormat(url));
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
@@ -92,6 +84,24 @@ public class EmojiServerHelper {
 			if (l == val)
 				return true;
 		return false;
+	}
+
+	private static byte[] toByteArray(InputStream stream) {
+		try {
+			byte[] arr = new byte[stream.available()];
+			stream.read(arr);
+			return arr;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return new byte[0];
+	}
+
+	private static Image.Format getImageFormat(String url) {
+		for (Image.Format f : Image.Format.values())
+			if (url.matches("(?i).*\\." + f.getExtension() + ".*"))
+				return f;
+		return null;
 	}
 
 }

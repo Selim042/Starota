@@ -1,13 +1,13 @@
 package us.myles_selim.starota.search.pokemon;
 
 import java.util.Collection;
-import java.util.EnumSet;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.misc.utils.IndexHolder;
@@ -23,9 +23,9 @@ public class CommandSearchPoke extends StarotaCommand {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS,
-				Permissions.USE_EXTERNAL_EMOJIS, Permissions.ADD_REACTIONS, Permissions.MANAGE_MESSAGES);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS,
+				Permission.USE_EXTERNAL_EMOJIS, Permission.ADD_REACTIONS, Permission.MANAGE_MESSAGES);
 	}
 
 	@Override
@@ -54,16 +54,16 @@ public class CommandSearchPoke extends StarotaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
+	public void execute(String[] args, Message message, StarotaServer server, TextChannel channel)
 			throws Exception {
 		String search = "";
 		for (int i = 1; i < args.length; i++)
 			search += " " + args[i];
 		Collection<EnumPokemon> results = SearchEngine.search(EnumPokemon.class, search);
 		if (results.isEmpty())
-			channel.sendMessage("No matches");
+			channel.createMessage("No matches");
 		else
-			new SearchResultReactionMessage(results).sendMessage(channel);
+			new SearchResultReactionMessage(results).createMessage(channel);
 	}
 
 	private class SearchResultReactionMessage extends ReactionMessage {
@@ -79,32 +79,35 @@ public class CommandSearchPoke extends StarotaCommand {
 		}
 
 		@Override
-		public void onSend(StarotaServer server, IChannel channel, IMessage msg) {
+		public void onSend(StarotaServer server, TextChannel channel, Message msg) {
 			if (results.size() / RESULTS_PER_PAGE == 0)
 				return;
 			this.addPageButtons(pageIndex, results.size() / RESULTS_PER_PAGE);
 		}
 
 		@Override
-		protected EmbedObject getEmbed(StarotaServer server) {
-			EmbedBuilder builder = new EmbedBuilder();
-			builder.withTitle(String.format("Search results: (%d)", results.size()));
-			int maxVal = Math.min(pageIndex.value * RESULTS_PER_PAGE + RESULTS_PER_PAGE, results.size());
-			int i = 0;
-			for (EnumPokemon p : results) {
-				if (i >= maxVal)
-					break;
-				if (i >= pageIndex.value * RESULTS_PER_PAGE) {
-					String typeString = p.getType1().getEmoji().toString();
-					if (p.getType2() != null)
-						typeString += p.getType2().getEmoji();
-					builder.appendDesc(String.format(" - %s %s\n", p.getName(), typeString));
+		protected Consumer<EmbedCreateSpec> getEmbed(StarotaServer server) {
+			return (e) -> {
+				e.setTitle(String.format("Search results: (%d)", results.size()));
+				int maxVal = Math.min(pageIndex.value * RESULTS_PER_PAGE + RESULTS_PER_PAGE,
+						results.size());
+				int i = 0;
+				StringBuilder desc = new StringBuilder();
+				for (EnumPokemon p : results) {
+					if (i >= maxVal)
+						break;
+					if (i >= pageIndex.value * RESULTS_PER_PAGE) {
+						String typeString = p.getType1().getEmoji().toString();
+						if (p.getType2() != null)
+							typeString += p.getType2().getEmoji();
+						desc.append(String.format(" - %s %s\n", p.getName(), typeString));
+					}
+					i++;
 				}
-				i++;
-			}
-			builder.withFooterText(String.format("Page: %d/%d", pageIndex.value + 1,
-					results.size() / RESULTS_PER_PAGE + 1));
-			return builder.build();
+				e.setFooter(String.format("Page: %d/%d", pageIndex.value + 1,
+						results.size() / RESULTS_PER_PAGE + 1), null);
+				e.setDescription(desc.toString());
+			};
 		}
 
 	}

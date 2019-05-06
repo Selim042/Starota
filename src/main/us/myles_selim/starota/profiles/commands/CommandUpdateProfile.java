@@ -1,9 +1,9 @@
 package us.myles_selim.starota.profiles.commands;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Permission;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.enums.EnumTeam;
@@ -27,34 +27,34 @@ public class CommandUpdateProfile extends StarotaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
-		boolean isAdmin = channel.getModifiedPermissions(message.getAuthor())
-				.contains(Permissions.ADMINISTRATOR);
-		IUser target = message.getAuthor();
+	public void execute(String[] args, Message message, StarotaServer server, TextChannel channel) {
+		boolean isAdmin = channel.getEffectivePermissions(message.getAuthor().get().getId()).block()
+				.contains(Permission.ADMINISTRATOR);
+		User target = message.getAuthor().get();
 		if (args.length > 3 && !isAdmin) {
-			channel.sendMessage("Only admins can change other user's profile information.");
+			channel.createMessage("Only admins can change other user's profile information.");
 			return;
 		}
 		if (args.length > 3 && isAdmin) {
-			target = Starota.findUser(server.getDiscordGuild().getLongID(), args[3]);
+			target = Starota.findUser(server.getDiscordGuild().getId().asLong(), args[3]);
 			if (target == null) {
-				channel.sendMessage("User " + args[3] + " not found.");
+				channel.createMessage("User " + args[3] + " not found.");
 				return;
 			}
 		}
 		if (!server.hasProfile(target)) {
 			if (target.equals(message.getAuthor()))
-				channel.sendMessage("You do not yet have a profile.  Please contact an admin of \""
+				channel.createMessage("You do not yet have a profile.  Please contact an admin of \""
 						+ server.getDiscordGuild().getName() + "\".");
 			else
-				channel.sendMessage(
+				channel.createMessage(
 						target + " does not yet have a profile.  Please contact an admin of \""
 								+ server.getDiscordGuild().getName() + "\".");
 			return;
 		}
 		if (args.length < 3) {
 			if (isAdmin)
-				channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName()
+				channel.createMessage("**Usage**: " + server.getPrefix() + this.getName()
 						+ " [level/trainerCode/realName/alt] [value] <target>");
 			else
 				this.sendUsage(server.getPrefix(), channel);
@@ -72,7 +72,7 @@ public class CommandUpdateProfile extends StarotaCommand {
 				level = -1;
 			}
 			if (level < 0 || level > 40) {
-				channel.sendMessage("Level \"" + args[2] + "\" is an invalid level");
+				channel.createMessage("Level \"" + args[2] + "\" is an invalid level");
 				return;
 			}
 			profile.setLevel(level);
@@ -82,7 +82,7 @@ public class CommandUpdateProfile extends StarotaCommand {
 		case "trainer_code":
 		case "tc":
 			if (args[2].length() != 12) {
-				channel.sendMessage("Code \"" + args[2] + "\" is an invalid trainer code");
+				channel.createMessage("Code \"" + args[2] + "\" is an invalid trainer code");
 				return;
 			}
 			long trainerCode;
@@ -128,7 +128,7 @@ public class CommandUpdateProfile extends StarotaCommand {
 					team = null;
 				}
 				if (team == null) {
-					channel.sendMessage("Team \"" + args[3] + "\" not found");
+					channel.createMessage("Team \"" + args[3] + "\" not found");
 					return;
 				}
 				profile.setTeam(team);
@@ -143,10 +143,11 @@ public class CommandUpdateProfile extends StarotaCommand {
 		}
 		if (executed) {
 			server.setProfile(target, profile);
-			channel.sendMessage("Updated \"" + args[1] + "\" to \"" + args[2] + "\"",
-					profile.toEmbed(server));
+			channel.createMessage(
+					(m) -> m.setContent("Updated \"" + args[1] + "\" to \"" + args[2] + "\"")
+							.setEmbed(profile.toEmbed(server)));
 		} else
-			channel.sendMessage("Invalid option \"" + args[1] + "\".");
+			channel.createMessage("Invalid option \"" + args[1] + "\".");
 	}
 
 }

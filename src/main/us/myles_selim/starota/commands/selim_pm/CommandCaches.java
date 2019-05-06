@@ -10,9 +10,9 @@ import java.util.function.Consumer;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
 import us.myles_selim.starota.misc.data_types.cache.ClearCache;
@@ -53,14 +53,14 @@ public class CommandCaches extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel)
+	public void execute(String[] args, Message message, Guild guild, TextChannel channel)
 			throws Exception {
 		switch (args[0].toLowerCase()) {
 		case "getcaches":
 			String out = "";
 			for (String key : CACHES.keySet())
 				out += key + ", ";
-			channel.sendMessage(out);
+			channel.createMessage(out);
 			return;
 		case "dumpcache":
 			if (args.length < 2) {
@@ -68,11 +68,11 @@ public class CommandCaches extends JavaCommand {
 				return;
 			}
 			if (!CACHES.containsKey(args[1])) {
-				channel.sendMessage("Cache not found");
+				channel.createMessage("Cache not found");
 				return;
 			}
 			CACHES.get(args[1]).accept(args[1]);
-			channel.sendMessage("Dumped");
+			channel.createMessage("Dumped");
 			return;
 		}
 	}

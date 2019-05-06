@@ -4,10 +4,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.misc.data_types.EmbedBuilder;
 import us.myles_selim.starota.misc.data_types.RaidBoss;
 import us.myles_selim.starota.misc.utils.ImageHelper;
 import us.myles_selim.starota.pokedex.GoHubDatabase;
@@ -109,11 +110,11 @@ public class WebhookRaid extends WebhookData implements IGymWebhook, IPokemonWeb
 	private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("hh:mm");
 
 	@Override
-	public EmbedObject toEmbed() {
+	public Consumer<EmbedCreateSpec> toEmbed() {
 		if (hasHatched())
 			throw new IllegalArgumentException("egg has already hatched");
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.withTitle("Tier " + this.level + " raid at " + this.gym_name);
+		builder.setTitle("Tier " + this.level + " raid at " + this.gym_name);
 		builder.withThumbnail(ImageHelper.getRaidEgg(this.level));
 		builder.withColor(RaidBoss.getColor(this.level, null));
 		builder.appendDesc("\n**Time Left Until Hatch**: " + getTimeRemainingHatch(this));
@@ -124,9 +125,9 @@ public class WebhookRaid extends WebhookData implements IGymWebhook, IPokemonWeb
 		String bossesString = "";
 		for (RaidBoss b : bosses)
 			bossesString += (b.getForm() == null ? "" : b.getForm() + " ") + b.getPokemon() + "\n";
-		builder.appendField("Possible Bosses:", bossesString, false);
+		builder.addField("Possible Bosses:", bossesString, false);
 
-		builder.appendField("Directions:",
+		builder.addField("Directions:",
 				String.format(
 						"[Google Maps](https://www.google.com/maps/search/?api=1&query=%1$f,%2$f) | "
 								+ "[Apple Maps](http://maps.apple.com/?daddr=%1$f,%2$f)",

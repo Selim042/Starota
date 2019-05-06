@@ -1,10 +1,10 @@
 package us.myles_selim.starota.trading;
 
 import java.time.Instant;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Member;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.Starota;
@@ -12,6 +12,7 @@ import us.myles_selim.starota.embed_converter.annotations.EmbedFooterText;
 import us.myles_selim.starota.embed_converter.annotations.EmbedTitle;
 import us.myles_selim.starota.enums.EnumGender;
 import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.misc.data_types.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.ImageHelper;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
@@ -122,23 +123,25 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 		return this.legacy;
 	}
 
-	public EmbedObject getPostEmbed(StarotaServer server) {
+	public Consumer<EmbedCreateSpec> getPostEmbed(StarotaServer server) {
 		return getPostEmbed(server, true);
 	}
 
-	public EmbedObject getPostEmbed(StarotaServer server, boolean includeUsage) {
+	public Consumer<EmbedCreateSpec> getPostEmbed(StarotaServer server, boolean includeUsage) {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withTitle("Tradeboard Post #" + String.format("%04d", this.getId()) + "\n\n");
 		builder.appendField("Trade Type:",
 				"Poster " + (this.isLookingFor() ? "is looking for" : "currently has"), false);
-		IUser user = Starota.getUser(this.getOwner());
+		Member user = Starota.getUser(this.getOwner()).asMember(server.getDiscordGuild().getId())
+				.block();
 		if (user != null) {
-			String nickname = user.getNicknameForGuild(server.getDiscordGuild());
+			String nickname = user.getDisplayName();
 			if (nickname != null)
 				builder.appendField("Discord User:",
-						nickname + " (_" + user.getName() + "#" + user.getDiscriminator() + "_)", true);
+						nickname + " (_" + user.getUsername() + "#" + user.getDiscriminator() + "_)",
+						true);
 			else
-				builder.appendField("Discord User:", user.getName() + "#" + user.getDiscriminator(),
+				builder.appendField("Discord User:", user.getUsername() + "#" + user.getDiscriminator(),
 						true);
 		}
 		PlayerProfile profile = server.getProfile(user);
@@ -153,8 +156,8 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 		// isShiny()));
 		builder.withThumbnail(ImageHelper.getOfficalArtwork(pokemon, form));
 
-		builder.withAuthorIcon(user.getAvatarURL());
-		builder.withAuthorName(user.getDisplayName(server.getDiscordGuild()));
+		builder.withAuthorIcon(user.getAvatarUrl());
+		builder.withAuthorName(user.getDisplayName());
 		if (form != null)
 			builder.withColor(form.getType1(pokemon).getColor());
 		else

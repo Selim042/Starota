@@ -17,7 +17,7 @@ import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
-import sx.blah.discord.handle.obj.IGuild;
+import discord4j.core.object.entity.Guild;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumDonorPerm;
 import us.myles_selim.starota.misc.utils.RolePermHelper;
@@ -89,7 +89,7 @@ public class HttpHandlerWebhooks implements HttpHandler {
 			// (endingSlash ? 19 : 18),
 			// endingSlash ? url.length() - 1 : url.length()));
 			long guildId = Long.parseLong(url.substring(hookIndex + 9, hookIndex + 27));
-			IGuild guild;
+			Guild guild;
 			if (Starota.FULLY_STARTED)
 				guild = Starota.getGuild(guildId);
 			else

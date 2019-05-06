@@ -5,21 +5,22 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.User;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.EBList;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.ebs.Storage;
+import us.myles_selim.starota.misc.data_types.EmbedBuilder;
 
 public class Leaderboard extends DataType<Leaderboard> {
 
 	public static final int PER_PAGE = 10;
 
-	private IGuild server;
+	private Guild server;
 	private String displayName;
 	private List<LeaderboardEntry> entries;
 	private List<String> aliases;
@@ -29,7 +30,7 @@ public class Leaderboard extends DataType<Leaderboard> {
 	public Leaderboard() {}
 
 	@SuppressWarnings("unchecked")
-	public Leaderboard(IGuild server, EBStorage ebs) {
+	public Leaderboard(Guild server, EBStorage ebs) {
 		this.server = server;
 		this.displayName = ebs.get("displayName", String.class);
 		this.entries = new LinkedList<>(ebs.get("entries", EBList.class).values());
@@ -38,11 +39,11 @@ public class Leaderboard extends DataType<Leaderboard> {
 		this.color = ebs.get("color", Integer.class);
 	}
 
-	public Leaderboard(IGuild server, String displayName) {
+	public Leaderboard(Guild server, String displayName) {
 		this(server, displayName, true);
 	}
 
-	public Leaderboard(IGuild server, String displayName, boolean decending) {
+	public Leaderboard(Guild server, String displayName, boolean decending) {
 		this.server = server;
 		this.displayName = displayName;
 		this.entries = new LinkedList<>();
@@ -50,21 +51,22 @@ public class Leaderboard extends DataType<Leaderboard> {
 		this.decending = decending;
 	}
 
-//	public EBStorage toStorage() {
-//		EBStorage stor = new EBStorage().registerPrimitives();
-//		stor.set("displayName", this.displayName);
-//		EBList<LeaderboardEntry> entries = new EBList<>(new DataTypeLeaderboardEntry());
-//		for (LeaderboardEntry te : this.entries)
-//			entries.addWrapped(te);
-//		stor.set("entries", entries);
-//		EBList<String> aliases = new EBList<>(new DataTypeString());
-//		for (String a : this.aliases)
-//			aliases.addWrapped(a);
-//		stor.set("aliases", aliases);
-//		stor.set("decending", this.decending);
-//		stor.set("color", this.color);
-//		return stor;
-//	}
+	// public EBStorage toStorage() {
+	// EBStorage stor = new EBStorage().registerPrimitives();
+	// stor.set("displayName", this.displayName);
+	// EBList<LeaderboardEntry> entries = new EBList<>(new
+	// DataTypeLeaderboardEntry());
+	// for (LeaderboardEntry te : this.entries)
+	// entries.addWrapped(te);
+	// stor.set("entries", entries);
+	// EBList<String> aliases = new EBList<>(new DataTypeString());
+	// for (String a : this.aliases)
+	// aliases.addWrapped(a);
+	// stor.set("aliases", aliases);
+	// stor.set("decending", this.decending);
+	// stor.set("color", this.color);
+	// return stor;
+	// }
 
 	public String getDisplayName() {
 		return this.displayName;
@@ -136,11 +138,11 @@ public class Leaderboard extends DataType<Leaderboard> {
 				&& this.aliases.get(0).equalsIgnoreCase(this.displayName.replaceAll(" ", "_"))));
 	}
 
-	public EmbedObject toEmbed() {
+	public Consumer<EmbedCreateSpec> toEmbed() {
 		return toEmbed(0);
 	}
 
-	public EmbedObject toEmbed(int page) {
+	public Consumer<EmbedCreateSpec> toEmbed(int page) {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withTitle(this.displayName + " Leaderboard");
 		if (page < 0 || page > this.entries.size() / PER_PAGE)
@@ -149,12 +151,12 @@ public class Leaderboard extends DataType<Leaderboard> {
 		for (int i = page * PER_PAGE; i < (page + 1) * PER_PAGE && i < this.entries.size(); i++) {
 			found = true;
 			LeaderboardEntry entry = this.entries.get(i);
-			IUser user = entry.getDiscordUser();
-			String userDisplay = user.getNicknameForGuild(server);
+			User user = entry.getDiscordUser();
+			String userDisplay = user.asMember(server.getId()).block().getDisplayName();
 			if (userDisplay == null)
-				userDisplay = user.getName() + "#" + user.getDiscriminator();
+				userDisplay = user.getUsername() + "#" + user.getDiscriminator();
 			else
-				userDisplay += "(__" + user.getName() + "#" + user.getDiscriminator() + "__)";
+				userDisplay += "(__" + user.getUsername() + "#" + user.getDiscriminator() + "__)";
 			builder.appendDesc("**" + (i + 1) + "**) " + userDisplay + ": "
 					+ NumberFormat.getNumberInstance(Locale.US).format(entry.getValue()) + "\n");
 		}
@@ -167,7 +169,7 @@ public class Leaderboard extends DataType<Leaderboard> {
 		return builder.build();
 	}
 
-	public EmbedObject toEmbedOptions() {
+	public Consumer<EmbedCreateSpec> toEmbedOptions() {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withTitle("Options for: " + this.displayName);
 		builder.appendField("Decending:", Boolean.toString(this.decending), true);

@@ -1,12 +1,11 @@
 package us.myles_selim.starota.trading.commands;
 
-import java.util.EnumSet;
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.RequestBuffer;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.enums.EnumGender;
 import us.myles_selim.starota.enums.EnumPokemon;
@@ -22,8 +21,8 @@ public class CommandForTrade extends StarotaCommand {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS);
 	}
 
 	@Override
@@ -32,9 +31,9 @@ public class CommandForTrade extends StarotaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
+	public void execute(String[] args, Message message, StarotaServer server, TextChannel channel) {
 		if (args.length < 2) {
-			channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName()
+			channel.createMessage("**Usage**: " + server.getPrefix() + this.getName()
 					+ " [pokemon] <form> <shiny> <gender>");
 			return;
 		}
@@ -44,25 +43,25 @@ public class CommandForTrade extends StarotaCommand {
 		boolean shiny = pokemonInst.getShiny();
 		EnumGender gender = pokemonInst.getGender();
 		if (pokemon == null) {
-			channel.sendMessage("Pokemon \"" + args[1] + "\" not found");
+			channel.createMessage("Pokemon \"" + args[1] + "\" not found");
 			return;
 		}
 		if (!pokemon.isAvailable()) {
-			channel.sendMessage("Pokemon **" + pokemon + "** is not available");
+			channel.createMessage("Pokemon **" + pokemon + "** is not available");
 			return;
 		}
 		if (!pokemon.isTradable()) {
-			channel.sendMessage("Pokemon **" + pokemon + "** is not tradable");
+			channel.createMessage("Pokemon **" + pokemon + "** is not tradable");
 			return;
 		}
 		if (shiny && ((form == null && !pokemon.isShinyable())
 				|| (form != null && !form.canBeShiny(pokemon)))) {
-			channel.sendMessage("Pokemon **" + pokemon + "** cannot be shiny"
+			channel.createMessage("Pokemon **" + pokemon + "** cannot be shiny"
 					+ (form == null ? "" : " in form \"" + form + "\""));
 			return;
 		}
 		if (pokemon.getGenderPossible() != gender && pokemon.getGenderPossible() != EnumGender.EITHER) {
-			channel.sendMessage("Pokemon **" + pokemon + "** cannot be " + gender);
+			channel.createMessage("Pokemon **" + pokemon + "** cannot be " + gender);
 			return;
 		}
 
@@ -72,18 +71,20 @@ public class CommandForTrade extends StarotaCommand {
 		for (int i = 0; i < posts.size(); i++) {
 			TradeboardPost p = posts.get(i);
 			if (!foundTrade)
-				RequestBuffer.request(() -> channel.sendMessage(
-						"Found the following " + posts.size() + " trades that match your search",
-						p.getPostEmbed(server)));
+				channel.createMessage((m) -> m
+						.setContent(
+								"Found the following " + posts.size() + " trades that match your search")
+						.setEmbed(p.getPostEmbed(server)));
 			else
-				RequestBuffer.request(() -> channel.sendMessage(p.getPostEmbed(server)));
+				channel.createEmbed(p.getPostEmbed(server));
 			foundTrade = true;
 		}
 
 		if (!foundTrade) {
-			TradeboardPost post = server.newPost(false, message.getAuthor().getLongID(), pokemon, form,
-					shiny, gender, pokemonInst.isLegacy());
-			channel.sendMessage("Posted a new trade for your search", post.getPostEmbed(server));
+			TradeboardPost post = server.newPost(false, message.getAuthor().get().getId().asLong(),
+					pokemon, form, shiny, gender, pokemonInst.isLegacy());
+			channel.createMessage((m) -> m.setContent("Posted a new trade for your search")
+					.setEmbed(post.getPostEmbed(server)));
 		}
 	}
 

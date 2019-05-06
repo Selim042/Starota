@@ -1,9 +1,11 @@
 package us.myles_selim.starota.webserver.webhooks;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
+import java.util.function.Consumer;
+
+import discord4j.core.spec.EmbedCreateSpec;
 
 public abstract class WebhookData {
 
-	public abstract EmbedObject toEmbed();
+	public abstract Consumer<EmbedCreateSpec> toEmbed();
 
 }

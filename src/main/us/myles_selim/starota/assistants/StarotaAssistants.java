@@ -4,37 +4,39 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-import sx.blah.discord.api.ClientBuilder;
-import sx.blah.discord.api.IDiscordClient;
-import sx.blah.discord.handle.obj.ActivityType;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.handle.obj.StatusType;
-import sx.blah.discord.util.DiscordException;
+import discord4j.core.DiscordClient;
+import discord4j.core.DiscordClientBuilder;
+import discord4j.core.object.PermissionOverwrite;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.GuildChannel;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.presence.Activity;
+import discord4j.core.object.presence.Presence;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
+import discord4j.core.object.util.Snowflake;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 
 public class StarotaAssistants {
 
 	private static final String ROLE_NAME = "Starota Assistant";
-	private static final Map<Long, IDiscordClient> CLIENT_MAP = new ConcurrentHashMap<>();
-	private static final List<IDiscordClient> CLIENTS = new ArrayList<>();
+	private static final Map<Long, DiscordClient> CLIENT_MAP = new ConcurrentHashMap<>();
+	private static final List<DiscordClient> CLIENTS = new ArrayList<>();
 	private static final List<Long> ASSISTANT_IDS = new ArrayList<>();
 	private static boolean inited = false;
 
-	public static final EnumSet<Permissions> USED_PERMISSIONS = EnumSet.of(Permissions.READ_MESSAGES,
-			Permissions.SEND_MESSAGES, Permissions.USE_EXTERNAL_EMOJIS, Permissions.ADD_REACTIONS);
+	public static final PermissionSet USED_PERMISSIONS = PermissionSet.of(Permission.VIEW_CHANNEL,
+			Permission.SEND_MESSAGES, Permission.USE_EXTERNAL_EMOJIS, Permission.ADD_REACTIONS);
 
 	public static void init() {
 		if (inited)
@@ -42,9 +44,9 @@ public class StarotaAssistants {
 		inited = true;
 
 		if (Starota.IS_DEV)
-			CLIENT_MAP.put(StarotaConstants.STAROTA_DEV_ID, Starota.getClient());
+			CLIENT_MAP.put(StarotaConstants.STAROTA_DEV_ID.asLong(), Starota.getClient());
 		else
-			CLIENT_MAP.put(StarotaConstants.STAROTA_ID, Starota.getClient());
+			CLIENT_MAP.put(StarotaConstants.STAROTA_ID.asLong(), Starota.getClient());
 		Properties properties = new Properties();
 		try {
 			properties.load(new FileInputStream("starota.properties"));
@@ -55,29 +57,25 @@ public class StarotaAssistants {
 		if (!properties.containsKey("assistants"))
 			return;
 		for (String token : properties.getProperty("assistants").split(";")) {
-			ClientBuilder clientBuilder = new ClientBuilder();
-			clientBuilder.withToken(token);
-			IDiscordClient client = null;
-			try {
-				client = clientBuilder.login();
-			} catch (DiscordException e) {
-				e.printStackTrace();
-			}
+			DiscordClientBuilder clientBuilder = new DiscordClientBuilder(token);
+			DiscordClient client = null;
+			client = clientBuilder.build();
+			client.login();
 			if (client != null) {
 				try {
-					while (!client.isReady())
+					while (!client.isConnected())
 						Thread.sleep(10);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				// client.changeAvatar(Image.forUser(Starota.getOurUser()));
+				// client.changeAvatar(Image.forUser(Starota.getSelf().block()));
 				if (Starota.IS_DEV)
-					client.changePresence(StatusType.IDLE, ActivityType.LISTENING, Starota.BOT_NAME);
+					client.updatePresence(Presence.idle(Activity.listening(Starota.BOT_NAME)));
 				else
-					client.changePresence(StatusType.INVISIBLE);
-				CLIENT_MAP.put(client.getOurUser().getLongID(), client);
+					client.updatePresence(Presence.invisible());
+				CLIENT_MAP.put(client.getSelf().block().getId().asLong(), client);
 				CLIENTS.add(client);
-				ASSISTANT_IDS.add(client.getOurUser().getLongID());
+				ASSISTANT_IDS.add(client.getSelf().block().getId().asLong());
 			}
 		}
 		new Thread("AssistantStatusUpdater") {
@@ -85,12 +83,11 @@ public class StarotaAssistants {
 			@Override
 			public void run() {
 				while (true) {
-					for (IDiscordClient client : CLIENTS) {
+					for (DiscordClient client : CLIENTS) {
 						if (Starota.IS_DEV)
-							client.changePresence(StatusType.IDLE, ActivityType.LISTENING,
-									Starota.BOT_NAME);
+							client.updatePresence(Presence.idle(Activity.listening(Starota.BOT_NAME)));
 						else
-							client.changePresence(StatusType.INVISIBLE);
+							client.updatePresence(Presence.invisible());
 					}
 					try {
 						Thread.sleep(3600000); // 1 hour
@@ -102,50 +99,50 @@ public class StarotaAssistants {
 		}.start();
 	}
 
-	public static boolean areAllOnServer(IGuild guild) {
-		for (Entry<Long, IDiscordClient> e : CLIENT_MAP.entrySet())
-			if (guild.getUserByID(e.getKey()) == null)
+	public static boolean areAllOnServer(Guild guild) {
+		for (Entry<Long, DiscordClient> e : CLIENT_MAP.entrySet())
+			if (guild.getMemberById(Snowflake.of(e.getKey())) == null)
 				return false;
 		return true;
 	}
 
-	public static void setPermissionsForChannel(IChannel channel) {
-		channel = Starota.getChannel(channel.getGuild().getLongID(), channel.getLongID());
-		IRole role = getAssistantRole(channel.getGuild());
-		channel.overrideRolePermissions(role, USED_PERMISSIONS, EnumSet.noneOf(Permissions.class));
+	public static void setPermissionForChannel(GuildChannel channel) {
+		channel = Starota.getChannel(channel.getGuild().block().getId().asLong(),
+				channel.getId().asLong());
+		Role role = getAssistantRole(channel.getGuild().block());
+		channel.addRoleOverwrite(role.getId(),
+				PermissionOverwrite.forRole(role.getId(), USED_PERMISSIONS, PermissionSet.none()));
 	}
 
-	public static IRole getAssistantRole(IGuild guild) {
-		IRole role = null;
-		for (IRole r : guild.getRolesByName(ROLE_NAME)) {
+	public static Role getAssistantRole(Guild guild) {
+		Role role = null;
+		for (Role r : MiscUtils.getRoleByName(guild, ROLE_NAME)) {
 			role = r;
 			break;
 		}
-		if (role == null) {
-			role = guild.createRole();
-			role.changeName(ROLE_NAME);
-			role.changePermissions(USED_PERMISSIONS);
-		}
+		if (role == null)
+			role = guild.createRole((r) -> r.setName(ROLE_NAME).setPermissions(USED_PERMISSIONS))
+					.block();
 		return role;
 	}
 
-	public static void setAssistantRole(IGuild guild, IUser user) {
-		if (!isAssistant(user))
+	public static void setAssistantRole(Guild guild, Member member) {
+		if (!isAssistant(member))
 			return;
-		user.addRole(getAssistantRole(guild));
+		member.addRole(getAssistantRole(guild).getId());
 	}
 
-	public static boolean isAssistant(IUser user) {
-		return ASSISTANT_IDS.contains(user.getLongID());
+	public static boolean isAssistant(Member member) {
+		return ASSISTANT_IDS.contains(member.getId().asLong());
 	}
 
-	public static List<IDiscordClient> getClients() {
+	public static List<DiscordClient> getClients() {
 		return Collections.unmodifiableList(CLIENTS);
 	}
 
-	public static IDiscordClient getResponsibleClient(IMessage msg) {
-		long id = msg.getAuthor().getLongID();
-		for (Entry<Long, IDiscordClient> e : CLIENT_MAP.entrySet())
+	public static DiscordClient getResponsibleClient(Message msg) {
+		long id = msg.getAuthor().get().getId().asLong();
+		for (Entry<Long, DiscordClient> e : CLIENT_MAP.entrySet())
 			if (e.getKey().equals(id))
 				return e.getValue();
 		return null;

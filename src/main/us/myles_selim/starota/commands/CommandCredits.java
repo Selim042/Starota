@@ -1,13 +1,11 @@
 package us.myles_selim.starota.commands;
 
-import java.util.EnumSet;
-
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
@@ -19,33 +17,34 @@ public class CommandCredits extends JavaCommand {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS);
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.withTitle("Credits for " + Starota.BOT_NAME + " v" + StarotaConstants.VERSION);
+	public void execute(String[] args, Message message, Guild guild, TextChannel channel) {
+		channel.createEmbed((e) -> {
+			e.setTitle("Credits for " + Starota.BOT_NAME + " v" + StarotaConstants.VERSION);
 
-		builder.appendDesc("**General Development**: Selim_042: [GitHub](http://github.com/Selim042) | "
-				+ "[Twitter](http://twitter.com/Selim_042)\n");
-		builder.appendDesc("**Discord4J**: [austinv11](https://github.com/austinv11)\n");
-		builder.appendDesc("**Pokemon Go Database**: [Pokemon Go Hub](https://pokemongohub.net/)\n");
-		builder.appendDesc(
-				"**Raid Boss, Field Research, and Egg Information**: [The Silph Road](https://thesilphroad.com/)\n");
-		builder.appendDesc("**Ditto Information**: [Leek Duck](https://leekduck.com)\n");
-		builder.appendDesc("**Maps**: [MapBox](https://www.mapbox.com/)\n");
+			StringBuilder desc = new StringBuilder();
+			desc.append("**General Development**: Selim_042: [GitHub](http://github.com/Selim042) | "
+					+ "[Twitter](http://twitter.com/Selim_042)\n");
+			desc.append("**Discord4J**: [austinv11](https://github.com/austinv11)\n");
+			desc.append("**Pokemon Go Database**: [Pokemon Go Hub](https://pokemongohub.net/)\n");
+			desc.append(
+					"**Raid Boss, Field Research, and Egg Information**: [The Silph Road](https://thesilphroad.com/)\n");
+			desc.append("**Ditto Information**: [Leek Duck](https://leekduck.com)\n");
+			desc.append("**Maps**: [MapBox](https://www.mapbox.com/)\n");
 
-		StringBuilder editors = new StringBuilder();
-		editors.append("**Article Editors**:\n");
-		IGuild supportServer = Starota.getSupportServer();
-		for (IUser u : supportServer
-				.getUsersByRole(supportServer.getRoleByID(StarotaConstants.EDITOR_ROLE_ID)))
-			editors.append(String.format(" - %s#%s\n", u.getName(), u.getDiscriminator()));
-		builder.appendDesc(editors.toString());
-
-		channel.sendMessage(builder.build());
+			desc.append("**Article Editors**:\n");
+			Guild supportServer = Starota.getSupportServer();
+			for (Member m : supportServer.getMembers()
+					.filter((m) -> m.getRoles()
+							.any((r) -> r.getId().equals(StarotaConstants.EDITOR_ROLE_ID)).block())
+					.collectList().block())
+				desc.append(String.format(" - %s#%s\n", m.getUsername(), m.getDiscriminator()));
+			e.setDescription(desc.toString());
+		});
 	}
 
 }

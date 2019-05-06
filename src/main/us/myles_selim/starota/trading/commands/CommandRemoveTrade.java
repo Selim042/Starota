@@ -1,7 +1,7 @@
 package us.myles_selim.starota.trading.commands;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
 import us.myles_selim.starota.commands.StarotaCommand;
 import us.myles_selim.starota.trading.TradeboardPost;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -18,25 +18,25 @@ public class CommandRemoveTrade extends StarotaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
+	public void execute(String[] args, Message message, StarotaServer server, TextChannel channel) {
 		if (args.length < 2) {
-			channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName() + " [postId]");
+			channel.createMessage("**Usage**: " + server.getPrefix() + this.getName() + " [postId]");
 			return;
 		}
 		int id;
 		try {
 			id = Integer.parseInt(args[1]);
 		} catch (NumberFormatException e) {
-			channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName() + " [postId]");
+			channel.createMessage("**Usage**: " + server.getPrefix() + this.getName() + " [postId]");
 			return;
 		}
 		TradeboardPost post = server.getPost(id);
-		if (post != null && post.getOwner() == message.getAuthor().getLongID()) {
+		if (post != null && post.getOwner() == message.getAuthor().get().getId().asLong()) {
 			server.removePost(id);
-			channel.sendMessage("Trade #" + String.format("%04d", id) + " removed",
-					post.getPostEmbed(server));
+			channel.createMessage((m) -> m.setContent("Trade #" + String.format("%04d", id) + " removed")
+					.setEmbed(post.getPostEmbed(server)));
 		} else
-			channel.sendMessage("Trade #" + String.format("%04d", id) + " not found");
+			channel.createMessage("Trade #" + String.format("%04d", id) + " not found");
 	}
 
 }

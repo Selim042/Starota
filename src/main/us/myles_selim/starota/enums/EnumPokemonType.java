@@ -1,7 +1,9 @@
 package us.myles_selim.starota.enums;
 
-import sx.blah.discord.handle.obj.IEmoji;
-import sx.blah.discord.handle.obj.IGuild;
+import java.awt.Color;
+
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.GuildEmoji;
 import us.myles_selim.starota.Starota;
 
 public enum EnumPokemonType {
@@ -25,7 +27,7 @@ public enum EnumPokemonType {
 	FAIRY(0xee99ac);
 
 	private String name;
-	private int color;
+	private Color color;
 	private String emojiName;
 
 	EnumPokemonType(int color) {
@@ -35,7 +37,7 @@ public enum EnumPokemonType {
 	EnumPokemonType(int color, String emojiName) {
 		this.name = this.name();
 		this.name = name.substring(0, 1).toUpperCase() + name.substring(1, name.length()).toLowerCase();
-		this.color = color;
+		this.color = new Color(color);
 		if (emojiName != null)
 			this.emojiName = emojiName;
 		else
@@ -47,17 +49,18 @@ public enum EnumPokemonType {
 		return this.name;
 	}
 
-	public int getColor() {
+	public Color getColor() {
 		return this.color;
 	}
 
 	private static final long EMOJI_SERVER_ID = 408997776672948224L;
-	private static IGuild EMOJI_SERVER;
+	private static Guild EMOJI_SERVER;
 
-	public IEmoji getEmoji() {
+	public GuildEmoji getEmoji() {
 		if (EMOJI_SERVER == null)
 			EMOJI_SERVER = Starota.getGuild(EMOJI_SERVER_ID);
-		return EMOJI_SERVER.getEmojiByName(emojiName);
+		return EMOJI_SERVER.getEmojis().filter((e) -> e.getName().equalsIgnoreCase(emojiName))
+				.blockFirst();
 	}
 
 	public static EnumPokemonType fromOrdinal(int ordinal) {

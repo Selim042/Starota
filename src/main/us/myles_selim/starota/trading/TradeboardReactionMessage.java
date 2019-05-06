@@ -1,14 +1,14 @@
 package us.myles_selim.starota.trading;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.impl.obj.ReactionEmoji;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IReaction;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.RequestBuffer;
+import java.util.function.Consumer;
+
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.reaction.ReactionEmoji;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.reaction_messages.PersistReactionMessage;
@@ -19,65 +19,55 @@ public class TradeboardReactionMessage extends PersistReactionMessage {
 	public static final String CONFIRM_EMOJI = "✅";
 	public static final String DELETE_EMOJI = "❌";
 
-	private static final EmbedObject DELETED_EMBED;
+	private static final Consumer<EmbedCreateSpec> DELETED_EMBED = (e) -> e
+			.setDescription("Trade deleted");
 
-	static {
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.appendDescription("Trade deleted");
-		DELETED_EMBED = builder.build();
-	}
-
-	private IGuild guild;
+	private Guild guild;
 	private int postId;
 
 	public TradeboardReactionMessage() {}
 
-	public TradeboardReactionMessage(IGuild guild, TradeboardPost post) {
+	public TradeboardReactionMessage(Guild guild, TradeboardPost post) {
 		this.guild = guild;
 		this.postId = post.getId();
 	}
 
 	@Override
-	public void onSend(StarotaServer server, IChannel channel, IMessage msg) {
+	public void onSend(StarotaServer server, TextChannel channel, Message msg) {
 		this.guild = server.getDiscordGuild();
 
-		RequestBuffer.request(() -> msg.addReaction(ReactionEmoji.of(CONFIRM_EMOJI))).get();
-		RequestBuffer.request(() -> msg.addReaction(ReactionEmoji.of(DELETE_EMOJI)));
+		msg.addReaction(ReactionEmoji.unicode(CONFIRM_EMOJI));
+		msg.addReaction(ReactionEmoji.unicode(DELETE_EMOJI));
 	}
 
 	@Override
-	public void onReactionAdded(StarotaServer server, IChannel channel, IMessage msg, IUser user,
-			IReaction react) {
-		String name = react.getEmoji().getName();
+	public void onReactionAdded(StarotaServer server, TextChannel channel, Message msg, Member member,
+			ReactionEmoji react) {
+		String name = react.toString();
 		if (name.equals(CONFIRM_EMOJI)) {
 			// System.out.println("confirmed");
 			TradeboardPost post = server.getPost(this.postId);
-			IUser poster = Starota.getUser(post.getOwner());
-			String nickname = user.getNicknameForGuild(server.getDiscordGuild());
-			if (nickname != null)
-				nickname += " (_" + poster.getName() + "#" + poster.getDiscriminator() + "_)";
-			else
-				nickname = poster.getName() + "#" + poster.getDiscriminator();
-			poster.getOrCreatePMChannel()
-					.sendMessage(nickname + " from " + server.getDiscordGuild().getName()
-							+ " is interested in your trade. Please contact them for more information.",
-							post.getPostEmbed(server, false));
-			msg.removeReaction(user, react);
+			User poster = Starota.getUser(post.getOwner());
+			poster.getPrivateChannel().block().createMessage((m) -> m
+					.setContent(member.getDisplayName() + " from " + server.getDiscordGuild().getName()
+							+ " is interested in your trade. Please contact them for more information.")
+					.setEmbed(post.getPostEmbed(server, false)));
+			msg.removeReaction(react, member.getId());
 		}
 		if (name.equals(DELETE_EMOJI)) {
 			// System.out.println("deleted");
 			TradeboardPost post = server.getPost(this.postId);
-			if (user.getLongID() != post.getOwner())
+			if (member.getId().asLong() != post.getOwner())
 				return;
 			server.removePost(this.postId);
-			msg.edit(DELETED_EMBED);
-			msg.removeReaction(user, react);
+			msg.edit((m) -> m.setEmbed(DELETED_EMBED));
+			msg.removeReaction(react, member.getId());
 			msg.delete();
 		}
 	}
 
 	@Override
-	protected EmbedObject getEmbed(StarotaServer server) {
+	protected Consumer<EmbedCreateSpec> getEmbed(StarotaServer server) {
 		StarotaServer sserver = StarotaServer.getServer(this.guild);
 		return sserver.getPost(this.postId).getPostEmbed(sserver);
 	}
@@ -86,7 +76,7 @@ public class TradeboardReactionMessage extends PersistReactionMessage {
 	public void toBytes(Storage stor) {
 		if (this.guild == null)
 			return;
-		stor.writeLong(this.guild.getLongID());
+		stor.writeLong(this.guild.getId().asLong());
 		stor.writeInt(this.postId);
 	}
 
