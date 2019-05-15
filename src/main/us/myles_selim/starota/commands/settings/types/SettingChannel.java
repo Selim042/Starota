@@ -76,8 +76,8 @@ public class SettingChannel extends ServerSetting<TextChannel> {
 	public void fromBytes(Storage stor) {
 		super.fromBytes(stor);
 		long ch = stor.readLong();
-		if (ch == -1)
-			this.setValue(null);
+		if (ch == -1 || this.getServer() == null)
+			this.setValue((TextChannel) null);
 		else
 			this.setValue(this.getServer().getDiscordGuild().getChannelById(Snowflake.of(ch)));
 	}

@@ -60,6 +60,8 @@ public abstract class ServerSetting<V> extends Setting<V> {
 		long id = stor.readLong();
 		if (id != -1)
 			this.server = StarotaServer.getServer(Starota.getGuild(id));
+		else
+			this.server = null;
 	}
 
 	@SuppressWarnings("unchecked")

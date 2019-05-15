@@ -485,16 +485,16 @@ public class EmbedBuilder {
 
 		return (e) -> {
 			e.setTitle(embed.title);
-			e.setDescription(embed.description);
+			e.setDescription(embed.description == null ? "" : embed.description);
 			e.setUrl(embed.url);
 			e.setTimestamp(Instant.parse(embed.timestamp));
-			e.setColor(color == null ? new Color(embed.color)
-					: new Color(color.getRed() & 0xFF << 16, (color.getGreen() & 0xFF) << 8,
-							(color.getBlue() & 0xFF)));
-			e.setFooter(embed.footer.text, embed.footer.icon_url);
-			e.setImage(embed.image.url);
-			e.setThumbnail(embed.thumbnail.url);
-			e.setAuthor(embed.author.name, embed.author.url, embed.author.icon_url);
+			e.setColor(color == null ? new Color(embed.color) : new Color(color.getRGB()));
+			if (embed.footer != null)
+				e.setFooter(embed.footer.text, embed.footer.icon_url);
+			e.setImage(embed.image == null ? null : embed.image.url);
+			e.setThumbnail(embed.thumbnail == null ? null : embed.thumbnail.url);
+			if (embed.author != null)
+				e.setAuthor(embed.author.name, embed.author.url, embed.author.icon_url);
 			for (EmbedObject.EmbedFieldObject f : fields)
 				e.addField(f.name, f.value, f.inline);
 		};

@@ -23,6 +23,7 @@ import discord4j.core.event.domain.guild.GuildCreateEvent;
 import discord4j.core.event.domain.guild.GuildDeleteEvent;
 import discord4j.core.event.domain.guild.GuildEvent;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
+import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.event.domain.message.MessageDeleteEvent;
 import discord4j.core.event.domain.message.MessageUpdateEvent;
@@ -38,7 +39,6 @@ import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
-import reactor.core.publisher.Mono;
 import us.myles_selim.starota.assistants.CommandInviteAssistants;
 import us.myles_selim.starota.assistants.StarotaAssistants;
 import us.myles_selim.starota.assistants.pokedex.PokedexBot;
@@ -166,7 +166,8 @@ public class Starota {
 					PROPERTIES.getProperty("token"));
 			IS_DEV = Boolean.parseBoolean(PROPERTIES.getProperty("is_dev"));
 			CLIENT = clientBuilder.build();
-			Mono<Void> finalMono = CLIENT.login().doOnError((t) -> t.printStackTrace());
+			// Mono<Void> finalMono = CLIENT.login().doOnError((t) ->
+			// t.printStackTrace());
 			if (CLIENT == null) {
 				System.err.println("Failed to login, exiting");
 				return;
@@ -189,9 +190,11 @@ public class Starota {
 					"Channel where " + BOT_NAME + " prints out news articles when they are published."));
 
 			// load all StarotaServer data
-			CLIENT.getGuilds().all((g) -> {
-				StarotaServer.getServer(g);
-				return true;
+			CLIENT.getEventDispatcher().on(ReadyEvent.class).subscribe((e) -> {
+				CLIENT.getGuilds().all((g) -> {
+					StarotaServer.getServer(g);
+					return true;
+				});
 			});
 
 			COMMAND_HANDLER = new PrimaryCommandHandler(CLIENT);
@@ -203,7 +206,8 @@ public class Starota {
 			DebugServer.init();
 
 			System.out.println("registering commands");
-			CLIENT.updatePresence(Presence.doNotDisturb(Activity.playing("registering commands...")));
+			// CLIENT.updatePresence(Presence.doNotDisturb(Activity.playing("registering
+			// commands...")));
 
 			JavaCommandHandler jCmdHandler = new JavaCommandHandler();
 			COMMAND_HANDLER.registerCommandHandler(jCmdHandler);
@@ -211,17 +215,31 @@ public class Starota {
 
 			SelimPMCommandHandler.init();
 
-			try {
-				Thread.sleep(2500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			// try {
+			// Thread.sleep(2500);
+			// } catch (InterruptedException e) {
+			// e.printStackTrace();
+			// }
 			System.out.println("starting threads and loading settings...");
-			CLIENT.updatePresence(
-					Presence.idle(Activity.playing("starting threads and loading settings...")));
+			// CLIENT.updatePresence(
+			// Presence.idle(Activity.playing("starting threads and loading
+			// settings...")));
 
 			// dispatcher.registerListener(COMMAND_HANDLER);
 			dispatcher.on(COMMAND_HANDLER.getEventType()).subscribe(COMMAND_HANDLER::execute);
+			dispatcher.on(MessageCreateEvent.class).subscribe((e) -> {
+				if (e.getMember().get().isBot())
+					return;
+//				e.getMessage().getChannel().block().createMessage((m) -> {
+//					System.out.println("NORMAL");
+//					m.setContent("HI").setEmbed((em) -> {
+//						em.setTitle("Hello").setDescription("World!");
+//					});
+//				}).doOnError((throwable) -> {
+//					System.out.println("ERROR");
+//					throwable.printStackTrace();
+//				}).block();
+			});
 
 			// dispatcher.registerListener(REACTION_MESSAGES_REGISTRY);
 			dispatcher.on(ReactionAddEvent.class).subscribe(REACTION_MESSAGES_REGISTRY::onReactAdd);
@@ -245,11 +263,11 @@ public class Starota {
 			PokedexBot.start();
 			submitStats();
 
-			try {
-				Thread.sleep(2500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			// try {
+			// Thread.sleep(2500);
+			// } catch (InterruptedException e) {
+			// e.printStackTrace();
+			// }
 			System.out.println("v" + StarotaConstants.VERSION + (DEBUG || IS_DEV ? "d" : ""));
 			StatusUpdater statusUpdater = new StatusUpdater(CLIENT);
 			statusUpdater.addPresence(Presence.online(
@@ -341,7 +359,7 @@ public class Starota {
 				return false;
 			};
 			f.apply(null);
-			finalMono.block();
+			CLIENT.login().doOnError((t) -> t.printStackTrace()).block();
 		} catch (Exception e) {
 			System.err.println("+-------------------------------------------------------------------+");
 			System.err.println("| Starota failed to start properly. Printing exception then exiting |");

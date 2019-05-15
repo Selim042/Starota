@@ -101,31 +101,32 @@ public class CommandRaidBosses extends StarotaCommand {
 	private static Consumer<EmbedCreateSpec> getAllTiers() {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Raid Bosses:");
-		for (int i = 6; i > 0; i--) {
+		for (int tier = 6; tier > 0; tier--) {
 			String fieldTitle;
-			if (i == 6)
+			if (tier == 6)
 				fieldTitle = "**EX Raid Boss";
 			else
-				fieldTitle = "**Tier " + i + " Raid Boss";
+				fieldTitle = "**Tier " + tier + " Raid Boss";
 			String fieldDesc = "";
 			int numBosses = 0;
-			for (RaidBoss b : SilphRoadData.getBosses(i)) {
+			for (RaidBoss b : SilphRoadData.getBosses(tier)) {
 				numBosses++;
 				String postfix = b.getForm() == null ? "" : "_" + b.getForm();
 				fieldDesc += b.getPokemon() + (b.getForm() == null ? "" : " (" + b.getForm() + ")")
 						+ EmojiServerHelper.getEmoji(b.getPokemon() + postfix,
 								ImageHelper.getOfficalArtwork(b.getPokemon(), b.getForm()))
-						+ (b.isShinyable() ? EmojiServerHelper.getEmoji("shiny") + "\n" : "\n");
+						+ (b.isShinyable() ? EmojiServerHelper.getEmoji("shiny").asFormat() + "\n"
+								: "\n");
 			}
 			if (numBosses > 1)
 				fieldTitle += "es**: ";
 			else
 				fieldTitle += "**: ";
-			if (i == 6)
-				fieldTitle += EmojiServerHelper.getEmoji("ex_raid");
+			if (tier == 6)
+				fieldTitle += EmojiServerHelper.getEmoji("ex_raid").asFormat();
 			else {
-				for (int i2 = 0; i2 < i; i2++)
-					fieldTitle += EmojiServerHelper.getEmoji("raid");
+				for (int i = 0; i < tier; i++)
+					fieldTitle += EmojiServerHelper.getEmoji("raid").asFormat();
 			}
 			builder.addField(fieldTitle, fieldDesc, true);
 		}

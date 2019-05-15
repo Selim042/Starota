@@ -65,7 +65,9 @@ public class CommandHelp extends JavaCommand {
 						}
 						e.addField("Aliases:", aliasesS.substring(0, aliasesS.length() - 2), false);
 					}
-				});
+				}).doOnError((throwable) -> {
+					System.out.println("ERROR");
+				}).block();
 				return;
 			}
 		}
@@ -125,7 +127,7 @@ public class CommandHelp extends JavaCommand {
 							+ getName() + " " + (fPage + 2) + "`");
 				desc.append("\n**Page**: " + (fPage + 1) + "/" + ((disp.size() / CMDS_PER_PAGE) + 1));
 				e.setDescription(desc.toString());
-			});
+			}).block();
 		}
 	}
 
