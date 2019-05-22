@@ -29,10 +29,10 @@ import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
-import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.assistants.CommandInviteAssistants;
 import us.myles_selim.starota.assistants.StarotaAssistants;
 import us.myles_selim.starota.assistants.pokedex.PokedexBot;
+import us.myles_selim.starota.assistants.registration.RegistrationBot;
 import us.myles_selim.starota.commands.CommandArticleMessage;
 import us.myles_selim.starota.commands.CommandChangelog;
 import us.myles_selim.starota.commands.CommandCredits;
@@ -47,6 +47,7 @@ import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 import us.myles_selim.starota.commands.selim_pm.SelimPMCommandHandler;
 import us.myles_selim.starota.commands.settings.CommandSettings;
+import us.myles_selim.starota.commands.settings.types.SettingBoolean;
 import us.myles_selim.starota.commands.settings.types.SettingChannel;
 import us.myles_selim.starota.commands.tutorial.commands.CommandTutorial;
 import us.myles_selim.starota.debug_server.DebugServer;
@@ -185,6 +186,11 @@ public class Starota {
 			StarotaServer.setDefaultValue(new SettingChannel(null,
 					StarotaConstants.Settings.NEWS_CHANNEL,
 					"Channel where " + BOT_NAME + " prints out news articles when they are published."));
+			StarotaServer.setDefaultValue(new SettingBoolean(StarotaConstants.Settings.PROFILE_NICKNAME,
+					"Sets nickname to PoGo username when profile is made.", true));
+			
+			// default leaderboards
+			StarotaServer.registerDefaultLeaderboards();
 
 			// load all StarotaServer data
 			for (IGuild g : CLIENT.getGuilds())
@@ -223,6 +229,7 @@ public class Starota {
 			// ReactionMessageRegistry.init();
 			WebServer.init();
 			PokedexBot.start();
+			RegistrationBot.start();
 			submitStats();
 
 			try {

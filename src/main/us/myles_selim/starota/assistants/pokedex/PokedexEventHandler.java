@@ -14,11 +14,6 @@ import us.myles_selim.starota.misc.utils.StarotaConstants;
 public class PokedexEventHandler {
 
 	@EventSubscriber
-	public void onServerJoin(GuildCreateEvent event) {
-		Starota.submitStats();
-	}
-
-	@EventSubscriber
 	public void onServerCreate(GuildCreateEvent event) {
 		Starota.submitStats();
 		PokedexBot.updateOwners();

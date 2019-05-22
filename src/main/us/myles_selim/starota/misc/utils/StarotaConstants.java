@@ -30,6 +30,8 @@ public class StarotaConstants {
 		public static final String NEWS_CHANNEL = "newsChannel";
 		/** Changelog logging channel */
 		public static final String CHANGES_CHANNEL = "changesChannel";
+		/** Profile nickname setting */
+		public static final String PROFILE_NICKNAME = "profileNickname";
 
 	}
 

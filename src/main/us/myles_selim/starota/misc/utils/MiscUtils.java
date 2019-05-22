@@ -41,6 +41,13 @@ public class MiscUtils {
 		return false;
 	}
 
+	public static boolean stringArrayContainsIgnoreCase(String[] arr, String val) {
+		for (String v : arr)
+			if (v == val || v.equalsIgnoreCase(val))
+				return true;
+		return false;
+	}
+
 	public static IRole getTeamRole(IGuild guild, EnumTeam team) {
 		for (IRole r : guild.getRoles()) {
 			if (team.name().equalsIgnoreCase(r.getName().replaceAll(" ", "_")))

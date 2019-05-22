@@ -30,7 +30,7 @@ public class CommandUpdateLeaderboard extends StarotaCommand {
 
 	@Override
 	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
-		if (args.length < 3) {
+		if (args.length < 2) {
 			channel.sendMessage(
 					"**Usage**: " + server.getPrefix() + getName() + " " + getGeneralUsage());
 			return;
@@ -42,6 +42,34 @@ public class CommandUpdateLeaderboard extends StarotaCommand {
 			return;
 		}
 		LeaderboardEntry entry = board.getEntry(user.getLongID());
+		switch (board.getType()) {
+		case INTEGRATION:
+			channel.sendMessage(
+					"This leaderboard is managed by an integration and cannot be updated manually");
+			break;
+		case NORMAL:
+			if (args.length < 3) {
+				channel.sendMessage(
+						"**Usage**: " + server.getPrefix() + getName() + " " + getGeneralUsage());
+				return;
+			}
+			handleNormalBoard(board, entry, user, channel, args);
+			break;
+		case OCR:
+			if (message.getAttachments().isEmpty()) {
+				channel.sendMessage("This leaderboard is updated via OCR (image processing).  "
+						+ "Please upload your respective photo with this message to update");
+				return;
+			}
+			break;
+		default:
+			channel.sendMessage("Unrecognized leaderboard type, please report to Selim#0042 urgently");
+			break;
+		}
+	}
+
+	private void handleNormalBoard(Leaderboard board, LeaderboardEntry entry, IUser user,
+			IChannel channel, String[] args) {
 		try {
 			if (entry != null) {
 				long oldStat = entry.getValue();

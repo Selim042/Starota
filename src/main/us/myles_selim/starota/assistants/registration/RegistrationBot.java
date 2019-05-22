@@ -1,0 +1,117 @@
+package us.myles_selim.starota.assistants.registration;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Properties;
+
+import org.discordbots.api.client.DiscordBotListAPI;
+
+import sx.blah.discord.api.ClientBuilder;
+import sx.blah.discord.api.IDiscordClient;
+import sx.blah.discord.handle.obj.ActivityType;
+import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IRole;
+import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.Permissions;
+import sx.blah.discord.handle.obj.StatusType;
+import sx.blah.discord.util.DiscordException;
+import sx.blah.discord.util.RequestBuffer;
+import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.misc.utils.StarotaConstants;
+import us.myles_selim.starota.misc.utils.StatusUpdater;
+import us.myles_selim.starota.misc.utils.StatusUpdater.PresenceData;
+
+public class RegistrationBot {
+
+	public static IDiscordClient REGISTRATION_CLIENT;
+
+	public static final String BOT_NAME = "Registration Bot";
+	public static final EnumSet<Permissions> USED_PERMISSIONS = EnumSet.of(Permissions.SEND_MESSAGES,
+			Permissions.READ_MESSAGES, Permissions.MANAGE_MESSAGES, Permissions.USE_EXTERNAL_EMOJIS,
+			Permissions.ADD_REACTIONS);
+
+	private static Properties PROPERTIES = new Properties();
+	private static DiscordBotListAPI BOT_LIST;
+	private static boolean started = false;
+
+	public static void start() {
+		//if (started || Starota.IS_DEV)
+		if (started)
+			return;
+		started = true;
+
+		ClientBuilder builder = new ClientBuilder();
+		try {
+			PROPERTIES.load(new FileInputStream("starota.properties"));
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+		builder.withToken(PROPERTIES.getProperty("registration_bot"));
+		try {
+			REGISTRATION_CLIENT = builder.login();
+		} catch (DiscordException e) {
+			e.printStackTrace();
+			System.err.println("failed to start Registration bot");
+			return;
+		}
+		try {
+			while (!REGISTRATION_CLIENT.isReady())
+				Thread.sleep(10);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		StatusUpdater statuses = new StatusUpdater(REGISTRATION_CLIENT);
+		statuses.addPresence(new PresenceData(StatusType.ONLINE, ActivityType.PLAYING,
+				"v" + StarotaConstants.VERSION + (Starota.DEBUG || Starota.IS_DEV ? "d" : "")));
+		statuses.start();
+
+		REGISTRATION_CLIENT.getDispatcher().registerListener(new RegistrationEventHandler());
+	}
+
+	public static IUser getOurUser() {
+		if (!started)
+			return null;
+		return REGISTRATION_CLIENT.getOurUser();
+	}
+
+	public static String getOurName(IGuild guild) {
+		if (REGISTRATION_CLIENT == null)
+			return null;
+		if (guild == null)
+			return getOurUser().getName();
+		return getOurUser().getDisplayName(guild);
+	}
+
+	public static DiscordBotListAPI getBotListAPI() {
+		if (BOT_LIST == null && PROPERTIES.containsKey("dex_bot_list_token"))
+			BOT_LIST = new DiscordBotListAPI.Builder()
+					.token(PROPERTIES.getProperty("dex_bot_list_token"))
+					.botId(REGISTRATION_CLIENT.getOurUser().getStringID()).build();
+		return BOT_LIST;
+	}
+
+	public static void updateOwners() {
+		if (Starota.IS_DEV)
+			return;
+		IRole ownerRole = REGISTRATION_CLIENT.getRoleByID(578327458873475085L);
+		List<IUser> currentOwners = new ArrayList<>();
+		for (IGuild g : REGISTRATION_CLIENT.getGuilds()) {
+			IUser owner = REGISTRATION_CLIENT.getGuildByID(StarotaConstants.SUPPORT_SERVER)
+					.getUserByID(g.getOwnerLongID());
+			if (owner == null)
+				continue;
+			if (!owner.hasRole(ownerRole))
+				RequestBuffer.request(() -> owner.addRole(ownerRole));
+			currentOwners.add(owner);
+		}
+		for (IUser u : REGISTRATION_CLIENT.getGuildByID(StarotaConstants.SUPPORT_SERVER)
+				.getUsersByRole(ownerRole))
+			if (!currentOwners.contains(u))
+				u.removeRole(ownerRole);
+	}
+
+}

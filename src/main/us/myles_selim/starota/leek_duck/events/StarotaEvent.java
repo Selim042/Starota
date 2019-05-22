@@ -153,7 +153,7 @@ public class StarotaEvent {
 		for (String b : this.bonuses)
 			bonuses.append(String.format(" - %s\n", b));
 		if (bonuses.length() != 0)
-			builder.appendField("Bonuses:", bonuses.toString().substring(0, bonuses.length() - 2),
+			builder.appendField("Bonuses:", bonuses.toString().substring(0, bonuses.length() - 1),
 					false);
 
 		StringBuilder tieredBonuses = new StringBuilder();

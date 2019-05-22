@@ -11,8 +11,6 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.ebs.DataType;
-import us.myles_selim.ebs.EBList;
-import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.ebs.Storage;
 
 public class Leaderboard extends DataType<Leaderboard> {
@@ -25,18 +23,10 @@ public class Leaderboard extends DataType<Leaderboard> {
 	private List<String> aliases;
 	private boolean decending;
 	private int color;
+	private EnumUpdateType type;
+	private boolean isEnabled = true;
 
 	public Leaderboard() {}
-
-	@SuppressWarnings("unchecked")
-	public Leaderboard(IGuild server, EBStorage ebs) {
-		this.server = server;
-		this.displayName = ebs.get("displayName", String.class);
-		this.entries = new LinkedList<>(ebs.get("entries", EBList.class).values());
-		this.aliases = new LinkedList<>(ebs.get("aliases", EBList.class).values());
-		this.decending = ebs.get("decending", Boolean.class);
-		this.color = ebs.get("color", Integer.class);
-	}
 
 	public Leaderboard(IGuild server, String displayName) {
 		this(server, displayName, true);
@@ -47,24 +37,9 @@ public class Leaderboard extends DataType<Leaderboard> {
 		this.displayName = displayName;
 		this.entries = new LinkedList<>();
 		this.aliases = new LinkedList<>();
+		addAlias(displayName.replaceAll(" ", "_"));
 		this.decending = decending;
 	}
-
-//	public EBStorage toStorage() {
-//		EBStorage stor = new EBStorage().registerPrimitives();
-//		stor.set("displayName", this.displayName);
-//		EBList<LeaderboardEntry> entries = new EBList<>(new DataTypeLeaderboardEntry());
-//		for (LeaderboardEntry te : this.entries)
-//			entries.addWrapped(te);
-//		stor.set("entries", entries);
-//		EBList<String> aliases = new EBList<>(new DataTypeString());
-//		for (String a : this.aliases)
-//			aliases.addWrapped(a);
-//		stor.set("aliases", aliases);
-//		stor.set("decending", this.decending);
-//		stor.set("color", this.color);
-//		return stor;
-//	}
 
 	public String getDisplayName() {
 		return this.displayName;
@@ -132,8 +107,26 @@ public class Leaderboard extends DataType<Leaderboard> {
 	}
 
 	public boolean isActive() {
-		return !(this.aliases.isEmpty() || (this.aliases.size() == 1
+		return isEnabled && !(this.aliases.isEmpty() || (this.aliases.size() == 1
 				&& this.aliases.get(0).equalsIgnoreCase(this.displayName.replaceAll(" ", "_"))));
+	}
+
+	protected void setType(EnumUpdateType type) {
+		this.type = type;
+	}
+
+	public EnumUpdateType getType() {
+		if (this.type == null)
+			return EnumUpdateType.NORMAL;
+		return this.type;
+	}
+
+	public boolean isEnabled() {
+		return this.isEnabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.isEnabled = enabled;
 	}
 
 	public EmbedObject toEmbed() {
@@ -172,10 +165,12 @@ public class Leaderboard extends DataType<Leaderboard> {
 		builder.withTitle("Options for: " + this.displayName);
 		builder.appendField("Decending:", Boolean.toString(this.decending), true);
 		builder.appendField("Active:", Boolean.toString(isActive()), true);
+		builder.appendField("Enabled:", Boolean.toString(isEnabled()), true);
 		String aliases = "";
 		for (String a : this.aliases)
 			aliases += " - " + a + "\n";
 		builder.appendField("Aliases:", aliases, false);
+		builder.appendField("Type:", getType().getDisplayName(), false);
 		builder.withColor(this.color);
 		return builder.build();
 	}
@@ -200,12 +195,19 @@ public class Leaderboard extends DataType<Leaderboard> {
 		this.displayName = value.displayName;
 		this.entries = new LinkedList<>(value.entries);
 		this.server = value.server;
+		this.type = value.type;
+		this.isEnabled = value.isEnabled;
 	}
 
 	@Override
 	protected void setValueObject(Object value) {
-		if (value instanceof Leaderboard)
+		if (value instanceof Leaderboard && !(value instanceof DefaultLeaderboard))
 			setValue((Leaderboard) value);
+	}
+
+	@Override
+	public boolean acceptsValue(Object value) {
+		return super.acceptsValue(value) && !(value instanceof DefaultLeaderboard);
 	}
 
 	@Override
@@ -234,6 +236,11 @@ public class Leaderboard extends DataType<Leaderboard> {
 		}
 		stor.writeBoolean(this.decending);
 		stor.writeInt(this.color);
+		if (this.type == null)
+			stor.writeInt(0);
+		else
+			stor.writeInt(this.type.ordinal());
+		stor.writeByte((byte) (isEnabled ? 1 : 2));
 	}
 
 	@Override
@@ -249,6 +256,29 @@ public class Leaderboard extends DataType<Leaderboard> {
 			this.aliases.add(stor.readString());
 		this.decending = stor.readBoolean();
 		this.color = stor.readInt();
+		int type = stor.readInt();
+		if (type <= 0 || type >= EnumUpdateType.values().length)
+			this.type = EnumUpdateType.NORMAL;
+		else
+			this.type = EnumUpdateType.values()[type];
+		byte enabledByte = stor.readByte();
+		this.isEnabled = enabledByte == 0 || enabledByte == 1 ? true : false;
+	}
+
+	public enum EnumUpdateType {
+		NORMAL("Normal"),
+		INTEGRATION("Intergration"),
+		OCR("OCR");
+
+		private final String displayName;
+
+		EnumUpdateType(String displayName) {
+			this.displayName = displayName;
+		}
+
+		public String getDisplayName() {
+			return this.displayName;
+		}
 	}
 
 }

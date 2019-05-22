@@ -76,8 +76,8 @@ public class PokedexBot {
 			e.printStackTrace();
 		}
 		COMMAND_HANDLER = new PrimaryCommandHandler(POKEDEX_CLIENT, (IChannel ch) -> {
-			IUser starota = Starota.getUser(StarotaConstants.STAROTA_ID);
-			IUser starotaDev = Starota.getUser(StarotaConstants.STAROTA_DEV_ID);
+			IUser starota = POKEDEX_CLIENT.getUserByID(StarotaConstants.STAROTA_ID);
+			IUser starotaDev = POKEDEX_CLIENT.getUserByID(StarotaConstants.STAROTA_DEV_ID);
 			List<IUser> users = ch.getUsersHere();
 			if (ch instanceof IPrivateChannel || users.contains(starota) || users.contains(starotaDev))
 				return false;

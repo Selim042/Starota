@@ -60,6 +60,12 @@
 			<artifactId>twitter4j-stream</artifactId>
 			<version>[4.0,)</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.github.nguyenq</groupId>
+			<artifactId>tess4j</artifactId>
+			<version>tess4j-4.3.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>

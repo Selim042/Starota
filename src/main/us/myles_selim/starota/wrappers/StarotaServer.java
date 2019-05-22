@@ -40,6 +40,8 @@ import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.geofence.GeoPoint;
 import us.myles_selim.starota.geofence.GeoRegion;
 import us.myles_selim.starota.geofence.GeoRegion.DataTypeGeoRegion;
+import us.myles_selim.starota.leaderboards.DefaultLeaderboard;
+import us.myles_selim.starota.leaderboards.DefaultLeaderboard.EnumBadgeLeaderboard;
 import us.myles_selim.starota.leaderboards.Leaderboard;
 import us.myles_selim.starota.misc.data_types.Pair;
 import us.myles_selim.starota.misc.utils.MiscUtils;
@@ -113,6 +115,8 @@ public class StarotaServer {
 	public PlayerProfile setProfile(IUser user, PlayerProfile profile) {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.PROFILES))
 			return null;
+		if ((boolean) this.getSetting(StarotaConstants.Settings.PROFILE_NICKNAME))
+			guild.setUserNickname(user, profile.getPoGoName());
 		profiles.set(user.getStringID(), profile);
 		return profile;
 	}
@@ -191,10 +195,6 @@ public class StarotaServer {
 			optionsFile.delete();
 	}
 	// end data stuffs
-
-	// start settings stuffs
-
-	// end settings stufs
 
 	// start tradeboard stuffs
 	public void addPost(PlayerProfile profile, TradeboardPost post) {
@@ -343,10 +343,13 @@ public class StarotaServer {
 		Leaderboard testBoard = getLeaderboard(name);
 		if (testBoard != null)
 			return null;
-		if (leaderboards.getKeys().size() >= RolePermHelper.getMaxLeaderboards(guild))
+		int activeBoards = 0;
+		for (String key : leaderboards.getKeys())
+			if (leaderboards.get(key, Leaderboard.class).isActive())
+				activeBoards++;
+		if (activeBoards >= RolePermHelper.getMaxLeaderboards(guild))
 			return null;
 		Leaderboard board = new Leaderboard(guild, name);
-		board.addAlias(name.replaceAll(" ", "_"));
 		leaderboards.set(name, board);
 		return board;
 	}
@@ -364,6 +367,7 @@ public class StarotaServer {
 	public List<Leaderboard> getLeaderboards() {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.LEADERBOARDS))
 			return null;
+		updateDefaultLeaderboards();
 		List<Leaderboard> boards = new ArrayList<>();
 		for (String key : leaderboards.getKeys())
 			boards.add(leaderboards.get(key, Leaderboard.class));
@@ -373,6 +377,7 @@ public class StarotaServer {
 	public List<Leaderboard> getLeaderboardsActive() {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.LEADERBOARDS))
 			return null;
+		updateDefaultLeaderboards();
 		List<Leaderboard> boards = new ArrayList<>();
 		for (String key : leaderboards.getKeys()) {
 			Leaderboard board = leaderboards.get(key, Leaderboard.class);
@@ -391,10 +396,10 @@ public class StarotaServer {
 			return leaderboards.get(name, Leaderboard.class);
 		for (String key : leaderboards.getKeys()) {
 			Leaderboard board = leaderboards.get(key, Leaderboard.class);
-			if (stringArrayContainsIgnoreCase(names, board.getDisplayName()))
+			if (MiscUtils.stringArrayContainsIgnoreCase(names, board.getDisplayName()))
 				return board;
 			for (String alias : board.getAliases())
-				if (stringArrayContainsIgnoreCase(names, alias))
+				if (MiscUtils.stringArrayContainsIgnoreCase(names, alias))
 					return board;
 		}
 		return null;
@@ -409,11 +414,25 @@ public class StarotaServer {
 		return board;
 	}
 
-	private boolean stringArrayContainsIgnoreCase(String[] arr, String val) {
-		for (String v : arr)
-			if (v == val || v.equalsIgnoreCase(val))
-				return true;
-		return false;
+	private void updateDefaultLeaderboards() {
+		for (DefaultLeaderboard board : DEFAULT_LEADERBOARDS)
+			if (!leaderboards.containsKey(board.getDisplayName()))
+				leaderboards.set(board.getDisplayName(), board.toGuildLeaderboard(getDiscordGuild()));
+	}
+
+	// static leaderboard stuffs
+	private static final List<DefaultLeaderboard> DEFAULT_LEADERBOARDS = new LinkedList<>();
+
+	public static void registerDefaultLeaderboards() {
+		if (!DEFAULT_LEADERBOARDS.isEmpty())
+			return;
+
+		for (EnumBadgeLeaderboard badge : EnumBadgeLeaderboard.values())
+			DEFAULT_LEADERBOARDS.add(new DefaultLeaderboard(badge));
+	}
+
+	public static List<DefaultLeaderboard> getDefaultLeaderboards() {
+		return Collections.unmodifiableList(DEFAULT_LEADERBOARDS);
 	}
 	// end leaderboard stuffs
 
