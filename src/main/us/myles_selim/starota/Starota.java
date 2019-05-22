@@ -31,6 +31,7 @@ import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.assistants.CommandInviteAssistants;
 import us.myles_selim.starota.assistants.StarotaAssistants;
+import us.myles_selim.starota.assistants.points.PointBot;
 import us.myles_selim.starota.assistants.pokedex.PokedexBot;
 import us.myles_selim.starota.assistants.registration.RegistrationBot;
 import us.myles_selim.starota.commands.CommandArticleMessage;
@@ -188,7 +189,7 @@ public class Starota {
 					"Channel where " + BOT_NAME + " prints out news articles when they are published."));
 			StarotaServer.setDefaultValue(new SettingBoolean(StarotaConstants.Settings.PROFILE_NICKNAME,
 					"Sets nickname to PoGo username when profile is made.", true));
-			
+
 			// default leaderboards
 			StarotaServer.registerDefaultLeaderboards();
 
@@ -256,7 +257,7 @@ public class Starota {
 					boolean sentToAll = true;
 					List<IGuild> guilds = new ArrayList<>(CLIENT.getGuilds());
 					if (!IS_DEV)
-						guilds.addAll(PokedexBot.POKEDEX_CLIENT.getGuilds());
+						guilds.addAll(PokedexBot.CLIENT.getGuilds());
 					for (IGuild g : guilds) {
 						StarotaServer server = StarotaServer.getServer(g);
 						IChannel changesChannel = server
@@ -593,11 +594,33 @@ public class Starota {
 					else
 						System.out.println("Starota Submitted");
 				});
-				if (PokedexBot.POKEDEX_CLIENT != null) {
+				if (PokedexBot.CLIENT != null) {
 					shards.clear();
-					for (IShard s : PokedexBot.POKEDEX_CLIENT.getShards())
+					for (IShard s : PokedexBot.CLIENT.getShards())
 						shards.add(s.getGuilds().size());
 					PokedexBot.getBotListAPI().setStats(shards).whenComplete((v, e) -> {
+						if (e != null)
+							e.printStackTrace();
+						else
+							System.out.println("Pokedex Submitted");
+					});
+				}
+				if (RegistrationBot.CLIENT != null) {
+					shards.clear();
+					for (IShard s : RegistrationBot.CLIENT.getShards())
+						shards.add(s.getGuilds().size());
+					RegistrationBot.getBotListAPI().setStats(shards).whenComplete((v, e) -> {
+						if (e != null)
+							e.printStackTrace();
+						else
+							System.out.println("Pokedex Submitted");
+					});
+				}
+				if (PointBot.CLIENT != null) {
+					shards.clear();
+					for (IShard s : PointBot.CLIENT.getShards())
+						shards.add(s.getGuilds().size());
+					PointBot.getBotListAPI().setStats(shards).whenComplete((v, e) -> {
 						if (e != null)
 							e.printStackTrace();
 						else

@@ -1,4 +1,4 @@
-package us.myles_selim.starota.assistants.registration;
+package us.myles_selim.starota.assistants.points;
 
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;
@@ -16,51 +16,49 @@ import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class RegistrationEventHandler {
+public class PointEventHandler {
 
 	@EventSubscriber
 	public void onServerCreate(GuildCreateEvent event) {
-		if (!event.getGuild().getUsers().contains(
-				RegistrationBot.CLIENT.getUserByID(StarotaConstants.STAROTA_ID))) {
+		if (!event.getGuild().getUsers()
+				.contains(PointBot.CLIENT.getUserByID(StarotaConstants.STAROTA_ID))) {
 			IPrivateChannel pm = event.getGuild().getOwner().getOrCreatePMChannel();
-			pm.sendMessage("This bot requires Starota to also be added to the server.  "
-					+ "Follow the link below to add it.  "
-					+ "Please re-add this bot after adding Starota."
+			pm.sendMessage("This bot has additional content including leaderboards if "
+					+ Starota.BOT_NAME + " is also in your server.\n" + "For more information visit "
 					+ "\nhttps://discordbots.org/bot/489245655710040099");
-			event.getGuild().leave();
 			return;
 		}
 		Starota.submitStats();
-		RegistrationBot.updateOwners();
+		PointBot.updateOwners();
 		IGuild server = event.getGuild();
-		if (!server.getUsers().contains(RegistrationBot.CLIENT.getOurUser()))
+		if (!server.getUsers().contains(PointBot.CLIENT.getOurUser()))
 			return;
-		IUser selimUser = RegistrationBot.CLIENT.fetchUser(StarotaConstants.SELIM_USER_ID);
+		IUser selimUser = PointBot.CLIENT.fetchUser(StarotaConstants.SELIM_USER_ID);
 		RequestBuffer.request(() -> {
 			IPrivateChannel selimPm = selimUser.getOrCreatePMChannel();
-			selimPm.sendMessage(
-					RegistrationBot.BOT_NAME + " was added to the server: " + server.getName());
+			selimPm.sendMessage(PointBot.BOT_NAME + " was added to the server: " + server.getName());
 		});
 		RequestBuffer.request(() -> {
 			IUser serverOwner = server.getOwner();
 			IPrivateChannel ownerPm = serverOwner.getOrCreatePMChannel();
 			EmbedBuilder builder = new EmbedBuilder();
-			String ourName = RegistrationBot.getOurName(server);
+			String ourName = PointBot.getOurName(server);
 			builder.withTitle("Thanks for using " + ourName + "!");
 			builder.appendDesc("If you need any assistance with " + ourName
 					+ " or it's features, feel free to join our support server at "
 					+ StarotaConstants.SUPPORT_SERVER_LINK);
 			ownerPm.sendMessage(builder.build());
 		});
-		if (!RegistrationBot.CLIENT.getOurUser().getPermissionsForGuild(server)
+		if (!PointBot.CLIENT.getOurUser().getPermissionsForGuild(server)
 				.contains(Permissions.SEND_MESSAGES)) {
 			IUser serverOwner = server.getOwner();
 			IPrivateChannel ownerPm = serverOwner.getOrCreatePMChannel();
-			ownerPm.sendMessage(RegistrationBot.getOurName(server)
+			ownerPm.sendMessage(PointBot.getOurName(server)
 					+ " requires the `SEND_MESSAGES` permission for all command functionality.");
 		}
 	}
 
+	// TODO: finish this
 	@EventSubscriber
 	public void onMessage(MessageReceivedEvent event) {
 		if (event.getAuthor().isBot() || event.getMessage().getAttachments().size() != 1)

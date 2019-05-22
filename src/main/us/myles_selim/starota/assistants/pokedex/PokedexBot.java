@@ -36,7 +36,7 @@ import us.myles_selim.starota.reaction_messages.ReactionMessageRegistry;
 
 public class PokedexBot {
 
-	public static IDiscordClient POKEDEX_CLIENT;
+	public static IDiscordClient CLIENT;
 	public static PrimaryCommandHandler COMMAND_HANDLER;
 	public static ReactionMessageRegistry REACTION_MESSAGES_REGISTRY;
 
@@ -63,33 +63,33 @@ public class PokedexBot {
 		}
 		builder.withToken(PROPERTIES.getProperty("pokedex_bot"));
 		try {
-			POKEDEX_CLIENT = builder.login();
+			CLIENT = builder.login();
 		} catch (DiscordException e) {
 			e.printStackTrace();
 			System.err.println("failed to start Pokedex bot");
 			return;
 		}
 		try {
-			while (!POKEDEX_CLIENT.isReady())
+			while (!CLIENT.isReady())
 				Thread.sleep(10);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		COMMAND_HANDLER = new PrimaryCommandHandler(POKEDEX_CLIENT, (IChannel ch) -> {
-			IUser starota = POKEDEX_CLIENT.getUserByID(StarotaConstants.STAROTA_ID);
-			IUser starotaDev = POKEDEX_CLIENT.getUserByID(StarotaConstants.STAROTA_DEV_ID);
+		COMMAND_HANDLER = new PrimaryCommandHandler(CLIENT, (IChannel ch) -> {
+			IUser starota = CLIENT.getUserByID(StarotaConstants.STAROTA_ID);
+			IUser starotaDev = CLIENT.getUserByID(StarotaConstants.STAROTA_DEV_ID);
 			List<IUser> users = ch.getUsersHere();
 			if (ch instanceof IPrivateChannel || users.contains(starota) || users.contains(starotaDev))
 				return false;
 			return true;
 		});
-		REACTION_MESSAGES_REGISTRY = new ReactionMessageRegistry(POKEDEX_CLIENT);
+		REACTION_MESSAGES_REGISTRY = new ReactionMessageRegistry(CLIENT);
 		Thread statusUpdater = new Thread("PokedexStatusUpdater") {
 
 			@Override
 			public void run() {
 				while (true) {
-					POKEDEX_CLIENT.changePresence(StatusType.ONLINE, ActivityType.PLAYING, "v"
+					CLIENT.changePresence(StatusType.ONLINE, ActivityType.PLAYING, "v"
 							+ StarotaConstants.VERSION + (Starota.DEBUG || Starota.IS_DEV ? "d" : ""));
 					try {
 						Thread.sleep(3600000); // 1 hour
@@ -105,13 +105,13 @@ public class PokedexBot {
 		COMMAND_HANDLER.registerCommandHandler(jCmdHandler);
 		jCmdHandler.registerDefaultCommands();
 
+		long ourId = getOurUser().getLongID();
 		jCmdHandler.registerCommand(new CommandChangelog());
 		jCmdHandler.registerCommand(new CommandCredits());
-		jCmdHandler.registerCommand(
-				new CommandSupportBot(BOT_NAME, POKEDEX_CLIENT.getOurUser().getLongID()));
-		jCmdHandler.registerCommand(new CommandInvite(BOT_NAME, POKEDEX_CLIENT.getOurUser().getLongID(),
+		jCmdHandler.registerCommand(new CommandSupportBot(BOT_NAME, ourId));
+		jCmdHandler.registerCommand(new CommandInvite(BOT_NAME, ourId,
 				Permissions.generatePermissionsNumber(USED_PERMISSIONS)));
-		jCmdHandler.registerCommand(new CommandVote(Starota.BOT_NAME, StarotaConstants.STAROTA_ID));
+		jCmdHandler.registerCommand(new CommandVote(BOT_NAME, ourId));
 
 		// TODO: add this ability back in for Pokedex
 		// jCmdHandler.registerCommand("Administrative", new
@@ -119,7 +119,7 @@ public class PokedexBot {
 
 		jCmdHandler.registerCommand("Pokedex", new CommandPokedex());
 
-		EventDispatcher dispatcher = POKEDEX_CLIENT.getDispatcher();
+		EventDispatcher dispatcher = CLIENT.getDispatcher();
 		dispatcher.registerListener(COMMAND_HANDLER);
 		dispatcher.registerListener(REACTION_MESSAGES_REGISTRY);
 		dispatcher.registerListener(new PokedexEventHandler());
@@ -128,11 +128,11 @@ public class PokedexBot {
 	public static IUser getOurUser() {
 		if (!started)
 			return null;
-		return POKEDEX_CLIENT.getOurUser();
+		return CLIENT.getOurUser();
 	}
 
 	public static String getOurName(IGuild guild) {
-		if (POKEDEX_CLIENT == null)
+		if (CLIENT == null)
 			return null;
 		if (guild == null)
 			return getOurUser().getName();
@@ -143,17 +143,17 @@ public class PokedexBot {
 		if (BOT_LIST == null && PROPERTIES.containsKey("dex_bot_list_token"))
 			BOT_LIST = new DiscordBotListAPI.Builder()
 					.token(PROPERTIES.getProperty("dex_bot_list_token"))
-					.botId(POKEDEX_CLIENT.getOurUser().getStringID()).build();
+					.botId(CLIENT.getOurUser().getStringID()).build();
 		return BOT_LIST;
 	}
 
 	public static void updateOwners() {
 		if (Starota.IS_DEV)
 			return;
-		IRole ownerRole = POKEDEX_CLIENT.getRoleByID(567718302491607050L);
+		IRole ownerRole = CLIENT.getRoleByID(567718302491607050L);
 		List<IUser> currentOwners = new ArrayList<>();
-		for (IGuild g : POKEDEX_CLIENT.getGuilds()) {
-			IUser owner = POKEDEX_CLIENT.getGuildByID(StarotaConstants.SUPPORT_SERVER)
+		for (IGuild g : CLIENT.getGuilds()) {
+			IUser owner = CLIENT.getGuildByID(StarotaConstants.SUPPORT_SERVER)
 					.getUserByID(g.getOwnerLongID());
 			if (owner == null)
 				continue;
@@ -161,8 +161,7 @@ public class PokedexBot {
 				RequestBuffer.request(() -> owner.addRole(ownerRole));
 			currentOwners.add(owner);
 		}
-		for (IUser u : POKEDEX_CLIENT.getGuildByID(StarotaConstants.SUPPORT_SERVER)
-				.getUsersByRole(ownerRole))
+		for (IUser u : CLIENT.getGuildByID(StarotaConstants.SUPPORT_SERVER).getUsersByRole(ownerRole))
 			if (!currentOwners.contains(u))
 				u.removeRole(ownerRole);
 	}

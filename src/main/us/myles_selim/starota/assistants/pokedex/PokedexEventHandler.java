@@ -18,9 +18,9 @@ public class PokedexEventHandler {
 		Starota.submitStats();
 		PokedexBot.updateOwners();
 		IGuild server = event.getGuild();
-		if (!server.getUsers().contains(PokedexBot.POKEDEX_CLIENT.getOurUser()))
+		if (!server.getUsers().contains(PokedexBot.CLIENT.getOurUser()))
 			return;
-		IUser selimUser = PokedexBot.POKEDEX_CLIENT.fetchUser(StarotaConstants.SELIM_USER_ID);
+		IUser selimUser = PokedexBot.CLIENT.fetchUser(StarotaConstants.SELIM_USER_ID);
 		RequestBuffer.request(() -> {
 			IPrivateChannel selimPm = selimUser.getOrCreatePMChannel();
 			selimPm.sendMessage(PokedexBot.BOT_NAME + " was added to the server: " + server.getName());
@@ -36,7 +36,7 @@ public class PokedexEventHandler {
 					+ StarotaConstants.SUPPORT_SERVER_LINK);
 			ownerPm.sendMessage(builder.build());
 		});
-		if (!PokedexBot.POKEDEX_CLIENT.getOurUser().getPermissionsForGuild(server)
+		if (!PokedexBot.CLIENT.getOurUser().getPermissionsForGuild(server)
 				.contains(Permissions.SEND_MESSAGES)) {
 			IUser serverOwner = server.getOwner();
 			IPrivateChannel ownerPm = serverOwner.getOrCreatePMChannel();

@@ -1,4 +1,4 @@
-package us.myles_selim.starota.assistants.registration;
+package us.myles_selim.starota.assistants.points;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,11 +24,11 @@ import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.misc.utils.StatusUpdater;
 import us.myles_selim.starota.misc.utils.StatusUpdater.PresenceData;
 
-public class RegistrationBot {
+public class PointBot {
 
 	public static IDiscordClient CLIENT;
 
-	public static final String BOT_NAME = "Registration Bot";
+	public static final String BOT_NAME = "Point Bot";
 	public static final EnumSet<Permissions> USED_PERMISSIONS = EnumSet.of(Permissions.SEND_MESSAGES,
 			Permissions.READ_MESSAGES, Permissions.MANAGE_MESSAGES, Permissions.USE_EXTERNAL_EMOJIS,
 			Permissions.ADD_REACTIONS);
@@ -38,8 +38,8 @@ public class RegistrationBot {
 	private static boolean started = false;
 
 	public static void start() {
-		if (started || Starota.IS_DEV)
-		// if (started)
+		// if (started || Starota.IS_DEV)
+		if (started)
 			return;
 		started = true;
 
@@ -50,12 +50,12 @@ public class RegistrationBot {
 			e.printStackTrace();
 			return;
 		}
-		builder.withToken(PROPERTIES.getProperty("registration_bot"));
+		builder.withToken(PROPERTIES.getProperty("point_bot"));
 		try {
 			CLIENT = builder.login();
 		} catch (DiscordException e) {
 			e.printStackTrace();
-			System.err.println("failed to start Registration bot");
+			System.err.println("failed to start " + BOT_NAME);
 			return;
 		}
 		try {
@@ -67,9 +67,12 @@ public class RegistrationBot {
 		StatusUpdater statuses = new StatusUpdater(CLIENT);
 		statuses.addPresence(new PresenceData(StatusType.ONLINE, ActivityType.PLAYING,
 				"v" + StarotaConstants.VERSION + (Starota.DEBUG || Starota.IS_DEV ? "d" : "")));
+		statuses.addPresence(new PresenceData(StatusType.ONLINE, ActivityType.STREAMING, "quest data"));
+		statuses.addPresence(
+				new PresenceData(StatusType.ONLINE, ActivityType.WATCHING, "players complete quests"));
 		statuses.start();
 
-		CLIENT.getDispatcher().registerListener(new RegistrationEventHandler());
+		CLIENT.getDispatcher().registerListener(new PointEventHandler());
 	}
 
 	public static IUser getOurUser() {
@@ -87,9 +90,9 @@ public class RegistrationBot {
 	}
 
 	public static DiscordBotListAPI getBotListAPI() {
-		if (BOT_LIST == null && PROPERTIES.containsKey("registration_bot_list_token"))
+		if (BOT_LIST == null && PROPERTIES.containsKey("point_bot_list_token"))
 			BOT_LIST = new DiscordBotListAPI.Builder()
-					.token(PROPERTIES.getProperty("registration_bot_list_token"))
+					.token(PROPERTIES.getProperty("point_bot_list_token"))
 					.botId(CLIENT.getOurUser().getStringID()).build();
 		return BOT_LIST;
 	}
@@ -97,7 +100,7 @@ public class RegistrationBot {
 	public static void updateOwners() {
 		if (Starota.IS_DEV)
 			return;
-		IRole ownerRole = CLIENT.getRoleByID(578327458873475085L);
+		IRole ownerRole = CLIENT.getRoleByID(580813099624431636L);
 		List<IUser> currentOwners = new ArrayList<>();
 		for (IGuild g : CLIENT.getGuilds()) {
 			IUser owner = CLIENT.getGuildByID(StarotaConstants.SUPPORT_SERVER)
