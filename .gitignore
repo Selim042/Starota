@@ -16,4 +16,7 @@ starotaData/leaderboard/*
 starotaData/regions/*
 starota_dump*
 
+configs/*
+*.traineddata
+
 /target/
