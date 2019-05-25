@@ -29,8 +29,6 @@ import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
-import us.myles_selim.starota.assistants.CommandInviteAssistants;
-import us.myles_selim.starota.assistants.StarotaAssistants;
 import us.myles_selim.starota.assistants.points.PointBot;
 import us.myles_selim.starota.assistants.pokedex.PokedexBot;
 import us.myles_selim.starota.assistants.registration.RegistrationBot;
@@ -108,7 +106,6 @@ import us.myles_selim.starota.trading.commands.CommandTradeboardHelp;
 import us.myles_selim.starota.vote_rewards.CommandVotePerks;
 import us.myles_selim.starota.vote_rewards.VoteReminderThread;
 import us.myles_selim.starota.webserver.WebServer;
-import us.myles_selim.starota.webserver.WebhookEventHandler;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class Starota {
@@ -171,7 +168,6 @@ public class Starota {
 				System.err.println("Failed to login, exiting");
 				return;
 			}
-			StarotaAssistants.init();
 			EventDispatcher dispatcher = CLIENT.getDispatcher();
 			try {
 				while (!CLIENT.isReady())
@@ -226,11 +222,11 @@ public class Starota {
 			dispatcher.registerListener(COMMAND_HANDLER);
 			dispatcher.registerListener(REACTION_MESSAGES_REGISTRY);
 			dispatcher.registerListener(new EventHandler());
-			dispatcher.registerListener(new WebhookEventHandler());
 			// ReactionMessageRegistry.init();
 			WebServer.init();
 			PokedexBot.start();
 			RegistrationBot.start();
+			PointBot.start();
 			submitStats();
 
 			try {
@@ -352,7 +348,6 @@ public class Starota {
 		jCmdHandler.registerCommand(new CommandVote(Starota.BOT_NAME, StarotaConstants.STAROTA_ID));
 
 		jCmdHandler.registerCommand("Administrative", new CommandStatus());
-		jCmdHandler.registerCommand("Administrative", new CommandInviteAssistants());
 		jCmdHandler.registerCommand("Administrative", new CommandVotePerks());
 		jCmdHandler.registerCommand("Administrative", new CommandSettings());
 		if (IS_DEV) {

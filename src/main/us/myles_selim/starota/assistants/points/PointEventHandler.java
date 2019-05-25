@@ -1,19 +1,24 @@
 package us.myles_selim.starota.assistants.points;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IMessage;
+import sx.blah.discord.handle.obj.IMessage.Attachment;
 import sx.blah.discord.handle.obj.IPrivateChannel;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.misc.utils.IJournalEntry;
 import us.myles_selim.starota.misc.utils.ImageHelper;
 import us.myles_selim.starota.misc.utils.OcrHelper;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
-import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class PointEventHandler {
@@ -58,24 +63,23 @@ public class PointEventHandler {
 		}
 	}
 
-	// TODO: finish this
 	@EventSubscriber
 	public void onMessage(MessageReceivedEvent event) {
 		if (event.getAuthor().isBot() || event.getMessage().getAttachments().size() != 1)
 			return;
 		StarotaServer server = StarotaServer.getServer(event.getGuild());
-		IUser author = event.getAuthor();
-		if (!server.hasProfile(author)) {
-			PlayerProfile profile = OcrHelper.getProfile(server,
-					ImageHelper.getImage(event.getMessage().getAttachments().get(0).getUrl()));
-			if (profile == null) {
-				event.getChannel().sendMessage("profile == null");
-				return;
-			}
-			profile.setDiscordId(author.getLongID()).toEmbed(server);
-			server.setProfile(author, profile);
-			event.getChannel().sendMessage(profile.toEmbed(server));
-		}
+		IMessage msg = event.getMessage();
+		String msgS = msg.getContent();
+		if (msgS.startsWith(server.getPrefix()) || msg.getAttachments().size() <= 0)
+			return;
+		StringBuilder out = new StringBuilder("```\n");
+		List<IJournalEntry> entries = new LinkedList<>();
+		for (Attachment attach : msg.getAttachments())
+			entries.addAll(OcrHelper.getJournalEntries(server, ImageHelper.getImage(attach.getUrl())));
+		for (IJournalEntry entry : entries)
+			out.append(entry.toString() + "\n");
+		out.append("```");
+		msg.reply(out.toString());
 	}
 
 }

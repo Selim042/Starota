@@ -12,12 +12,13 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.Storage;
+import us.myles_selim.starota.Starota;
 
 public class Leaderboard extends DataType<Leaderboard> {
 
 	public static final int PER_PAGE = 10;
 
-	private IGuild server;
+	private IGuild guild;
 	private String displayName;
 	private List<LeaderboardEntry> entries;
 	private List<String> aliases;
@@ -33,7 +34,7 @@ public class Leaderboard extends DataType<Leaderboard> {
 	}
 
 	public Leaderboard(IGuild server, String displayName, boolean decending) {
-		this.server = server;
+		this.guild = server;
 		this.displayName = displayName;
 		this.entries = new LinkedList<>();
 		this.aliases = new LinkedList<>();
@@ -143,7 +144,7 @@ public class Leaderboard extends DataType<Leaderboard> {
 			found = true;
 			LeaderboardEntry entry = this.entries.get(i);
 			IUser user = entry.getDiscordUser();
-			String userDisplay = user.getNicknameForGuild(server);
+			String userDisplay = user.getNicknameForGuild(guild);
 			if (userDisplay == null)
 				userDisplay = user.getName() + "#" + user.getDiscriminator();
 			else
@@ -194,7 +195,7 @@ public class Leaderboard extends DataType<Leaderboard> {
 		this.decending = value.decending;
 		this.displayName = value.displayName;
 		this.entries = new LinkedList<>(value.entries);
-		this.server = value.server;
+		this.guild = value.guild;
 		this.type = value.type;
 		this.isEnabled = value.isEnabled;
 	}
@@ -241,6 +242,7 @@ public class Leaderboard extends DataType<Leaderboard> {
 		else
 			stor.writeInt(this.type.ordinal());
 		stor.writeByte((byte) (isEnabled ? 1 : 2));
+		stor.writeLong(this.guild.getLongID());
 	}
 
 	@Override
@@ -263,6 +265,9 @@ public class Leaderboard extends DataType<Leaderboard> {
 			this.type = EnumUpdateType.values()[type];
 		byte enabledByte = stor.readByte();
 		this.isEnabled = enabledByte == 0 || enabledByte == 1 ? true : false;
+		long guildId = stor.readLong();
+		if (guildId != 0)
+			this.guild = Starota.getGuild(guildId);
 	}
 
 	public enum EnumUpdateType {

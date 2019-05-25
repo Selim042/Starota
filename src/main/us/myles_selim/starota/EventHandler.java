@@ -21,17 +21,12 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
-import us.myles_selim.starota.assistants.StarotaAssistants;
 import us.myles_selim.starota.debug_server.DebugServer;
 import us.myles_selim.starota.misc.data_types.cache.ClearCache;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class EventHandler {
-
-	// private static final long RESEARCH_WEBHOOK = 490020347408678922L;
-	// private static final String SUBMITTED_REGEX = "\\*\\*Submitted by:\\*\\*
-	// .*#\\d{4}";
 
 	@EventSubscriber
 	public void onMessageRecieved(MessageReceivedEvent event) {
@@ -40,38 +35,6 @@ public class EventHandler {
 		if (Starota.DEBUG)
 			System.out.println("Channel: " + event.getChannel() + ", Author: " + event.getAuthor()
 					+ ", Message: " + event.getMessage());
-		// if (JavaCommandHandler.executeCommand(event.getMessage(),
-		// event.getGuild(), event.getChannel()))
-		// return;
-		// if (event.getGuild().getLongID() == Starota.PVILLE_SERVER) {
-		// long authorId = event.getAuthor().getLongID();
-		// long webhookId = event.getMessage().getWebhookLongID();
-		// if (webhookId == RESEARCH_WEBHOOK) {
-		// System.out.println("webhook research");
-		// IMessage message = event.getMessage();
-		// List<IEmbed> embeds = message.getEmbeds();
-		// for (IEmbed embed : embeds) {
-		// for (String line : embed.getDescription().split("\n")) {
-		// if (line.matches(SUBMITTED_REGEX)) {
-		// String trueAuthor = line.substring(18);
-		// IUser trueAuthorUser = Starota.findUser(event.getGuild().getLongID(),
-		// trueAuthor);
-		// if (trueAuthorUser != null) {
-		// authorId = trueAuthorUser.getLongID();
-		// System.out.println(
-		// "true author for \"" + line + "\" is " + trueAuthorUser.getName()
-		// + "#" + trueAuthorUser.getDiscriminator());
-		// } else
-		// authorId = -1;
-		// }
-		// }
-		// }
-		// }
-		// if (authorId != -1)
-		// ResearchTracker.addPost(event.getGuild().getLongID(), authorId);
-		// }
-		// else
-		// ResearchTracker.addPost(event.getGuild(), event.getAuthor());
 	}
 
 	@EventSubscriber
@@ -113,9 +76,8 @@ public class EventHandler {
 
 	@EventSubscriber
 	public void onUserJoin(UserJoinEvent event) {
-		Starota.updateOwners();
-		if (StarotaAssistants.isAssistant(event.getUser()))
-			StarotaAssistants.setAssistantRole(event.getGuild(), event.getUser());
+		if (event.getGuild().getLongID() == StarotaConstants.SUPPORT_SERVER)
+			Starota.updateOwners();
 	}
 
 	private static final Map<String, Consumer<String>> CACHES = new HashMap<>();
@@ -137,38 +99,38 @@ public class EventHandler {
 
 	@EventSubscriber
 	public void cacheHandler(MessageReceivedEvent event) {
-//		if (!(event.getChannel() instanceof IPrivateChannel))
-//			return;
-//		IPrivateChannel channel = (IPrivateChannel) event.getChannel();
-//		// Selim's user id
-//		if (channel.getRecipient().getLongID() != 134855940938661889L)
-//			return;
-//		String message = event.getMessage().getContent();
-//		if (message.startsWith(".help")) {
-//			channel.sendMessage(".dumpCache\n" + ".getCaches\n");
-//			return;
-//		}
-//		String[] args = message.split(" ");
-//		switch (args[0].toLowerCase()) {
-//		case ".getcaches":
-//			String out = "";
-//			for (String key : CACHES.keySet())
-//				out += key + ", ";
-//			channel.sendMessage(out);
-//			return;
-//		case ".dumpcache":
-//			if (args.length < 2) {
-//				channel.sendMessage("Usage: .dumpCache <cacheName>");
-//				return;
-//			}
-//			if (!CACHES.containsKey(args[1])) {
-//				channel.sendMessage("Cache not found");
-//				return;
-//			}
-//			CACHES.get(args[1]).accept(args[1]);
-//			channel.sendMessage("Dumped");
-//			return;
-//		}
+		// if (!(event.getChannel() instanceof IPrivateChannel))
+		// return;
+		// IPrivateChannel channel = (IPrivateChannel) event.getChannel();
+		// // Selim's user id
+		// if (channel.getRecipient().getLongID() != 134855940938661889L)
+		// return;
+		// String message = event.getMessage().getContent();
+		// if (message.startsWith(".help")) {
+		// channel.sendMessage(".dumpCache\n" + ".getCaches\n");
+		// return;
+		// }
+		// String[] args = message.split(" ");
+		// switch (args[0].toLowerCase()) {
+		// case ".getcaches":
+		// String out = "";
+		// for (String key : CACHES.keySet())
+		// out += key + ", ";
+		// channel.sendMessage(out);
+		// return;
+		// case ".dumpcache":
+		// if (args.length < 2) {
+		// channel.sendMessage("Usage: .dumpCache <cacheName>");
+		// return;
+		// }
+		// if (!CACHES.containsKey(args[1])) {
+		// channel.sendMessage("Cache not found");
+		// return;
+		// }
+		// CACHES.get(args[1]).accept(args[1]);
+		// channel.sendMessage("Dumped");
+		// return;
+		// }
 	}
 
 	// update Patreon perms on debug server

@@ -20,6 +20,7 @@ import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.misc.utils.StatusUpdater;
 import us.myles_selim.starota.misc.utils.StatusUpdater.PresenceData;
@@ -73,6 +74,9 @@ public class PointBot {
 		statuses.start();
 
 		CLIENT.getDispatcher().registerListener(new PointEventHandler());
+		PrimaryCommandHandler cmdHandler = new PrimaryCommandHandler(CLIENT);
+		CLIENT.getDispatcher().registerListener(cmdHandler);
+		
 	}
 
 	public static IUser getOurUser() {
@@ -111,8 +115,7 @@ public class PointBot {
 				RequestBuffer.request(() -> owner.addRole(ownerRole));
 			currentOwners.add(owner);
 		}
-		for (IUser u : CLIENT.getGuildByID(StarotaConstants.SUPPORT_SERVER)
-				.getUsersByRole(ownerRole))
+		for (IUser u : CLIENT.getGuildByID(StarotaConstants.SUPPORT_SERVER).getUsersByRole(ownerRole))
 			if (!currentOwners.contains(u))
 				u.removeRole(ownerRole);
 	}

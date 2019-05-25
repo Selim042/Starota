@@ -8,10 +8,6 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.commands.StarotaCommand;
-import us.myles_selim.starota.reaction_messages.ReactionMessage;
-import us.myles_selim.starota.reaction_messages.ReactionMessageRegistry;
-import us.myles_selim.starota.webserver.webhooks.WebhookRaid;
-import us.myles_selim.starota.webserver.webhooks.reaction_messages.WebhookRaidReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandRaid extends StarotaCommand {
@@ -63,15 +59,7 @@ public class CommandRaid extends StarotaCommand {
 								"**Usage**: " + server.getPrefix() + this.getName() + " [time]");
 						return;
 					}
-					ReactionMessage rMsg = ReactionMessageRegistry.getRegistry(channel.getShard())
-							.getMessage(key);
-					if (rMsg instanceof WebhookRaidReactionMessage) {
-						WebhookRaid raidData = ((WebhookRaidReactionMessage) rMsg).getRaidData();
-						new RaidReactionMessage(raidData.getPokemon(), raidData.getForm(),
-								raidData.level, args[1], raidData.getGymName()).sendMessage(channel);
-						return;
-					} else
-						needsTier = true;
+					needsTier = true;
 				}
 			}
 			if (needsTier) {

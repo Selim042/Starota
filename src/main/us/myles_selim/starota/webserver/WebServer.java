@@ -9,7 +9,6 @@ import java.util.Properties;
 import com.sun.net.httpserver.HttpServer;
 
 import us.myles_selim.starota.misc.utils.StarotaConstants;
-import us.myles_selim.starota.webserver.webhooks.other.HttpHandlerWebhooks;
 
 // https://www.reddit.com/r/discordapp/comments/82p8i6/a_basic_tutorial_on_how_to_get_the_most_out_of/
 @SuppressWarnings("restriction")
@@ -35,7 +34,7 @@ public class WebServer {
 		try {
 			HttpServer server = HttpServer
 					.create(new InetSocketAddress(InetAddress.getByName("0.0.0.0"), PORT), 100);
-			server.createContext("/webhooks/", new HttpHandlerWebhooks());
+			//server.createContext("/webhooks/", new HttpHandlerWebhooks());
 			server.setExecutor(null);
 			server.start();
 		} catch (IOException e) {

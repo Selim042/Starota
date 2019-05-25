@@ -18,7 +18,6 @@ import javax.annotation.Nonnull;
 
 import org.discordbots.api.client.entity.SimpleUser;
 
-import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
@@ -37,9 +36,6 @@ import us.myles_selim.starota.commands.settings.types.SettingString;
 import us.myles_selim.starota.enums.EnumDonorPerm;
 import us.myles_selim.starota.enums.EnumGender;
 import us.myles_selim.starota.enums.EnumPokemon;
-import us.myles_selim.starota.geofence.GeoPoint;
-import us.myles_selim.starota.geofence.GeoRegion;
-import us.myles_selim.starota.geofence.GeoRegion.DataTypeGeoRegion;
 import us.myles_selim.starota.leaderboards.DefaultLeaderboard;
 import us.myles_selim.starota.leaderboards.DefaultLeaderboard.EnumBadgeLeaderboard;
 import us.myles_selim.starota.leaderboards.Leaderboard;
@@ -56,7 +52,6 @@ import us.myles_selim.starota.silph_road.SilphRoadCardUtils;
 import us.myles_selim.starota.trading.TradeboardPost;
 import us.myles_selim.starota.trading.forms.FormSet;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
-import us.myles_selim.starota.webserver.webhooks.EnumWebhookType;
 
 public class StarotaServer {
 
@@ -64,7 +59,6 @@ public class StarotaServer {
 	private static final File OPTIONS = new File(Starota.DATA_FOLDER, "options");
 	private static final File TRADEBOARD = new File(Starota.DATA_FOLDER, "tradeboard");
 	private static final File LEADERBOARDS = new File(Starota.DATA_FOLDER, "leaderboard");
-	private static final File REGIONS = new File(Starota.DATA_FOLDER, "regions");
 
 	public static final String TRADE_ID_KEY = "trade_id";
 
@@ -74,7 +68,6 @@ public class StarotaServer {
 	private EBList<TradeboardPost> tradeboard;
 	private EBStorage leaderboards;
 	private Map<String, Long> battleTimers = new ConcurrentHashMap<>();
-	private EBStorage regions;
 
 	// private int numDays;
 	// private int day;
@@ -468,38 +461,6 @@ public class StarotaServer {
 	}
 	// end pvp stuffs
 
-	// start region stuffs
-	public String getRegion(GeoPoint point) {
-		for (String key : regions.getKeys())
-			if (regions.get(key, GeoRegion.class).coordinateInRegion(point))
-				return key;
-		return null;
-	}
-
-	public IChannel getChannel(EnumWebhookType type, GeoPoint point) {
-		for (String key : regions.getKeys()) {
-			GeoRegion region = regions.get(key, GeoRegion.class);
-			long channelId = region.getHookChannel(type);
-			if (channelId != -1 && region.coordinateInRegion(point))
-				return Starota.getChannel(channelId);
-		}
-		return null;
-	}
-
-	public GeoRegion defineRegion(String name, GeoRegion region) {
-		regions.set(name, region);
-		return region;
-	}
-
-	public boolean deleteRegion(String name) {
-		if (regions.containsKey(name)) {
-			regions.clearKey(name);
-			return true;
-		}
-		return false;
-	}
-	// end region stuffs
-
 	// start vote stuff
 	@SuppressWarnings("deprecation")
 	public float getVoterPercent() {
@@ -736,8 +697,6 @@ public class StarotaServer {
 				new TradeboardPost());
 		server.leaderboards = ServerDataHelper.getEBSFromFolder(guild, LEADERBOARDS)
 				.registerType(new Leaderboard());
-		server.regions = ServerDataHelper.getEBSFromFolder(guild, REGIONS)
-				.registerType(new DataTypeGeoRegion());
 
 		return server;
 	}
