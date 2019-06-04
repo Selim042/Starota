@@ -36,6 +36,7 @@ import us.myles_selim.starota.commands.CommandArticleMessage;
 import us.myles_selim.starota.commands.CommandChangelog;
 import us.myles_selim.starota.commands.CommandCredits;
 import us.myles_selim.starota.commands.CommandGenerateCommandWiki;
+import us.myles_selim.starota.commands.CommandGetTimezones;
 import us.myles_selim.starota.commands.CommandInvite;
 import us.myles_selim.starota.commands.CommandPing;
 import us.myles_selim.starota.commands.CommandStatus;
@@ -48,6 +49,7 @@ import us.myles_selim.starota.commands.selim_pm.SelimPMCommandHandler;
 import us.myles_selim.starota.commands.settings.CommandSettings;
 import us.myles_selim.starota.commands.settings.types.SettingBoolean;
 import us.myles_selim.starota.commands.settings.types.SettingChannel;
+import us.myles_selim.starota.commands.settings.types.SettingTimeZone;
 import us.myles_selim.starota.commands.tutorial.commands.CommandTutorial;
 import us.myles_selim.starota.debug_server.DebugServer;
 import us.myles_selim.starota.leaderboards.commands.CommandEditLeaderboard;
@@ -61,6 +63,7 @@ import us.myles_selim.starota.lua.LuaEventHandler;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.commands.CommandUploadScript;
 import us.myles_selim.starota.lua.commands.LuaCommandHandler;
+import us.myles_selim.starota.misc.data_types.BotServer;
 import us.myles_selim.starota.misc.data_types.NullChannel;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
@@ -175,6 +178,7 @@ public class Starota {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			BotServer.registerServerType(CLIENT, StarotaServer.class);
 
 			// default settings, do this before anything else with StarotaServer
 			StarotaServer
@@ -185,6 +189,8 @@ public class Starota {
 					"Channel where " + BOT_NAME + " prints out news articles when they are published."));
 			StarotaServer.setDefaultValue(new SettingBoolean(StarotaConstants.Settings.PROFILE_NICKNAME,
 					"Sets nickname to PoGo username when profile is made.", true));
+			StarotaServer.setDefaultValue(new SettingTimeZone(StarotaConstants.Settings.TIMEZONE,
+					"Sets the server timezone.  For options, use `getTimezones`.", null));
 
 			// default leaderboards
 			StarotaServer.registerDefaultLeaderboards();
@@ -204,7 +210,7 @@ public class Starota {
 			System.out.println("registering commands");
 			CLIENT.changePresence(StatusType.DND, ActivityType.PLAYING, "registering commands...");
 
-			JavaCommandHandler jCmdHandler = new JavaCommandHandler();
+			JavaCommandHandler jCmdHandler = new JavaCommandHandler(CLIENT);
 			COMMAND_HANDLER.registerCommandHandler(jCmdHandler);
 			registerCommands(jCmdHandler);
 
@@ -275,7 +281,7 @@ public class Starota {
 
 			LuaUtils.registerConverters();
 			dispatcher.registerListener(new LuaEventHandler());
-			COMMAND_HANDLER.registerCommandHandler(new LuaCommandHandler());
+			COMMAND_HANDLER.registerCommandHandler(new LuaCommandHandler(CLIENT));
 
 			FULLY_STARTED = true;
 			DebugServer.update();
@@ -350,6 +356,7 @@ public class Starota {
 		jCmdHandler.registerCommand("Administrative", new CommandStatus());
 		jCmdHandler.registerCommand("Administrative", new CommandVotePerks());
 		jCmdHandler.registerCommand("Administrative", new CommandSettings());
+		jCmdHandler.registerCommand("Administrative", new CommandGetTimezones());
 		if (IS_DEV) {
 			jCmdHandler.registerCommand("Debug", new CommandTest());
 			jCmdHandler.registerCommand("Debug", new CommandGenerateCommandWiki());

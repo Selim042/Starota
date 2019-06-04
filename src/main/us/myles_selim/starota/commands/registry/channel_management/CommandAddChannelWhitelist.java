@@ -4,10 +4,10 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandAddChannelWhitelist extends StarotaCommand {
+public class CommandAddChannelWhitelist extends BotCommand<StarotaServer> {
 
 	public CommandAddChannelWhitelist() {
 		super("addChannelWhitelist");

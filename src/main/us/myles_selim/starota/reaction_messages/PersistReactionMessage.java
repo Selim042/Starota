@@ -19,7 +19,7 @@ public abstract class PersistReactionMessage extends ReactionMessage {
 		}
 
 		@Override
-		public void setValue(PersistReactionMessage value) {
+		protected void setValueInternal(PersistReactionMessage value) {
 			this.value = value;
 		}
 

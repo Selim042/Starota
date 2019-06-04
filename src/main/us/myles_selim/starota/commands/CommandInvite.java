@@ -8,7 +8,7 @@ import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandInvite extends StarotaCommand {
+public class CommandInvite extends BotCommand<StarotaServer> {
 
 	private String botName;
 	private long botId;

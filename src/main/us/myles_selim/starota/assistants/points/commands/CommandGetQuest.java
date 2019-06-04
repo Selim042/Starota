@@ -4,13 +4,13 @@ import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
-import us.myles_selim.starota.commands.StarotaCommand;
-import us.myles_selim.starota.wrappers.StarotaServer;
+import us.myles_selim.starota.assistants.points.PointServer;
+import us.myles_selim.starota.commands.BotCommand;
 
-public class CommandGetQuest extends StarotaCommand {
+public class CommandGetQuest extends BotCommand<PointServer> {
 
 	public CommandGetQuest() {
-		super("getQuest", "Gets the current quest.");
+		super("getQuest", "Gets the current quests.");
 	}
 
 	@Override
@@ -21,7 +21,7 @@ public class CommandGetQuest extends StarotaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
+	public void execute(String[] args, IMessage message, PointServer server, IChannel channel)
 			throws Exception {
 		super.execute(args, message, server, channel);
 	}

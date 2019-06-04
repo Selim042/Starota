@@ -30,9 +30,11 @@ import us.myles_selim.starota.commands.CommandSupportBot;
 import us.myles_selim.starota.commands.CommandVote;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
+import us.myles_selim.starota.misc.data_types.BotServer;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.pokedex.CommandPokedex;
 import us.myles_selim.starota.reaction_messages.ReactionMessageRegistry;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class PokedexBot {
 
@@ -75,6 +77,7 @@ public class PokedexBot {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		BotServer.registerServerType(CLIENT, StarotaServer.class);
 		COMMAND_HANDLER = new PrimaryCommandHandler(CLIENT, (IChannel ch) -> {
 			IUser starota = CLIENT.getUserByID(StarotaConstants.STAROTA_ID);
 			IUser starotaDev = CLIENT.getUserByID(StarotaConstants.STAROTA_DEV_ID);
@@ -101,7 +104,7 @@ public class PokedexBot {
 		};
 		statusUpdater.start();
 
-		JavaCommandHandler jCmdHandler = new JavaCommandHandler();
+		JavaCommandHandler jCmdHandler = new JavaCommandHandler(CLIENT);
 		COMMAND_HANDLER.registerCommandHandler(jCmdHandler);
 		jCmdHandler.registerDefaultCommands();
 

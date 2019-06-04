@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
@@ -26,6 +27,11 @@ public class JavaCommandHandler implements ICommandHandler {
 
 	private final List<JavaCommand> COMMANDS = new CopyOnWriteArrayList<>();
 	private final List<String> CATEGORIES = new CopyOnWriteArrayList<>();
+	private final IDiscordClient client;
+
+	public JavaCommandHandler(IDiscordClient client) {
+		this.client = client;
+	}
 
 	public void registerDefaultCommands() {
 		DebugServer.addPermission(Permissions.READ_MESSAGES);
@@ -119,30 +125,9 @@ public class JavaCommandHandler implements ICommandHandler {
 		return getAllCategories();
 	}
 
-	// public static void main(String... argsM) {
-	// String cmdS = "register \"Selim042 (Myles)\" 2";
-	// List<String> argsL = new ArrayList<>();
-	// String longArg = "";
-	// for (String arg : cmdS.split(" ")) {
-	// if (arg.startsWith("\"") && arg.endsWith("\""))
-	// argsL.add(arg);
-	// else if (arg.startsWith("\""))
-	// longArg += arg;
-	// else if (longArg != "" && arg.endsWith("\"")) {
-	// String longArgFull = longArg + " " + arg;
-	// argsL.add(longArgFull.substring(1, longArgFull.length() - 1));
-	// longArg = "";
-	// } else if (longArg != "")
-	// longArg += " " + arg;
-	// else
-	// argsL.add(arg);
-	// }
-	// if (longArg != "")
-	// for (String s : longArg.split(" "))
-	// argsL.add(s);
-	// String[] args = argsL.toArray(new String[0]);
-	// for (String s : args)
-	// System.out.println(s);
-	// }
+	@Override
+	public IDiscordClient getDiscordClient() {
+		return client;
+	}
 
 }

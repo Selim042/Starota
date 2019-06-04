@@ -8,13 +8,13 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IMessage.Attachment;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.Permissions;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.lua.ScriptManager;
 import us.myles_selim.starota.misc.utils.RolePermHelper;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandUploadScript extends StarotaCommand {
+public class CommandUploadScript extends BotCommand<StarotaServer> {
 
 	public CommandUploadScript() {
 		super("uploadScript", "Uploads a Lua script to Starota.");

@@ -9,12 +9,12 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.trading.TradeboardPost;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandGetUserTrades extends StarotaCommand {
+public class CommandGetUserTrades extends BotCommand<StarotaServer> {
 
 	public CommandGetUserTrades() {
 		super("getUserTrades", "Get trades either you posted or a specific user.");

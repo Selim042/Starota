@@ -23,7 +23,7 @@ public class ChannelDataType extends DataType<IChannel> {
 	}
 
 	@Override
-	public void setValue(IChannel value) {
+	protected void setValueInternal(IChannel value) {
 		this.value = value;
 	}
 

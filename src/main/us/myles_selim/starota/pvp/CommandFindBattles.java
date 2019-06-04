@@ -8,13 +8,13 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.misc.data_types.Pair;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandFindBattles extends StarotaCommand {
+public class CommandFindBattles extends BotCommand<StarotaServer> {
 
 	private static final int PLAYERS_PER_PAGE = 10;
 

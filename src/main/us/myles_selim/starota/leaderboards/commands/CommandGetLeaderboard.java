@@ -6,11 +6,11 @@ import java.util.List;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.leaderboards.Leaderboard;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandGetLeaderboard extends StarotaCommand {
+public class CommandGetLeaderboard extends BotCommand<StarotaServer> {
 
 	public CommandGetLeaderboard() {
 		super("getLeaderboard", "Displays the specified leaderboard.");

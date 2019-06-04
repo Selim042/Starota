@@ -6,12 +6,12 @@ import java.util.List;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.leaderboards.Leaderboard;
 import us.myles_selim.starota.misc.utils.RolePermHelper;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandEditLeaderboard extends StarotaCommand {
+public class CommandEditLeaderboard extends BotCommand<StarotaServer> {
 
 	private static final String OPTIONS = "**Options**:\n"
 			+ " - addAlias\n - removeAlias\n - aliases (comma delimited)\n - color\n - enabled";

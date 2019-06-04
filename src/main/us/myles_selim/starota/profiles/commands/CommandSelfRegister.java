@@ -8,13 +8,13 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandSelfRegister extends StarotaCommand {
+public class CommandSelfRegister extends BotCommand<StarotaServer> {
 
 	public CommandSelfRegister() {
 		super("sregister", "Registers your own profile and assigns you a profile.");

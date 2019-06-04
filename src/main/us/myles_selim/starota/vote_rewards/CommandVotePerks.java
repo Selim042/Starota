@@ -5,10 +5,10 @@ import java.util.EnumSet;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandVotePerks extends StarotaCommand {
+public class CommandVotePerks extends BotCommand<StarotaServer> {
 
 	public CommandVotePerks() {
 		super("votePerks", "Configure vote perks.");

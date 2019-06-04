@@ -7,10 +7,10 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandModules extends StarotaCommand {
+public class CommandModules extends BotCommand<StarotaServer> {
 
 	public CommandModules() {
 		super("modules", "Manage your enabled modules.");

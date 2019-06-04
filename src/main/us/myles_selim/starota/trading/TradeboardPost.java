@@ -192,7 +192,7 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 	}
 
 	@Override
-	public void setValue(TradeboardPost value) {
+	protected void setValueInternal(TradeboardPost value) {
 		if (value == null)
 			return;
 		this.id = value.id;

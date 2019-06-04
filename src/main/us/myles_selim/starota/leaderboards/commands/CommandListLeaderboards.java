@@ -8,11 +8,11 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.leaderboards.Leaderboard;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandListLeaderboards extends StarotaCommand {
+public class CommandListLeaderboards extends BotCommand<StarotaServer> {
 
 	public CommandListLeaderboards() {
 		super("listLeaderboards", "Displays all leaderboards.");
@@ -36,9 +36,8 @@ public class CommandListLeaderboards extends StarotaCommand {
 		IUser author = message.getAuthor();
 		EmbedBuilder builder = new EmbedBuilder();
 		List<Leaderboard> boards = server.getLeaderboards();
-		builder.withTitle("Leaderboards on " + server.getDiscordGuild().getName() + ":");
-		boolean isAdmin = author.getPermissionsForGuild(server.getDiscordGuild())
-				.contains(Permissions.ADMINISTRATOR);
+		builder.withTitle("Leaderboards on " + server.getName() + ":");
+		boolean isAdmin = author.getPermissionsForGuild(server).contains(Permissions.ADMINISTRATOR);
 		for (Leaderboard b : boards)
 			builder.appendDesc(
 					b.getDisplayName() + (isAdmin && !b.isActive() ? " _inactive_" : "") + "\n");

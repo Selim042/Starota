@@ -6,11 +6,11 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.role_management.GroupManager;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandAddGroup extends StarotaCommand {
+public class CommandAddGroup extends BotCommand<StarotaServer> {
 
 	public CommandAddGroup() {
 		super("addGroup", "Join the given group.");

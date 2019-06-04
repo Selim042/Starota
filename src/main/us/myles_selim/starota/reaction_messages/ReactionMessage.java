@@ -35,10 +35,10 @@ public class ReactionMessage {
 				(IMessage message, IUser user, boolean added) -> {
 					if (!added)
 						return false;
-					if (index.value <= 0)
-						index.value = index.value - 1;
-					else
+					if (index.value >= 0)
 						index.value--;
+					else
+						index.value = max - 1;
 					return true;
 				}));
 		addButton(new ReactionButton(EmojiConstants.getRightArrowEmoji(),

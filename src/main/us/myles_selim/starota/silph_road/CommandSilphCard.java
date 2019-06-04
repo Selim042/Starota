@@ -10,7 +10,7 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
@@ -20,7 +20,7 @@ import us.myles_selim.starota.silph_road.SilphCard.SilphBadgeData;
 import us.myles_selim.starota.silph_road.SilphCard.SilphSocial;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandSilphCard extends StarotaCommand {
+public class CommandSilphCard extends BotCommand<StarotaServer> {
 
 	public CommandSilphCard() {
 		super("silphCard", "Displays a given users Silph Road card.");

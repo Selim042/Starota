@@ -7,7 +7,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.RequestBuffer;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.enums.EnumGender;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.trading.PokemonInstance;
@@ -15,7 +15,7 @@ import us.myles_selim.starota.trading.TradeboardPost;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandLookingFor extends StarotaCommand {
+public class CommandLookingFor extends BotCommand<StarotaServer> {
 
 	public CommandLookingFor() {
 		super("lookingFor", "Looks for a trade matching your search, creates one if it doesn't exist.");

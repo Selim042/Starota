@@ -9,7 +9,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.leek_duck.events.EventData;
 import us.myles_selim.starota.leek_duck.events.StarotaEvent;
 import us.myles_selim.starota.misc.utils.IndexHolder;
@@ -18,7 +18,7 @@ import us.myles_selim.starota.search.SearchEngine;
 import us.myles_selim.starota.search.SearchOperator;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandSearchEvents extends StarotaCommand {
+public class CommandSearchEvents extends BotCommand<StarotaServer> {
 
 	public CommandSearchEvents() {
 		super("searchEvents", "Searches event information.");

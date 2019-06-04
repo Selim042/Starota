@@ -9,13 +9,13 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.misc.data_types.EggEntry;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
 import us.myles_selim.starota.silph_road.SilphRoadData;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandEggHatches extends StarotaCommand {
+public class CommandEggHatches extends BotCommand<StarotaServer> {
 
 	public CommandEggHatches() {
 		super("eggHatches", "Gets information on what can currently hatch from eggs.");

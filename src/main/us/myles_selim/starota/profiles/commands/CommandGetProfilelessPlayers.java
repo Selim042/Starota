@@ -10,11 +10,11 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandGetProfilelessPlayers extends StarotaCommand {
+public class CommandGetProfilelessPlayers extends BotCommand<StarotaServer> {
 
 	public CommandGetProfilelessPlayers() {
 		super("getProfilelessPlayers");

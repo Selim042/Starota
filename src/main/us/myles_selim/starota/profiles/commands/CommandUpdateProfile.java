@@ -5,12 +5,12 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandUpdateProfile extends StarotaCommand {
+public class CommandUpdateProfile extends BotCommand<StarotaServer> {
 
 	public CommandUpdateProfile() {
 		super("updateProfile", "Update parts of your profile.");

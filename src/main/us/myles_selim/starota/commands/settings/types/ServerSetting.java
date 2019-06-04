@@ -5,28 +5,29 @@ import java.lang.reflect.InvocationTargetException;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.settings.Setting;
+import us.myles_selim.starota.misc.data_types.BotServer;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public abstract class ServerSetting<V> extends Setting<V> {
 
-	private StarotaServer server;
+	private BotServer server;
 
-	public ServerSetting(StarotaServer server, String name) {
+	public ServerSetting(BotServer server, String name) {
 		super(name);
 		this.server = server;
 	}
 
-	public ServerSetting(StarotaServer server, String name, String desc) {
+	public ServerSetting(BotServer server, String name, String desc) {
 		super(name, desc);
 		this.server = server;
 	}
 
-	public ServerSetting(StarotaServer server, String name, V value) {
+	public ServerSetting(BotServer server, String name, V value) {
 		super(name, value);
 		this.server = server;
 	}
 
-	public ServerSetting(StarotaServer server, String name, String desc, V value) {
+	public ServerSetting(BotServer server, String name, String desc, V value) {
 		super(name, desc, value);
 		this.server = server;
 	}
@@ -36,12 +37,12 @@ public abstract class ServerSetting<V> extends Setting<V> {
 		this.server = setting.server;
 	}
 
-	public ServerSetting(StarotaServer server, ServerSetting<V> setting) {
+	public ServerSetting(BotServer server, ServerSetting<V> setting) {
 		super(setting);
 		this.server = server;
 	}
 
-	public StarotaServer getServer() {
+	public BotServer getServer() {
 		return this.server;
 	}
 
@@ -50,7 +51,7 @@ public abstract class ServerSetting<V> extends Setting<V> {
 		if (getServer() == null)
 			stor.writeLong(-1);
 		else
-			stor.writeLong(getServer().getDiscordGuild().getLongID());
+			stor.writeLong(getServer().getLongID());
 	}
 
 	@Override
@@ -63,15 +64,15 @@ public abstract class ServerSetting<V> extends Setting<V> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public ServerSetting<V> clone(StarotaServer server) {
+	public ServerSetting<V> clone(BotServer server) {
 		Class<?> clazz = this.getClass();
 		try {
-			return (ServerSetting<V>) clazz.getConstructor(StarotaServer.class, clazz)
-					.newInstance(server, this);
+			return (ServerSetting<V>) clazz.getConstructor(BotServer.class, clazz).newInstance(server,
+					this);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException | NoSuchMethodException | SecurityException e) {}
 		throw new IllegalArgumentException(
-				"ServerSetting classes must have a public copy constructor with StarotaServer "
+				"ServerSetting classes must have a public copy constructor with BotServer "
 						+ "as first param, missing in " + clazz.getName());
 	}
 

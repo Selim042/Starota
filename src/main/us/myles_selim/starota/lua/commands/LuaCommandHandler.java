@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
+import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
@@ -20,6 +21,12 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 public class LuaCommandHandler implements ICommandHandler {
 
 	private static final String CATEGORY = "Lua";
+
+	private final IDiscordClient client;
+
+	public LuaCommandHandler(IDiscordClient client) {
+		this.client = client;
+	}
 
 	@Override
 	public boolean executeCommand(String[] args, IMessage message, IGuild guild, IChannel channel)
@@ -60,6 +67,11 @@ public class LuaCommandHandler implements ICommandHandler {
 	@Override
 	public List<String> getAllCategories(IGuild server) {
 		return Collections.singletonList(CATEGORY);
+	}
+
+	@Override
+	public IDiscordClient getDiscordClient() {
+		return client;
 	}
 
 	private class LuaCommand implements ICommand {

@@ -189,7 +189,7 @@ public class Leaderboard extends DataType<Leaderboard> {
 	}
 
 	@Override
-	public void setValue(Leaderboard value) {
+	protected void setValueInternal(Leaderboard value) {
 		this.aliases = new LinkedList<>(value.aliases);
 		this.color = value.color;
 		this.decending = value.decending;

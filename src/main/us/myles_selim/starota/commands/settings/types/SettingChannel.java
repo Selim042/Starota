@@ -2,24 +2,24 @@ package us.myles_selim.starota.commands.settings.types;
 
 import sx.blah.discord.handle.obj.IChannel;
 import us.myles_selim.ebs.Storage;
+import us.myles_selim.starota.misc.data_types.BotServer;
 import us.myles_selim.starota.misc.data_types.NullChannel;
-import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class SettingChannel extends ServerSetting<IChannel> {
 
-	public SettingChannel(StarotaServer server, String name) {
+	public SettingChannel(BotServer server, String name) {
 		super(server, name);
 	}
 
-	public SettingChannel(StarotaServer server, String name, String desc) {
+	public SettingChannel(BotServer server, String name, String desc) {
 		super(server, name, desc);
 	}
 
-	public SettingChannel(StarotaServer server, String name, IChannel value) {
+	public SettingChannel(BotServer server, String name, IChannel value) {
 		super(server, name, value);
 	}
 
-	public SettingChannel(StarotaServer server, String name, String desc, IChannel value) {
+	public SettingChannel(BotServer server, String name, String desc, IChannel value) {
 		super(server, name, value);
 	}
 
@@ -27,7 +27,7 @@ public class SettingChannel extends ServerSetting<IChannel> {
 		super(setting);
 	}
 
-	public SettingChannel(StarotaServer server, SettingChannel setting) {
+	public SettingChannel(BotServer server, SettingChannel setting) {
 		super(server, setting);
 	}
 
@@ -41,13 +41,12 @@ public class SettingChannel extends ServerSetting<IChannel> {
 		if (this.getServer() == null)
 			throw new IllegalArgumentException("server isn't set?");
 		if (str.startsWith("#")) {
-			for (IChannel ch : this.getServer().getDiscordGuild()
-					.getChannelsByName(str.substring(1, str.length()))) {
+			for (IChannel ch : this.getServer().getChannelsByName(str.substring(1, str.length()))) {
 				return this.setValue(ch);
 			}
 		} else if (str.matches("<#[0-9]{18}>")) {
 			try {
-				return this.setValue(this.getServer().getDiscordGuild()
+				return this.setValue(this.getServer()
 						.getChannelByID(Long.parseLong(str.substring(2, str.length() - 1))));
 			} catch (NumberFormatException e) {
 				return false;
@@ -77,7 +76,7 @@ public class SettingChannel extends ServerSetting<IChannel> {
 		if (ch == -1)
 			this.setValue(NullChannel.NULL_CHANNEL);
 		else
-			this.setValue(this.getServer().getDiscordGuild().getChannelByID(ch));
+			this.setValue(this.getServer().getChannelByID(ch));
 	}
 
 }

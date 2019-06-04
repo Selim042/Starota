@@ -5,12 +5,12 @@ import java.util.List;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.leaderboards.Leaderboard;
 import us.myles_selim.starota.leaderboards.LeaderboardEntry;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandUpdateLeaderboard extends StarotaCommand {
+public class CommandUpdateLeaderboard extends BotCommand<StarotaServer> {
 
 	public CommandUpdateLeaderboard() {
 		super("updateLeaderboard", "Updates your leaderboard statistic.");

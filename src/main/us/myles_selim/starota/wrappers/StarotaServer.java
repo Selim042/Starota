@@ -9,10 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 
@@ -24,13 +22,11 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.ebs.EBList;
 import us.myles_selim.ebs.EBStorage;
-import us.myles_selim.ebs.IOHelper;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.settings.Setting;
 import us.myles_selim.starota.commands.settings.SettingSet;
 import us.myles_selim.starota.commands.settings.SettingSet.DataTypeSettingSet;
-import us.myles_selim.starota.commands.settings.SettingSet.EnumReturnSetStatus;
 import us.myles_selim.starota.commands.settings.types.SettingBoolean;
 import us.myles_selim.starota.commands.settings.types.SettingString;
 import us.myles_selim.starota.enums.EnumDonorPerm;
@@ -39,6 +35,7 @@ import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.leaderboards.DefaultLeaderboard;
 import us.myles_selim.starota.leaderboards.DefaultLeaderboard.EnumBadgeLeaderboard;
 import us.myles_selim.starota.leaderboards.Leaderboard;
+import us.myles_selim.starota.misc.data_types.BotServer;
 import us.myles_selim.starota.misc.data_types.Pair;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.RolePermHelper;
@@ -53,7 +50,7 @@ import us.myles_selim.starota.trading.TradeboardPost;
 import us.myles_selim.starota.trading.forms.FormSet;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 
-public class StarotaServer {
+public class StarotaServer extends BotServer {
 
 	private static final File PROFILES = new File(Starota.DATA_FOLDER, "profiles");
 	private static final File OPTIONS = new File(Starota.DATA_FOLDER, "options");
@@ -62,11 +59,10 @@ public class StarotaServer {
 
 	public static final String TRADE_ID_KEY = "trade_id";
 
-	private final IGuild guild;
-	public EBStorage profiles;
-	private EBStorage data;
-	private EBList<TradeboardPost> tradeboard;
-	private EBStorage leaderboards;
+	// private EBStorage profiles;
+	// private EBStorage data;
+	// private EBList<TradeboardPost> tradeboard;
+	// private EBStorage leaderboards;
 	private Map<String, Long> battleTimers = new ConcurrentHashMap<>();
 
 	// private int numDays;
@@ -75,30 +71,48 @@ public class StarotaServer {
 	// private Map<EnumUsageType, int[]> todayUsage;
 
 	private StarotaServer(IGuild server) {
-		this.guild = server;
-	}
-
-	public IGuild getDiscordGuild() {
-		return Starota.getGuild(this.guild.getLongID());
-		// return this.guild;
+		super(Starota.getClient(), server);
+		// setupServer(this);
 	}
 
 	public String getPrefix() {
-		return PrimaryCommandHandler.getPrefix(guild);
+		if (hasDataKey(PrimaryCommandHandler.PREFIX_KEY))
+			return String.valueOf(getDataValue(PrimaryCommandHandler.PREFIX_KEY));
+		return PrimaryCommandHandler.DEFAULT_PREFIX;
+	}
+
+	public void setPrefix(String prefix) {
+		setDataValue(PrimaryCommandHandler.PREFIX_KEY, prefix);
+	}
+
+	@Override
+	protected File getOptionsFile() {
+		return OPTIONS;
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public IGuild copy() {
+		return new StarotaServer(getDiscordGuild());
 	}
 
 	// start profile stuffs
+	private EBStorage getProfilesInternal() {
+		return ServerDataHelper.getEBSFromFolder(this, PROFILES)
+				.registerType(new PlayerProfile.DataTypePlayerProfile());
+	}
+
 	public boolean hasProfile(IUser user) {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.PROFILES))
 			return false;
-		return profiles.containsKey(user.getStringID());
+		return getProfilesInternal().containsKey(user.getStringID());
 	}
 
 	public PlayerProfile getProfile(IUser user) {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.PROFILES))
 			return null;
 		if (hasProfile(user)) {
-			PlayerProfile profile = profiles.get(user.getStringID(), PlayerProfile.class);
+			PlayerProfile profile = getProfilesInternal().get(user.getStringID(), PlayerProfile.class);
 			updateLevel(profile);
 			return profile;
 		}
@@ -109,8 +123,8 @@ public class StarotaServer {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.PROFILES))
 			return null;
 		if ((boolean) this.getSetting(StarotaConstants.Settings.PROFILE_NICKNAME))
-			guild.setUserNickname(user, profile.getPoGoName());
-		profiles.set(user.getStringID(), profile);
+			setUserNickname(user, profile.getPoGoName());
+		getProfilesInternal().set(user.getStringID(), profile);
 		return profile;
 	}
 
@@ -118,8 +132,8 @@ public class StarotaServer {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.PROFILES))
 			return null;
 		List<PlayerProfile> profilesL = new LinkedList<>();
-		for (String k : profiles.getKeys()) {
-			PlayerProfile profile = profiles.get(k, PlayerProfile.class);
+		for (String k : getProfilesInternal().getKeys()) {
+			PlayerProfile profile = getProfilesInternal().get(k, PlayerProfile.class);
 			updateLevel(profile);
 			profilesL.add(profile);
 		}
@@ -129,8 +143,8 @@ public class StarotaServer {
 	public PlayerProfile getProfile(String pogoName) {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.PROFILES))
 			return null;
-		for (String k : profiles.getKeys()) {
-			PlayerProfile profile = profiles.get(k, PlayerProfile.class);
+		for (String k : getProfilesInternal().getKeys()) {
+			PlayerProfile profile = getProfilesInternal().get(k, PlayerProfile.class);
 			if (profile.getPoGoName().equalsIgnoreCase(pogoName)) {
 				updateLevel(profile);
 				return profile;
@@ -150,56 +164,21 @@ public class StarotaServer {
 	}
 	// end profile stuffs
 
-	// start data stuffs
-	public EBStorage getData() {
-		return data;
-	}
-
-	public boolean hasDataKey(String key) {
-		return data.containsKey(key);
-	}
-
-	public boolean hasDataKey(String key, Class<?> type) {
-		return data.containsKey(key) && type != null && type.isInstance(data.get(key));
-	}
-
-	public Object getDataValue(String key) {
-		return data.get(key);
-	}
-
-	public <V> V getDataValue(String key, Class<V> type) {
-		return data.get(key, type);
-	}
-
-	public void setDataValue(String key, Object val) {
-		data.set(key, val);
-	}
-
-	public void clearDataValue(String key) {
-		data.clearKey(key);
-	}
-
-	public void clearDataOptions() {
-		for (String key : data.getKeys())
-			data.clearKey(key);
-		File optionsFile = new File(new File(Starota.DATA_FOLDER, "options"),
-				guild.getLongID() + IOHelper.EBS_EXTENSION);
-		if (optionsFile.exists())
-			optionsFile.delete();
-	}
-	// end data stuffs
-
 	// start tradeboard stuffs
+	private EBList<TradeboardPost> getTradeboardInternal() {
+		return ServerDataHelper.getEBListFromFolder(this, TRADEBOARD, new TradeboardPost());
+	}
+
 	public void addPost(PlayerProfile profile, TradeboardPost post) {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.TRADEBOARD))
 			return;
-		tradeboard.add(post);
+		getTradeboardInternal().add(post);
 	}
 
 	public List<TradeboardPost> getPosts() {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.TRADEBOARD))
 			return null;
-		return tradeboard.values();
+		return getTradeboardInternal().values();
 	}
 
 	public List<TradeboardPost> findPosts(boolean lookingFor, IGuild server, EnumPokemon pokemon) {
@@ -220,6 +199,7 @@ public class StarotaServer {
 			boolean shiny, EnumGender gender, boolean legacy) {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.TRADEBOARD))
 			return null;
+		EBList<TradeboardPost> tradeboard = getTradeboardInternal();
 		if (tradeboard == null)
 			return Collections.emptyList();
 		List<TradeboardPost> matching = new LinkedList<>();
@@ -253,7 +233,7 @@ public class StarotaServer {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.TRADEBOARD))
 			return null;
 		List<TradeboardPost> matching = new LinkedList<>();
-		for (TradeboardPost p : tradeboard.values())
+		for (TradeboardPost p : getTradeboardInternal().values())
 			if (p.getPokemon().equals(pokemon) && (form == null || p.getForm() == form)
 					&& (!shiny || p.isShiny() == shiny)
 					&& (gender == EnumGender.EITHER || gender == p.getGender())
@@ -282,15 +262,15 @@ public class StarotaServer {
 		if (hasDataKey(TRADE_ID_KEY))
 			nextPostId = (int) getDataValue(TRADE_ID_KEY);
 		if (nextPostId >= 9999) {
-			IUser serverOwner = guild.getOwner();
-			System.out.println("Server " + guild.getName() + ", run by " + serverOwner.getName() + "#"
+			IUser serverOwner = getOwner();
+			System.out.println("Server " + getName() + ", run by " + serverOwner.getName() + "#"
 					+ serverOwner.getDiscriminator() + " has hit the 9,999 trade post limit");
 			return null;
 		}
 		TradeboardPost post = new TradeboardPost(nextPostId, lookingFor, owner, pokemon, form, shiny,
 				gender, legacy);
 		setDataValue(TRADE_ID_KEY, nextPostId + 1);
-		tradeboard.addWrapped(post);
+		getTradeboardInternal().addWrapped(post);
 		return post;
 	}
 
@@ -299,7 +279,7 @@ public class StarotaServer {
 			return null;
 		if (id == -1)
 			return null;
-		for (TradeboardPost t : tradeboard.values())
+		for (TradeboardPost t : getTradeboardInternal().values())
 			if (t != null && t.getId() == id)
 				return t;
 		return null;
@@ -309,7 +289,7 @@ public class StarotaServer {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.TRADEBOARD))
 			return null;
 		List<TradeboardPost> posts = new LinkedList<>();
-		for (TradeboardPost t : tradeboard.values())
+		for (TradeboardPost t : getTradeboardInternal().values())
 			if (t != null && t.getOwner() == user.getLongID())
 				posts.add(t);
 		return Collections.unmodifiableList(posts);
@@ -319,6 +299,7 @@ public class StarotaServer {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.TRADEBOARD))
 			return null;
 		TradeboardPost post = null;
+		EBList<TradeboardPost> tradeboard = getTradeboardInternal();
 		for (TradeboardPost t : tradeboard.values())
 			if (t != null && t.getId() == id) {
 				post = t;
@@ -330,6 +311,10 @@ public class StarotaServer {
 	// end tradeboard stuffs
 
 	// start leaderboard stuffs
+	private EBStorage getLeaderboardsInternal() {
+		return ServerDataHelper.getEBSFromFolder(this, LEADERBOARDS).registerType(new Leaderboard());
+	}
+
 	public Leaderboard newLeaderboard(String name) {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.LEADERBOARDS))
 			return null;
@@ -337,24 +322,25 @@ public class StarotaServer {
 		if (testBoard != null)
 			return null;
 		int activeBoards = 0;
+		EBStorage leaderboards = getLeaderboardsInternal();
 		for (String key : leaderboards.getKeys())
 			if (leaderboards.get(key, Leaderboard.class).isActive())
 				activeBoards++;
-		if (activeBoards >= RolePermHelper.getMaxLeaderboards(guild))
+		if (activeBoards >= RolePermHelper.getMaxLeaderboards(this))
 			return null;
-		Leaderboard board = new Leaderboard(guild, name);
+		Leaderboard board = new Leaderboard(this, name);
 		leaderboards.set(name, board);
 		return board;
 	}
 
 	public void setLeaderboard(String name, Leaderboard board) {
-		leaderboards.set(name, board);
+		getLeaderboardsInternal().set(name, board);
 	}
 
 	public int getLeaderboardCount() {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.LEADERBOARDS))
 			return 0;
-		return leaderboards.getKeys().size();
+		return getLeaderboardsInternal().getKeys().size();
 	}
 
 	public List<Leaderboard> getLeaderboards() {
@@ -362,6 +348,7 @@ public class StarotaServer {
 			return null;
 		updateDefaultLeaderboards();
 		List<Leaderboard> boards = new ArrayList<>();
+		EBStorage leaderboards = getLeaderboardsInternal();
 		for (String key : leaderboards.getKeys())
 			boards.add(leaderboards.get(key, Leaderboard.class));
 		return Collections.unmodifiableList(boards);
@@ -372,6 +359,7 @@ public class StarotaServer {
 			return null;
 		updateDefaultLeaderboards();
 		List<Leaderboard> boards = new ArrayList<>();
+		EBStorage leaderboards = getLeaderboardsInternal();
 		for (String key : leaderboards.getKeys()) {
 			Leaderboard board = leaderboards.get(key, Leaderboard.class);
 			if (board.isActive())
@@ -385,6 +373,7 @@ public class StarotaServer {
 			return null;
 		String[] names = new String[] { name, name.replaceAll(" ", "_"), name.replaceAll(" ", "-"),
 				name.replaceAll(" ", "") };
+		EBStorage leaderboards = getLeaderboardsInternal();
 		if (leaderboards.containsKey(name))
 			return leaderboards.get(name, Leaderboard.class);
 		for (String key : leaderboards.getKeys()) {
@@ -408,9 +397,10 @@ public class StarotaServer {
 	}
 
 	private void updateDefaultLeaderboards() {
+		EBStorage leaderboards = getLeaderboardsInternal();
 		for (DefaultLeaderboard board : DEFAULT_LEADERBOARDS)
 			if (!leaderboards.containsKey(board.getDisplayName()))
-				leaderboards.set(board.getDisplayName(), board.toGuildLeaderboard(getDiscordGuild()));
+				leaderboards.set(board.getDisplayName(), board.toGuildLeaderboard(this));
 	}
 
 	// static leaderboard stuffs
@@ -470,11 +460,11 @@ public class StarotaServer {
 					.getVoters(Long.toString(StarotaConstants.STAROTA_ID)).toCompletableFuture().get();
 			int numVoters = 0;
 			for (SimpleUser su : voters) {
-				List<IUser> user = guild.getUsersByName(su.getUsername());
+				List<IUser> user = getUsersByName(su.getUsername());
 				if (user != null && !user.isEmpty())
 					numVoters++;
 			}
-			return numVoters * 100.0f / (guild.getUsers().size() * today.get(Calendar.DATE));
+			return numVoters * 100.0f / (getUsers().size() * today.get(Calendar.DATE));
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		}
@@ -482,7 +472,7 @@ public class StarotaServer {
 	}
 
 	public int getEarnedVotePoints() {
-		IUser owner = guild.getOwner();
+		IUser owner = getOwner();
 		int sum = 0;
 		int vals = 0;
 		for (IGuild g : Starota.getClient().getGuilds()) {
@@ -518,8 +508,7 @@ public class StarotaServer {
 
 	public List<EnumDonorPerm> getVoteRewards() {
 		List<EnumDonorPerm> donorPerms = new ArrayList<>();
-		for (IRole role : Starota.getSupportServer()
-				.getRolesForUser(this.getDiscordGuild().getOwner())) {
+		for (IRole role : Starota.getSupportServer().getRolesForUser(this.getOwner())) {
 			EnumDonorPerm perm = EnumDonorPerm.getPermForRole(role);
 			if (perm != null)
 				donorPerms.add(perm);
@@ -533,11 +522,11 @@ public class StarotaServer {
 	public boolean addVoteReward(EnumDonorPerm perm) {
 		int currentPoints = getUsedVotePoints();
 		int earnedPoints = getEarnedVotePoints();
-		if (this.getDiscordGuild().getOwner().hasRole(perm.getRole()) || perm.getPointsRequired() < 0
+		if (this.getOwner().hasRole(perm.getRole()) || perm.getPointsRequired() < 0
 				|| currentPoints + perm.getPointsRequired() > earnedPoints
 				|| !hasRequiredVoteRewards(perm))
 			return false;
-		RequestBuffer.request(() -> this.getDiscordGuild().getOwner().addRole(perm.getRole())).get();
+		RequestBuffer.request(() -> this.getOwner().addRole(perm.getRole())).get();
 		return true;
 	}
 
@@ -545,9 +534,9 @@ public class StarotaServer {
 	 * Returns if reward was removed
 	 */
 	public boolean removeVoteReward(EnumDonorPerm perm) {
-		if (getUsedVotePoints() <= 0 || !this.getDiscordGuild().getOwner().hasRole(perm.getRole()))
+		if (getUsedVotePoints() <= 0 || !this.getOwner().hasRole(perm.getRole()))
 			return false;
-		RequestBuffer.request(() -> this.getDiscordGuild().getOwner().removeRole(perm.getRole())).get();
+		RequestBuffer.request(() -> this.getOwner().removeRole(perm.getRole())).get();
 		List<EnumDonorPerm> toRemove = new ArrayList<>();
 		for (EnumDonorPerm p : getVoteRewards())
 			if (!hasRequiredVoteRewards(p))
@@ -613,47 +602,12 @@ public class StarotaServer {
 	// end usage stuff
 
 	// start settings stuff
-	public static final String SETTINGS_KEY = "setting_set";
-
-	private SettingSet getSettings() {
-		if (!this.hasDataKey(SETTINGS_KEY, SettingSet.class))
-			this.setDataValue(SETTINGS_KEY, getDefaultSettings(this));
-		return ((SettingSet) this.getDataValue(SETTINGS_KEY)).setServer(this);
-	}
-
-	public void forEachSetting(Consumer<Setting<?>> consumer) {
-		for (Setting<?> s : getSettings())
-			consumer.accept(s);
-	}
-
-	public <V> V getSetting(String name) {
-		return getSettings().getSetting(name);
-	}
-
-	public EnumReturnSetStatus setSetting(String name, String value) {
-		EnumReturnSetStatus status = getSettings().setSetting(name, value);
-		data.markDirty();
-		return status;
-	}
-
-	public <T> EnumReturnSetStatus setSetting(String name, T value) {
-		EnumReturnSetStatus status = getSettings().setSetting(name, value);
-		data.markDirty();
-		return status;
-	}
-
-	private static final String TIMEZONE = "timezone";
-
-	public TimeZone getTimezone() {
-		SettingSet settings = getSettings();
-		if (settings.isEmpty(TIMEZONE)) {
-			return MiscUtils.getTimezone(guild.getRegion());
-		}
-		return null;
-	}
-
-	// static settings stuff
 	private final static SettingSet DEFAULT_SETTINGS = new SettingSet();
+
+	@Override
+	protected SettingSet getDefaultSettings(BotServer server) {
+		return new SettingSet(DEFAULT_SETTINGS);
+	}
 
 	public static <V> void setDefaultValue(Setting<V> setting) {
 		DEFAULT_SETTINGS.addSetting(setting);
@@ -672,6 +626,7 @@ public class StarotaServer {
 	public static final String WEBHOOK_SECRET_KEY = "webhook_secret";
 
 	public String getWebhookSecret() {
+		EBStorage data = getData();
 		if (!data.containsKey(WEBHOOK_SECRET_KEY))
 			return null;
 		return data.get(WEBHOOK_SECRET_KEY, String.class);
@@ -682,22 +637,14 @@ public class StarotaServer {
 	private static final Map<Long, StarotaUser> USERS = new ConcurrentHashMap<>();
 
 	public static StarotaServer getServer(IGuild guild) {
+		if (guild instanceof StarotaServer)
+			return (StarotaServer) guild;
 		if (guild == null)
 			return null;
 		if (SERVERS.containsKey(guild.getLongID()))
 			return SERVERS.get(guild.getLongID());
 		StarotaServer server = new StarotaServer(guild);
 		SERVERS.put(guild.getLongID(), server);
-
-		server.profiles = ServerDataHelper.getEBSFromFolder(guild, PROFILES)
-				.registerType(new PlayerProfile.DataTypePlayerProfile());
-		server.data = ServerDataHelper.getEBSFromFolder(guild, OPTIONS)
-				.registerType(new DataTypeServerSettings());
-		server.tradeboard = ServerDataHelper.getEBListFromFolder(guild, TRADEBOARD,
-				new TradeboardPost());
-		server.leaderboards = ServerDataHelper.getEBSFromFolder(guild, LEADERBOARDS)
-				.registerType(new Leaderboard());
-
 		return server;
 	}
 

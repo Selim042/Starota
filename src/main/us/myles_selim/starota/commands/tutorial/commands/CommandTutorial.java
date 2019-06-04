@@ -4,12 +4,12 @@ import java.util.List;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.commands.tutorial.TutorialRegistry;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandTutorial extends StarotaCommand {
+public class CommandTutorial extends BotCommand<StarotaServer> {
 
 	private static final long TUTORIAL_CHANNEL_ID = 569938166988013588L;
 

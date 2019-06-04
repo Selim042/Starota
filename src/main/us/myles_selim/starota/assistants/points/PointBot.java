@@ -1,11 +1,15 @@
 package us.myles_selim.starota.assistants.points;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Timer;
+import java.util.function.Predicate;
 
 import org.discordbots.api.client.DiscordBotListAPI;
 
@@ -20,7 +24,10 @@ import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.commands.CommandGetTimezones;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
+import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
+import us.myles_selim.starota.commands.settings.CommandSettings;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.misc.utils.StatusUpdater;
 import us.myles_selim.starota.misc.utils.StatusUpdater.PresenceData;
@@ -33,6 +40,7 @@ public class PointBot {
 	public static final EnumSet<Permissions> USED_PERMISSIONS = EnumSet.of(Permissions.SEND_MESSAGES,
 			Permissions.READ_MESSAGES, Permissions.MANAGE_MESSAGES, Permissions.USE_EXTERNAL_EMOJIS,
 			Permissions.ADD_REACTIONS);
+	public final static File DATA_FOLDER = new File("pointData");
 
 	private static Properties PROPERTIES = new Properties();
 	private static DiscordBotListAPI BOT_LIST;
@@ -68,15 +76,32 @@ public class PointBot {
 		StatusUpdater statuses = new StatusUpdater(CLIENT);
 		statuses.addPresence(new PresenceData(StatusType.ONLINE, ActivityType.PLAYING,
 				"v" + StarotaConstants.VERSION + (Starota.DEBUG || Starota.IS_DEV ? "d" : "")));
-		statuses.addPresence(new PresenceData(StatusType.ONLINE, ActivityType.STREAMING, "quest data"));
+		statuses.addPresence(new PresenceData(StatusType.ONLINE, ActivityType.WATCHING, "quest data"));
 		statuses.addPresence(
 				new PresenceData(StatusType.ONLINE, ActivityType.WATCHING, "players complete quests"));
 		statuses.start();
 
 		CLIENT.getDispatcher().registerListener(new PointEventHandler());
 		PrimaryCommandHandler cmdHandler = new PrimaryCommandHandler(CLIENT);
+		JavaCommandHandler jCmdHandler = cmdHandler
+				.registerCommandHandler(new JavaCommandHandler(CLIENT));
+
+		jCmdHandler.registerCommand("Administrative", new CommandSettings());
+		jCmdHandler.registerCommand("Administrative", new CommandGetTimezones());
+
 		CLIENT.getDispatcher().registerListener(cmdHandler);
-		
+
+		// hacky, weird thing just to hide the deprecation warning
+		@SuppressWarnings("deprecation")
+		Predicate<Void> f = (v) -> {
+			Timer timer = new Timer();
+			Date nextHour = new Date();
+			nextHour.setHours(0);
+			nextHour.setMinutes(0);
+			timer.scheduleAtFixedRate(new SimpleQuestUpdateTask(), nextHour, (long) 3.6e+6);
+			return false;
+		};
+		f.test(null);
 	}
 
 	public static IUser getOurUser() {

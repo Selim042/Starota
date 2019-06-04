@@ -6,11 +6,11 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.commands.settings.SettingSet.EnumReturnSetStatus;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandSettings extends StarotaCommand {
+public class CommandSettings extends BotCommand<StarotaServer> {
 
 	public CommandSettings() {
 		super("settings", "Manages server settings.");
@@ -55,7 +55,7 @@ public class CommandSettings extends StarotaCommand {
 	private void sendSettingsEmbed(StarotaServer server, IChannel channel) {
 		EmbedBuilder builder = new EmbedBuilder();
 
-		builder.withTitle(server.getDiscordGuild().getName() + " Options:");
+		builder.withTitle(server.getName() + " Options:");
 		server.forEachSetting((setting) -> {
 			builder.appendDesc(
 					String.format(" - %s: %s\n", setting.getName(), setting.getValue().toString()));

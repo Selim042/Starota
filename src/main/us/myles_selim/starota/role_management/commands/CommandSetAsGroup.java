@@ -4,11 +4,11 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.Permissions;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.role_management.GroupManager;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandSetAsGroup extends StarotaCommand {
+public class CommandSetAsGroup extends BotCommand<StarotaServer> {
 
 	public CommandSetAsGroup() {
 		super("setAsGroup", "Sets the target role to a group.");

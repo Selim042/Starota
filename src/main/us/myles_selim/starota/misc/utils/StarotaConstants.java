@@ -32,6 +32,8 @@ public class StarotaConstants {
 		public static final String CHANGES_CHANNEL = "changesChannel";
 		/** Profile nickname setting */
 		public static final String PROFILE_NICKNAME = "profileNickname";
+		/** Server timezone */
+		public static final String TIMEZONE = "timezone";
 
 	}
 

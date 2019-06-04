@@ -5,12 +5,12 @@ import java.util.EnumSet;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.trading.TradeboardPost;
 import us.myles_selim.starota.trading.TradeboardReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandGetTrade extends StarotaCommand {
+public class CommandGetTrade extends BotCommand<StarotaServer> {
 
 	public CommandGetTrade() {
 		super("getTrade", "Gets a specific trade by ID.");

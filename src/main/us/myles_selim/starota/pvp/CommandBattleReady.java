@@ -4,11 +4,11 @@ import java.util.concurrent.TimeUnit;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandBattleReady extends StarotaCommand {
+public class CommandBattleReady extends BotCommand<StarotaServer> {
 
 	public CommandBattleReady() {
 		super("battleReady", "Marks yourself as battle ready.");

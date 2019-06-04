@@ -2,6 +2,7 @@ package us.myles_selim.starota.commands.registry;
 
 import java.util.List;
 
+import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;
@@ -18,5 +19,7 @@ public interface ICommandHandler {
 	public List<String> getAllCategories(IGuild server);
 
 	public ICommand findCommand(IGuild server, IMessage msg, String name);
+
+	public IDiscordClient getDiscordClient();
 
 }

@@ -7,11 +7,11 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.role_management.GroupManager;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandGetGroups extends StarotaCommand {
+public class CommandGetGroups extends BotCommand<StarotaServer> {
 
 	public CommandGetGroups() {
 		super("getGroups", "Shows a list of groups.");

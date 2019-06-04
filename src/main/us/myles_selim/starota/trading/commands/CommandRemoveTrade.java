@@ -2,11 +2,11 @@ package us.myles_selim.starota.trading.commands;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.trading.TradeboardPost;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandRemoveTrade extends StarotaCommand {
+public class CommandRemoveTrade extends BotCommand<StarotaServer> {
 
 	public CommandRemoveTrade() {
 		super("removeTrade", "Removes a given trade posted by yourself from the tradeboard.");

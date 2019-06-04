@@ -2,11 +2,11 @@ package us.myles_selim.starota.pvp;
 
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandNotReady extends StarotaCommand {
+public class CommandNotReady extends BotCommand<StarotaServer> {
 
 	public CommandNotReady() {
 		super("notReady", "Marks yourself as not battle ready.");

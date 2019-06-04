@@ -6,12 +6,12 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.EmbedBuilder;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.leek_duck.LeekDuckData;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandDitto extends StarotaCommand {
+public class CommandDitto extends BotCommand<StarotaServer> {
 
 	public CommandDitto() {
 		super("ditto", "Lists all Pokemon Ditto can take the form of.");

@@ -8,7 +8,7 @@ import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandPing extends StarotaCommand {
+public class CommandPing extends BotCommand<StarotaServer> {
 
 	public CommandPing() {
 		super("ping", "Gets " + Starota.BOT_NAME + "s approx. ping to the Discord API.");

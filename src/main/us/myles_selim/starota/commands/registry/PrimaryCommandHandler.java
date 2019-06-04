@@ -51,10 +51,7 @@ public class PrimaryCommandHandler {
 	public static String getPrefix(IGuild guild) {
 		if (guild == null)
 			return DEFAULT_PREFIX;
-		StarotaServer server = StarotaServer.getServer(guild);
-		if (server.hasDataKey(PREFIX_KEY))
-			return String.valueOf(server.getDataValue(PREFIX_KEY));
-		return DEFAULT_PREFIX;
+		return StarotaServer.getServer(guild).getPrefix();
 	}
 
 	public static void setPrefix(IGuild guild, String prefix) {
@@ -64,11 +61,12 @@ public class PrimaryCommandHandler {
 		server.setDataValue(PREFIX_KEY, prefix);
 	}
 
-	public void registerCommandHandler(ICommandHandler handler) {
+	public <H extends ICommandHandler> H registerCommandHandler(H handler) {
 		if (handler == null)
 			throw new IllegalArgumentException("handler cannot be null");
 		if (!COMMAND_HANDLERS.contains(handler))
 			COMMAND_HANDLERS.add(handler);
+		return handler;
 	}
 
 	@EventSubscriber

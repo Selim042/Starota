@@ -7,10 +7,10 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import us.myles_selim.ebs.EBStorage;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandRaid extends StarotaCommand {
+public class CommandRaid extends BotCommand<StarotaServer> {
 
 	public CommandRaid() {
 		super("raid", "Makes a new raid post.");

@@ -33,7 +33,7 @@ public class SelimPMCommandHandler {
 
 		INSTANCE = new PrimaryCommandHandler(Starota.getClient(), (IChannel c) -> isSelimPM(c));
 		Starota.getClient().getDispatcher().registerListener(INSTANCE);
-		JAVA_HANDLER = new JavaCommandHandler();
+		JAVA_HANDLER = new JavaCommandHandler(Starota.getClient());
 		INSTANCE.registerCommandHandler(JAVA_HANDLER);
 
 		registerCommand(new CommandPing());

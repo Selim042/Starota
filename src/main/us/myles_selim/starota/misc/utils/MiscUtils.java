@@ -4,6 +4,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import sx.blah.discord.handle.obj.IGuild;
@@ -19,7 +20,7 @@ public class MiscUtils {
 	public static String fixCharacters(String in) {
 		if (in == null)
 			return null;
-		return in.replaceAll("’", "'").replaceAll("�", "é").replaceAll("Ã©", "é");
+		return in.replaceAll("’", "'").replaceAll("é", "e").replaceAll("—", "-").replaceAll("×", "x");
 	}
 
 	public static String getTrainerCodeString(long trainerCode) {
@@ -65,6 +66,14 @@ public class MiscUtils {
 			return TimeZone.getTimeZone("US/Eastern");
 		case "us-west":
 			return TimeZone.getTimeZone("US/Pacific");
+		case "sydney":
+			return TimeZone.getTimeZone("Australia/Sydney");
+		case "eu-central":
+			return TimeZone.getTimeZone("Europe/Paris");
+		case "eu-west":
+			return TimeZone.getTimeZone("Europe/Istanbul");
+		case "brazil":
+			return TimeZone.getTimeZone("America/Belem");
 		default:
 			TwitterHelper.sendDirectMessage("Selim_042", "Region " + region.getID() + " not configured");
 			if (Starota.IS_DEV)
@@ -72,6 +81,13 @@ public class MiscUtils {
 					System.out.println("timezone id: " + id);
 			return TimeZone.getDefault();
 		}
+	}
+
+	public static <V> V getValueIgnoreCase(Map<String, V> map, String key) {
+		for (String s : map.keySet())
+			if (s.equalsIgnoreCase(key))
+				return map.get(s);
+		return null;
 	}
 
 	public static EnumPokemon[] getSuggestedPokemon(String input, int count) {
