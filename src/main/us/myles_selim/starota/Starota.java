@@ -29,6 +29,7 @@ import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.EmbedBuilder;
 import sx.blah.discord.util.RequestBuffer;
+import us.myles_selim.starota.assistants.CommandBots;
 import us.myles_selim.starota.assistants.points.PointBot;
 import us.myles_selim.starota.assistants.pokedex.PokedexBot;
 import us.myles_selim.starota.assistants.registration.RegistrationBot;
@@ -123,18 +124,10 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
 	public final static String CHANGELOG = "Changelog for v" + StarotaConstants.VERSION + "\n"
-			+ "Public changes:\n" + " + Brand new, searchable, enhanced event system\n"
-			+ " * Fix the 'e' in Pokemon in more places\n" + " + Mentioning " + BOT_NAME
-			+ " now works as a command prefix\n" + " + Add \"vote\" command\n"
-			+ " * Fix Pokedex cutting off moves for Pokemon with large movesets, like Mew\n"
-			+ " * Fixes updateProfile having trouble when setting alt account data\n"
-			+ " * Starota will now automatically update trainer level if it can find a Silph Road card with higher level\n"
-			+ " * Remove emoji from egg hatch tier command\n"
-			+ " * Correct types for Zapdos and Moltres\n"
-			+ " * Raid embeds now display nickname and Discord username/discriminator\n"
-			+ "\nAdministrative changes:\n"
-			+ " + Added system to message all server owners to easily inform of new features\n"
-			+ " + Brand new settings system, pulls the changelog channel command into here";
+			+ "Public changes:\n"
+			+ " + Pokedex now displays min/max CP for Pokemon currently in eggs or raids\n"
+			+ " + New Discord bot, Registration Bot (see .bots) that registers users via OCR\n"
+			+ " * Remove webhook stuff for now, more information incoming later";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static PrimaryCommandHandler COMMAND_HANDLER;
@@ -164,6 +157,7 @@ public class Starota {
 			CLIENT = null;
 			try {
 				CLIENT = clientBuilder.login();
+				CLIENT.changePresence(StatusType.OFFLINE);
 			} catch (DiscordException e) {
 				e.printStackTrace();
 			}
@@ -208,7 +202,6 @@ public class Starota {
 			DebugServer.init();
 
 			System.out.println("registering commands");
-			CLIENT.changePresence(StatusType.DND, ActivityType.PLAYING, "registering commands...");
 
 			JavaCommandHandler jCmdHandler = new JavaCommandHandler(CLIENT);
 			COMMAND_HANDLER.registerCommandHandler(jCmdHandler);
@@ -222,8 +215,6 @@ public class Starota {
 				e.printStackTrace();
 			}
 			System.out.println("starting threads and loading settings...");
-			CLIENT.changePresence(StatusType.IDLE, ActivityType.PLAYING,
-					"starting threads and loading settings...");
 
 			dispatcher.registerListener(COMMAND_HANDLER);
 			dispatcher.registerListener(REACTION_MESSAGES_REGISTRY);
@@ -232,7 +223,7 @@ public class Starota {
 			WebServer.init();
 			PokedexBot.start();
 			RegistrationBot.start();
-			PointBot.start();
+			// PointBot.start();
 			submitStats();
 
 			try {
@@ -250,6 +241,8 @@ public class Starota {
 					"to people search for events and Pokemon"));
 			statusUpdater.addPresence(new PresenceData(StatusType.ONLINE, ActivityType.PLAYING,
 					"with the new event system"));
+			statusUpdater.addPresence(
+					new PresenceData(StatusType.ONLINE, ActivityType.WATCHING, ".bots for new bots"));
 			statusUpdater.start();
 
 			EXECUTOR.execute(new Runnable() {
@@ -414,6 +407,7 @@ public class Starota {
 		jCmdHandler.registerCommand("Misc", new CommandEggHatches());
 		jCmdHandler.registerCommand("Misc", new CommandDitto());
 		jCmdHandler.registerCommand("Misc", new CommandArticleMessage());
+		jCmdHandler.registerCommand("Misc", new CommandBots());
 
 		jCmdHandler.registerCommand("Tutorial", new CommandTutorial());
 	}

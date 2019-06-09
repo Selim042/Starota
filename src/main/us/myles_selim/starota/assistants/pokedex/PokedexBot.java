@@ -23,6 +23,7 @@ import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.assistants.CommandBots;
 import us.myles_selim.starota.commands.CommandChangelog;
 import us.myles_selim.starota.commands.CommandCredits;
 import us.myles_selim.starota.commands.CommandInvite;
@@ -121,6 +122,8 @@ public class PokedexBot {
 		// CommandChangelogChannel());
 
 		jCmdHandler.registerCommand("Pokedex", new CommandPokedex());
+
+		jCmdHandler.registerCommand("Misc", new CommandBots());
 
 		EventDispatcher dispatcher = CLIENT.getDispatcher();
 		dispatcher.registerListener(COMMAND_HANDLER);

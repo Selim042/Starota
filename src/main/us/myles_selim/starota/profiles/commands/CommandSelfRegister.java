@@ -34,7 +34,7 @@ public class CommandSelfRegister extends BotCommand<StarotaServer> {
 	@Override
 	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
 		if (args.length < 3) {
-			if (!hasTeamRoles(server.getDiscordGuild())) {
+			if (!hasTeamRoles(message.getAuthor(), server)) {
 				channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName()
 						+ " [poGoName] [level] [team]");
 				return;
@@ -59,7 +59,7 @@ public class CommandSelfRegister extends BotCommand<StarotaServer> {
 			}
 		}
 		try {
-			for (IRole role : target.getRolesForGuild(server.getDiscordGuild())) {
+			for (IRole role : target.getRolesForGuild(server)) {
 				String name = role.getName().replaceAll(" ", "_");
 				for (EnumTeam t : EnumTeam.values()) {
 					if (t.name().equalsIgnoreCase(name)) {
@@ -74,7 +74,10 @@ public class CommandSelfRegister extends BotCommand<StarotaServer> {
 			team = null;
 		}
 		if (team == null) {
-			channel.sendMessage("Team \"" + args[2] + "\" not found");
+			if (args.length > 3)
+				channel.sendMessage("Team \"" + args[2] + "\" not found");
+			else
+				this.sendUsage(server.getPrefix(), channel);
 			return;
 		}
 
@@ -93,15 +96,15 @@ public class CommandSelfRegister extends BotCommand<StarotaServer> {
 				.setLevel(level).setTeam(team);
 		server.setProfile(target, profile);
 
-		IRole teamRole = MiscUtils.getTeamRole(server.getDiscordGuild(), team);
+		IRole teamRole = MiscUtils.getTeamRole(server, team);
 		if (teamRole != null)
 			target.addRole(teamRole);
 
 		channel.sendMessage("Sucessfully registered " + target.getName(), profile.toEmbed(server));
 	}
 
-	private static boolean hasTeamRoles(IGuild server) {
-		for (IRole r : server.getRoles()) {
+	private static boolean hasTeamRoles(IUser user, IGuild guild) {
+		for (IRole r : user.getRolesForGuild(guild)) {
 			for (EnumTeam t : EnumTeam.values()) {
 				if (t.getName().equalsIgnoreCase(r.getName()))
 					return true;

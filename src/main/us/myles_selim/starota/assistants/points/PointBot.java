@@ -24,10 +24,13 @@ import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.RequestBuffer;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.assistants.CommandBots;
+import us.myles_selim.starota.assistants.points.commands.CommandGetQuests;
 import us.myles_selim.starota.commands.CommandGetTimezones;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 import us.myles_selim.starota.commands.settings.CommandSettings;
+import us.myles_selim.starota.misc.data_types.BotServer;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.misc.utils.StatusUpdater;
 import us.myles_selim.starota.misc.utils.StatusUpdater.PresenceData;
@@ -73,6 +76,7 @@ public class PointBot {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		BotServer.registerServerType(PointBot.CLIENT, PointServer.class);
 		StatusUpdater statuses = new StatusUpdater(CLIENT);
 		statuses.addPresence(new PresenceData(StatusType.ONLINE, ActivityType.PLAYING,
 				"v" + StarotaConstants.VERSION + (Starota.DEBUG || Starota.IS_DEV ? "d" : "")));
@@ -88,6 +92,10 @@ public class PointBot {
 
 		jCmdHandler.registerCommand("Administrative", new CommandSettings());
 		jCmdHandler.registerCommand("Administrative", new CommandGetTimezones());
+
+		jCmdHandler.registerCommand("Quests", new CommandGetQuests());
+
+		jCmdHandler.registerCommand("Misc", new CommandBots());
 
 		CLIENT.getDispatcher().registerListener(cmdHandler);
 
