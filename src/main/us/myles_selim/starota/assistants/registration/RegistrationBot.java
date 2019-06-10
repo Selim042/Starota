@@ -38,8 +38,7 @@ public class RegistrationBot {
 	private static boolean started = false;
 
 	public static void start() {
-		if (started || Starota.IS_DEV)
-		// if (started)
+		if (started)
 			return;
 		started = true;
 
@@ -108,8 +107,7 @@ public class RegistrationBot {
 				RequestBuffer.request(() -> owner.addRole(ownerRole));
 			currentOwners.add(owner);
 		}
-		for (IUser u : CLIENT.getGuildByID(StarotaConstants.SUPPORT_SERVER)
-				.getUsersByRole(ownerRole))
+		for (IUser u : CLIENT.getGuildByID(StarotaConstants.SUPPORT_SERVER).getUsersByRole(ownerRole))
 			if (!currentOwners.contains(u))
 				u.removeRole(ownerRole);
 	}

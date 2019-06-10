@@ -127,7 +127,8 @@ public class Starota {
 			+ "Public changes:\n"
 			+ " + Pokedex now displays min/max CP for Pokemon currently in eggs or raids\n"
 			+ " + New Discord bot, Registration Bot (see .bots) that registers users via OCR\n"
-			+ " * Remove webhook stuff for now, more information incoming later";
+			+ " * Remove webhook stuff for now, more information incoming later\n"
+			+ " * Fix some weird stuff going on in .sRegister";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static PrimaryCommandHandler COMMAND_HANDLER;
@@ -157,7 +158,7 @@ public class Starota {
 			CLIENT = null;
 			try {
 				CLIENT = clientBuilder.login();
-				CLIENT.changePresence(StatusType.OFFLINE);
+				CLIENT.changePresence(StatusType.INVISIBLE);
 			} catch (DiscordException e) {
 				e.printStackTrace();
 			}

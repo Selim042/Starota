@@ -20,8 +20,8 @@ public class RegistrationEventHandler {
 
 	@EventSubscriber
 	public void onServerCreate(GuildCreateEvent event) {
-		if (!event.getGuild().getUsers().contains(
-				RegistrationBot.CLIENT.getUserByID(StarotaConstants.STAROTA_ID))) {
+		if (!event.getGuild().getUsers()
+				.contains(RegistrationBot.CLIENT.getUserByID(StarotaConstants.STAROTA_ID))) {
 			IPrivateChannel pm = event.getGuild().getOwner().getOrCreatePMChannel();
 			pm.sendMessage("This bot requires Starota to also be added to the server.  "
 					+ "Follow the link below to add it.  "
@@ -70,10 +70,8 @@ public class RegistrationEventHandler {
 		if (!server.hasProfile(author)) {
 			PlayerProfile profile = OcrHelper.getProfile(server,
 					ImageHelper.getImage(event.getMessage().getAttachments().get(0).getUrl()));
-			if (profile == null) {
-				event.getChannel().sendMessage("profile == null");
+			if (profile == null)
 				return;
-			}
 			profile.setDiscordId(author.getLongID()).toEmbed(server);
 			server.setProfile(author, profile);
 			event.getChannel().sendMessage(profile.toEmbed(server));
