@@ -172,7 +172,7 @@ public class PlayerProfile {
 		}
 
 		@Override
-		public void setValue(PlayerProfile value) {
+		protected void setValueInternal(PlayerProfile value) {
 			this.value = value;
 		}
 

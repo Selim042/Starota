@@ -5,8 +5,11 @@ import java.lang.reflect.InvocationTargetException;
 import javax.annotation.Nonnull;
 
 import us.myles_selim.ebs.Storage;
+import us.myles_selim.starota.misc.utils.IValueSetCallback;
 
 public abstract class Setting<V> {
+
+	private IValueSetCallback setCallback;
 
 	private final String name;
 	private final String desc;
@@ -40,6 +43,11 @@ public abstract class Setting<V> {
 		this.value = setting.value;
 	}
 
+	public Setting<V> setWriteCallback(IValueSetCallback callback) {
+		this.setCallback = callback;
+		return this;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -57,11 +65,15 @@ public abstract class Setting<V> {
 	public boolean setValue(Object newVal) {
 		if (newVal == null) {
 			this.value = getEmptyValue();
+			if (setCallback != null)
+				setCallback.onSet();
 			return true;
 		}
 		if (!getType().isInstance(newVal))
 			return false;
 		this.value = (V) newVal;
+		if (setCallback != null)
+			setCallback.onSet();
 		return true;
 	}
 

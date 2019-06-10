@@ -9,7 +9,7 @@ import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.misc.data_types.EmbedBuilder;
@@ -20,7 +20,7 @@ import us.myles_selim.starota.silph_road.SilphCard.SilphBadgeData;
 import us.myles_selim.starota.silph_road.SilphCard.SilphSocial;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandSilphCard extends StarotaCommand {
+public class CommandSilphCard extends BotCommand<StarotaServer> {
 
 	public CommandSilphCard() {
 		super("silphCard", "Displays a given users Silph Road card.");

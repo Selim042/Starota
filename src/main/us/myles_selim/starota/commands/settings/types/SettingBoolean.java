@@ -15,6 +15,10 @@ public class SettingBoolean extends Setting<Boolean> {
 		super(name, value);
 	}
 
+	public SettingBoolean(String name, String desc, boolean value) {
+		super(name, desc, value);
+	}
+
 	public SettingBoolean(SettingBoolean setting) {
 		super(setting.getName(), new Boolean(setting.getValue()));
 	}

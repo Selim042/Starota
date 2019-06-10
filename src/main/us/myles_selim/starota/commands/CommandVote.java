@@ -7,7 +7,7 @@ import discord4j.core.object.util.PermissionSet;
 import discord4j.core.object.util.Snowflake;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandVote extends StarotaCommand {
+public class CommandVote extends BotCommand<StarotaServer> {
 
 	private String botName;
 	private Snowflake botId;

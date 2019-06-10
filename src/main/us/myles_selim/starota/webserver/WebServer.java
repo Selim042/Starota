@@ -9,7 +9,7 @@ import java.util.Properties;
 import com.sun.net.httpserver.HttpServer;
 
 import us.myles_selim.starota.misc.utils.StarotaConstants;
-import us.myles_selim.starota.webserver.webhooks.other.HttpHandlerWebhooks;
+import us.myles_selim.starota.webserver.api.HttpHandlerAPIProfiles;
 
 // https://www.reddit.com/r/discordapp/comments/82p8i6/a_basic_tutorial_on_how_to_get_the_most_out_of/
 @SuppressWarnings("restriction")
@@ -17,7 +17,6 @@ public class WebServer {
 
 	public static int PORT = 7366;
 	public static final String USER_AGENT = "Starota HTTP Access/" + StarotaConstants.VERSION;
-	// "Mozilla/5.0";
 
 	private static boolean inited = false;
 	private static final Properties PROPERTIES = new Properties();
@@ -35,7 +34,9 @@ public class WebServer {
 		try {
 			HttpServer server = HttpServer
 					.create(new InetSocketAddress(InetAddress.getByName("0.0.0.0"), PORT), 100);
-			server.createContext("/webhooks/", new HttpHandlerWebhooks());
+			// server.createContext("/webhooks/", new HttpHandlerWebhooks());
+			server.createContext("/api/profiles/", new HttpHandlerAPIProfiles());
+			server.createContext("/settings/", new HttpHandlerSettings());
 			server.setExecutor(null);
 			server.start();
 		} catch (IOException e) {
@@ -43,6 +44,10 @@ public class WebServer {
 			inited = false;
 		}
 	}
+
+	// public static boolean isAuthorized(BotServer server, String token) {
+	//
+	// }
 
 	public static boolean isRunning() {
 		return inited;

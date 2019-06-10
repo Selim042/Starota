@@ -10,13 +10,13 @@ import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.PermissionSet;
 import discord4j.core.object.util.Snowflake;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandRegister extends StarotaCommand {
+public class CommandRegister extends BotCommand<StarotaServer> {
 
 	public static final String REGISTERED_PM = "You have been registered for a profile on `%s`.\n"
 			+ "For more profile information, go into that server and type the command `.profileHelp`.";

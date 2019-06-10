@@ -6,11 +6,11 @@ import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandProfile extends StarotaCommand {
+public class CommandProfile extends BotCommand<StarotaServer> {
 
 	public CommandProfile() {
 		super("profile", "Views a user's profile.");

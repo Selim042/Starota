@@ -5,10 +5,10 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.util.Permission;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandRemoveChannelWhitelist extends StarotaCommand {
+public class CommandRemoveChannelWhitelist extends BotCommand<StarotaServer> {
 
 	public CommandRemoveChannelWhitelist() {
 		super("removeChannelWhitelist");

@@ -52,7 +52,7 @@ public class LeaderboardEntry implements Comparable<LeaderboardEntry> {
 		}
 
 		@Override
-		public void setValue(LeaderboardEntry value) {
+		protected void setValueInternal(LeaderboardEntry value) {
 			this.value = value;
 		}
 

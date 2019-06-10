@@ -10,7 +10,7 @@ import us.myles_selim.starota.lua.LuaUtils;
 import us.myles_selim.starota.misc.utils.RolePermHelper;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandStatus extends StarotaCommand {
+public class CommandStatus extends BotCommand<StarotaServer> {
 
 	public CommandStatus() {
 		super("status", "Gets Starota status information.");

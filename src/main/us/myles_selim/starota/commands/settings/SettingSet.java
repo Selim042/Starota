@@ -10,9 +10,14 @@ import javax.annotation.Nonnull;
 import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.commands.settings.types.ServerSetting;
+import us.myles_selim.starota.misc.data_types.BotServer;
+import us.myles_selim.starota.misc.utils.IValueSetCallback;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class SettingSet implements Iterable<Setting<?>> {
+
+	private IValueSetCallback setCallback;
 
 	private final Map<String, Setting<?>> settings;
 
@@ -35,61 +40,79 @@ public class SettingSet implements Iterable<Setting<?>> {
 				this.settings.put(setting.getName(), setting.clone());
 	}
 
+	public SettingSet setWriteCallback(IValueSetCallback callback) {
+		this.setCallback = callback;
+		return this;
+	}
+
 	public <V> EnumReturnSetStatus addSetting(Setting<V> setting) {
 		if (settings.containsKey(setting.getName()))
 			return EnumReturnSetStatus.NOT_SET;
 		settings.put(setting.getName(), setting);
+		if (setCallback != null) {
+			setCallback.onSet();
+			setting.setWriteCallback(() -> {
+				if (setCallback != null)
+					setCallback.onSet();
+			});
+		}
 		return EnumReturnSetStatus.SUCCESS;
 	}
 
 	public <V> EnumReturnSetStatus setSetting(String name, String value) {
-		Setting<?> setting = settings.get(name);
+		Setting<?> setting = MiscUtils.getValueIgnoreCase(settings, name);
 		if (setting == null)
 			return EnumReturnSetStatus.NOT_FOUND;
-		if (setting.setValue(value))
+		if (setting.setValue(value)) {
+			if (setCallback != null)
+				setCallback.onSet();
 			return EnumReturnSetStatus.SUCCESS;
-		else
+		} else
 			return EnumReturnSetStatus.NOT_SET;
 	}
 
 	public <V> EnumReturnSetStatus setSetting(String name, V value) {
-		Setting<?> setting = settings.get(name);
+		Setting<?> setting = MiscUtils.getValueIgnoreCase(settings, name);
 		if (setting == null)
 			return EnumReturnSetStatus.NOT_FOUND;
 		if (!setting.getType().isInstance(value))
 			return EnumReturnSetStatus.NOT_SET;
-		if (setting.setValue(value))
+		if (setting.setValue(value)) {
+			if (setCallback != null)
+				setCallback.onSet();
 			return EnumReturnSetStatus.SUCCESS;
-		else
+		} else
 			return EnumReturnSetStatus.NOT_SET;
 	}
 
 	@SuppressWarnings("unchecked")
 	public <V> V getSetting(String name) {
-		Setting<?> setting = settings.get(name);
+		Setting<?> setting = MiscUtils.getValueIgnoreCase(settings, name);
 		if (setting != null)
 			return (V) setting.getValue();
 		return null;
 	}
 
 	public boolean hasSetting(String name) {
-		return settings.containsKey(name);
+		return MiscUtils.getValueIgnoreCase(settings, name) != null;
 	}
 
 	public boolean isEmpty(String name) {
-		Setting<?> setting = settings.get(name);
+		Setting<?> setting = getSetting(name);
 		if (setting == null)
 			return true;
 		return setting.getValue().equals(setting.getEmptyValue());
 	}
 
-	public SettingSet setServer(StarotaServer server) {
+	public SettingSet setServer(BotServer server) {
 		iterator().forEachRemaining((Setting<?> setting) -> {
 			if (setting instanceof ServerSetting)
 				this.settings.put(setting.getName(), ((ServerSetting<?>) setting).clone(server));
 			else
 				this.settings.put(setting.getName(), setting.clone());
 		});
+		if (setCallback != null)
+			setCallback.onSet();
 		return this;
 	}
 
@@ -141,7 +164,8 @@ public class SettingSet implements Iterable<Setting<?>> {
 		}
 
 		@Override
-		public void setValue(SettingSet value) {
+		protected void setValueInternal(SettingSet value) {
+			this.value.setWriteCallback(() -> setValue(getValue()));
 			for (Setting<?> setting : value)
 				this.value.setSetting(setting.getName(), setting.getValue());
 		}

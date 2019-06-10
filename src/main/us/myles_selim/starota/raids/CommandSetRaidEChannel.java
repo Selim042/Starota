@@ -6,10 +6,10 @@ import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.util.Permission;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.StarotaCommand;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class CommandSetRaidEChannel extends StarotaCommand {
+public class CommandSetRaidEChannel extends BotCommand<StarotaServer> {
 
 	public static final String CHANNELS_KEY = "raid_channels";
 
