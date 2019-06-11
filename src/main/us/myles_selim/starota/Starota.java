@@ -124,11 +124,7 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
 	public final static String CHANGELOG = "Changelog for v" + StarotaConstants.VERSION + "\n"
-			+ "Public changes:\n"
-			+ " + Pokedex now displays min/max CP for Pokemon currently in eggs or raids\n"
-			+ " + New Discord bot, Registration Bot (see .bots) that registers users via OCR\n"
-			+ " * Remove webhook stuff for now, more information incoming later\n"
-			+ " * Fix some weird stuff going on in .sRegister";
+			+ "Public changes:\n" + " * Fix timezone/setting error";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static PrimaryCommandHandler COMMAND_HANDLER;
