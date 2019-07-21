@@ -44,25 +44,28 @@ public class CommandRaid extends BotCommand<StarotaServer> {
 			throws CommandException {
 		if (args[0].equalsIgnoreCase("raid")) {
 			boolean needsTier = true;
-			String topic = ((TextChannel) channel).getTopic().get();
-			if (topic != null && topic.contains("Key: ")) {
-				long key = -1;
-				int index = topic.indexOf("(Key: 0x");
-				try {
-					key = Long.parseLong(topic.substring(index + 8, index + 24), 16);
-					needsTier = false;
-				} catch (NumberFormatException e) {
-					needsTier = true;
-				}
-				if (key == -1)
-					needsTier = true;
-				if (!needsTier) {
-					if (args.length < 2) {
-						channel.createMessage(
-								"**Usage**: " + server.getPrefix() + this.getName() + " [time]").block();
-						return;
+			if (((TextChannel) channel).getTopic().isPresent()) {
+				String topic = ((TextChannel) channel).getTopic().get();
+				if (topic != null && topic.contains("Key: ")) {
+					long key = -1;
+					int index = topic.indexOf("(Key: 0x");
+					try {
+						key = Long.parseLong(topic.substring(index + 8, index + 24), 16);
+						needsTier = false;
+					} catch (NumberFormatException e) {
+						needsTier = true;
 					}
-					needsTier = true;
+					if (key == -1)
+						needsTier = true;
+					if (!needsTier) {
+						if (args.length < 2) {
+							channel.createMessage(
+									"**Usage**: " + server.getPrefix() + this.getName() + " [time]")
+									.block();
+							return;
+						}
+						needsTier = true;
+					}
 				}
 			}
 			if (needsTier) {

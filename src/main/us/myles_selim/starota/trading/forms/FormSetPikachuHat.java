@@ -8,6 +8,7 @@ public class FormSetPikachuHat extends FormSetPichuHat {
 	protected FormSetPikachuHat() {
 		this.addForm(new FormString(-1, "H.F. Hat"));
 		this.addForm(new FormString(-1, "Flower"));
+		this.addForm(new FormString(-1, "Detective"));
 	}
 
 	@Override

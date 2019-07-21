@@ -1223,6 +1223,8 @@ public enum EnumPokemon {
 
 	public String getArtwork(int formId) {
 		switch (this) {
+		case MEWTWO:
+			return ImageHelper.getOfficalArtwork(this, formId == 1 ? 3 : 0);
 		case WORMADAM:
 		case ROTOM:
 		case ARCEUS:
