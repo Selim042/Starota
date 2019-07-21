@@ -1,16 +1,17 @@
 package us.myles_selim.starota.profiles.commands;
 
-import java.util.EnumSet;
-
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IPrivateChannel;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.PrivateChannel;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
+import discord4j.core.object.util.Snowflake;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.BotCommand;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.profiles.PlayerProfile;
@@ -26,9 +27,9 @@ public class CommandRegister extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS, Permissions.MANAGE_ROLES,
-				Permissions.MANAGE_MESSAGES);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS,
+				Permission.MANAGE_ROLES, Permission.MANAGE_MESSAGES);
 	}
 
 	@Override
@@ -37,25 +38,26 @@ public class CommandRegister extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public Permissions requiredUsePermission() {
-		return Permissions.ADMINISTRATOR;
+	public Permission requiredUsePermission() {
+		return Permission.ADMINISTRATOR;
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
 		if (args.length != 5) {
-			channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName()
-					+ " [poGoName] [target] [team] [level]");
+			channel.createMessage("**Usage**: " + server.getPrefix() + this.getName()
+					+ " [poGoName] [target] [team] [level]").block();
 			return;
 		}
 
-		IUser target = Starota.findUser(server.getDiscordGuild().getLongID(), args[2]);
+		Member target = Starota.findMember(server.getDiscordGuild(), args[2]);
 		if (target == null) {
-			channel.sendMessage("User \"" + args[2] + "\" not found");
+			channel.createMessage("User \"" + args[2] + "\" not found").block();
 			return;
 		}
 		if (server.hasProfile(target)) {
-			channel.sendMessage("User \"" + args[2] + "\" already has a profile");
+			channel.createMessage("User \"" + args[2] + "\" already has a profile").block();
 			return;
 		}
 
@@ -66,7 +68,7 @@ public class CommandRegister extends BotCommand<StarotaServer> {
 			team = null;
 		}
 		if (team == null) {
-			channel.sendMessage("Team \"" + args[3] + "\" not found");
+			channel.createMessage("Team \"" + args[3] + "\" not found").block();
 			return;
 		}
 
@@ -77,47 +79,34 @@ public class CommandRegister extends BotCommand<StarotaServer> {
 			level = -1;
 		}
 		if (level == -1) {
-			channel.sendMessage("Invalid level \"" + args[4] + "\"");
+			channel.createMessage("Invalid level \"" + args[4] + "\"").block();
 			return;
 		}
 
-		PlayerProfile profile = new PlayerProfile().setPoGoName(args[1]).setDiscordId(target.getLongID())
-				.setLevel(level).setTeam(team);
+		PlayerProfile profile = new PlayerProfile().setPoGoName(args[1])
+				.setDiscordId(target.getId().asLong()).setLevel(level).setTeam(team);
 		server.setProfile(target, profile);
 
-		IRole teamRole = MiscUtils.getTeamRole(server.getDiscordGuild(), team);
+		Role teamRole = MiscUtils.getTeamRole(server.getDiscordGuild(), team);
 		if (teamRole != null)
-			target.addRole(teamRole);
+			target.addRole(teamRole.getId()).block();
 
-		channel.sendMessage("Sucessfully registered " + target.getName(), profile.toEmbed(server));
-		IPrivateChannel targetPm = target.getOrCreatePMChannel();
-		targetPm.sendMessage(String.format(REGISTERED_PM, server.getDiscordGuild().getName()));
+		channel.createMessage((m) -> m.setContent("Sucessfully registered " + target.getUsername())
+				.setEmbed(profile.toEmbed(server))).block();
+		PrivateChannel targetPm = target.getPrivateChannel().block();
+		targetPm.createMessage(String.format(REGISTERED_PM, server.getDiscordGuild().getName())).block();
 
 		// Role updates (pville only)
-		IGuild guild = server.getDiscordGuild();
-		IRole roleLost = guild.getRoleByID(ROLE_LOST);
-		if (roleLost != null && target.hasRole(roleLost)) {
-			target.removeRole(roleLost);
-			target.addRole(guild.getRoleByID(ROLE_TRAINER));
-			// switch (team) {
-			// case INSTINCT:
-			// target.addRole(guild.getRoleByID(ROLE_INSTINCT));
-			// break;
-			// case MYSTIC:
-			// target.addRole(guild.getRoleByID(ROLE_MYSTIC));
-			// break;
-			// case VALOR:
-			// target.addRole(guild.getRoleByID(ROLE_VALOR));
-			// break;
-			// case NO_TEAM:
-			// default:
-			// break;
-			// }
+		Guild guild = server.getDiscordGuild();
+		Role roleLost = guild.getRoleById(ROLE_LOST).block();
+		if (roleLost != null && target.getRoleIds().contains(ROLE_LOST)) {
+			target.removeRole(ROLE_LOST).block();
+			target.addRole(ROLE_TRAINER).block();
 		}
 	}
 
-	private static final long ROLE_LOST = 493950373460181012L;
-	private static final long ROLE_TRAINER = 339514724620304386L;
+	private static final Snowflake ROLE_LOST = Snowflake.of(493950373460181012L);
+	private static final Snowflake ROLE_TRAINER = Snowflake.of(339514724620304386L);
 	// private static final long ROLE_INSTINCT = 336152173257687040L;
 	// private static final long ROLE_MYSTIC = 335596106102603792L;
 	// private static final long ROLE_VALOR = 336152455433945090L;

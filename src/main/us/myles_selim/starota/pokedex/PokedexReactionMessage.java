@@ -1,14 +1,16 @@
 package us.myles_selim.starota.pokedex;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IEmoji;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IReaction;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.RequestBuffer;
+import java.util.function.Consumer;
+
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.reaction.ReactionEmoji;
+import discord4j.core.object.reaction.ReactionEmoji.Custom;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.pokedex.PokedexEntry.DexForm;
 import us.myles_selim.starota.reaction_messages.ReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -31,14 +33,14 @@ public class PokedexReactionMessage extends ReactionMessage {
 	}
 
 	@Override
-	public void onSend(StarotaServer server, IChannel channel, IMessage msg) {
+	public void onSend(StarotaServer server, TextChannel channel, Message msg) {
 		if (entry.forms.length <= 1)
 			return;
 		for (int i = 0; i < entry.forms.length; i++) {
 			DexForm f = entry.forms[i];
 			sendForms = true;
-			IEmoji emoji = f.getEmoji(entry);
-			RequestBuffer.request(() -> msg.addReaction(emoji));
+			Custom emoji = f.getEmoji(entry);
+			msg.addReaction(emoji).block();
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {}
@@ -46,28 +48,30 @@ public class PokedexReactionMessage extends ReactionMessage {
 	}
 
 	@Override
-	public void onEdit(StarotaServer server, IChannel channel, IMessage msg) {
+	public void onEdit(StarotaServer server, TextChannel channel, Message msg) {
 		if (!sendForms)
 			onSend(server, channel, msg);
 	}
 
 	@Override
-	public void onReactionAdded(StarotaServer server, IChannel channel, IMessage msg, IUser user,
-			IReaction react) {
-		String name = react.getEmoji().getName();
+	public void onReactionAdded(StarotaServer server, TextChannel channel, Message msg, Member user,
+			ReactionEmoji react) {
+		if (!react.asCustomEmoji().isPresent())
+			return;
+		String name = MiscUtils.getEmojiName(react);
 		if (name.startsWith(entry.name + "_")) {
-			msg.removeReaction(user, react);
+			msg.removeReaction(react, user.getId()).block();
 			String formName = name.substring(name.indexOf("_") + 1);
 			if (!isFormValid(formName) || form.equals(formName))
 				return;
 			form = formName;
 			if (!entry.hasEmbedPrepared(formName))
-				RequestBuffer.request(() -> msg.edit(GoHubDatabase.LOADING_EMBED));
-			EmbedObject newEmbed = getEmbed(server);
-			RequestBuffer.request(() -> msg.edit(newEmbed));
+				msg.edit((m) -> m.setEmbed(GoHubDatabase.LOADING_EMBED)).block();
+			Consumer<? super EmbedCreateSpec> newEmbed = getEmbed(server);
+			msg.edit((m) -> m.setEmbed(newEmbed)).block();
 		} else if (this.entry.getPokemon().equals(EnumPokemon.ARCEUS)) {
-			msg.removeReaction(user, react);
-			String formName = react.getEmoji().getName().toUpperCase();
+			msg.removeReaction(react, user.getId()).block();
+			String formName = react.asCustomEmoji().get().getName().toUpperCase();
 			if (formName.endsWith("TYPE"))
 				formName = formName.substring(0, formName.length() - 4);
 			try {
@@ -80,18 +84,18 @@ public class PokedexReactionMessage extends ReactionMessage {
 				return;
 			form = formName;
 			if (!entry.hasEmbedPrepared(formName))
-				RequestBuffer.request(() -> msg.edit(GoHubDatabase.LOADING_EMBED));
-			EmbedObject newEmbed = getEmbed(server);
-			RequestBuffer.request(() -> msg.edit(newEmbed));
+				msg.edit((m) -> m.setEmbed(GoHubDatabase.LOADING_EMBED)).block();
+			Consumer<? super EmbedCreateSpec> newEmbed = getEmbed(server);
+			msg.edit((m) -> m.setEmbed(newEmbed)).block();
 		}
 	}
 
 	@Override
-	public void onReactionRemoved(StarotaServer server, IChannel channel, IMessage msg, IUser user,
-			IReaction react) {}
+	public void onReactionRemoved(StarotaServer server, TextChannel channel, Message msg, Member user,
+			ReactionEmoji react) {}
 
 	@Override
-	protected EmbedObject getEmbed(StarotaServer server) {
+	protected Consumer<? super EmbedCreateSpec> getEmbed(StarotaServer server) {
 		return entry.toEmbed(form);
 	}
 

@@ -1,10 +1,12 @@
 package us.myles_selim.starota.role_management.commands;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.util.Permission;
 import us.myles_selim.starota.commands.BotCommand;
+import us.myles_selim.starota.commands.registry.CommandException;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.role_management.GroupManager;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -15,33 +17,35 @@ public class CommandSetAsGroup extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public Permissions requiredUsePermission() {
-		return Permissions.ADMINISTRATOR;
+	public Permission requiredUsePermission() {
+		return Permission.ADMINISTRATOR;
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
 		if (args.length < 3) {
-			channel.sendMessage(
-					"**Usage**: " + server.getPrefix() + this.getName() + " [group] [isGroup]");
+			channel.createMessage(
+					"**Usage**: " + server.getPrefix() + this.getName() + " [group] [isGroup]").block();
 			return;
 		}
-		IRole targetRole = null;
-		for (IRole role : server.getDiscordGuild().getRolesByName(args[1])) {
+		Role targetRole = null;
+		for (Role role : MiscUtils.getRolesByName(server.getDiscordGuild(), args[1], false)) {
 			targetRole = role;
 			break;
 		}
 		if (targetRole == null) {
-			channel.sendMessage("Role \"" + args[1] + "\" not found");
+			channel.createMessage("Role \"" + args[1] + "\" not found").block();
 			return;
 		}
 		boolean isGroup = args[2].equalsIgnoreCase("true");
 		GroupManager.setAsGroup(server, targetRole, isGroup);
 		if (isGroup)
-			channel.sendMessage("Role \"" + targetRole.getName() + "\" is now an assignable group.");
+			channel.createMessage("Role \"" + targetRole.getName() + "\" is now an assignable group.")
+					.block();
 		else
-			channel.sendMessage(
-					"Role \"" + targetRole.getName() + "\" is no longer an assignable group.");
+			channel.createMessage(
+					"Role \"" + targetRole.getName() + "\" is no longer an assignable group.").block();
 	}
 
 }

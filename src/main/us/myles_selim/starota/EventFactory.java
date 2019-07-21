@@ -3,9 +3,7 @@ package us.myles_selim.starota;
 import java.util.List;
 import java.util.Map.Entry;
 
-import sx.blah.discord.handle.obj.IUser;
-import us.myles_selim.starota.embed_converter.ExtraField;
-import us.myles_selim.starota.lua.LuaUtils;
+import discord4j.core.object.entity.User;
 import us.myles_selim.starota.lua.events.GetProfileEvent;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.profiles.PlayerProfile;
@@ -46,14 +44,28 @@ public class EventFactory {
 					SilphRoadCardUtils.getCardURL(profile.getPoGoName()), false));
 			event.setThumbnail(SilphRoadCardUtils.getCardAvatar(profile.getPoGoName()));
 		}
-		IUser user = profile.getDiscordUser();
-		fields.add(
-				new ExtraField("Discord User:", user.getName() + "#" + user.getDiscriminator(), true));
+		User user = profile.getDiscordUser();
+		fields.add(new ExtraField("Discord User:", user.getUsername() + "#" + user.getDiscriminator(),
+				true));
 		String patronRoleName = profile.getDonorRoleName();
 		if (patronRoleName != null)
 			fields.add(new ExtraField("Donor:", patronRoleName, true));
-		LuaUtils.handleEvent(event);
+		// LuaUtils.handleEvent(event);
 		return event;
+	}
+
+	public static class ExtraField {
+
+		public String title;
+		public String value;
+		public boolean inline;
+
+		public ExtraField(String title, String value, boolean inline) {
+			this.title = title;
+			this.value = value;
+			this.inline = inline;
+		}
+
 	}
 
 }

@@ -1,13 +1,13 @@
 package us.myles_selim.starota.trading.commands;
 
-import java.util.EnumSet;
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.RequestBuffer;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.BotCommand;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.enums.EnumGender;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.trading.PokemonInstance;
@@ -22,8 +22,8 @@ public class CommandFindTrade extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS);
 	}
 
 	@Override
@@ -32,10 +32,11 @@ public class CommandFindTrade extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
 		if (args.length < 2) {
-			channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName()
-					+ " [pokemon] <form> <shiny> <gender>");
+			channel.createMessage("**Usage**: " + server.getPrefix() + this.getName()
+					+ " [pokemon] <form> <shiny> <gender>").block();
 			return;
 		}
 		PokemonInstance pokemonInst = PokemonInstance.getInstance(args);
@@ -44,36 +45,36 @@ public class CommandFindTrade extends BotCommand<StarotaServer> {
 		boolean shiny = pokemonInst.getShiny();
 		EnumGender gender = pokemonInst.getGender();
 		if (pokemon == null) {
-			channel.sendMessage("Pokemon \"" + args[1] + "\" not found");
+			channel.createMessage("Pokemon \"" + args[1] + "\" not found").block();
 			return;
 		}
 		if (!pokemon.isAvailable()) {
-			channel.sendMessage("Pokemon **" + pokemon + "** is not available");
+			channel.createMessage("Pokemon **" + pokemon + "** is not available").block();
 			return;
 		}
 		if (!pokemon.isTradable()) {
-			channel.sendMessage("Pokemon **" + pokemon + "** is not tradable");
+			channel.createMessage("Pokemon **" + pokemon + "** is not tradable").block();
 			return;
 		}
 		if (shiny && ((form == null && !pokemon.isShinyable())
 				|| (form != null && !form.canBeShiny(pokemon)))) {
-			channel.sendMessage("Pokemon **" + pokemon + "** cannot be shiny"
-					+ (form == null ? "" : " in form \"" + form + "\""));
+			channel.createMessage("Pokemon **" + pokemon + "** cannot be shiny"
+					+ (form == null ? "" : " in form \"" + form + "\"")).block();
 			return;
 		}
 		if (pokemon.getGenderPossible() != gender && pokemon.getGenderPossible() != EnumGender.EITHER) {
-			channel.sendMessage("Pokemon **" + pokemon + "** cannot be " + gender);
+			channel.createMessage("Pokemon **" + pokemon + "** cannot be " + gender).block();
 			return;
 		}
 
 		List<TradeboardPost> posts = server.findPosts(pokemon, form, shiny, gender,
 				pokemonInst.isLegacy());
 		if (posts.isEmpty())
-			channel.sendMessage("No trades currently open matching your search");
+			channel.createMessage("No trades currently open matching your search").block();
 		else {
-			channel.sendMessage("Found " + posts.size() + " results for your search");
+			channel.createMessage("Found " + posts.size() + " results for your search").block();
 			for (TradeboardPost p : posts)
-				RequestBuffer.request(() -> channel.sendMessage(p.getPostEmbed(server)));
+				channel.createEmbed(p.getPostEmbed(server)).block();
 		}
 	}
 

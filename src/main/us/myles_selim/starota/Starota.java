@@ -5,30 +5,30 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import org.discordbots.api.client.DiscordBotListAPI;
 
-import sx.blah.discord.api.ClientBuilder;
-import sx.blah.discord.api.IDiscordClient;
-import sx.blah.discord.api.IShard;
-import sx.blah.discord.api.events.EventDispatcher;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.ActivityType;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.handle.obj.StatusType;
-import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.RequestBuffer;
+import discord4j.core.DiscordClient;
+import discord4j.core.DiscordClientBuilder;
+import discord4j.core.event.EventDispatcher;
+import discord4j.core.object.entity.Channel;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.GuildChannel;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.presence.Activity;
+import discord4j.core.object.presence.Presence;
+import discord4j.core.object.util.Snowflake;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.assistants.CommandBots;
 import us.myles_selim.starota.assistants.points.PointBot;
 import us.myles_selim.starota.assistants.pokedex.PokedexBot;
@@ -36,7 +36,6 @@ import us.myles_selim.starota.assistants.registration.RegistrationBot;
 import us.myles_selim.starota.commands.CommandArticleMessage;
 import us.myles_selim.starota.commands.CommandChangelog;
 import us.myles_selim.starota.commands.CommandCredits;
-import us.myles_selim.starota.commands.CommandGenerateCommandWiki;
 import us.myles_selim.starota.commands.CommandGetTimezones;
 import us.myles_selim.starota.commands.CommandInvite;
 import us.myles_selim.starota.commands.CommandPing;
@@ -60,16 +59,11 @@ import us.myles_selim.starota.leaderboards.commands.CommandNewLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandUpdateLeaderboard;
 import us.myles_selim.starota.leek_duck.ditto.CommandDitto;
 import us.myles_selim.starota.leek_duck.events.CommandEvents;
-import us.myles_selim.starota.lua.LuaEventHandler;
-import us.myles_selim.starota.lua.LuaUtils;
-import us.myles_selim.starota.lua.commands.CommandUploadScript;
-import us.myles_selim.starota.lua.commands.LuaCommandHandler;
 import us.myles_selim.starota.misc.data_types.BotServer;
-import us.myles_selim.starota.misc.data_types.NullChannel;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.misc.utils.StatusUpdater;
-import us.myles_selim.starota.misc.utils.StatusUpdater.PresenceData;
 import us.myles_selim.starota.misc.utils.TwitterHelper;
 import us.myles_selim.starota.misc.utils.WikiGenerator;
 import us.myles_selim.starota.modules.BaseModules;
@@ -100,8 +94,6 @@ import us.myles_selim.starota.silph_road.CommandSilphCard;
 import us.myles_selim.starota.silph_road.eggs.CommandEggHatches;
 import us.myles_selim.starota.trading.commands.CommandFindTrade;
 import us.myles_selim.starota.trading.commands.CommandForTrade;
-import us.myles_selim.starota.trading.commands.CommandGetForms;
-import us.myles_selim.starota.trading.commands.CommandGetShinies;
 import us.myles_selim.starota.trading.commands.CommandGetTrade;
 import us.myles_selim.starota.trading.commands.CommandGetUserTrades;
 import us.myles_selim.starota.trading.commands.CommandLookingFor;
@@ -114,7 +106,7 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class Starota {
 
-	private static IDiscordClient CLIENT;
+	private static DiscordClient CLIENT;
 	private static DiscordBotListAPI BOT_LIST;
 	// private static Socket MANAGER_SOCKET;
 	private static final Properties PROPERTIES = new Properties();
@@ -131,6 +123,7 @@ public class Starota {
 	public static ReactionMessageRegistry REACTION_MESSAGES_REGISTRY;
 	public static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
 
+	@SuppressWarnings("deprecation")
 	public static void main(String[] args) {
 		// register shutdown stuff
 		Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -148,27 +141,24 @@ public class Starota {
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-			ClientBuilder clientBuilder = new ClientBuilder();
-			clientBuilder.withToken(PROPERTIES.getProperty("token"));
+			DiscordClientBuilder clientBuilder = new DiscordClientBuilder(
+					PROPERTIES.getProperty("token"));
 			IS_DEV = Boolean.parseBoolean(PROPERTIES.getProperty("is_dev"));
-			CLIENT = null;
-			try {
-				CLIENT = clientBuilder.login();
-				CLIENT.changePresence(StatusType.INVISIBLE);
-			} catch (DiscordException e) {
-				e.printStackTrace();
-			}
+			CLIENT = clientBuilder.build();
+			Thread botRun = new Thread() {
+
+				@Override
+				public void run() {
+					CLIENT.login().block();
+				}
+			};
+			botRun.start();
+			CLIENT.updatePresence(Presence.invisible());
 			if (CLIENT == null) {
 				System.err.println("Failed to login, exiting");
 				return;
 			}
-			EventDispatcher dispatcher = CLIENT.getDispatcher();
-			try {
-				while (!CLIENT.isReady())
-					Thread.sleep(10);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			EventDispatcher dispatcher = CLIENT.getEventDispatcher();
 			BotServer.registerServerType(CLIENT, StarotaServer.class);
 
 			// default settings, do this before anything else with StarotaServer
@@ -187,7 +177,7 @@ public class Starota {
 			StarotaServer.registerDefaultLeaderboards();
 
 			// load all StarotaServer data
-			for (IGuild g : CLIENT.getGuilds())
+			for (Guild g : CLIENT.getGuilds().collectList().block())
 				StarotaServer.getServer(g);
 
 			COMMAND_HANDLER = new PrimaryCommandHandler(CLIENT);
@@ -205,17 +195,11 @@ public class Starota {
 			registerCommands(jCmdHandler);
 
 			SelimPMCommandHandler.init();
-
-			try {
-				Thread.sleep(2500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
 			System.out.println("starting threads and loading settings...");
 
-			dispatcher.registerListener(COMMAND_HANDLER);
-			dispatcher.registerListener(REACTION_MESSAGES_REGISTRY);
-			dispatcher.registerListener(new EventHandler());
+			COMMAND_HANDLER.setup(dispatcher);
+			REACTION_MESSAGES_REGISTRY.setup(dispatcher);
+			new EventHandler().setup(dispatcher);
 			// ReactionMessageRegistry.init();
 			WebServer.init();
 			PokedexBot.start();
@@ -223,23 +207,16 @@ public class Starota {
 			// PointBot.start();
 			submitStats();
 
-			try {
-				Thread.sleep(2500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
 			System.out.println("v" + StarotaConstants.VERSION + (DEBUG || IS_DEV ? "d" : ""));
 			StatusUpdater statusUpdater = new StatusUpdater(CLIENT);
-			statusUpdater.addPresence(new PresenceData(StatusType.ONLINE, ActivityType.PLAYING,
-					"v" + StarotaConstants.VERSION + (DEBUG || IS_DEV ? "d" : "")));
-			statusUpdater.addPresence(new PresenceData(StatusType.ONLINE, ActivityType.WATCHING,
-					"people organize raids with `raid`"));
-			statusUpdater.addPresence(new PresenceData(StatusType.ONLINE, ActivityType.LISTENING,
-					"to people search for events and Pokemon"));
-			statusUpdater.addPresence(new PresenceData(StatusType.ONLINE, ActivityType.PLAYING,
-					"with the new event system"));
+			statusUpdater.addPresence(Presence.online(
+					Activity.playing("v" + StarotaConstants.VERSION + (DEBUG || IS_DEV ? "d" : ""))));
 			statusUpdater.addPresence(
-					new PresenceData(StatusType.ONLINE, ActivityType.WATCHING, ".bots for new bots"));
+					Presence.online(Activity.watching("people organize raids with `raid`")));
+			statusUpdater.addPresence(
+					Presence.online(Activity.listening("to people search for events and Pokemon")));
+			statusUpdater.addPresence(Presence.online(Activity.playing("with the new event system")));
+			statusUpdater.addPresence(Presence.online(Activity.watching(".bots for new bots")));
 			statusUpdater.start();
 
 			EXECUTOR.execute(new Runnable() {
@@ -247,19 +224,18 @@ public class Starota {
 				@Override
 				public void run() {
 					boolean sentToAll = true;
-					List<IGuild> guilds = new ArrayList<>(CLIENT.getGuilds());
+					List<Guild> guilds = new ArrayList<>(CLIENT.getGuilds().collectList().block());
 					if (!IS_DEV)
-						guilds.addAll(PokedexBot.CLIENT.getGuilds());
-					for (IGuild g : guilds) {
+						guilds.addAll(PokedexBot.CLIENT.getGuilds().collectList().block());
+					for (Guild g : guilds) {
 						StarotaServer server = StarotaServer.getServer(g);
-						IChannel changesChannel = server
+						TextChannel changesChannel = server
 								.getSetting(StarotaConstants.Settings.CHANGES_CHANNEL);
-						if (changesChannel.equals(NullChannel.NULL_CHANNEL))
+						if (changesChannel == null)
 							continue;
 						String latestChangelog = (String) server.getDataValue("changesVersion");
 						if (!StarotaConstants.VERSION.equalsIgnoreCase(latestChangelog)) {
-							RequestBuffer.request(
-									() -> changesChannel.sendMessage("```" + CHANGELOG + "```"));
+							changesChannel.createMessage("```" + CHANGELOG + "```");
 							server.setDataValue("changesVersion", StarotaConstants.VERSION);
 						} else
 							sentToAll = false;
@@ -269,9 +245,10 @@ public class Starota {
 				}
 			});
 
-			LuaUtils.registerConverters();
-			dispatcher.registerListener(new LuaEventHandler());
-			COMMAND_HANDLER.registerCommandHandler(new LuaCommandHandler(CLIENT));
+			// LuaUtils.registerConverters();
+			// new LuaEventHandler().setup(dispatcher);
+			// COMMAND_HANDLER.registerCommandHandler(new
+			// LuaCommandHandler(CLIENT));
 
 			FULLY_STARTED = true;
 			DebugServer.update();
@@ -292,12 +269,12 @@ public class Starota {
 
 			Thread discord4JWatchdog = new Thread("D4JWatchdog") {
 
-				private boolean isReady = CLIENT.isReady();
+				private boolean isReady = CLIENT.isConnected();
 
 				@Override
 				public void run() {
 					while (true) {
-						boolean inReady = CLIENT.isReady();
+						boolean inReady = CLIENT.isConnected();
 						if (!isReady && !inReady)
 							System.exit(1);
 						isReady = inReady;
@@ -339,7 +316,7 @@ public class Starota {
 		jCmdHandler
 				.registerCommand(new CommandSupportBot(Starota.BOT_NAME, StarotaConstants.STAROTA_ID));
 		jCmdHandler.registerCommand(new CommandInvite(Starota.BOT_NAME, StarotaConstants.STAROTA_ID,
-				Permissions.generatePermissionsNumber(DebugServer.getUsedPermissions())));
+				DebugServer.getUsedPermission().getRawValue()));
 		jCmdHandler.registerCommand(new CommandPing());
 		jCmdHandler.registerCommand(new CommandVote(Starota.BOT_NAME, StarotaConstants.STAROTA_ID));
 
@@ -349,7 +326,6 @@ public class Starota {
 		jCmdHandler.registerCommand("Administrative", new CommandGetTimezones());
 		if (IS_DEV) {
 			jCmdHandler.registerCommand("Debug", new CommandTest());
-			jCmdHandler.registerCommand("Debug", new CommandGenerateCommandWiki());
 		}
 
 		jCmdHandler.registerCommand("Profiles", new CommandRegister());
@@ -365,10 +341,6 @@ public class Starota {
 		jCmdHandler.registerCommand("Groups", new CommandSetAsGroup());
 
 		jCmdHandler.registerCommand("Tradeboard", new CommandTradeboardHelp());
-		if (IS_DEV) {
-			jCmdHandler.registerCommand("Debug", new CommandGetForms());
-			jCmdHandler.registerCommand("Debug", new CommandGetShinies());
-		}
 		jCmdHandler.registerCommand("Tradeboard", new CommandForTrade());
 		jCmdHandler.registerCommand("Tradeboard", new CommandGetUserTrades());
 		jCmdHandler.registerCommand("Tradeboard", new CommandFindTrade());
@@ -376,7 +348,7 @@ public class Starota {
 		jCmdHandler.registerCommand("Tradeboard", new CommandLookingFor());
 		jCmdHandler.registerCommand("Tradeboard", new CommandRemoveTrade());
 
-		jCmdHandler.registerCommand("Lua", new CommandUploadScript());
+		// jCmdHandler.registerCommand("Lua", new CommandUploadScript());
 
 		jCmdHandler.registerCommand("Leaderboard", new CommandEditLeaderboard());
 		jCmdHandler.registerCommand("Leaderboard", new CommandUpdateLeaderboard());
@@ -409,66 +381,87 @@ public class Starota {
 		jCmdHandler.registerCommand("Tutorial", new CommandTutorial());
 	}
 
-	public static IDiscordClient getClient() {
+	public static DiscordClient getClient() {
 		return CLIENT;
 	}
 
 	public static DiscordBotListAPI getBotListAPI() {
 		if (BOT_LIST == null && PROPERTIES.containsKey("bot_list_token"))
 			BOT_LIST = new DiscordBotListAPI.Builder().token(PROPERTIES.getProperty("bot_list_token"))
-					.botId(CLIENT.getOurUser().getStringID()).build();
+					.botId(CLIENT.getSelf().block().getId().asString()).build();
 		return BOT_LIST;
 	}
 
-	public static IGuild getGuild(long guildId) {
-		return CLIENT.getGuildByID(guildId);
+	public static Guild getGuild(Snowflake guildId) {
+		return getGuild(guildId.asLong());
 	}
 
-	public static IChannel getChannel(long guildId, long channelId) {
-		return getGuild(guildId).getChannelByID(channelId);
+	public static Guild getGuild(long guildId) {
+		return CLIENT.getGuildById(Snowflake.of(guildId)).block();
 	}
 
-	public static IChannel getChannel(long channelId) {
-		return CLIENT.getChannelByID(channelId);
+	public static TextChannel getChannel(long guildId, long channelId) {
+		GuildChannel ch = getGuild(guildId).getChannelById(Snowflake.of(channelId)).block();
+		if (ch instanceof TextChannel)
+			return (TextChannel) ch;
+		return null;
 	}
 
-	public static IUser getUser(long userId) {
-		return CLIENT.fetchUser(userId);
+	public static TextChannel getChannel(long channelId) {
+		Channel ch = CLIENT.getChannelById(Snowflake.of(channelId)).block();
+		if (ch instanceof TextChannel)
+			return (TextChannel) ch;
+		return null;
 	}
 
-	public static IUser getOurUser() {
-		return CLIENT.getOurUser();
+	public static User getUser(long userId) {
+		return CLIENT.getUserById(Snowflake.of(userId)).block();
+	}
+
+	public static User getOurUser() {
+		return CLIENT.getSelf().block();
+	}
+
+	public static Member getOurUserAsMember(Guild guild) {
+		return CLIENT.getSelf().block().asMember(guild.getId()).block();
 	}
 
 	public static String getOurName(long guildId) {
 		return getOurName(getGuild(guildId));
 	}
 
-	public static String getOurName(IGuild guild) {
+	public static String getOurName(Guild guild) {
 		if (CLIENT == null)
 			return null;
 		if (guild == null)
-			return getOurUser().getName();
-		return getOurUser().getDisplayName(guild);
+			return getOurUser().getUsername();
+		return getOurUser().asMember(guild.getId()).block().getDisplayName();
 	}
 
-	public static IUser findUser(String name) {
+	public static Member findMember(Guild guild, String name) {
+		User u = findUser(guild.getId().asLong(), name);
+		if (u == null)
+			return null;
+		return u.asMember(guild.getId()).block();
+	}
+
+	public static User findUser(String name) {
 		return findUser(-1, name);
 	}
 
-	public static IUser findUser(long serverId, String name) {
+	public static User findUser(long serverId, String name) {
 		try {
 			long userId = Long.parseLong(name);
-			IUser user = getUser(userId);
+			User user = getUser(userId);
 			if (user != null)
 				return user;
 		} catch (NumberFormatException e) {}
 		String user = name.replaceAll("@", "").replaceAll("#\\d{4}", "");
 		if (user.matches("<\\d{18}>")) {
 			long userId = Long.parseLong(user.substring(1, 19));
-			IGuild guild = Starota.getGuild(serverId);
+			Guild guild = Starota.getGuild(serverId);
 			if (guild != null) {
-				IUser userD = guild.getUserByID(userId);
+				Member userD = guild.getMemberById(Snowflake.of(userId)).block();
 				if (userD != null)
 					return userD;
 			}
@@ -480,26 +473,29 @@ public class Starota {
 		} else if (name.matches("<@!\\d*>")) {
 			try {
 				long id = Long.parseLong(name.substring(3, name.length() - 1));
-				IUser idUser = getUser(id);
+				User idUser = getUser(id);
 				if (idUser != null) {
 					return idUser;
 				}
 			} catch (NumberFormatException e) {}
 		}
-		IDiscordClient client = Starota.getClient();
-		List<IUser> users;
-		if (serverId != -1)
-			users = client.getGuildByID(serverId).getUsersByName(user);
-		else
-			users = client.getUsersByName(user);
-		for (IUser u : users)
+		DiscordClient client = Starota.getClient();
+		List<User> users;
+		if (serverId != -1) {
+			users = new LinkedList<>();
+			for (Member m : MiscUtils
+					.getMembersByName(client.getGuildById(Snowflake.of(serverId)).block(), user))
+				users.add(m);
+		} else
+			users = MiscUtils.getUsersByName(client, user, false);
+		for (User u : users)
 			if (discrim == null || u.getDiscriminator().equals(discrim))
 				return u;
 		if (serverId != -1) {
-			IGuild server = client.getGuildByID(serverId);
-			for (IUser u : server.getUsers()) {
-				String nickname = u.getNicknameForGuild(server);
-				if (u.getName().equalsIgnoreCase(user) || u.getDisplayName(server).equalsIgnoreCase(user)
+			Guild server = client.getGuildById(Snowflake.of(serverId)).block();
+			for (Member u : server.getMembers().collectList().block()) {
+				String nickname = u.getDisplayName();
+				if (u.getUsername().equalsIgnoreCase(user) || u.getDisplayName().equalsIgnoreCase(user)
 						|| (nickname != null && nickname.equalsIgnoreCase(user)))
 					return u;
 			}
@@ -507,43 +503,52 @@ public class Starota {
 		return null;
 	}
 
-	public static IChannel findChannel(String name) {
+	public static TextChannel findChannel(String name) {
 		return findChannel(-1, name);
 	}
 
-	public static IChannel findChannel(long serverId, String name) {
+	public static TextChannel findChannel(long serverId, String name) {
 		if (name == null)
 			return null;
 		if (name.matches("<#\\d*>")) {
 			try {
 				long id = Long.parseLong(name.substring(2, name.length() - 1));
-				IChannel idChannel = getChannel(id);
+				TextChannel idChannel = getChannel(id);
 				if (idChannel != null)
 					return idChannel;
 			} catch (NumberFormatException e) {}
 		}
 		name = name.substring(1);
-		IDiscordClient client = Starota.getClient();
-		List<IChannel> channels;
-		if (serverId != -1)
-			channels = client.getGuildByID(serverId).getChannelsByName(name);
-		else {
-			channels = client.getChannels(true);
-			for (IChannel ch : channels)
+		DiscordClient client = Starota.getClient();
+		List<TextChannel> channels;
+		if (serverId != -1) {
+			channels = new ArrayList<>();
+			for (GuildChannel ch : MiscUtils
+					.getChannelsByName(client.getGuildById(Snowflake.of(serverId)).block(), name)) {
+				if (ch instanceof TextChannel)
+					channels.add((TextChannel) ch);
+			}
+		} else {
+			channels = new ArrayList<>();
+			for (Guild g : client.getGuilds().collectList().block())
+				for (GuildChannel ch : g.getChannels().collectList().block())
+					if (ch instanceof TextChannel)
+						channels.add((TextChannel) ch);
+			for (TextChannel ch : channels)
 				if (ch.getName().equalsIgnoreCase(name))
 					return ch;
 		}
 		if (serverId != -1) {
-			IGuild server = client.getGuildByID(serverId);
-			for (IChannel ch : server.getChannels())
-				if (ch.getName().equalsIgnoreCase(name))
-					return ch;
+			Guild server = client.getGuildById(Snowflake.of(serverId)).block();
+			for (GuildChannel ch : server.getChannels().collectList().block())
+				if (ch instanceof TextChannel && ch.getName().equalsIgnoreCase(name))
+					return (TextChannel) ch;
 		}
 		return null;
 	}
 
-	public static IGuild getSupportServer() {
-		return getGuild(StarotaConstants.SUPPORT_SERVER);
+	public static Guild getSupportServer() {
+		return getGuild(StarotaConstants.SUPPORT_SERVER.asLong());
 	}
 
 	public static void submitError(Throwable e) {
@@ -553,10 +558,13 @@ public class Starota {
 	public static void submitError(String message, Throwable e) {
 		if (IS_DEV)
 			e.printStackTrace();
-		if (IS_DEV || CLIENT == null || !CLIENT.isReady())
+		if (IS_DEV || CLIENT == null || !CLIENT.isConnected())
 			return;
 		long reportChannelId = 522805019326677002L;
-		IChannel reportChannel = CLIENT.getChannelByID(reportChannelId);
+		TextChannel reportChannel = null;
+		Channel ch = CLIENT.getChannelById(Snowflake.of(reportChannelId)).block();
+		if (ch instanceof TextChannel)
+			reportChannel = (TextChannel) ch;
 		if (reportChannel == null)
 			return;
 		EmbedBuilder builder = new EmbedBuilder();
@@ -570,55 +578,50 @@ public class Starota {
 			body += line + "\n";
 		}
 		builder.appendDesc(body);
-		RequestBuffer.request(() -> reportChannel.sendMessage(builder.build()));
+		reportChannel.createEmbed(builder.build());
 	}
 
 	public static void submitStats() {
 		try {
 			getBotListAPI();
 			if (!IS_DEV) {
-				System.out.println("Submitting shard info to the bot list");
-				List<Integer> shards = new ArrayList<>();
-				for (IShard s : CLIENT.getShards())
-					shards.add(s.getGuilds().size());
-				BOT_LIST.setStats(shards).whenComplete((v, e) -> {
-					if (e != null)
-						e.printStackTrace();
-					else
-						System.out.println("Starota Submitted");
-				});
+				System.out.println("Submitting server info to the bot list");
+				BOT_LIST.setStats(CLIENT.getGuilds().collectList().block().size())
+						.whenComplete((v, e) -> {
+							if (e != null)
+								e.printStackTrace();
+							else
+								System.out.println("Starota Submitted");
+						});
 				if (PokedexBot.CLIENT != null) {
-					shards.clear();
-					for (IShard s : PokedexBot.CLIENT.getShards())
-						shards.add(s.getGuilds().size());
-					PokedexBot.getBotListAPI().setStats(shards).whenComplete((v, e) -> {
-						if (e != null)
-							e.printStackTrace();
-						else
-							System.out.println("Pokedex Submitted");
-					});
+					PokedexBot.getBotListAPI()
+							.setStats(PokedexBot.CLIENT.getGuilds().collectList().block().size())
+							.whenComplete((v, e) -> {
+								if (e != null)
+									e.printStackTrace();
+								else
+									System.out.println("Pokedex Submitted");
+							});
 				}
 				if (RegistrationBot.CLIENT != null) {
-					shards.clear();
-					for (IShard s : RegistrationBot.CLIENT.getShards())
-						shards.add(s.getGuilds().size());
-					RegistrationBot.getBotListAPI().setStats(shards).whenComplete((v, e) -> {
-						if (e != null)
-							e.printStackTrace();
-						else
-							System.out.println("Pokedex Submitted");
-					});
+					RegistrationBot.getBotListAPI()
+							.setStats(RegistrationBot.CLIENT.getGuilds().collectList().block().size())
+							.whenComplete((v, e) -> {
+								if (e != null)
+									e.printStackTrace();
+								else
+									System.out.println("RegBot Submitted");
+							});
 				}
 				if (PointBot.CLIENT != null) {
-					shards.clear();
-					for (IShard s : PointBot.CLIENT.getShards())
-						shards.add(s.getGuilds().size());
-					PointBot.getBotListAPI().setStats(shards).whenComplete((v, e) -> {
-						if (e != null)
-							e.printStackTrace();
-						else
-							System.out.println("Pokedex Submitted");
-					});
+					PointBot.getBotListAPI()
+							.setStats(PointBot.CLIENT.getGuilds().collectList().block().size())
+							.whenComplete((v, e) -> {
+								if (e != null)
+									e.printStackTrace();
+								else
+									System.out.println("Pokedex Submitted");
+							});
 				}
 			} else
 				System.out.println("BOT LIST TOKEN NOT FOUND");
@@ -630,17 +633,18 @@ public class Starota {
 	public static void updateOwners() {
 		if (IS_DEV)
 			return;
-		IRole ownerRole = CLIENT.getRoleByID(539645716583284776L);
-		List<IUser> currentOwners = new ArrayList<>();
-		for (IGuild g : CLIENT.getGuilds()) {
-			IUser owner = getSupportServer().getUserByID(g.getOwnerLongID());
+		Guild supportServer = getSupportServer();
+		Snowflake ownerRole = Snowflake.of(539645716583284776L);
+		List<Member> currentOwners = new ArrayList<>();
+		for (Guild g : CLIENT.getGuilds().collectList().block()) {
+			Member owner = supportServer.getMemberById(g.getOwnerId()).block();
 			if (owner == null)
 				continue;
-			if (!owner.hasRole(ownerRole))
-				RequestBuffer.request(() -> owner.addRole(ownerRole));
+			if (!owner.getRoleIds().contains(ownerRole))
+				owner.addRole(ownerRole);
 			currentOwners.add(owner);
 		}
-		for (IUser u : getSupportServer().getUsersByRole(ownerRole))
+		for (Member u : MiscUtils.getMembersByRole(supportServer, ownerRole))
 			if (!currentOwners.contains(u))
 				u.removeRole(ownerRole);
 	}
@@ -650,96 +654,79 @@ public class Starota {
 			264445053596991498L, // Discord Bot List
 	};
 
-	public static void sendOwnersMessage(String msg, IUser author) {
+	public static void sendOwnersMessage(String msg, User author) {
 		sendOwnersMessage(msg, null, author);
 	}
 
-	public static void sendOwnersMessage(EmbedObject embed, IUser author) {
+	public static void sendOwnersMessage(Consumer<? super EmbedCreateSpec> embed, User author) {
 		sendOwnersMessage(null, embed, author);
 	}
 
-	public static void sendOwnersMessage(String msg, EmbedObject embed, IUser author) {
+	public static void sendOwnersMessage(String msg, Consumer<? super EmbedCreateSpec> embed,
+			User author) {
 		EXECUTOR.execute(new Runnable() {
 
 			@Override
 			public void run() {
-				final EmbedObject fEmbed = embed == null || embed.equals(new EmbedObject()) ? null
-						: embed;
+				final Consumer<? super EmbedCreateSpec> fEmbed = embed == null ? null : embed;
 				List<Long> alreadySent = new ArrayList<>();
-
-				if (IS_DEV) {
-					// testing channel on bot test server
-					IChannel ch = CLIENT.getChannelByID(504089729143406595L);
-					if ((msg == null || msg.isEmpty()) && fEmbed != null)
-						RequestBuffer.request(() -> ch.sendMessage(fEmbed)).get();
-					else if ((msg != null && !msg.isEmpty()) && fEmbed == null)
-						RequestBuffer.request(() -> ch.sendMessage(msg)).get();
-					else if ((msg != null && !msg.isEmpty()) && fEmbed != null)
-						RequestBuffer.request(() -> ch.sendMessage(msg, fEmbed)).get();
-					RequestBuffer.request(() -> ch.sendMessage(getAuthorEmbed(author)));
-				}
-
-				for (IGuild g : CLIENT.getGuilds()) {
-					if (MiscUtils.arrContains(SKIPPED_SERVERS, g.getLongID()))
+				for (Guild g : CLIENT.getGuilds().collectList().block()) {
+					if (MiscUtils.arrContains(SKIPPED_SERVERS, g.getId().asLong()))
 						continue;
-					IUser owner = g.getOwner();
-					if (author.getLongID() == owner.getLongID()
-							|| alreadySent.contains(owner.getLongID()))
+					Member owner = g.getOwner().block();
+					if (author.getId().asLong() == owner.getId().asLong()
+							|| alreadySent.contains(owner.getId().asLong()))
 						continue;
-					alreadySent.add(owner.getLongID());
+					alreadySent.add(owner.getId().asLong());
 					if ((msg == null || msg.isEmpty()) && fEmbed != null)
-						RequestBuffer.request(() -> owner.getOrCreatePMChannel().sendMessage(fEmbed))
-								.get();
+						owner.getPrivateChannel().block().createEmbed(fEmbed).block();
 					else if ((msg != null && !msg.isEmpty()) && fEmbed == null)
-						RequestBuffer.request(() -> owner.getOrCreatePMChannel().sendMessage(msg)).get();
+						owner.getPrivateChannel().block().createMessage(msg).block();
 					else if ((msg != null && !msg.isEmpty()) && fEmbed != null)
-						RequestBuffer
-								.request(() -> owner.getOrCreatePMChannel().sendMessage(msg, fEmbed))
-								.get();
-					RequestBuffer.request(
-							() -> owner.getOrCreatePMChannel().sendMessage(getAuthorEmbed(author)));
+						owner.getPrivateChannel().block()
+								.createMessage((m) -> m.setContent(msg).setEmbed(fEmbed)).block();
+					owner.getPrivateChannel().block().createEmbed(getAuthorEmbed(author)).block();
 				}
 			}
 		});
 	}
 
-	public static void sendArticle(String msg, IUser author) {
-		sendOwnersMessage(msg, null, author);
+	public static void sendArticle(String msg, User author) {
+		sendArticle(msg, null, author);
 	}
 
-	public static void sendArticle(EmbedObject embed, IUser author) {
-		sendOwnersMessage(null, embed, author);
+	public static void sendArticle(Consumer<? super EmbedCreateSpec> embed, User author) {
+		sendArticle(null, embed, author);
 	}
 
-	public static void sendArticle(String msg, EmbedObject embed, IUser author) {
+	public static void sendArticle(String msg, Consumer<? super EmbedCreateSpec> embed, User author) {
 		EXECUTOR.execute(new Runnable() {
 
 			@Override
 			public void run() {
-				final EmbedObject fEmbed = embed == null || embed.equals(new EmbedObject()) ? null
-						: embed;
-				for (IGuild g : CLIENT.getGuilds()) {
-					if (MiscUtils.arrContains(SKIPPED_SERVERS, g.getLongID()))
+				final Consumer<? super EmbedCreateSpec> fEmbed = embed == null ? null : embed;
+				for (Guild g : CLIENT.getGuilds().collectList().block()) {
+					if (MiscUtils.arrContains(SKIPPED_SERVERS, g.getId().asLong()))
 						continue;
 					StarotaServer server = StarotaServer.getServer(g);
-					IChannel ch = server.getSetting(StarotaConstants.Settings.NEWS_CHANNEL);
+					TextChannel ch = server.getSetting(StarotaConstants.Settings.NEWS_CHANNEL);
 					if (ch == null)
 						continue;
 					if ((msg == null || msg.isEmpty()) && fEmbed != null)
-						RequestBuffer.request(() -> ch.sendMessage(fEmbed)).get();
+						ch.createEmbed(fEmbed).block();
 					else if ((msg != null && !msg.isEmpty()) && fEmbed == null)
-						RequestBuffer.request(() -> ch.sendMessage(msg)).get();
+						ch.createMessage(msg).block();
 					else if ((msg != null && !msg.isEmpty()) && fEmbed != null)
-						RequestBuffer.request(() -> ch.sendMessage(msg, fEmbed)).get();
-					RequestBuffer.request(() -> ch.sendMessage(getAuthorEmbed(author)));
+						ch.createMessage((m) -> m.setContent(msg).setEmbed(fEmbed)).block();
+					ch.createEmbed(getAuthorEmbed(author)).block();
 				}
 			}
 		});
 	}
 
-	private static EmbedObject getAuthorEmbed(IUser author) {
+	private static Consumer<? super EmbedCreateSpec> getAuthorEmbed(User author) {
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.withFooterIcon(author.getAvatarURL()).withFooterText(author.getName());
+		builder.withFooterIcon(author.getAvatarUrl()).withFooterText(author.getUsername());
 		builder.appendDesc("Sent by:");
 		return builder.build();
 	}

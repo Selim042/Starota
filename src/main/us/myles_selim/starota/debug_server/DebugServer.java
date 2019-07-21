@@ -1,70 +1,73 @@
 package us.myles_selim.starota.debug_server;
 
 import java.util.EnumSet;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
+import discord4j.core.object.util.Snowflake;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 
 // TODO: Optimize this
 public class DebugServer /* extends Thread */ {
 
 	public static final long DEBUG_SERVER_ID = 517546213520965662L;
 
-	private static IGuild DEBUG_SERVER;
-	private static EmbedObject NOT_READY_EMBED;
-	private static final EnumSet<Permissions> USED_PERMISSIONS = EnumSet.noneOf(Permissions.class);
+	private static Guild DEBUG_SERVER;
+	private static Consumer<? super EmbedCreateSpec> NOT_READY_EMBED;
+	private static final EnumSet<Permission> USED_PERMISSIONS = EnumSet.noneOf(Permission.class);
 
-	// private static final IMessage STATUS;
-	// private static final IMessage DISCORD_PERMS;
-	// private static final IMessage PATREON_PERMS;
-	// private static final IMessage MODULES;
+	// private static final Message STATUS;
+	// private static final Message DISCORD_PERMS;
+	// private static final Message PATREON_PERMS;
+	// private static final Message MODULES;
 
 	public static void init() {
 		DEBUG_SERVER = Starota.getGuild(DEBUG_SERVER_ID);
-		IChannel ch;
+		TextChannel ch;
 
 		if (Starota.IS_DEV)
-			ch = DEBUG_SERVER.getChannelByID(517546371503357972L);
+			ch = (TextChannel) DEBUG_SERVER.getChannelById(Snowflake.of(517546371503357972L)).block();
 		else
-			ch = DEBUG_SERVER.getChannelByID(517548271435120643L);
-		if (ch.getFullMessageHistory().isEmpty())
-			new StatusReactionMessage().sendMessage(ch);
+			ch = (TextChannel) DEBUG_SERVER.getChannelById(Snowflake.of(517548271435120643L)).block();
+		if (ch.getMessagesBefore(ch.getLastMessageId().get()).collectList().block().isEmpty())
+			new StatusReactionMessage().createMessage(ch);
 
 		if (Starota.IS_DEV)
-			ch = DEBUG_SERVER.getChannelByID(522806654434017282L);
+			ch = (TextChannel) DEBUG_SERVER.getChannelById(Snowflake.of(522806654434017282L)).block();
 		else
-			ch = DEBUG_SERVER.getChannelByID(522806624260194304L);
-		if (ch.getFullMessageHistory().isEmpty())
-			new DiscordPermsReactionMessage().sendMessage(ch);
+			ch = (TextChannel) DEBUG_SERVER.getChannelById(Snowflake.of(522806624260194304L)).block();
+		if (ch.getMessagesBefore(ch.getLastMessageId().get()).collectList().block().isEmpty())
+			new DiscordPermsReactionMessage().createMessage(ch);
 
 		if (Starota.IS_DEV)
-			ch = DEBUG_SERVER.getChannelByID(517548301932036096L);
+			ch = (TextChannel) DEBUG_SERVER.getChannelById(Snowflake.of(517548301932036096L)).block();
 		else
-			ch = DEBUG_SERVER.getChannelByID(517546321595334656L);
-		if (ch.getFullMessageHistory().isEmpty())
-			new DonorPermsReactionMessage().sendMessage(ch);
+			ch = (TextChannel) DEBUG_SERVER.getChannelById(Snowflake.of(517546321595334656L)).block();
+		if (ch.getMessagesBefore(ch.getLastMessageId().get()).collectList().block().isEmpty())
+			new DonorPermsReactionMessage().createMessage(ch);
 
 		if (Starota.IS_DEV)
-			ch = DEBUG_SERVER.getChannelByID(518285102703181847L);
+			ch = (TextChannel) DEBUG_SERVER.getChannelById(Snowflake.of(518285102703181847L)).block();
 		else
-			ch = DEBUG_SERVER.getChannelByID(518285130108764181L);
-		if (ch.getFullMessageHistory().isEmpty())
-			new ModulesReactionMessage().sendMessage(ch);
+			ch = (TextChannel) DEBUG_SERVER.getChannelById(Snowflake.of(518285130108764181L)).block();
+		if (ch.getMessagesBefore(ch.getLastMessageId().get()).collectList().block().isEmpty())
+			new ModulesReactionMessage().createMessage(ch);
 	}
 
-	public static void addPermission(Permissions perm) {
+	public static void addPermission(Permission perm) {
 		USED_PERMISSIONS.add(perm);
 	}
 
-	public static EnumSet<Permissions> getUsedPermissions() {
-		return USED_PERMISSIONS.clone();
+	public static PermissionSet getUsedPermission() {
+		return PermissionSet.of(USED_PERMISSIONS.toArray(new Permission[0]));
 	}
 
-	public static EmbedObject getNotReadyEmbed() {
+	public static Consumer<? super EmbedCreateSpec> getNotReadyEmbed() {
 		if (NOT_READY_EMBED != null)
 			return NOT_READY_EMBED;
 		EmbedBuilder builder = new EmbedBuilder();
@@ -87,7 +90,7 @@ public class DebugServer /* extends Thread */ {
 	// }
 
 	public static void update() {
-		if (!Starota.getClient().isReady())
+		if (!Starota.getClient().isConnected())
 			return;
 		// RequestBuffer
 		// .request(() -> STATUS.edit(Starota.FULLY_STARTED ? getStatusEmbed() :
@@ -103,10 +106,10 @@ public class DebugServer /* extends Thread */ {
 		// NOT_READY_EMBED));
 	}
 
-	// private static EmbedObject getStatusEmbed() {
+	// private static EmbedCreateSpec getStatusEmbed() {
 	// EmbedBuilder builder = new EmbedBuilder();
 	// builder.withTitle("Status:");
-	// for (IGuild g : Starota.getClient().getGuilds()) {
+	// for (Guild g : Starota.getClient().getGuilds()) {
 	// if (EmojiServerHelper.isEmojiServer(g))
 	// continue;
 	// if (g.equals(DEBUG_SERVER))
@@ -131,19 +134,19 @@ public class DebugServer /* extends Thread */ {
 	// return builder.build();
 	// }
 	//
-	// private static EmbedObject getDiscordPermsEmbed() {
+	// private static EmbedCreateSpec getDiscordPermsEmbed() {
 	// EmbedBuilder builder = new EmbedBuilder();
 	// builder.withTitle("Missing Discord Perms:");
 	// IUser ourUser = Starota.getOurUser();
-	// for (IGuild g : Starota.getClient().getGuilds()) {
+	// for (Guild g : Starota.getClient().getGuilds()) {
 	// if (EmojiServerHelper.isEmojiServer(g))
 	// continue;
 	// if (g.equals(DEBUG_SERVER))
 	// continue;
 	// String text = "";
-	// EnumSet<Permissions> invertPerms = EnumSet.allOf(Permissions.class);
+	// PermissionSet invertPerms = EnumSet.allOf(Permission.class);
 	// invertPerms.removeAll(USED_PERMISSIONS);
-	// for (Permissions p : invertPerms)
+	// for (Permission p : invertPerms)
 	// text += " - " + p + "\n";
 	// builder.appendField(g.getName(), text.isEmpty() ? "All permissions given"
 	// : text, true);
@@ -153,10 +156,10 @@ public class DebugServer /* extends Thread */ {
 	// return builder.build();
 	// }
 	//
-	// private static EmbedObject getPatreonPermsEmbed() {
+	// private static EmbedCreateSpec getPatreonPermsEmbed() {
 	// EmbedBuilder builder = new EmbedBuilder();
 	// builder.withTitle("Patreon Perms:");
-	// for (IGuild g : Starota.getClient().getGuilds()) {
+	// for (Guild g : Starota.getClient().getGuilds()) {
 	// if (EmojiServerHelper.isEmojiServer(g))
 	// continue;
 	// if (g.equals(DEBUG_SERVER))
@@ -176,10 +179,10 @@ public class DebugServer /* extends Thread */ {
 	// return builder.build();
 	// }
 	//
-	// private static EmbedObject getModulesEmbed() {
+	// private static EmbedCreateSpec getModulesEmbed() {
 	// EmbedBuilder builder = new EmbedBuilder();
 	// builder.withTitle("Enabled Modules:");
-	// for (IGuild g : Starota.getClient().getGuilds()) {
+	// for (Guild g : Starota.getClient().getGuilds()) {
 	// if (EmojiServerHelper.isEmojiServer(g))
 	// continue;
 	// if (g.equals(DEBUG_SERVER))

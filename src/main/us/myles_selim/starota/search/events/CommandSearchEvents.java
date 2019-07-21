@@ -1,17 +1,20 @@
 package us.myles_selim.starota.search.events;
 
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.commands.BotCommand;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.leek_duck.events.EventData;
 import us.myles_selim.starota.leek_duck.events.StarotaEvent;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.IndexHolder;
 import us.myles_selim.starota.reaction_messages.ReactionMessage;
 import us.myles_selim.starota.search.SearchEngine;
@@ -25,9 +28,9 @@ public class CommandSearchEvents extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS,
-				Permissions.USE_EXTERNAL_EMOJIS, Permissions.ADD_REACTIONS, Permissions.MANAGE_MESSAGES);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS,
+				Permission.USE_EXTERNAL_EMOJIS, Permission.ADD_REACTIONS, Permission.MANAGE_MESSAGES);
 	}
 
 	@Override
@@ -63,17 +66,17 @@ public class CommandSearchEvents extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
-			throws Exception {
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
 		String search = "";
 		for (int i = 1; i < args.length; i++)
 			search += " " + args[i];
 		Collection<StarotaEvent> results = SearchEngine.search(EventData.getRunningUpcomingEvents(),
 				search);
 		if (results.isEmpty())
-			channel.sendMessage("No matches");
+			channel.createMessage("No matches").block();
 		else
-			new SearchResultReactionMessage(results).sendMessage(channel);
+			new SearchResultReactionMessage(results).createMessage((TextChannel) channel);
 	}
 
 	private class SearchResultReactionMessage extends ReactionMessage {
@@ -87,12 +90,12 @@ public class CommandSearchEvents extends BotCommand<StarotaServer> {
 		}
 
 		@Override
-		public void onSend(StarotaServer server, IChannel channel, IMessage msg) {
+		public void onSend(StarotaServer server, TextChannel channel, Message msg) {
 			this.addPageButtons(pageIndex, results.size());
 		}
 
 		@Override
-		protected EmbedObject getEmbed(StarotaServer server) {
+		protected Consumer<? super EmbedCreateSpec> getEmbed(StarotaServer server) {
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.withAuthorName(String.format("Search results: (%d)", results.size()));
 			return results.toArray(new StarotaEvent[0])[pageIndex.value].toEmbed(pageIndex.value + 1,

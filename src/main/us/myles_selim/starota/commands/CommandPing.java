@@ -1,11 +1,11 @@
 package us.myles_selim.starota.commands;
 
-import java.util.EnumSet;
-
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandPing extends BotCommand<StarotaServer> {
@@ -15,15 +15,17 @@ public class CommandPing extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES);
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
-		IMessage msg = channel.sendMessage("Pong!");
-		msg.edit("Pong! (" + (msg.getTimestamp().toEpochMilli() - message.getTimestamp().toEpochMilli())
-				+ "ms)");
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
+		Message msg = channel.createMessage("Pong!").block();
+		msg.edit((m) -> m.setContent("Pong! ("
+				+ (msg.getTimestamp().toEpochMilli() - message.getTimestamp().toEpochMilli()) + "ms)"))
+				.block();
 	}
 
 }

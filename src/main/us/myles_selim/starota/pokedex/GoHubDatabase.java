@@ -7,6 +7,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -17,14 +18,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
 import us.myles_selim.starota.enums.EnumWeather;
 import us.myles_selim.starota.misc.data_types.cache.CachedData;
 import us.myles_selim.starota.misc.data_types.cache.ClearCache;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.pokedex.PokedexEntry.DexCounter;
 import us.myles_selim.starota.pokedex.PokedexEntry.DexMove;
@@ -32,12 +34,12 @@ import us.myles_selim.starota.pokedex.PokedexEntry.DexMoveset;
 
 public class GoHubDatabase {
 
-	public static final EmbedObject LOADING_EMBED;
+	public static final Consumer<? super EmbedCreateSpec> LOADING_EMBED;
 
 	static {
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.appendDesc(
-				"Loading Pokémon Go Hub Database... " + EmojiServerHelper.getEmoji("loading"));
+		builder.appendDesc("Loading Pokémon Go Hub Database... "
+				+ MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("loading")));
 		LOADING_EMBED = builder.build();
 	}
 

@@ -1,12 +1,13 @@
 package us.myles_selim.starota.leaderboards.commands;
 
-import java.util.EnumSet;
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.BotCommand;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.leaderboards.Leaderboard;
 import us.myles_selim.starota.misc.utils.RolePermHelper;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -29,13 +30,13 @@ public class CommandEditLeaderboard extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public Permissions requiredUsePermission() {
-		return Permissions.ADMINISTRATOR;
+	public Permission requiredUsePermission() {
+		return Permission.ADMINISTRATOR;
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS);
 	}
 
 	@Override
@@ -44,27 +45,28 @@ public class CommandEditLeaderboard extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
 		if (args.length == 2 && args[1].equalsIgnoreCase("options")) {
-			channel.sendMessage(OPTIONS);
+			channel.createMessage(OPTIONS).block();
 			return;
 		}
 		if (args.length == 3 && args[2].equalsIgnoreCase("view")) {
 			Leaderboard board = server.getLeaderboard(args[1]);
 			if (board == null)
-				channel.sendMessage("Leaderboard \"" + args[1] + "\" not found");
+				channel.createMessage("Leaderboard \"" + args[1] + "\" not found").block();
 			else
-				channel.sendMessage(board.toEmbedOptions());
+				channel.createEmbed(board.toEmbedOptions()).block();
 			return;
 		}
 		if (args.length < 4) {
-			channel.sendMessage(
-					"**Usage**: " + server.getPrefix() + getName() + " " + getGeneralUsage());
+			channel.createMessage(
+					"**Usage**: " + server.getPrefix() + getName() + " " + getGeneralUsage()).block();
 			return;
 		}
 		Leaderboard board = server.getLeaderboard(args[1]);
 		if (board == null) {
-			channel.sendMessage("Leaderboard \"" + args[1] + "\" not found");
+			channel.createMessage("Leaderboard \"" + args[1] + "\" not found").block();
 			return;
 		}
 		boolean updated;
@@ -122,9 +124,9 @@ public class CommandEditLeaderboard extends BotCommand<StarotaServer> {
 			case "true":
 				int maxBoards = RolePermHelper.getMaxLeaderboards(server.getDiscordGuild());
 				if (server.getLeaderboardsActive().size() >= maxBoards) {
-					channel.sendMessage(String.format(
+					channel.createMessage(String.format(
 							"This server has already reached its limit of %d active leaderboards",
-							maxBoards));
+							maxBoards)).block();
 					return;
 				}
 				enabled = true;
@@ -145,13 +147,15 @@ public class CommandEditLeaderboard extends BotCommand<StarotaServer> {
 			}
 			break;
 		default:
-			channel.sendMessage("Unknown option \"" + args[2] + "\", valid options are:\n" + OPTIONS);
+			channel.createMessage("Unknown option \"" + args[2] + "\", valid options are:\n" + OPTIONS)
+					.block();
 			return;
 		}
 		if (!updated)
-			channel.sendMessage("Invalid value \"" + args[3] + "\"");
+			channel.createMessage("Invalid value \"" + args[3] + "\"").block();
 		else {
-			channel.sendMessage("Updated options for " + board.getDisplayName(), board.toEmbedOptions());
+			channel.createMessage((m) -> m.setContent("Updated options for " + board.getDisplayName())
+					.setEmbed(board.toEmbedOptions())).block();
 			server.setLeaderboard(board.getDisplayName(), board);
 		}
 	}

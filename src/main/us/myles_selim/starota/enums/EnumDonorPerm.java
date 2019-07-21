@@ -4,8 +4,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import sx.blah.discord.handle.obj.IRole;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.util.Snowflake;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.misc.utils.StarotaConstants;
 
 public enum EnumDonorPerm {
 	LUA(517172285103407104L, 2),
@@ -18,7 +20,7 @@ public enum EnumDonorPerm {
 	STAROTA_MANAGEMENT(560892614426099712L);
 
 	private static int MAX_POINTS;
-	private static final Map<Long, EnumDonorPerm> ROLE_MAP = new HashMap<>();
+	private static final Map<Snowflake, EnumDonorPerm> ROLE_MAP = new HashMap<>();
 
 	static {
 		for (EnumDonorPerm perm : values()) {
@@ -31,11 +33,11 @@ public enum EnumDonorPerm {
 		return MAX_POINTS;
 	}
 
-	public static EnumDonorPerm getPermForRole(IRole role) {
-		return ROLE_MAP.get(role.getLongID());
+	public static EnumDonorPerm getPermForRole(Role role) {
+		return ROLE_MAP.get(role.getId());
 	}
 
-	private long roleId;
+	private Snowflake roleId;
 	private int pointsRequired;
 	private EnumDonorPerm[] preReqs;
 
@@ -48,17 +50,17 @@ public enum EnumDonorPerm {
 	}
 
 	EnumDonorPerm(long roleId, int pointsRequired, EnumDonorPerm... preReqs) {
-		this.roleId = roleId;
+		this.roleId = Snowflake.of(roleId);
 		this.pointsRequired = pointsRequired;
 		this.preReqs = preReqs;
 	}
 
-	public long getRoleId() {
+	public Snowflake getRoleId() {
 		return this.roleId;
 	}
 
-	public IRole getRole() {
-		return Starota.getClient().getRoleByID(this.roleId);
+	public Role getRole() {
+		return Starota.getClient().getRoleById(StarotaConstants.SUPPORT_SERVER, this.roleId).block();
 	}
 
 	public int getPointsRequired() {

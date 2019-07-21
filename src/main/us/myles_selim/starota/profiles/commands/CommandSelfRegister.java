@@ -1,14 +1,14 @@
 package us.myles_selim.starota.profiles.commands;
 
-import java.util.EnumSet;
-
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.BotCommand;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.profiles.PlayerProfile;
@@ -21,9 +21,9 @@ public class CommandSelfRegister extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS, Permissions.MANAGE_ROLES,
-				Permissions.MANAGE_MESSAGES);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS,
+				Permission.MANAGE_ROLES, Permission.MANAGE_MESSAGES);
 	}
 
 	@Override
@@ -32,21 +32,22 @@ public class CommandSelfRegister extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
 		if (args.length < 3) {
-			if (!hasTeamRoles(message.getAuthor(), server)) {
-				channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName()
-						+ " [poGoName] [level] [team]");
+			if (!hasTeamRoles(message.getAuthorAsMember().block(), server.getDiscordGuild())) {
+				channel.createMessage("**Usage**: " + server.getPrefix() + this.getName()
+						+ " [poGoName] [level] [team]").block();
 				return;
 			}
-			channel.sendMessage(
-					"**Usage**: " + server.getPrefix() + this.getName() + " [username] [level]");
+			channel.createMessage(
+					"**Usage**: " + server.getPrefix() + this.getName() + " [username] [level]").block();
 			return;
 		}
 
-		IUser target = message.getAuthor();
+		Member target = message.getAuthorAsMember().block();
 		if (server.hasProfile(target)) {
-			channel.sendMessage("User \"" + args[1] + "\" already has a profile");
+			channel.createMessage("User \"" + args[1] + "\" already has a profile").block();
 			return;
 		}
 
@@ -59,7 +60,7 @@ public class CommandSelfRegister extends BotCommand<StarotaServer> {
 			}
 		}
 		try {
-			for (IRole role : target.getRolesForGuild(server)) {
+			for (Role role : target.getRoles().collectList().block()) {
 				String name = role.getName().replaceAll(" ", "_");
 				for (EnumTeam t : EnumTeam.values()) {
 					if (t.name().equalsIgnoreCase(name)) {
@@ -75,7 +76,7 @@ public class CommandSelfRegister extends BotCommand<StarotaServer> {
 		}
 		if (team == null) {
 			if (args.length > 3)
-				channel.sendMessage("Team \"" + args[2] + "\" not found");
+				channel.createMessage("Team \"" + args[2] + "\" not found").block();
 			else
 				this.sendUsage(server.getPrefix(), channel);
 			return;
@@ -88,23 +89,24 @@ public class CommandSelfRegister extends BotCommand<StarotaServer> {
 			level = -1;
 		}
 		if (level == -1) {
-			channel.sendMessage("Invalid level \"" + args[2] + "\"");
+			channel.createMessage("Invalid level \"" + args[2] + "\"").block();
 			return;
 		}
 
-		PlayerProfile profile = new PlayerProfile().setPoGoName(args[1]).setDiscordId(target.getLongID())
-				.setLevel(level).setTeam(team);
+		PlayerProfile profile = new PlayerProfile().setPoGoName(args[1])
+				.setDiscordId(target.getId().asLong()).setLevel(level).setTeam(team);
 		server.setProfile(target, profile);
 
-		IRole teamRole = MiscUtils.getTeamRole(server, team);
+		Role teamRole = MiscUtils.getTeamRole(server.getDiscordGuild(), team);
 		if (teamRole != null)
-			target.addRole(teamRole);
+			target.addRole(teamRole.getId()).block();
 
-		channel.sendMessage("Sucessfully registered " + target.getName(), profile.toEmbed(server));
+		channel.createMessage((m) -> m.setContent("Sucessfully registered " + target.getUsername())
+				.setEmbed(profile.toEmbed(server))).block();
 	}
 
-	private static boolean hasTeamRoles(IUser user, IGuild guild) {
-		for (IRole r : user.getRolesForGuild(guild)) {
+	private static boolean hasTeamRoles(Member user, Guild guild) {
+		for (Role r : user.getRoles().collectList().block()) {
 			for (EnumTeam t : EnumTeam.values()) {
 				if (t.getName().equalsIgnoreCase(r.getName()))
 					return true;

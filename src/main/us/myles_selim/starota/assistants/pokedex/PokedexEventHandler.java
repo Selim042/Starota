@@ -1,48 +1,45 @@
 package us.myles_selim.starota.assistants.pokedex;
 
-import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IPrivateChannel;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.RequestBuffer;
+import discord4j.core.event.domain.guild.GuildCreateEvent;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.PrivateChannel;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.Snowflake;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
+import us.myles_selim.starota.misc.utils.EventListener;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 
-public class PokedexEventHandler {
+public class PokedexEventHandler implements EventListener {
 
 	@EventSubscriber
 	public void onServerCreate(GuildCreateEvent event) {
 		Starota.submitStats();
 		PokedexBot.updateOwners();
-		IGuild server = event.getGuild();
-		if (!server.getUsers().contains(PokedexBot.CLIENT.getOurUser()))
+		Guild server = event.getGuild();
+		Snowflake ourId = PokedexBot.getOurUser().getId();
+		if (!server.getMembers().any((m) -> m.getId().equals(ourId)).block())
 			return;
-		IUser selimUser = PokedexBot.CLIENT.fetchUser(StarotaConstants.SELIM_USER_ID);
-		RequestBuffer.request(() -> {
-			IPrivateChannel selimPm = selimUser.getOrCreatePMChannel();
-			selimPm.sendMessage(PokedexBot.BOT_NAME + " was added to the server: " + server.getName());
-		});
-		RequestBuffer.request(() -> {
-			IUser serverOwner = server.getOwner();
-			IPrivateChannel ownerPm = serverOwner.getOrCreatePMChannel();
-			EmbedBuilder builder = new EmbedBuilder();
-			String ourName = PokedexBot.getOurName(server);
-			builder.withTitle("Thanks for using " + ourName + "!");
-			builder.appendDesc("If you need any assistance with " + ourName
-					+ " or it's features, feel free to join our support server at "
-					+ StarotaConstants.SUPPORT_SERVER_LINK);
-			ownerPm.sendMessage(builder.build());
-		});
-		if (!PokedexBot.CLIENT.getOurUser().getPermissionsForGuild(server)
-				.contains(Permissions.SEND_MESSAGES)) {
-			IUser serverOwner = server.getOwner();
-			IPrivateChannel ownerPm = serverOwner.getOrCreatePMChannel();
-			ownerPm.sendMessage(PokedexBot.getOurName(server)
-					+ " requires the `SEND_MESSAGES` permission for all command functionality.");
-		}
+		User selimUser = PokedexBot.CLIENT.getUserById(StarotaConstants.SELIM_USER_ID).block();
+		PrivateChannel selimPm = selimUser.getPrivateChannel().block();
+		selimPm.createMessage(PokedexBot.BOT_NAME + " was added to the server: " + server.getName());
+
+		Member serverOwner = server.getOwner().block();
+		PrivateChannel ownerPm = serverOwner.getPrivateChannel().block();
+		EmbedBuilder builder = new EmbedBuilder();
+		String ourName = PokedexBot.getOurName(server);
+		builder.withTitle("Thanks for using " + ourName + "!");
+		builder.appendDesc("If you need any assistance with " + ourName
+				+ " or it's features, feel free to join our support server at "
+				+ StarotaConstants.SUPPORT_SERVER_LINK);
+		ownerPm.createEmbed(builder.build()).block();
+
+		if (!PokedexBot.CLIENT.getSelf().block().asMember(server.getId()).block().getBasePermissions()
+				.block().contains(Permission.SEND_MESSAGES))
+			ownerPm.createMessage(PokedexBot.getOurName(server)
+					+ " requires the `SEND_MESSAGES` permission for all command functionality.").block();
 	}
 
 }

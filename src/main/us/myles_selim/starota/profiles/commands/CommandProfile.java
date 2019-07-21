@@ -1,13 +1,13 @@
 package us.myles_selim.starota.profiles.commands;
 
-import java.util.EnumSet;
-
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.BotCommand;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -18,8 +18,8 @@ public class CommandProfile extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS);
 	}
 
 	@Override
@@ -28,32 +28,33 @@ public class CommandProfile extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
-		IUser target;
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
+		Member target;
 		if (args.length == 1)
-			target = message.getAuthor();
+			target = message.getAuthorAsMember().block();
 		else {
 			if (args.length != 2) {
-				channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName() + " <target>");
+				channel.createMessage("**Usage**: " + server.getPrefix() + this.getName() + " <target>");
 				return;
 			}
-			target = Starota.findUser(server.getDiscordGuild().getLongID(), args[1]);
+			target = Starota.findMember(server.getDiscordGuild(), args[1]);
 			if (target == null) {
 				PlayerProfile profile = server.getProfile(args[1]);
 				if (profile == null)
-					channel.sendMessage("User \"" + args[1] + "\" not found");
+					channel.createMessage("User \"" + args[1] + "\" not found").block();
 				else {
-					channel.sendMessage(profile.toEmbed(server));
+					channel.createEmbed(profile.toEmbed(server)).block();
 					return;
 				}
 				return;
 			}
 		}
 		if (server.hasProfile(target)) {
-			channel.sendMessage(server.getProfile(target).toEmbed(server));
+			channel.createEmbed(server.getProfile(target).toEmbed(server)).block();
 			return;
 		}
-		channel.sendMessage("User " + target.getName() + " does not have a profile");
+		channel.createMessage("User " + target.getUsername() + " does not have a profile").block();
 	}
 
 }

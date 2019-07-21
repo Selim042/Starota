@@ -5,7 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.util.Permission;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.ICommand;
 import us.myles_selim.starota.debug_server.DebugServer;
@@ -68,8 +68,8 @@ public class WikiGenerator {
 						out += "**Required Permission to Use**: " + cmd.requiredUsePermission().name()
 								+ "\n\n";
 
-					out += "**Requried Channel Permissions to Use**:\n";
-					for (Permissions p : cmd.getCommandPermissions())
+					out += "**Requried Channel Permission to Use**:\n";
+					for (Permission p : cmd.getCommandPermission())
 						out += " - " + p + "\n";
 
 					out += "---\n";

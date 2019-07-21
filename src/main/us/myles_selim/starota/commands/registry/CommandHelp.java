@@ -1,17 +1,19 @@
 package us.myles_selim.starota.commands.registry;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 
 public class CommandHelp extends JavaCommand {
 
@@ -22,8 +24,8 @@ public class CommandHelp extends JavaCommand {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS);
 	}
 
 	@Override
@@ -37,8 +39,8 @@ public class CommandHelp extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
-		IUser author = message.getAuthor();
+	public void execute(String[] args, Message message, Guild guild, MessageChannel channel) {
+		User author = message.getAuthor().get();
 
 		if (args.length >= 2) {
 			ICommand cmd = this.getCommandHandler().findCommand(guild, message, args[1]);
@@ -50,7 +52,9 @@ public class CommandHelp extends JavaCommand {
 				if (cmd.getGeneralUsage() != null && !cmd.getGeneralUsage().isEmpty())
 					builder.appendField("Usage:", cmd.getGeneralUsage(), true);
 				if (cmd.getAdminUsage() != null && !cmd.getAdminUsage().isEmpty()
-						&& channel.getModifiedPermissions(author).contains(Permissions.ADMINISTRATOR))
+						&& (!(channel instanceof TextChannel)
+								|| ((TextChannel) channel).getEffectivePermissions(author.getId())
+										.block().contains(Permission.ADMINISTRATOR)))
 					builder.appendField("Admin Usage:", cmd.getAdminUsage(), true);
 
 				if (cmd.getDescription() != null && !cmd.getDescription().isEmpty())
@@ -65,8 +69,8 @@ public class CommandHelp extends JavaCommand {
 					}
 					builder.appendField("Aliases:", aliasesS.substring(0, aliasesS.length() - 2), false);
 				}
-				// IMessage helpMessage =
-				channel.sendMessage(builder.build());
+				// Message helpMessage =
+				channel.createEmbed(builder.build()).block();
 
 				// Thread deleteHelp = new Thread() {
 				//
@@ -82,8 +86,8 @@ public class CommandHelp extends JavaCommand {
 				// }
 				//
 				// };
-				// if (Starota.getOurUser().getPermissionsForGuild(guild)
-				// .contains(Permissions.MANAGE_MESSAGES))
+				// if (Starota.getOurUser().getPermissionForGuild(guild)
+				// .contains(Permission.MANAGE_MESSAGES))
 				// deleteHelp.start();
 				return;
 			}
@@ -105,13 +109,15 @@ public class CommandHelp extends JavaCommand {
 
 		List<ICommand> cmds = this.getCommandHandler().getCommandsByCategory(guild, category);
 		List<ICommand> disp = new LinkedList<>();
+		Member authorM = author.asMember(guild.getId()).block();
 		for (ICommand cmd : cmds) {
 			if (guild == null)
 				disp.add(cmd);
-			if (guild != null && (author.getPermissionsForGuild(guild)
-					.contains(Permissions.ADMINISTRATOR)
-					|| ((author.getPermissionsForGuild(guild).contains(cmd.requiredUsePermission())
-							|| cmd.requiredUsePermission() == null) && cmd.hasRequiredRole(guild, author)
+			PermissionSet authorPerms = authorM.getBasePermissions().block();
+			if (guild != null && (authorPerms.contains(Permission.ADMINISTRATOR)
+					|| ((authorPerms.contains(cmd.requiredUsePermission())
+							|| cmd.requiredUsePermission() == null)
+							&& cmd.hasRequiredRole(guild, authorM)
 							&& cmd.isRequiredChannel(guild, channel))))
 				disp.add(cmd);
 		}
@@ -119,10 +125,10 @@ public class CommandHelp extends JavaCommand {
 		if (page > disp.size() / CMDS_PER_PAGE)
 			page = 0;
 
-		// IMessage helpMessage;
+		// Message helpMessage;
 		if (disp.isEmpty())
 			// helpMessage =
-			channel.sendMessage("No commands found");
+			channel.createMessage("No commands found").block();
 		else {
 			String prevCategory = null;
 			EmbedBuilder builder = new EmbedBuilder().appendDescription("**Available Commands:**\n\n");
@@ -144,7 +150,7 @@ public class CommandHelp extends JavaCommand {
 						+ PrimaryCommandHandler.getPrefix(guild) + getName() + " " + (page + 2) + "`");
 			builder.appendDesc("\n**Page**: " + (page + 1) + "/" + ((disp.size() / CMDS_PER_PAGE) + 1));
 			// helpMessage =
-			channel.sendMessage(builder.build());
+			channel.createEmbed(builder.build()).block();
 		}
 		// Thread deleteHelp = new Thread() {
 		//
@@ -161,7 +167,7 @@ public class CommandHelp extends JavaCommand {
 		//
 		// };
 		// if
-		// (Starota.getOurUser().getPermissionsForGuild(guild).contains(Permissions.MANAGE_MESSAGES))
+		// (Starota.getOurUser().getPermissionForGuild(guild).contains(Permission.MANAGE_MESSAGES))
 		// deleteHelp.start();
 	}
 

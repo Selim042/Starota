@@ -1,7 +1,7 @@
 package us.myles_selim.starota.enums;
 
-import sx.blah.discord.handle.obj.IEmoji;
-import sx.blah.discord.handle.obj.IGuild;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.GuildEmoji;
 import us.myles_selim.starota.Starota;
 
 public enum EnumPokemonType {
@@ -58,12 +58,12 @@ public enum EnumPokemonType {
 	}
 
 	private static final long EMOJI_SERVER_ID = 408997776672948224L;
-	private static IGuild EMOJI_SERVER;
+	private static Guild EMOJI_SERVER;
 
-	public IEmoji getEmoji() {
+	public GuildEmoji getEmoji() {
 		if (EMOJI_SERVER == null)
 			EMOJI_SERVER = Starota.getGuild(EMOJI_SERVER_ID);
-		return EMOJI_SERVER.getEmojiByName(emojiName);
+		return EMOJI_SERVER.getEmojis().filter((e) -> e.getName().equals(emojiName)).blockFirst();
 	}
 
 	public static EnumPokemonType fromOrdinal(int ordinal) {

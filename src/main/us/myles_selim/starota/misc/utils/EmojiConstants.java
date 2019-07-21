@@ -1,6 +1,6 @@
 package us.myles_selim.starota.misc.utils;
 
-import sx.blah.discord.handle.impl.obj.ReactionEmoji;
+import discord4j.core.object.reaction.ReactionEmoji;
 
 public class EmojiConstants {
 
@@ -11,15 +11,15 @@ public class EmojiConstants {
 	public static final String RIGHT_ARROW = "➡";
 
 	public static ReactionEmoji getBooleanEmoji(boolean tf) {
-		return ReactionEmoji.of(tf ? GREEN_CHECK : RED_X);
+		return ReactionEmoji.unicode(tf ? GREEN_CHECK : RED_X);
 	}
 
 	public static ReactionEmoji getLeftArrowEmoji() {
-		return ReactionEmoji.of(LEFT_ARROW);
+		return ReactionEmoji.unicode(LEFT_ARROW);
 	}
 
 	public static ReactionEmoji getRightArrowEmoji() {
-		return ReactionEmoji.of(RIGHT_ARROW);
+		return ReactionEmoji.unicode(RIGHT_ARROW);
 	}
 
 }

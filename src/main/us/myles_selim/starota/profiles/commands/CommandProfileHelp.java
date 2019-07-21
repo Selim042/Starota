@@ -1,12 +1,12 @@
 package us.myles_selim.starota.profiles.commands;
 
-import java.util.EnumSet;
-
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.BotCommand;
+import us.myles_selim.starota.commands.registry.CommandException;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandProfileHelp extends BotCommand<StarotaServer> {
@@ -16,12 +16,13 @@ public class CommandProfileHelp extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS);
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withTitle("Profile Help");
 		String prefix = server.getPrefix();
@@ -32,7 +33,7 @@ public class CommandProfileHelp extends BotCommand<StarotaServer> {
 				+ "updateProfile**\".  This allows you to update your real name, level, and more.\n\n"
 				+ "The \"**" + prefix
 				+ "help [commandName]**\" command is always helpful if you are unsure.");
-		channel.sendMessage(builder.build());
+		channel.createEmbed(builder.build()).block();
 	}
 
 }

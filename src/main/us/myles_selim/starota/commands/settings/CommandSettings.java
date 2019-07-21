@@ -1,13 +1,14 @@
 package us.myles_selim.starota.commands.settings;
 
-import java.util.EnumSet;
-
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.BotCommand;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.commands.settings.SettingSet.EnumReturnSetStatus;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandSettings extends BotCommand<StarotaServer> {
@@ -17,13 +18,13 @@ public class CommandSettings extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public Permissions requiredUsePermission() {
-		return Permissions.ADMINISTRATOR;
+	public Permission requiredUsePermission() {
+		return Permission.ADMINISTRATOR;
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS);
 	}
 
 	@Override
@@ -32,40 +33,41 @@ public class CommandSettings extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
-			throws Exception {
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
 		if (args.length == 1) {
-			sendSettingsEmbed(server, channel);
+			sendSettingsEmbed(server, (TextChannel) channel);
 			return;
 		}
 		EnumReturnSetStatus status = server.setSetting(args[1], args[2]);
 		switch (status) {
 		case NOT_FOUND:
-			channel.sendMessage("Setting \"" + args[1] + "\" not found");
+			channel.createMessage("Setting \"" + args[1] + "\" not found").block();
 			break;
 		case NOT_SET:
-			channel.sendMessage("Setting \"" + args[1] + "\" not set, did you provide a valid value?");
+			channel.createMessage("Setting \"" + args[1] + "\" not set, did you provide a valid value?")
+					.block();
 			break;
 		case SUCCESS:
-			channel.sendMessage("Setting \"" + args[1] + "\" set to " + server.getSetting(args[1]));
+			channel.createMessage("Setting \"" + args[1] + "\" set to " + server.getSetting(args[1]))
+					.block();
 			break;
 		}
 	}
 
-	private void sendSettingsEmbed(StarotaServer server, IChannel channel) {
+	private void sendSettingsEmbed(StarotaServer server, TextChannel channel) {
 		EmbedBuilder builder = new EmbedBuilder();
 
-		builder.withTitle(server.getName() + " Options:");
+		builder.withTitle(server.getDiscordGuild().getName() + " Options:");
 		server.forEachSetting((setting) -> {
-			builder.appendDesc(
-					String.format(" - %s: %s\n", setting.getName(), setting.getValue().toString()));
+			builder.appendDesc(String.format(" - %s: %s\n", setting.getName(), setting.getValue()));
 			if (setting.getDescription() != null)
 				builder.appendDesc(String.format("%s\n\n", setting.getDescription()));
 			else
 				builder.appendDesc("\n");
 		});
 
-		channel.sendMessage(builder.build());
+		channel.createEmbed(builder.build()).block();
 	}
 
 }

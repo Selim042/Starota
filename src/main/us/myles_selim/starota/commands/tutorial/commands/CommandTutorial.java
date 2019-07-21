@@ -2,16 +2,18 @@ package us.myles_selim.starota.commands.tutorial.commands;
 
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.util.Snowflake;
 import us.myles_selim.starota.commands.BotCommand;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.commands.tutorial.TutorialRegistry;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandTutorial extends BotCommand<StarotaServer> {
 
-	private static final long TUTORIAL_CHANNEL_ID = 569938166988013588L;
+	private static final Snowflake TUTORIAL_CHANNEL_ID = Snowflake.of(569938166988013588L);
 
 	public CommandTutorial() {
 		super("tutStart", "Starts the tutorial.");
@@ -26,21 +28,21 @@ public class CommandTutorial extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
-			throws Exception {
-		if (server.getDiscordGuild().getLongID() != StarotaConstants.SUPPORT_SERVER) {
-			channel.sendMessage("To use the tutorial, please join the offical server here: "
-					+ StarotaConstants.SUPPORT_SERVER_LINK);
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
+		if (server.getDiscordGuild().getId().equals(StarotaConstants.SUPPORT_SERVER)) {
+			channel.createMessage("To use the tutorial, please join the offical server here: "
+					+ StarotaConstants.SUPPORT_SERVER_LINK).block();
 			return;
 		}
-		if (channel.getLongID() != TUTORIAL_CHANNEL_ID) {
-			channel.sendMessage("To use the tutorial, please start in the "
-					+ server.getDiscordGuild().getChannelByID(TUTORIAL_CHANNEL_ID).mention()
+		if (channel.getId().equals(TUTORIAL_CHANNEL_ID)) {
+			channel.createMessage("To use the tutorial, please start in the "
+					+ server.getDiscordGuild().getChannelById(TUTORIAL_CHANNEL_ID).block().getMention()
 					+ " channel.");
 			return;
 		}
 		if (args.length > 1 && args[1].equalsIgnoreCase("chapters")) {
-			channel.sendMessage(TutorialRegistry.getTableEmbed());
+			channel.createEmbed(TutorialRegistry.getTableEmbed()).block();
 			return;
 		}
 	}

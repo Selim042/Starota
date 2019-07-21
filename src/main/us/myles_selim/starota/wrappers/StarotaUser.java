@@ -1,17 +1,17 @@
 package us.myles_selim.starota.wrappers;
 
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IUser;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
 import us.myles_selim.starota.profiles.PlayerProfile;
 
 public class StarotaUser {
 
 	private final StarotaServer server;
-	private final IUser user;
+	private final Member user;
 
 	// private SubscriptionOptions subOptions;
 
-	protected StarotaUser(StarotaServer server, IUser user) {
+	protected StarotaUser(StarotaServer server, Member user) {
 		this.server = server;
 		this.user = user;
 	}
@@ -20,11 +20,11 @@ public class StarotaUser {
 		return this.server;
 	}
 
-	public IGuild getDiscordGuild() {
+	public Guild getDiscordGuild() {
 		return this.server.getDiscordGuild();
 	}
 
-	public IUser getDiscordUser() {
+	public Member getDiscordMember() {
 		return this.user;
 	}
 

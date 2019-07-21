@@ -1,14 +1,14 @@
 package us.myles_selim.starota.leek_duck.ditto;
 
-import java.util.EnumSet;
-
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.BotCommand;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.leek_duck.LeekDuckData;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandDitto extends BotCommand<StarotaServer> {
@@ -18,13 +18,13 @@ public class CommandDitto extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS);
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
-			throws Exception {
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withAuthorIcon("https://leekduck.com/assets/img/favicon/favicon-32x32.png");
 		builder.withAuthorName("Leek Duck").withColor(0xDAA0F7);
@@ -33,9 +33,9 @@ public class CommandDitto extends BotCommand<StarotaServer> {
 		builder.withTitle("Dittoable Pokemon:").withUrl("https://leekduck.com/FindDitto/");
 		builder.withThumbnail(EnumPokemon.DITTO.getArtwork(0));
 
-		IMessage oldMessage = null;
+		Message oldMessage = null;
 		if (!LeekDuckData.areDittoablesLoaded())
-			oldMessage = channel.sendMessage(LeekDuckData.LOADING_EMBED);
+			oldMessage = channel.createEmbed(LeekDuckData.LOADING_EMBED).block();
 		for (EnumPokemon p : LeekDuckData.getDittoablePokemon())
 			builder.appendDesc(" - " + p.getName() + "\n");
 
@@ -43,9 +43,9 @@ public class CommandDitto extends BotCommand<StarotaServer> {
 		builder.withTimestamp(LeekDuckData.getDittoableCacheTime());
 
 		if (oldMessage != null)
-			oldMessage.edit(builder.build());
+			oldMessage.edit((msg) -> msg.setEmbed(builder.build())).block();
 		else
-			channel.sendMessage(builder.build());
+			channel.createEmbed(builder.build()).block();
 	}
 
 }
