@@ -116,7 +116,8 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
 	public final static String CHANGELOG = "Changelog for v" + StarotaConstants.VERSION + "\n"
-			+ "Public changes:\n" + " * Fix timezone/setting error";
+			+ "Public changes:\n" + " + Add Armored Mewtwo and fix Nidoran male raids\n"
+			+ " * Update everything for Discord4J v3!  Major update!";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static PrimaryCommandHandler COMMAND_HANDLER;
