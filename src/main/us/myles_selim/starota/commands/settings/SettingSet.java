@@ -98,7 +98,7 @@ public class SettingSet implements Iterable<Setting<?>> {
 	}
 
 	public boolean isEmpty(String name) {
-		Setting<?> setting = settings.get(name);
+		Setting<?> setting = MiscUtils.getValueIgnoreCase(settings, name);
 		if (setting == null)
 			return true;
 		return setting.getValue().equals(setting.getEmptyValue());
