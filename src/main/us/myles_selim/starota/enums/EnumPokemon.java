@@ -25,6 +25,7 @@ import us.myles_selim.starota.trading.forms.FormSetCastform;
 import us.myles_selim.starota.trading.forms.FormSetDeoxys;
 import us.myles_selim.starota.trading.forms.FormSetEevee;
 import us.myles_selim.starota.trading.forms.FormSetGiratina;
+import us.myles_selim.starota.trading.forms.FormSetMewtwo;
 import us.myles_selim.starota.trading.forms.FormSetPichuHat;
 import us.myles_selim.starota.trading.forms.FormSetPikachuHat;
 import us.myles_selim.starota.trading.forms.FormSetRaichuHat;
@@ -200,7 +201,7 @@ public enum EnumPokemon {
 	DRATINI(EnumPokemonStage.BASE, EnumPokemonType.DRAGON),
 	DRAGONAIR(EnumPokemonStage.MIDDLE, EnumPokemonType.DRAGON),
 	DRAGONITE(EnumPokemonStage.FINAL, EnumPokemonType.DRAGON, EnumPokemonType.FLYING),
-	MEWTWO(EnumPokemonStage.LEGEND, EnumPokemonType.PSYCHIC, EnumGender.UNKNOWN),
+	MEWTWO(EnumPokemonStage.LEGEND, EnumPokemonType.PSYCHIC, FormSetMewtwo.FORM_SET, EnumGender.UNKNOWN),
 	MEW(EnumPokemonStage.MYTHIC, EnumPokemonType.PSYCHIC, EnumGender.UNKNOWN),
 	// GEN 2
 	CHIKORITA(EnumPokemonStage.BASE, EnumPokemonType.GRASS),

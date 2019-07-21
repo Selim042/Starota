@@ -68,7 +68,7 @@ public class EmojiServerHelper {
 			if (gemoji != null) {
 				System.out.println(
 						"uploading missing emoji " + namef + " to " + guild.getName() + ", " + fallback);
-				return emoji;
+				return ReactionEmoji.custom(gemoji);
 			}
 		}
 		Starota.getClient().getUserById(StarotaConstants.SELIM_USER_ID).block().getPrivateChannel()

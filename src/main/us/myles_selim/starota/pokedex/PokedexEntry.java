@@ -312,10 +312,10 @@ public class PokedexEntry extends ReactionMessage {
 		StringBuilder cps = new StringBuilder();
 		RaidBoss boss = SilphRoadData.getBoss(entry.getPokemon(), formS);
 		if (boss != null) {
-			cps.append(String.format("Raid Catch Min/Max: %d-%d CP\n", getCP(20, 10, 10, 10),
-					getCP(20, 15, 15, 15)));
-			cps.append(String.format("Raid Boosted Min/Max: %d-%d CP\n", getCP(25, 10, 10, 10),
-					getCP(25, 15, 15, 15)));
+			cps.append(String.format("Raid Catch Min/Max: %d-%d CP\n", entry.getCP(20, 10, 10, 10),
+					entry.getCP(20, 15, 15, 15)));
+			cps.append(String.format("Raid Boosted Min/Max: %d-%d CP\n", entry.getCP(25, 10, 10, 10),
+					entry.getCP(25, 15, 15, 15)));
 		}
 		EggEntry egg = SilphRoadData.getEgg(entry.getPokemon(), formS);
 		if (egg != null)
