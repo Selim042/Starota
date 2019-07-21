@@ -1,17 +1,18 @@
 package us.myles_selim.starota.vote_rewards;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.impl.obj.ReactionEmoji;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IReaction;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.RequestBuffer;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.reaction.ReactionEmoji;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.enums.EnumDonorPerm;
 import us.myles_selim.starota.misc.data_types.Pair;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
+import us.myles_selim.starota.misc.utils.EmojiConstants;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.reaction_messages.ReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -19,20 +20,18 @@ public class VoteRewardsReactionMessage extends ReactionMessage {
 
 	private static final String[] EMOJI = new String[] { "1⃣", "2⃣", "3⃣", "4⃣", "5⃣", "6⃣", "7⃣", "8⃣",
 			"9⃣", "A⃣", "B⃣", "C⃣", "D⃣", "E⃣", "F⃣" };
-	private static final String ENABLED = "✅";
-	private static final String DISABLED = "❌";
 
 	private Pair<ReactionEmoji, EnumDonorPerm>[] displayedPerms;
 
 	@Override
-	public void onReactionAdded(StarotaServer server, IChannel channel, IMessage msg, IUser user,
-			IReaction react) {
-		RequestBuffer.request(() -> msg.removeReaction(user, react)).get();
-		if (server.getDiscordGuild().getOwnerLongID() != user.getLongID())
+	public void onReactionAdded(StarotaServer server, TextChannel channel, Message msg, Member user,
+			ReactionEmoji react) {
+		msg.removeReaction(react, user.getId()).block();
+		if (!server.getDiscordGuild().getOwnerId().equals(user.getId()))
 			return;
 		EnumDonorPerm perm = null;
 		for (Pair<ReactionEmoji, EnumDonorPerm> p : displayedPerms) {
-			if (p != null && p.left.equals(react.getEmoji())) {
+			if (p != null && p.left.equals(react)) {
 				perm = p.right;
 				break;
 			}
@@ -56,15 +55,15 @@ public class VoteRewardsReactionMessage extends ReactionMessage {
 	}
 
 	@Override
-	public void onSend(StarotaServer server, IChannel channel, IMessage msg) {
+	public void onSend(StarotaServer server, TextChannel channel, Message msg) {
 		for (Pair<ReactionEmoji, EnumDonorPerm> e : displayedPerms)
 			if (e != null)
-				RequestBuffer.request(() -> msg.addReaction(e.left)).get();
+				msg.addReaction(e.left).block();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected EmbedObject getEmbed(StarotaServer server) {
+	protected Consumer<? super EmbedCreateSpec> getEmbed(StarotaServer server) {
 		displayedPerms = new Pair[EnumDonorPerm.values().length];
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withTitle("Choose your vote perks:");
@@ -73,9 +72,11 @@ public class VoteRewardsReactionMessage extends ReactionMessage {
 		for (EnumDonorPerm p : EnumDonorPerm.values()) {
 			if (index >= EMOJI.length || p.getPointsRequired() < 0)
 				continue;
-			ReactionEmoji emoji = ReactionEmoji.of(EMOJI[index]);
-			builder.appendDesc(emoji + ": " + p + " (" + p.getPointsRequired() + " points) "
-					+ ReactionEmoji.of(enabledPerms.contains(p) ? ENABLED : DISABLED) + "\n");
+			ReactionEmoji emoji = ReactionEmoji.unicode(EMOJI[index]);
+			builder.appendDesc(MiscUtils.getEmojiDisplay(emoji) + ": " + p + " (" + p.getPointsRequired()
+					+ " points) "
+					+ MiscUtils.getEmojiDisplay(EmojiConstants.getBooleanEmoji(enabledPerms.contains(p)))
+					+ "\n");
 			displayedPerms[index] = new Pair<>(emoji, p);
 
 			index++;

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -1247,9 +1248,15 @@ public enum EnumPokemon {
 			int id = Integer.parseInt(name);
 			return getPokemon(id);
 		} catch (NumberFormatException e) {}
-		for (EnumPokemon p : values())
-			if (p.name.equalsIgnoreCase(name))
+		for (EnumPokemon p : values()) {
+			List<String> names = new ArrayList<>();
+			names.add(p.name.toLowerCase());
+			names.add(p.name().toLowerCase());
+			names.add(p.name.replaceAll("_", "").toLowerCase());
+			names.add(p.name().replaceAll("_", "").toLowerCase());
+			if (names.contains(name.toLowerCase()))
 				return p;
+		}
 		return null;
 	}
 

@@ -1,6 +1,6 @@
 package us.myles_selim.starota.leaderboards;
 
-import sx.blah.discord.handle.obj.IGuild;
+import discord4j.core.object.entity.Guild;
 
 public class DefaultLeaderboard extends Leaderboard {
 
@@ -13,7 +13,7 @@ public class DefaultLeaderboard extends Leaderboard {
 		this.setColor(defaultBoard.getColor());
 	}
 
-	public Leaderboard toGuildLeaderboard(IGuild guild) {
+	public Leaderboard toGuildLeaderboard(Guild guild) {
 		Leaderboard newBoard = new Leaderboard(guild, this.getDisplayName());
 		newBoard.setValue(this);
 		return newBoard;

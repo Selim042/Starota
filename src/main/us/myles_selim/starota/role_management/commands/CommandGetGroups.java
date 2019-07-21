@@ -1,13 +1,13 @@
 package us.myles_selim.starota.role_management.commands;
 
-import java.util.EnumSet;
-
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.BotCommand;
+import us.myles_selim.starota.commands.registry.CommandException;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.role_management.GroupManager;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -18,17 +18,18 @@ public class CommandGetGroups extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS);
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withTitle("Available Roles:");
-		for (IRole role : GroupManager.getGroups(server))
+		for (Role role : GroupManager.getGroups(server))
 			builder.appendDesc(role.getName() + "\n");
-		channel.sendMessage(builder.build());
+		channel.createEmbed(builder.build()).block();
 	}
 
 }

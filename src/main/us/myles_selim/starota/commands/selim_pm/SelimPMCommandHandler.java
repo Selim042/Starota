@@ -3,14 +3,16 @@ package us.myles_selim.starota.commands.selim_pm;
 import java.util.Collections;
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IPrivateChannel;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Channel;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.PrivateChannel;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.util.Permission;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.CommandPing;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.commands.registry.CommandHelp;
 import us.myles_selim.starota.commands.registry.ICommand;
 import us.myles_selim.starota.commands.registry.ICommandHandler;
@@ -26,13 +28,14 @@ public class SelimPMCommandHandler {
 
 	private static boolean inited = false;
 
+	@SuppressWarnings("deprecation")
 	public static void init() {
 		if (inited && Starota.FULLY_STARTED)
 			return;
 		inited = true;
 
-		INSTANCE = new PrimaryCommandHandler(Starota.getClient(), (IChannel c) -> isSelimPM(c));
-		Starota.getClient().getDispatcher().registerListener(INSTANCE);
+		INSTANCE = new PrimaryCommandHandler(Starota.getClient(), (Channel c) -> isSelimPM(c));
+		INSTANCE.setup(Starota.getClient().getEventDispatcher());
 		JAVA_HANDLER = new JavaCommandHandler(Starota.getClient());
 		INSTANCE.registerCommandHandler(JAVA_HANDLER);
 
@@ -61,9 +64,9 @@ public class SelimPMCommandHandler {
 		JAVA_HANDLER.registerCommand(category, cmd);
 	}
 
-	public static boolean isSelimPM(IChannel channel) {
-		if (channel instanceof IPrivateChannel && ((IPrivateChannel) channel).getRecipient()
-				.getLongID() == StarotaConstants.SELIM_USER_ID)
+	public static boolean isSelimPM(Channel channel) {
+		if (channel instanceof PrivateChannel
+				&& ((PrivateChannel) channel).getRecipientIds().contains(StarotaConstants.SELIM_USER_ID))
 			return true;
 		return false;
 	}
@@ -100,12 +103,12 @@ public class SelimPMCommandHandler {
 		}
 
 		@Override
-		public final Permissions requiredUsePermission() {
+		public final Permission requiredUsePermission() {
 			return null;
 		}
 
 		@Override
-		public final IRole requiredRole(IGuild guild) {
+		public final Role requiredRole(Guild guild) {
 			return null;
 		}
 
@@ -130,8 +133,8 @@ public class SelimPMCommandHandler {
 		}
 
 		@Override
-		public abstract void execute(String[] args, IMessage message, IGuild guild, IChannel channel)
-				throws Exception;
+		public abstract void execute(String[] args, Message message, Guild guild, MessageChannel channel)
+				throws CommandException;
 
 		@Override
 		public final void setCommandHandler(ICommandHandler handler) {}

@@ -9,74 +9,74 @@ import java.util.function.Consumer;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 
-import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.guild.GuildCreateEvent;
-import sx.blah.discord.handle.impl.events.guild.GuildLeaveEvent;
-import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
-import sx.blah.discord.handle.impl.events.guild.member.UserJoinEvent;
-import sx.blah.discord.handle.impl.events.guild.role.RoleUpdateEvent;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IPrivateChannel;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.RequestBuffer;
+import discord4j.core.event.domain.guild.GuildCreateEvent;
+import discord4j.core.event.domain.guild.GuildDeleteEvent;
+import discord4j.core.event.domain.guild.MemberJoinEvent;
+import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.event.domain.role.RoleUpdateEvent;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.PrivateChannel;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Permission;
 import us.myles_selim.starota.debug_server.DebugServer;
 import us.myles_selim.starota.misc.data_types.cache.ClearCache;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
+import us.myles_selim.starota.misc.utils.EventListener;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class EventHandler {
+public class EventHandler implements EventListener {
 
 	@EventSubscriber
-	public void onMessageRecieved(MessageReceivedEvent event) {
-		if (event.getGuild() == null || event.getGuild().getLongID() == StarotaConstants.SUPPORT_SERVER)
+	public void onMessageRecieved(MessageCreateEvent event) {
+		if (event.getGuild() == null
+				|| event.getGuild().block().getId().equals(StarotaConstants.SUPPORT_SERVER))
 			return;
-		if (Starota.DEBUG)
-			System.out.println("Channel: " + event.getChannel() + ", Author: " + event.getAuthor()
+		if (Starota.DEBUG) {
+			Message msg = event.getMessage();
+			System.out.println("Channel: " + msg.getChannel().block() + ", Author: " + msg.getAuthor()
 					+ ", Message: " + event.getMessage());
+		}
 	}
 
 	@EventSubscriber
 	public void onServerCreate(GuildCreateEvent event) {
 		Starota.submitStats();
 		Starota.updateOwners();
-		IGuild server = event.getGuild();
-		if (!server.getUsers().contains(Starota.getClient().getOurUser()))
+		Guild server = event.getGuild();
+		if (!server.getMembers().collectList().block().contains(Starota.getOurUser()))
 			return;
-		IUser selimUser = Starota.getUser(StarotaConstants.SELIM_USER_ID);
-		RequestBuffer.request(() -> {
-			IPrivateChannel selimPm = selimUser.getOrCreatePMChannel();
-			selimPm.sendMessage("Starota was added to the server: " + server.getName());
-		});
-		RequestBuffer.request(() -> {
-			IUser serverOwner = server.getOwner();
-			IPrivateChannel ownerPm = serverOwner.getOrCreatePMChannel();
-			EmbedBuilder builder = new EmbedBuilder();
-			String ourName = Starota.getOurName(server);
-			builder.withTitle("Thanks for using " + ourName + "!");
-			builder.appendDesc("If you need any assistance with " + ourName
-					+ " or it's features, feel free to join our support server at "
-					+ StarotaConstants.SUPPORT_SERVER_LINK);
-			ownerPm.sendMessage(builder.build());
-		});
-		if (!Starota.getOurUser().getPermissionsForGuild(server).contains(Permissions.SEND_MESSAGES)) {
-			IUser serverOwner = server.getOwner();
-			IPrivateChannel ownerPm = serverOwner.getOrCreatePMChannel();
-			ownerPm.sendMessage(Starota.getOurName(server)
+		User selimUser = Starota.getUser(StarotaConstants.SELIM_USER_ID.asLong());
+		PrivateChannel selimPm = selimUser.getPrivateChannel().block();
+		selimPm.createMessage("Starota was added to the server: " + server.getName());
+
+		Member serverOwner = server.getOwner().block();
+		PrivateChannel ownerPm = serverOwner.getPrivateChannel().block();
+		EmbedBuilder builder = new EmbedBuilder();
+		String ourName = Starota.getOurName(server);
+		builder.withTitle("Thanks for using " + ourName + "!");
+		builder.appendDesc("If you need any assistance with " + ourName
+				+ " or it's features, feel free to join our support server at "
+				+ StarotaConstants.SUPPORT_SERVER_LINK);
+		ownerPm.createEmbed(builder.build());
+		if (!Starota.getOurUser().asMember(server.getId()).block().getBasePermissions().block()
+				.contains(Permission.SEND_MESSAGES))
+			ownerPm.createMessage(Starota.getOurName(server)
 					+ " requires the `SEND_MESSAGES` permission for all command functionality.");
-		}
 	}
 
 	@EventSubscriber
-	public void onServerLeave(GuildLeaveEvent event) {
-		StarotaServer.getServer(event.getGuild()).clearDataOptions();
+	public void onServerLeave(GuildDeleteEvent event) {
+		if (!event.isUnavailable())
+			StarotaServer.getServer(event.getGuild().get()).clearDataOptions();
 		Starota.updateOwners();
 	}
 
 	@EventSubscriber
-	public void onUserJoin(UserJoinEvent event) {
-		if (event.getGuild().getLongID() == StarotaConstants.SUPPORT_SERVER)
+	public void onUserJoin(MemberJoinEvent event) {
+		if (event.getGuild().block().getId().equals(StarotaConstants.SUPPORT_SERVER))
 			Starota.updateOwners();
 	}
 
@@ -97,46 +97,10 @@ public class EventHandler {
 		}
 	}
 
-	@EventSubscriber
-	public void cacheHandler(MessageReceivedEvent event) {
-		// if (!(event.getChannel() instanceof IPrivateChannel))
-		// return;
-		// IPrivateChannel channel = (IPrivateChannel) event.getChannel();
-		// // Selim's user id
-		// if (channel.getRecipient().getLongID() != 134855940938661889L)
-		// return;
-		// String message = event.getMessage().getContent();
-		// if (message.startsWith(".help")) {
-		// channel.sendMessage(".dumpCache\n" + ".getCaches\n");
-		// return;
-		// }
-		// String[] args = message.split(" ");
-		// switch (args[0].toLowerCase()) {
-		// case ".getcaches":
-		// String out = "";
-		// for (String key : CACHES.keySet())
-		// out += key + ", ";
-		// channel.sendMessage(out);
-		// return;
-		// case ".dumpcache":
-		// if (args.length < 2) {
-		// channel.sendMessage("Usage: .dumpCache <cacheName>");
-		// return;
-		// }
-		// if (!CACHES.containsKey(args[1])) {
-		// channel.sendMessage("Cache not found");
-		// return;
-		// }
-		// CACHES.get(args[1]).accept(args[1]);
-		// channel.sendMessage("Dumped");
-		// return;
-		// }
-	}
-
 	// update Patreon perms on debug server
 	@EventSubscriber
 	public void roleChange(RoleUpdateEvent event) {
-		if (event.getGuild().getLongID() == StarotaConstants.SUPPORT_SERVER)
+		if (event.getCurrent().getGuild().block().getId().equals(StarotaConstants.SUPPORT_SERVER))
 			DebugServer.update();
 	}
 

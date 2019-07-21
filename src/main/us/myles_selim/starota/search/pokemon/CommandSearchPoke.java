@@ -1,16 +1,20 @@
 package us.myles_selim.starota.search.pokemon;
 
 import java.util.Collection;
-import java.util.EnumSet;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.commands.BotCommand;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.IndexHolder;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.reaction_messages.ReactionMessage;
 import us.myles_selim.starota.search.SearchEngine;
 import us.myles_selim.starota.search.SearchOperator;
@@ -23,9 +27,9 @@ public class CommandSearchPoke extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS,
-				Permissions.USE_EXTERNAL_EMOJIS, Permissions.ADD_REACTIONS, Permissions.MANAGE_MESSAGES);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS,
+				Permission.USE_EXTERNAL_EMOJIS, Permission.ADD_REACTIONS, Permission.MANAGE_MESSAGES);
 	}
 
 	@Override
@@ -54,16 +58,16 @@ public class CommandSearchPoke extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
-			throws Exception {
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
 		String search = "";
 		for (int i = 1; i < args.length; i++)
 			search += " " + args[i];
 		Collection<EnumPokemon> results = SearchEngine.search(EnumPokemon.class, search);
 		if (results.isEmpty())
-			channel.sendMessage("No matches");
+			channel.createMessage("No matches").block();
 		else
-			new SearchResultReactionMessage(results).sendMessage(channel);
+			new SearchResultReactionMessage(results).createMessage((TextChannel) channel);
 	}
 
 	private class SearchResultReactionMessage extends ReactionMessage {
@@ -79,14 +83,14 @@ public class CommandSearchPoke extends BotCommand<StarotaServer> {
 		}
 
 		@Override
-		public void onSend(StarotaServer server, IChannel channel, IMessage msg) {
+		public void onSend(StarotaServer server, TextChannel channel, Message msg) {
 			if (results.size() / RESULTS_PER_PAGE == 0)
 				return;
 			this.addPageButtons(pageIndex, results.size() / RESULTS_PER_PAGE);
 		}
 
 		@Override
-		protected EmbedObject getEmbed(StarotaServer server) {
+		protected Consumer<? super EmbedCreateSpec> getEmbed(StarotaServer server) {
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.withTitle(String.format("Search results: (%d)", results.size()));
 			int maxVal = Math.min(pageIndex.value * RESULTS_PER_PAGE + RESULTS_PER_PAGE, results.size());
@@ -95,9 +99,9 @@ public class CommandSearchPoke extends BotCommand<StarotaServer> {
 				if (i >= maxVal)
 					break;
 				if (i >= pageIndex.value * RESULTS_PER_PAGE) {
-					String typeString = p.getType1().getEmoji().toString();
+					String typeString = MiscUtils.getEmojiDisplay(p.getType1().getEmoji());
 					if (p.getType2() != null)
-						typeString += p.getType2().getEmoji();
+						typeString += MiscUtils.getEmojiDisplay(p.getType2().getEmoji());
 					builder.appendDesc(String.format(" - %s %s\n", p.getName(), typeString));
 				}
 				i++;

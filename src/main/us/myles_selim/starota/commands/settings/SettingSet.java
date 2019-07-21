@@ -98,7 +98,7 @@ public class SettingSet implements Iterable<Setting<?>> {
 	}
 
 	public boolean isEmpty(String name) {
-		Setting<?> setting = getSetting(name);
+		Setting<?> setting = settings.get(name);
 		if (setting == null)
 			return true;
 		return setting.getValue().equals(setting.getEmptyValue());
@@ -165,6 +165,7 @@ public class SettingSet implements Iterable<Setting<?>> {
 
 		@Override
 		protected void setValueInternal(SettingSet value) {
+			this.value.settings.clear();
 			this.value.setWriteCallback(() -> setValue(getValue()));
 			for (Setting<?> setting : value)
 				this.value.setSetting(setting.getName(), setting.getValue());

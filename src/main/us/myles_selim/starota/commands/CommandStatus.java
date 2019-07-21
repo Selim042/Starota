@@ -1,15 +1,13 @@
 package us.myles_selim.starota.commands;
 
-import java.util.EnumSet;
-
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.lua.LuaUtils;
-import us.myles_selim.starota.misc.utils.RolePermHelper;
+import us.myles_selim.starota.commands.registry.CommandException;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandStatus extends BotCommand<StarotaServer> {
@@ -19,28 +17,30 @@ public class CommandStatus extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public Permissions requiredUsePermission() {
-		return Permissions.ADMINISTRATOR;
+	public Permission requiredUsePermission() {
+		return Permission.ADMINISTRATOR;
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS);
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
-		IUser sender = message.getAuthor();
-		if (sender.getPermissionsForGuild(server.getDiscordGuild())
-				.contains(Permissions.ADMINISTRATOR)) {
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
+		Member sender = message.getAuthorAsMember().block();
+		if (sender.getBasePermissions().block().contains(Permission.ADMINISTRATOR)) {
 			EmbedBuilder builder = new EmbedBuilder();
-			builder.withTitle(Starota.getClient().getOurUser().getDisplayName(server.getDiscordGuild())
-					+ " Status");
-			builder.appendField("Discord:", Starota.getClient().isReady() ? "Online" : "Offline", true);
-			if (RolePermHelper.canUseLua(server.getDiscordGuild()))
-				builder.appendField("Lua:",
-						LuaUtils.isInitialized(server) ? "Initialized" : "Uninitalized", true);
-			channel.sendMessage(builder.build());
+			builder.withTitle(
+					Starota.getOurUserAsMember(server.getDiscordGuild()).getDisplayName() + " Status");
+			builder.appendField("Discord:", Starota.getClient().isConnected() ? "Online" : "Offline",
+					true);
+			// if (RolePermHelper.canUseLua(server.getDiscordGuild()))
+			// builder.appendField("Lua:",
+			// LuaUtils.isInitialized(server) ? "Initialized" : "Uninitalized",
+			// true);
+			channel.createEmbed(builder.build()).block();
 		}
 	}
 

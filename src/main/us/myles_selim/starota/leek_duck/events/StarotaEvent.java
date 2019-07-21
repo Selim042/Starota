@@ -4,12 +4,13 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.EmojiConstants;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
 import us.myles_selim.starota.misc.utils.ImageHelper;
@@ -105,7 +106,7 @@ public class StarotaEvent {
 		return output;
 	}
 
-	public EmbedObject toEmbed(int index, int max, StarotaServer server) {
+	public Consumer<? super EmbedCreateSpec> toEmbed(int index, int max, StarotaServer server) {
 		EmbedBuilder builder = new EmbedBuilder();
 
 		builder.withColor(this.color).withImage(this.image);
@@ -126,7 +127,8 @@ public class StarotaEvent {
 		for (int id : this.featuredPokemon) {
 			EnumPokemon poke = EnumPokemon.getPokemon(id);
 			if (MiscUtils.arrContains(this.newShinies, id))
-				featPoke.append(poke.getName() + " " + EmojiServerHelper.getEmoji("shiny") + ", ");
+				featPoke.append(poke.getName() + " "
+						+ MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("shiny")) + ", ");
 			else
 				featPoke.append(poke.getName() + ", ");
 		}
@@ -143,9 +145,10 @@ public class StarotaEvent {
 			builder.appendField("Featured Types:", featType.substring(0, featType.length() - 2), false);
 
 		if (this.raidsChanged || this.raidOriented) {
-			builder.appendField("Raids:",
-					"Raids Changed: " + EmojiConstants.getBooleanEmoji(this.raidsChanged)
-							+ "\nRaid Oriented: " + EmojiConstants.getBooleanEmoji(this.raidOriented),
+			builder.appendField("Raids:", "Raids Changed: "
+					+ MiscUtils.getEmojiDisplay(EmojiConstants.getBooleanEmoji(this.raidsChanged))
+					+ "\nRaid Oriented: "
+					+ MiscUtils.getEmojiDisplay(EmojiConstants.getBooleanEmoji(this.raidOriented)),
 					false);
 		}
 

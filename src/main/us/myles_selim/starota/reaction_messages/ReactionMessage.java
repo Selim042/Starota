@@ -2,37 +2,38 @@ package us.myles_selim.starota.reaction_messages;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.impl.obj.ReactionEmoji;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IPrivateChannel;
-import sx.blah.discord.handle.obj.IReaction;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.RequestBuffer;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.reaction.ReactionEmoji;
+import discord4j.core.spec.EmbedCreateSpec;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.EmojiConstants;
 import us.myles_selim.starota.misc.utils.IndexHolder;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
+/**
+ * Only usable on servers. Bots cannot edit messages in a private channel.
+ */
 public class ReactionMessage {
 
 	private ReactionMessageRegistry registry;
-	private IMessage msg;
+	private Message msg;
 	private Map<ReactionEmoji, ReactionButton> buttons = new HashMap<>();
 
 	public final ReactionMessage addButton(ReactionButton button) {
 		if (buttons.containsKey(button.emoji))
 			return this;
 		this.buttons.put(button.getEmoji(), button);
-		RequestBuffer.request(() -> this.msg.addReaction(button.emoji)).get();
+		this.msg.addReaction(button.emoji).block();
 		return this;
 	}
 
 	public final ReactionMessage addPageButtons(IndexHolder index, int max) {
 		addButton(new ReactionButton(EmojiConstants.getLeftArrowEmoji(),
-				(IMessage message, IUser user, boolean added) -> {
+				(Message message, Member user, boolean added) -> {
 					if (!added)
 						return false;
 					if (index.value >= 0)
@@ -42,7 +43,7 @@ public class ReactionMessage {
 					return true;
 				}));
 		addButton(new ReactionButton(EmojiConstants.getRightArrowEmoji(),
-				(IMessage message, IUser user, boolean added) -> {
+				(Message message, Member user, boolean added) -> {
 					if (!added)
 						return false;
 					if (index.value >= max)
@@ -56,72 +57,64 @@ public class ReactionMessage {
 
 	public final ReactionMessage clearButtons() {
 		for (ReactionEmoji e : this.buttons.keySet())
-			RequestBuffer.request(() -> this.msg.removeReaction(registry.getBot(), e));
+			this.msg.removeReaction(e, registry.getBot().getId());
 		this.buttons.clear();
 		return this;
 	}
 
-	public final IMessage sendMessage(IChannel channel) {
-		registry = ReactionMessageRegistry.getRegistry(channel.getShard());
-		EmbedObject emb = getEmbed(
-				channel instanceof IPrivateChannel ? null : StarotaServer.getServer(channel.getGuild()));
-		msg = channel.sendMessage(emb);
-		// ReactionMessageRegistry.MESSAGES.put(msg.getStringID(), this);
-		registry.messages.put(msg.getStringID(), this);
-		StarotaServer sserver = StarotaServer
-				.getServer(channel instanceof IPrivateChannel ? null : channel.getGuild());
+	public final Message createMessage(TextChannel channel) {
+		registry = ReactionMessageRegistry.getRegistry(channel.getClient());
+		Consumer<? super EmbedCreateSpec> emb = getEmbed(
+				StarotaServer.getServer(channel.getGuild().block()));
+		msg = channel.createEmbed(emb).block();
+		registry.messages.put(msg.getId().asString(), this);
+		StarotaServer sserver = StarotaServer.getServer(channel.getGuild().block());
 		onSend(sserver, channel, msg);
 		if (this instanceof PersistReactionMessage)
-			// ReactionMessageRegistry.serialize(sserver, msg,
-			// (PersistReactionMessage) this);
 			registry.serialize(sserver, msg, (PersistReactionMessage) this);
 		return msg;
 	}
 
-	public final IMessage editMessage(IChannel channel, IMessage msg) {
+	public final Message editMessage(TextChannel channel, Message msg) {
 		if (msg == null)
-			return sendMessage(channel);
-		registry = ReactionMessageRegistry.getRegistry(channel.getShard());
+			return createMessage(channel);
+		registry = ReactionMessageRegistry.getRegistry(channel.getClient());
 		this.msg = msg;
-		EmbedObject emb = getEmbed(
-				channel instanceof IPrivateChannel ? null : StarotaServer.getServer(channel.getGuild()));
-		msg.edit(emb);
-		// ReactionMessageRegistry.MESSAGES.put(msg.getStringID(), this);
-		registry.messages.put(msg.getStringID(), this);
-		StarotaServer sserver = StarotaServer
-				.getServer(channel instanceof IPrivateChannel ? null : channel.getGuild());
+		Consumer<? super EmbedCreateSpec> emb = getEmbed(
+				StarotaServer.getServer(channel.getGuild().block()));
+		msg.edit((ed) -> ed.setEmbed(emb)).block();
+		registry.messages.put(msg.getId().asString(), this);
+		StarotaServer sserver = StarotaServer.getServer(channel.getGuild().block());
 		// onSend(sserver, channel, msg);
 		onEdit(sserver, channel, msg);
 		if (this instanceof PersistReactionMessage)
-			// ReactionMessageRegistry.serialize(sserver, msg,
-			// (PersistReactionMessage) this);
 			registry.serialize(sserver, msg, (PersistReactionMessage) this);
 		return msg;
 	}
 
-	public final IMessage getMessage() {
+	public final Message getMessage() {
 		return this.msg;
 	}
 
-	public void onSend(StarotaServer server, IChannel channel, IMessage msg) {}
+	public void onSend(StarotaServer server, TextChannel channel, Message msg) {}
 
-	public void onEdit(StarotaServer server, IChannel channel, IMessage msg) {}
+	public void onEdit(StarotaServer server, TextChannel channel, Message msg) {}
 
-	public void onReactionAdded(StarotaServer server, IChannel channel, IMessage msg, IUser user,
-			IReaction react) {
-		ReactionButton button = this.buttons.get(react.getEmoji());
+	public void onReactionAdded(StarotaServer server, TextChannel channel, Message msg, Member user,
+			ReactionEmoji react) {
+		ReactionButton button = this.buttons.get(react);
 		if (button != null)
 			button.execute(msg, user, true);
 	}
 
-	public void onReactionRemoved(StarotaServer server, IChannel channel, IMessage msg, IUser user,
-			IReaction react) {
-		ReactionButton button = this.buttons.get(react.getEmoji());
+	public void onReactionRemoved(StarotaServer server, TextChannel channel, Message msg, Member user,
+			ReactionEmoji react) {
+		ReactionButton button = this.buttons.get(react);
 		if (button != null)
 			button.execute(msg, user, false);
 	}
 
-	protected EmbedObject getEmbed(StarotaServer server) {
+	protected Consumer<? super EmbedCreateSpec> getEmbed(StarotaServer server) {
 		return new EmbedBuilder().setLenient(true).build();
 	}
 
@@ -139,20 +132,19 @@ public class ReactionMessage {
 			return this.emoji;
 		}
 
-		public void execute(IMessage message, IUser user, boolean added) {
+		public void execute(Message message, Member user, boolean added) {
 			boolean toRemoveUpdate = handler.execute(message, user, added);
 			if (added && toRemoveUpdate)
-				RequestBuffer.request(() -> message.removeReaction(user, emoji));
+				message.removeReaction(emoji, user.getId()).block();
 			if (toRemoveUpdate)
-				RequestBuffer
-						.request(() -> editMessage(message.getChannel(), message));
+				editMessage((TextChannel) message.getChannel().block(), message);
 		}
 
 	}
 
 	public interface IButtonAction {
 
-		public boolean execute(IMessage message, IUser user, boolean added);
+		public boolean execute(Message message, Member user, boolean added);
 
 	}
 

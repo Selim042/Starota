@@ -1,9 +1,11 @@
 package us.myles_selim.starota.assistants.points;
 
+import java.util.function.Consumer;
+
 import javax.annotation.Nonnull;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.spec.EmbedCreateSpec;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 
 public class PointQuest<V extends QuestType<P>, P> {
 
@@ -34,7 +36,7 @@ public class PointQuest<V extends QuestType<P>, P> {
 		return System.currentTimeMillis() >= this.expireTime;
 	}
 
-	public EmbedObject toEmbed() {
+	public Consumer<? super EmbedCreateSpec> toEmbed() {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withTitle(toString());
 		builder.withThumbnail(getType().getImage(getParam()));

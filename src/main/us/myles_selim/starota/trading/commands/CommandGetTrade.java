@@ -1,11 +1,12 @@
 package us.myles_selim.starota.trading.commands;
 
-import java.util.EnumSet;
-
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.BotCommand;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.trading.TradeboardPost;
 import us.myles_selim.starota.trading.TradeboardReactionMessage;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -17,9 +18,9 @@ public class CommandGetTrade extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS,
-				Permissions.USE_EXTERNAL_EMOJIS, Permissions.ADD_REACTIONS, Permissions.MANAGE_MESSAGES);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS,
+				Permission.USE_EXTERNAL_EMOJIS, Permission.ADD_REACTIONS, Permission.MANAGE_MESSAGES);
 	}
 
 	@Override
@@ -28,9 +29,11 @@ public class CommandGetTrade extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
 		if (args.length < 2) {
-			channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName() + " [tradeId]");
+			channel.createMessage("**Usage**: " + server.getPrefix() + this.getName() + " [tradeId]")
+					.block();
 			return;
 		}
 		int tradeId = -1;
@@ -39,11 +42,12 @@ public class CommandGetTrade extends BotCommand<StarotaServer> {
 		} catch (NumberFormatException e) {}
 		TradeboardPost post = server.getPost(tradeId);
 		if (post == null) {
-			channel.sendMessage("Trade \"" + args[1] + "\" not found.");
+			channel.createMessage("Trade \"" + args[1] + "\" not found.").block();
 			return;
 		}
-		// channel.sendMessage(post.getPostEmbed(server));
-		new TradeboardReactionMessage(server.getDiscordGuild(), post).sendMessage(channel);
+		// channel.createMessage(post.getPostEmbed(server));
+		new TradeboardReactionMessage(server.getDiscordGuild(), post)
+				.createMessage((TextChannel) channel);
 	}
 
 }

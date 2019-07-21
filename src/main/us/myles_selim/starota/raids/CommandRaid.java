@@ -1,13 +1,16 @@
 package us.myles_selim.starota.raids;
 
-import java.util.EnumSet;
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
+import discord4j.core.object.util.Snowflake;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.commands.BotCommand;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandRaid extends BotCommand<StarotaServer> {
@@ -17,9 +20,9 @@ public class CommandRaid extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS,
-				Permissions.USE_EXTERNAL_EMOJIS, Permissions.ADD_REACTIONS, Permissions.MANAGE_MESSAGES);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS,
+				Permission.USE_EXTERNAL_EMOJIS, Permission.ADD_REACTIONS, Permission.MANAGE_MESSAGES);
 	}
 
 	@Override
@@ -37,11 +40,11 @@ public class CommandRaid extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
-			throws Exception {
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
 		if (args[0].equalsIgnoreCase("raid")) {
 			boolean needsTier = true;
-			String topic = channel.getTopic();
+			String topic = ((TextChannel) channel).getTopic().get();
 			if (topic != null && topic.contains("Key: ")) {
 				long key = -1;
 				int index = topic.indexOf("(Key: 0x");
@@ -55,21 +58,22 @@ public class CommandRaid extends BotCommand<StarotaServer> {
 					needsTier = true;
 				if (!needsTier) {
 					if (args.length < 2) {
-						channel.sendMessage(
-								"**Usage**: " + server.getPrefix() + this.getName() + " [time]");
+						channel.createMessage(
+								"**Usage**: " + server.getPrefix() + this.getName() + " [time]").block();
 						return;
 					}
 					needsTier = true;
 				}
 			}
 			if (needsTier) {
-				channel.sendMessage("Please specify raid tier in command name. Example: `"
-						+ server.getPrefix() + "raid5 " + getGeneralUsage() + "`");
+				channel.createMessage("Please specify raid tier in command name. Example: `"
+						+ server.getPrefix() + "raid5 " + getGeneralUsage() + "`").block();
 				return;
 			}
 		}
 		if (args.length < 3) {
-			channel.sendMessage("**Usage**: " + server.getPrefix() + args[0] + " " + getGeneralUsage());
+			channel.createMessage("**Usage**: " + server.getPrefix() + args[0] + " " + getGeneralUsage())
+					.block();
 			return;
 		}
 		String location = "";
@@ -97,24 +101,25 @@ public class CommandRaid extends BotCommand<StarotaServer> {
 			tier = 6;
 			break;
 		default:
-			channel.sendMessage("Failed to get raid tier");
+			channel.createMessage("Failed to get raid tier").block();
 			return;
 		}
-		IChannel sendChannel = getSendChannel(server, channel);
-		new RaidReactionMessage(tier, args[1], location).sendMessage(sendChannel);
+		TextChannel sendChannel = getSendChannel(server, (TextChannel) channel);
+		new RaidReactionMessage(tier, args[1], location).createMessage(sendChannel);
 		if (!sendChannel.equals(channel))
-			channel.sendMessage("Posted raid in " + sendChannel + ".");
+			channel.createMessage("Posted raid in " + sendChannel + ".").block();
 	}
 
-	private static IChannel getSendChannel(StarotaServer server, IChannel msgChannel) {
+	private static TextChannel getSendChannel(StarotaServer server, TextChannel msgChannel) {
 		if (!server.getData().containsKey(CommandSetRaidEChannel.CHANNELS_KEY))
 			return msgChannel;
 		EBStorage channels = server.getData().get(CommandSetRaidEChannel.CHANNELS_KEY, EBStorage.class);
-		if (channels.containsKey(msgChannel.getStringID())) {
-			long channelId = channels.get(msgChannel.getStringID(), Long.class);
+		if (channels.containsKey(msgChannel.getId().asString())) {
+			long channelId = channels.get(msgChannel.getId().asString(), Long.class);
 			if (channelId == -1)
 				return msgChannel;
-			return server.getDiscordGuild().getChannelByID(channelId);
+			return (TextChannel) server.getDiscordGuild().getChannelById(Snowflake.of(channelId))
+					.block();
 		}
 		return msgChannel;
 	}

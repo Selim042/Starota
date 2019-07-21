@@ -1,17 +1,19 @@
 package us.myles_selim.starota.silph_road.eggs;
 
-import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.RequestBuffer;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.commands.BotCommand;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.misc.data_types.EggEntry;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.silph_road.SilphRoadData;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -22,9 +24,9 @@ public class CommandEggHatches extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS,
-				Permissions.USE_EXTERNAL_EMOJIS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS,
+				Permission.USE_EXTERNAL_EMOJIS);
 	}
 
 	@Override
@@ -40,10 +42,10 @@ public class CommandEggHatches extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
-			throws Exception {
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
 		if (args.length == 1) {
-			channel.sendMessage(getAllDists());
+			channel.createEmbed(getAllDists()).block();
 			return;
 		}
 		if (args.length < 2) {
@@ -61,18 +63,18 @@ public class CommandEggHatches extends BotCommand<StarotaServer> {
 			sendUsage(server.getPrefix(), channel);
 			return;
 		}
-		IMessage msg = null;
+		Message msg = null;
 		if (!SilphRoadData.areEggsLoaded(dist))
-			msg = RequestBuffer.request(() -> {
-				return channel.sendMessage(SilphRoadData.LOADING_EMBED);
-			}).get();
+			msg = channel.createEmbed(SilphRoadData.LOADING_EMBED).block();
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.withTitle(
-				String.format("%dk Eggs: %s", dist, EmojiServerHelper.getEmoji(dist + "kEgg")));
+		builder.withTitle(String.format("%dk Eggs: %s", dist,
+				MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji(dist + "kEgg"))));
 		for (EggEntry b : SilphRoadData.getEggs(dist))
-			builder.appendDescription(
-					b.getPokemon() + (b.getForm() == null ? "" : " (" + b.getForm() + ") ")
-							+ (b.isShinyable() ? EmojiServerHelper.getEmoji("shiny") + "\n" : "\n"));
+			builder.appendDescription(b.getPokemon()
+					+ (b.getForm() == null ? "" : " (" + b.getForm() + ") ")
+					+ (b.isShinyable()
+							? MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("shiny")) + "\n"
+							: "\n"));
 
 		builder.withUrl("https://thesilphroad.com/raid-bosses");
 		builder.withAuthorName("The Silph Road");
@@ -80,14 +82,14 @@ public class CommandEggHatches extends BotCommand<StarotaServer> {
 		builder.withAuthorUrl("https://thesilphroad.com/");
 		builder.withFooterText("Last updated");
 		builder.withTimestamp(SilphRoadData.getEggCacheTime());
-		IMessage msgF = msg;
+		Message msgF = msg;
 		if (msgF != null)
-			RequestBuffer.request(() -> msgF.edit(builder.build()));
+			msgF.edit((m) -> m.setEmbed(builder.build())).block();
 		else
-			RequestBuffer.request(() -> channel.sendMessage(builder.build()));
+			channel.createEmbed(builder.build()).block();
 	}
 
-	private static EmbedObject getAllDists() {
+	private static Consumer<? super EmbedCreateSpec> getAllDists() {
 		EmbedBuilder builder = new EmbedBuilder().withTitle("Egg Distance List:").withColor(-1);
 		builder.withUrl("https://thesilphroad.com/egg-distances");
 		builder.withAuthorName("The Silph Road");
@@ -130,19 +132,23 @@ public class CommandEggHatches extends BotCommand<StarotaServer> {
 				break;
 			}
 		}
-		builder.appendField("**2k Eggs**: " + EmojiServerHelper.getEmoji("2kEgg"),
+		builder.appendField(
+				"**2k Eggs**: " + MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("2kEgg")),
 				"**Non-Shinies**: " + nonShinies2k.substring(0, nonShinies2k.length() - 2) + "\n\n"
 						+ "**Shinies**: " + shinies2k.substring(0, shinies2k.length() - 2),
 				false);
-		builder.appendField("**5k Eggs**: " + EmojiServerHelper.getEmoji("5kEgg"),
+		builder.appendField(
+				"**5k Eggs**: " + MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("5kEgg")),
 				"**Non-Shinies**: " + nonShinies5k.substring(0, nonShinies5k.length() - 2) + "\n\n"
 						+ "**Shinies**: " + shinies5k.substring(0, shinies5k.length() - 2),
 				false);
-		builder.appendField("**7k Eggs**: " + EmojiServerHelper.getEmoji("7kEgg"),
+		builder.appendField(
+				"**7k Eggs**: " + MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("7kEgg")),
 				"**Non-Shinies**: " + nonShinies7k.substring(0, nonShinies7k.length() - 2) + "\n\n"
 						+ "**Shinies**: " + shinies7k.substring(0, shinies7k.length() - 2),
 				false);
-		builder.appendField("**10k Eggs**: " + EmojiServerHelper.getEmoji("10kEgg"),
+		builder.appendField(
+				"**10k Eggs**: " + MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("10kEgg")),
 				"**Non-Shinies**: " + nonShinies10k.substring(0, nonShinies10k.length() - 2) + "\n\n"
 						+ "**Shinies**: " + shinies10k.substring(0, shinies10k.length() - 2),
 				false);

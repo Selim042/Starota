@@ -1,11 +1,12 @@
 package us.myles_selim.starota.profiles.commands;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.util.Permission;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.BotCommand;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -27,35 +28,37 @@ public class CommandUpdateProfile extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
-		boolean isAdmin = channel.getModifiedPermissions(message.getAuthor())
-				.contains(Permissions.ADMINISTRATOR);
-		IUser target = message.getAuthor();
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
+		boolean isAdmin = message.getAuthorAsMember().block().getBasePermissions().block()
+				.contains(Permission.ADMINISTRATOR);
 		if (args.length > 3 && !isAdmin) {
-			channel.sendMessage("Only admins can change other user's profile information.");
+			channel.createMessage("Only admins can change other user's profile information.").block();
 			return;
 		}
+		Member target = message.getAuthorAsMember().block();
 		if (args.length > 3 && isAdmin) {
-			target = Starota.findUser(server.getDiscordGuild().getLongID(), args[3]);
+			target = Starota.findMember(server.getDiscordGuild(), args[3]);
 			if (target == null) {
-				channel.sendMessage("User " + args[3] + " not found.");
+				channel.createMessage("User " + args[3] + " not found.").block();
 				return;
 			}
 		}
 		if (!server.hasProfile(target)) {
 			if (target.equals(message.getAuthor()))
-				channel.sendMessage("You do not yet have a profile.  Please contact an admin of \""
-						+ server.getDiscordGuild().getName() + "\".");
+				channel.createMessage("You do not yet have a profile.  Please contact an admin of \""
+						+ server.getDiscordGuild().getName() + "\".").block();
 			else
-				channel.sendMessage(
+				channel.createMessage(
 						target + " does not yet have a profile.  Please contact an admin of \""
-								+ server.getDiscordGuild().getName() + "\".");
+								+ server.getDiscordGuild().getName() + "\".")
+						.block();
 			return;
 		}
 		if (args.length < 3) {
 			if (isAdmin)
-				channel.sendMessage("**Usage**: " + server.getPrefix() + this.getName()
-						+ " [level/trainerCode/realName/alt] [value] <target>");
+				channel.createMessage("**Usage**: " + server.getPrefix() + this.getName()
+						+ " [level/trainerCode/realName/alt] [value] <target>").block();
 			else
 				this.sendUsage(server.getPrefix(), channel);
 			return;
@@ -72,7 +75,7 @@ public class CommandUpdateProfile extends BotCommand<StarotaServer> {
 				level = -1;
 			}
 			if (level < 0 || level > 40) {
-				channel.sendMessage("Level \"" + args[2] + "\" is an invalid level");
+				channel.createMessage("Level \"" + args[2] + "\" is an invalid level").block();
 				return;
 			}
 			profile.setLevel(level);
@@ -82,7 +85,7 @@ public class CommandUpdateProfile extends BotCommand<StarotaServer> {
 		case "trainer_code":
 		case "tc":
 			if (args[2].length() != 12) {
-				channel.sendMessage("Code \"" + args[2] + "\" is an invalid trainer code");
+				channel.createMessage("Code \"" + args[2] + "\" is an invalid trainer code").block();
 				return;
 			}
 			long trainerCode;
@@ -128,7 +131,7 @@ public class CommandUpdateProfile extends BotCommand<StarotaServer> {
 					team = null;
 				}
 				if (team == null) {
-					channel.sendMessage("Team \"" + args[3] + "\" not found");
+					channel.createMessage("Team \"" + args[3] + "\" not found").block();
 					return;
 				}
 				profile.setTeam(team);
@@ -143,10 +146,12 @@ public class CommandUpdateProfile extends BotCommand<StarotaServer> {
 		}
 		if (executed) {
 			server.setProfile(target, profile);
-			channel.sendMessage("Updated \"" + args[1] + "\" to \"" + args[2] + "\"",
-					profile.toEmbed(server));
+			channel.createMessage(
+					(m) -> m.setContent("Updated \"" + args[1] + "\" to \"" + args[2] + "\"")
+							.setEmbed(profile.toEmbed(server)))
+					.block();
 		} else
-			channel.sendMessage("Invalid option \"" + args[1] + "\".");
+			channel.createMessage("Invalid option \"" + args[1] + "\".").block();
 	}
 
 }

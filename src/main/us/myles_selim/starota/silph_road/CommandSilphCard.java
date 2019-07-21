@@ -1,19 +1,21 @@
 package us.myles_selim.starota.silph_road;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.BotCommand;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumTeam;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.modules.BaseModules;
 import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.silph_road.SilphCard.SilphBadgeData;
@@ -27,8 +29,9 @@ public class CommandSilphCard extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS, Permissions.USE_EXTERNAL_EMOJIS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS,
+				Permission.USE_EXTERNAL_EMOJIS);
 	}
 
 	@Override
@@ -44,24 +47,24 @@ public class CommandSilphCard extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
-			throws Exception {
-		String target = message.getAuthor().getName();
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
+		String target = message.getAuthor().get().getUsername();
 		if (args.length > 1)
 			target = args[1];
 		if (StarotaModule.isModuleEnabled(server, BaseModules.PROFILES)
 				&& !SilphRoadCardUtils.hasCard(target)) {
-			IUser possibleUser = Starota.findUser(target);
-			if (possibleUser != null && server.hasProfile(Starota.findUser(target)))
+			Member possibleUser = Starota.findMember(server.getDiscordGuild(), target);
+			if (possibleUser != null && server.hasProfile(possibleUser))
 				target = server.getProfile(possibleUser).getPoGoName();
 		}
 		if (!SilphRoadCardUtils.hasCard(target)) {
-			channel.sendMessage("User \"" + target + "\" does not have a Silph Road card.");
+			channel.createMessage("User \"" + target + "\" does not have a Silph Road card.").block();
 			return;
 		}
 		SilphCard card = SilphRoadCardUtils.getCard(target);
 		if (!card.data.is_public.equals("1")) {
-			channel.sendMessage("User \"" + target + "\"'s Silph Road card is not public.");
+			channel.createMessage("User \"" + target + "\"'s Silph Road card is not public.").block();
 			return;
 		}
 		EmbedBuilder builder = new EmbedBuilder();
@@ -100,7 +103,8 @@ public class CommandSilphCard extends BotCommand<StarotaServer> {
 		List<String> badgesStrings = new ArrayList<>();
 		String newBadgesString = "";
 		for (SilphBadgeData bd : card.data.badges) {
-			String emojiS = EmojiServerHelper.getEmoji(bd.Badge.slug, bd.Badge.image).toString();
+			String emojiS = MiscUtils
+					.getEmojiDisplay(EmojiServerHelper.getEmoji(bd.Badge.slug, bd.Badge.image));
 			// System.out.println("new length will be " +
 			// (newBadgesString.length() + emojiS.length()));
 			if (newBadgesString.length() + emojiS.length() > 1024) {
@@ -119,7 +123,7 @@ public class CommandSilphCard extends BotCommand<StarotaServer> {
 		}
 
 		builder.withFooterText("Last updated " + card.data.modified);
-		channel.sendMessage(builder.build());
+		channel.createEmbed(builder.build()).block();
 	}
 
 }

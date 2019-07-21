@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.misc.data_types.EggEntry;
@@ -21,17 +21,20 @@ import us.myles_selim.starota.misc.data_types.RaidBoss;
 import us.myles_selim.starota.misc.data_types.ResearchTask;
 import us.myles_selim.starota.misc.data_types.cache.CachedData;
 import us.myles_selim.starota.misc.data_types.cache.ClearCache;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 
 public class SilphRoadData {
 
-	public static final EmbedObject LOADING_EMBED;
+	public static final Consumer<? super EmbedCreateSpec> LOADING_EMBED;
 
 	static {
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.appendDesc("Loading Silph Road... " + EmojiServerHelper.getEmoji("loading"));
+		builder.appendDesc("Loading Silph Road... "
+				+ MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("loading")));
 		LOADING_EMBED = builder.build();
 	}
 
@@ -96,7 +99,8 @@ public class SilphRoadData {
 						String match2 = nameMatcher.group();
 						String[] pokemonName = splitName(match2
 								.substring(match2.indexOf("boss-name\">") + 11, match2.length() - 6));
-						EnumPokemon pokemon = EnumPokemon.getPokemon(pokemonName[0]);
+						EnumPokemon pokemon = EnumPokemon
+								.getPokemon(pokemonName[0].replaceAll("â™", "♂"));
 						if (pokemon == null) {
 							Starota.submitError("Cannot find raid boss named " + pokemonName[0],
 									new IllegalArgumentException(
@@ -121,7 +125,8 @@ public class SilphRoadData {
 	}
 
 	public static boolean areBossesLoaded(int tier) {
-		if (BOSSES != null && !BOSSES.hasPassed(86400000L)) // 1 day
+		if (BOSSES != null && TIERED_EGGS != null && !BOSSES.hasPassed(86400000L)) // 1
+																					// day
 			return TIERED_EGGS[tier - 1] != null;
 		return false;
 	}
@@ -308,7 +313,7 @@ public class SilphRoadData {
 			.compile("<div class=\"pokemonOption.*?\"boss-name\">.*?<\\/div>");
 
 	private static CachedData<List<ResearchTask>> TASKS;
-//	private static List<ResearchTask>[] TIERED_TASKS;
+	// private static List<ResearchTask>[] TIERED_TASKS;
 
 	public static List<ResearchTask> getTasks() {
 		if (TASKS != null && !TASKS.hasPassed(86400000L)) // 1 day
@@ -326,57 +331,60 @@ public class SilphRoadData {
 			Matcher generalMatcher = TASK_GROUP_PATTERN.matcher(html);
 			while (generalMatcher.find()) {
 				String match = generalMatcher.group();
-				 System.out.println(match);
-				 if (match != null)
-				 break;
-//				Matcher tierMatcher = TASK_TIER_PATTERN.matcher(match);
-//				Matcher nameMatcher = TASK_NAME_PATTERN.matcher(match);
-//				if (tierMatcher.find()) {
-//					String tierName = tierMatcher.group();
-//					int tier;
-//					switch (tierName) {
-//					case "<h4>EX Raids</h4>":
-//						tier = 6;
-//						break;
-//					case "<h4>Tier 5</h4>":
-//						tier = 5;
-//						break;
-//					case "<h4>Tier 4</h4>":
-//						tier = 4;
-//						break;
-//					case "<h4>Tier 3</h4>":
-//						tier = 3;
-//						break;
-//					case "<h4>Tier 2</h4>":
-//						tier = 2;
-//						break;
-//					case "<h4>Tier 1</h4>":
-//						tier = 1;
-//						break;
-//					default:
-//						continue;
-//					}
-//					while (nameMatcher.find()) {
-//						String match2 = nameMatcher.group();
-//						String[] pokemonName = splitName(match2
-//								.substring(match2.indexOf("boss-name\">") + 11, match2.length() - 6));
-//						EnumPokemon pokemon = EnumPokemon.getPokemon(pokemonName[0]);
-//						if (pokemon == null) {
-//							Starota.submitError("Cannot find raid boss named " + pokemonName[0],
-//									new IllegalArgumentException(
-//											"Cannot find raid boss named " + pokemonName[0]));
-//							continue;
-//						}
-//						boolean shinyable = match2.contains("shiny");
-//						Form form = null;
-//						if (pokemon.getFormSet() != null)
-//							form = pokemon.getFormSet().getForm(pokemonName[1]);
-//						newTasks.add(new ResearchTask(pokemon, form, tier, shinyable));
-//					}
-//				}
+				System.out.println(match);
+				if (match != null)
+					break;
+				// Matcher tierMatcher = TASK_TIER_PATTERN.matcher(match);
+				// Matcher nameMatcher = TASK_NAME_PATTERN.matcher(match);
+				// if (tierMatcher.find()) {
+				// String tierName = tierMatcher.group();
+				// int tier;
+				// switch (tierName) {
+				// case "<h4>EX Raids</h4>":
+				// tier = 6;
+				// break;
+				// case "<h4>Tier 5</h4>":
+				// tier = 5;
+				// break;
+				// case "<h4>Tier 4</h4>":
+				// tier = 4;
+				// break;
+				// case "<h4>Tier 3</h4>":
+				// tier = 3;
+				// break;
+				// case "<h4>Tier 2</h4>":
+				// tier = 2;
+				// break;
+				// case "<h4>Tier 1</h4>":
+				// tier = 1;
+				// break;
+				// default:
+				// continue;
+				// }
+				// while (nameMatcher.find()) {
+				// String match2 = nameMatcher.group();
+				// String[] pokemonName = splitName(match2
+				// .substring(match2.indexOf("boss-name\">") + 11,
+				// match2.length() - 6));
+				// EnumPokemon pokemon = EnumPokemon.getPokemon(pokemonName[0]);
+				// if (pokemon == null) {
+				// Starota.submitError("Cannot find raid boss named " +
+				// pokemonName[0],
+				// new IllegalArgumentException(
+				// "Cannot find raid boss named " + pokemonName[0]));
+				// continue;
+				// }
+				// boolean shinyable = match2.contains("shiny");
+				// Form form = null;
+				// if (pokemon.getFormSet() != null)
+				// form = pokemon.getFormSet().getForm(pokemonName[1]);
+				// newTasks.add(new ResearchTask(pokemon, form, tier,
+				// shinyable));
+				// }
+				// }
 			}
 			TASKS = new CachedData<>(newTasks);
-//			setupTaskTiers();
+			// setupTaskTiers();
 			return Collections.unmodifiableList(newTasks);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -390,19 +398,19 @@ public class SilphRoadData {
 		return false;
 	}
 
-//	public static List<ResearchTask> getTasks(int tier) {
-//		getTasks();
-//		return TIERED_TASKS[tier - 1];
-//	}
+	// public static List<ResearchTask> getTasks(int tier) {
+	// getTasks();
+	// return TIERED_TASKS[tier - 1];
+	// }
 
-//	public static ResearchTask getTask(EnumPokemon pokemon, Form form) {
-//		getTasks();
-//		for (ResearchTask b : TASKS.getValue())
-//			if (b.getPokemon().equals(pokemon)
-//					&& ((form == null && b.getForm() == null) || b.getForm().equals(form)))
-//				return b;
-//		return null;
-//	}
+	// public static ResearchTask getTask(EnumPokemon pokemon, Form form) {
+	// getTasks();
+	// for (ResearchTask b : TASKS.getValue())
+	// if (b.getPokemon().equals(pokemon)
+	// && ((form == null && b.getForm() == null) || b.getForm().equals(form)))
+	// return b;
+	// return null;
+	// }
 
 	public static long getTaskCacheTime() {
 		if (TASKS == null)
@@ -410,17 +418,17 @@ public class SilphRoadData {
 		return TASKS.getCreationTime();
 	}
 
-//	@SuppressWarnings("unchecked")
-//	private static void setupTaskTiers() {
-//		TIERED_TASKS = new ArrayList[6];
-//		for (ResearchTask b : TASKS.getValue()) {
-//			List<ResearchTask> tier = TIERED_TASKS[b.getTier() - 1];
-//			if (tier == null)
-//				tier = new ArrayList<>();
-//			tier.add(b);
-//			TIERED_TASKS[b.getTier() - 1] = tier;
-//		}
-//	}
+	// @SuppressWarnings("unchecked")
+	// private static void setupTaskTiers() {
+	// TIERED_TASKS = new ArrayList[6];
+	// for (ResearchTask b : TASKS.getValue()) {
+	// List<ResearchTask> tier = TIERED_TASKS[b.getTier() - 1];
+	// if (tier == null)
+	// tier = new ArrayList<>();
+	// tier.add(b);
+	// TIERED_TASKS[b.getTier() - 1] = tier;
+	// }
+	// }
 
 	@ClearCache("silphroaddata")
 	public static void dumpCaches() {

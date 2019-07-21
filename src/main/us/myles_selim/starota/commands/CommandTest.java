@@ -2,9 +2,9 @@ package us.myles_selim.starota.commands;
 
 import java.util.TimeZone;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.util.RequestBuffer;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandTest extends BotCommand<StarotaServer> {
@@ -14,7 +14,8 @@ public class CommandTest extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel) {
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
 		// try {
 		// RaidReactionMessage rMsg = new RaidReactionMessage(6, "9:30",
 		// "Chess Pieces - UW-Platteville");
@@ -29,22 +30,23 @@ public class CommandTest extends BotCommand<StarotaServer> {
 		// RaidReactionMessage.class.getDeclaredMethod("getEmbed",
 		// StarotaServer.class);
 		// method.setAccessible(true);
-		// EmbedObject embed = (EmbedObject) method.invoke(rMsg, server);
-		// embed.image = new EmbedObject.ImageObject(String.format(
+		// EmbedCreateSpec embed = (EmbedCreateSpec) method.invoke(rMsg,
+		// server);
+		// embed.image = new EmbedCreateSpec.ImageObject(String.format(
 		// "https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/pin-s+%06X(-90.4879800,42.733048)/-90.4879800,42.733048,16.5,0,0/600x300@2x?logo=false&access_token=pk.eyJ1Ijoic2VsaW0wNDIiLCJhIjoiY2pyOXpmM2g1MG16cTQzbndqZXk5dHNndCJ9.vsh20BzsPBgTcBBcKWBqQw",
 		// EnumTeam.INSTINCT.getColor()), null, 0, 0);
-		// channel.sendMessage(embed);
+		// channel.createMessage(embed);
 		// } catch (Exception e) {
 		// e.printStackTrace();
 		// }
 
-		// channel.sendMessage(TimeZone.getTimeZone(args[1]).toString());
+		// channel.createMessage(TimeZone.getTimeZone(args[1]).toString());
 
 		// WebhookPokemon hook = new WebhookPokemon();
 		// hook.pokemon_id = 1;
 		// hook.weight = 8.99;
 		// hook.height = 0.84;
-		// channel.sendMessage(
+		// channel.createMessage(
 		// "weight" " + hook.getWeightModifier() + "\nheight" " +
 		// hook.getHeightModifier());
 
@@ -75,9 +77,9 @@ public class CommandTest extends BotCommand<StarotaServer> {
 		// out += "\n";
 		// else
 		// out += p.getName() + "\n";
-		// channel.sendMessage("```\n" + out + "\n```");
+		// channel.createMessage("```\n" + out + "\n```");
 
-		// IMessage msg = channel.sendMessage(new
+		// Message msg = channel.createMessage(new
 		// EmbedBuilder().withTitle("Random New Pokestop")
 		// .withUrl("https://discordapp.com").withDesc("Test Pokestop
 		// submission.")
@@ -100,16 +102,16 @@ public class CommandTest extends BotCommand<StarotaServer> {
 		// false)
 		// .build());
 		// RequestBuffer.request(() ->
-		// msg.addReaction(ReactionEmoji.of("⬅"))).get();
+		// msg.addReaction(ReactionEmoji.unicode("⬅"))).get();
 		// RequestBuffer.request(() ->
-		// msg.addReaction(ReactionEmoji.of("➡"))).get();
+		// msg.addReaction(ReactionEmoji.unicode("➡"))).get();
 		// RequestBuffer.request(() ->
 		// msg.addReaction(EmojiConstants.getBooleanEmoji(true))).get();
 		// RequestBuffer.request(() ->
 		// msg.addReaction(EmojiConstants.getBooleanEmoji(false))).get();
 
 		// if (message.getAttachments().isEmpty()) {
-		// channel.sendMessage("No screenshot found");
+		// channel.createMessage("No screenshot found");
 		// return;
 		// }
 		// BufferedImage image =
@@ -117,9 +119,9 @@ public class CommandTest extends BotCommand<StarotaServer> {
 
 		// BadgeData badge = OcrHelper.getBadgeValue(server, image);
 		// if (badge != null)
-		// channel.sendMessage(badge.name + ": " + badge.value);
+		// channel.createMessage(badge.name + ": " + badge.value);
 		// else
-		// channel.sendMessage("Bad OCR. If this is a gold badge, please try
+		// channel.createMessage("Bad OCR. If this is a gold badge, please try
 		// taking a new screenshot. "
 		// + "The gold sparkles can interfere.");
 
@@ -128,21 +130,19 @@ public class CommandTest extends BotCommand<StarotaServer> {
 		// StringBuilder out = new StringBuilder("```\n");
 		// for (IJournalEntry entry : entries)
 		// out.append(entry + "\n");
-		// channel.sendMessage(out.append("```").toString());
+		// channel.createMessage(out.append("```").toString());
 
-		channel.sendMessage(server.getTimezone().toString());
+		channel.createMessage(server.getTimezone().toString());
 		String msg = "";
 		for (String id : TimeZone.getAvailableIDs()) {
 			if (msg.length() + id.length() > 1500) {
 				String fMsg = msg;
-				RequestBuffer.request(() -> {
-					channel.sendMessage(fMsg);
-				}).get();
+				channel.createMessage(fMsg).block();
 				msg = id + '\n';
 			}
 			msg += id + '\n';
 		}
-		RequestBuffer.request(() -> channel.sendMessage("done"));
+		channel.createMessage("done").block();
 	}
 
 }

@@ -1,6 +1,6 @@
 package us.myles_selim.starota.commands.tutorial;
 
-import sx.blah.discord.handle.obj.IUser;
+import discord4j.core.object.entity.User;
 
 public class TutorialChapter {
 
@@ -20,6 +20,6 @@ public class TutorialChapter {
 		return description;
 	}
 
-	public void execute(IUser user, ChapterProgress progress) throws Exception {}
+	public void execute(User user, ChapterProgress progress) throws Exception {}
 
 }

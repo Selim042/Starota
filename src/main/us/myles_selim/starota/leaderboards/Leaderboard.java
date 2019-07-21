@@ -5,20 +5,21 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 
 public class Leaderboard extends DataType<Leaderboard> {
 
 	public static final int PER_PAGE = 10;
 
-	private IGuild guild;
+	private Guild guild;
 	private String displayName;
 	private List<LeaderboardEntry> entries;
 	private List<String> aliases;
@@ -29,11 +30,11 @@ public class Leaderboard extends DataType<Leaderboard> {
 
 	public Leaderboard() {}
 
-	public Leaderboard(IGuild server, String displayName) {
+	public Leaderboard(Guild server, String displayName) {
 		this(server, displayName, true);
 	}
 
-	public Leaderboard(IGuild server, String displayName, boolean decending) {
+	public Leaderboard(Guild server, String displayName, boolean decending) {
 		this.guild = server;
 		this.displayName = displayName;
 		this.entries = new LinkedList<>();
@@ -130,11 +131,11 @@ public class Leaderboard extends DataType<Leaderboard> {
 		this.isEnabled = enabled;
 	}
 
-	public EmbedObject toEmbed() {
+	public Consumer<? super EmbedCreateSpec> toEmbed() {
 		return toEmbed(0);
 	}
 
-	public EmbedObject toEmbed(int page) {
+	public Consumer<? super EmbedCreateSpec> toEmbed(int page) {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withTitle(this.displayName + " Leaderboard");
 		if (page < 0 || page > this.entries.size() / PER_PAGE)
@@ -143,12 +144,12 @@ public class Leaderboard extends DataType<Leaderboard> {
 		for (int i = page * PER_PAGE; i < (page + 1) * PER_PAGE && i < this.entries.size(); i++) {
 			found = true;
 			LeaderboardEntry entry = this.entries.get(i);
-			IUser user = entry.getDiscordUser();
-			String userDisplay = user.getNicknameForGuild(guild);
+			Member user = entry.getDiscordMember(guild);
+			String userDisplay = user.getDisplayName();
 			if (userDisplay == null)
-				userDisplay = user.getName() + "#" + user.getDiscriminator();
+				userDisplay = user.getUsername() + "#" + user.getDiscriminator();
 			else
-				userDisplay += "(__" + user.getName() + "#" + user.getDiscriminator() + "__)";
+				userDisplay += "(__" + user.getUsername() + "#" + user.getDiscriminator() + "__)";
 			builder.appendDesc("**" + (i + 1) + "**) " + userDisplay + ": "
 					+ NumberFormat.getNumberInstance(Locale.US).format(entry.getValue()) + "\n");
 		}
@@ -161,7 +162,7 @@ public class Leaderboard extends DataType<Leaderboard> {
 		return builder.build();
 	}
 
-	public EmbedObject toEmbedOptions() {
+	public Consumer<? super EmbedCreateSpec> toEmbedOptions() {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withTitle("Options for: " + this.displayName);
 		builder.appendField("Decending:", Boolean.toString(this.decending), true);
@@ -242,7 +243,7 @@ public class Leaderboard extends DataType<Leaderboard> {
 		else
 			stor.writeInt(this.type.ordinal());
 		stor.writeByte((byte) (isEnabled ? 1 : 2));
-		stor.writeLong(this.guild.getLongID());
+		stor.writeLong(this.guild.getId().asLong());
 	}
 
 	@Override

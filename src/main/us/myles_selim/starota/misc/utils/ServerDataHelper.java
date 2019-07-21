@@ -2,7 +2,7 @@ package us.myles_selim.starota.misc.utils;
 
 import java.io.File;
 
-import sx.blah.discord.handle.obj.IGuild;
+import discord4j.core.object.entity.Guild;
 import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.EBList;
 import us.myles_selim.ebs.EBStorage;
@@ -12,11 +12,11 @@ import us.myles_selim.ebs.data_types.DataTypeEBStorage;
 
 public class ServerDataHelper {
 
-	public static EBList<EBStorage> getEBSsFromFolder(IGuild server, File folder) {
+	public static EBList<EBStorage> getEBSsFromFolder(Guild server, File folder) {
 		if (!folder.exists() || !folder.isDirectory())
 			return new EBList<>(new DataTypeEBStorage());
 		EBList<EBStorage> ebss = new EBList<>(new DataTypeEBStorage());
-		File sFolder = new File(folder, server.getStringID());
+		File sFolder = new File(folder, server.getId().asString());
 		if (!sFolder.exists())
 			return new EBList<>(new DataTypeEBStorage());
 		File[] nestFiles = sFolder.listFiles(IOHelper.EBS_FILE_FILTER);
@@ -28,8 +28,8 @@ public class ServerDataHelper {
 		return ebss;
 	}
 
-	public static EBStorage getEBSFromFolder(IGuild server, File folder) {
-		File ebsFile = new File(folder, server.getStringID() + IOHelper.EBS_EXTENSION);
+	public static EBStorage getEBSFromFolder(Guild server, File folder) {
+		File ebsFile = new File(folder, server.getId().asString() + IOHelper.EBS_EXTENSION);
 		if (!ebsFile.exists() || !folder.exists() || !folder.isDirectory())
 			return new EBStorage().registerPrimitives()
 					.setOnWriteCallback(new FileWriteCallback(ebsFile));
@@ -37,9 +37,9 @@ public class ServerDataHelper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T, D extends DataType<T>> EBList<T> getEBListFromFolder(IGuild server, File folder,
+	public static <T, D extends DataType<T>> EBList<T> getEBListFromFolder(Guild server, File folder,
 			DataType<T> type) {
-		File eblFile = new File(folder, server.getStringID() + IOHelper.EBS_LIST_EXTENSION);
+		File eblFile = new File(folder, server.getId().asString() + IOHelper.EBS_LIST_EXTENSION);
 		if (!eblFile.exists() || !folder.exists() || !folder.isDirectory())
 			return new EBList<>(type).setOnWriteCallback(new FileWriteCallback(eblFile));
 		return (EBList<T>) IOHelper.readEBList(eblFile)

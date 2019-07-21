@@ -1,13 +1,14 @@
 package us.myles_selim.starota.modules;
 
-import java.util.EnumSet;
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.BotCommand;
+import us.myles_selim.starota.commands.registry.CommandException;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandModules extends BotCommand<StarotaServer> {
@@ -17,13 +18,13 @@ public class CommandModules extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public Permissions requiredUsePermission() {
-		return Permissions.ADMINISTRATOR;
+	public Permission requiredUsePermission() {
+		return Permission.ADMINISTRATOR;
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES, Permissions.EMBED_LINKS);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES, Permission.EMBED_LINKS);
 	}
 
 	@Override
@@ -39,8 +40,8 @@ public class CommandModules extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
-			throws Exception {
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
 		if (args.length == 2 && args[1].equalsIgnoreCase("info")) {
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.withTitle("Modules:");
@@ -60,17 +61,17 @@ public class CommandModules extends BotCommand<StarotaServer> {
 					out += "no info to display";
 				builder.appendField(m.getName(), out, false);
 			}
-			channel.sendMessage(builder.build());
+			channel.createEmbed(builder.build()).block();
 			return;
 		}
 		if (args.length < 3) {
-			channel.sendMessage(
-					"**Usage**: " + server.getPrefix() + getName() + " " + getGeneralUsage());
+			channel.createMessage(
+					"**Usage**: " + server.getPrefix() + getName() + " " + getGeneralUsage()).block();
 			return;
 		}
 		StarotaModule module = StarotaModule.getModule(args[2]);
 		if (module == null) {
-			channel.sendMessage("Module \"" + args[2] + "\" not found");
+			channel.createMessage("Module \"" + args[2] + "\" not found").block();
 			return;
 		}
 		boolean status;
@@ -79,21 +80,23 @@ public class CommandModules extends BotCommand<StarotaServer> {
 		case "on":
 			status = StarotaModule.enableModule(server, module);
 			if (status)
-				channel.sendMessage("Enabled the \"" + module.getName() + "\" module.");
+				channel.createMessage("Enabled the \"" + module.getName() + "\" module.").block();
 			else
-				channel.sendMessage("The \"" + module.getName() + "\" module is already enabled.");
+				channel.createMessage("The \"" + module.getName() + "\" module is already enabled.")
+						.block();
 			break;
 		case "disable":
 		case "off":
 			status = StarotaModule.disableModule(server, module);
 			if (status)
-				channel.sendMessage("Disabled the \"" + module.getName() + "\" module.");
+				channel.createMessage("Disabled the \"" + module.getName() + "\" module.").block();
 			else
-				channel.sendMessage("The \"" + module.getName() + "\" module is already disabled.");
+				channel.createMessage("The \"" + module.getName() + "\" module is already disabled.")
+						.block();
 			break;
 		default:
-			channel.sendMessage(
-					"**Usage**: " + server.getPrefix() + getName() + " " + getGeneralUsage());
+			channel.createMessage(
+					"**Usage**: " + server.getPrefix() + getName() + " " + getGeneralUsage()).block();
 			break;
 		}
 	}

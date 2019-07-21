@@ -5,21 +5,22 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.IUser;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.entity.User;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumDonorPerm;
 
 public class RolePermHelper {
 
-	public static boolean canUseLua(IGuild server) {
+	public static boolean canUseLua(Guild server) {
 		if (server == null)
 			return false;
 		return getDonorPerms(server).contains(EnumDonorPerm.LUA);
 	}
 
-	public static int getMaxLeaderboards(IGuild server) {
+	public static int getMaxLeaderboards(Guild server) {
 		int max = 3;
 		for (EnumDonorPerm p : RolePermHelper.getDonorPerms(server)) {
 			switch (p) {
@@ -42,14 +43,14 @@ public class RolePermHelper {
 		return max;
 	}
 
-	public static IRole getDonorRole(IUser user) {
-		IGuild supportServer = Starota.getSupportServer();
-		if (!supportServer.getUsers().contains(user))
+	public static Role getDonorRole(User user) {
+		Guild supportServer = Starota.getSupportServer();
+		if (!supportServer.getMembers().collectList().block().contains(user))
 			return null;
-		List<IRole> supportRoles = supportServer.getRoles();
-		List<IRole> patronRoles = new ArrayList<>();
+		List<Role> supportRoles = supportServer.getRoles().collectList().block();
+		List<Role> patronRoles = new ArrayList<>();
 		boolean inRange = false;
-		for (IRole r : supportRoles) {
+		for (Role r : supportRoles) {
 			if (r.getName().equals("MARKER")) {
 				inRange = !inRange;
 				continue;
@@ -57,23 +58,24 @@ public class RolePermHelper {
 			if (inRange)
 				patronRoles.add(r);
 		}
-		patronRoles.retainAll(user.getRolesForGuild(supportServer));
+		Member userMember = user.asMember(supportServer.getId()).block();
+		patronRoles.retainAll(userMember.getRoles().collectList().block());
 		if (patronRoles.size() > 0)
 			return patronRoles.get(0);
 		return null;
 	}
 
-	public static List<EnumDonorPerm> getDonorPerms(IGuild server) {
+	public static List<EnumDonorPerm> getDonorPerms(Guild server) {
 		if (server == null)
 			return Collections.emptyList();
-		IUser owner = server.getOwner();
-		IGuild supportServer = Starota.getSupportServer();
-		if (!supportServer.getUsers().contains(owner))
+		Member owner = server.getOwner().block();
+		Guild supportServer = Starota.getSupportServer();
+		if (!supportServer.getMembers().collectList().block().contains(owner))
 			return Collections.emptyList();
-		if (owner.getLongID() == StarotaConstants.SELIM_USER_ID)
+		if (owner.getId().equals(StarotaConstants.SELIM_USER_ID))
 			return Arrays.asList(EnumDonorPerm.values());
 		List<EnumDonorPerm> perms = new ArrayList<>();
-		List<IRole> roles = owner.getRolesForGuild(supportServer);
+		List<Role> roles = owner.getRoles().collectList().block();
 		for (EnumDonorPerm p : EnumDonorPerm.values())
 			if (roles.contains(p.getRole()))
 				perms.add(p);

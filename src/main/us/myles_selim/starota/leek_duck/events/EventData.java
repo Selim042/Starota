@@ -8,6 +8,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -17,21 +18,23 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.misc.data_types.cache.CachedData;
 import us.myles_selim.starota.misc.data_types.cache.ClearCache;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 
 public class EventData {
 
-	public static final EmbedObject LOADING_EMBED;
+	public static final Consumer<? super EmbedCreateSpec> LOADING_EMBED;
 
 	static {
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.appendDesc("Loading event data... " + EmojiServerHelper.getEmoji("loading"));
+		builder.appendDesc("Loading event data... "
+				+ MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("loading")));
 		LOADING_EMBED = builder.build();
 	}
 

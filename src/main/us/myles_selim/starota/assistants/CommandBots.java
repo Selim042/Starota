@@ -1,10 +1,11 @@
 package us.myles_selim.starota.assistants;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 
 public class CommandBots extends JavaCommand {
 
@@ -13,8 +14,8 @@ public class CommandBots extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel)
-			throws Exception {
+	public void execute(String[] args, Message message, Guild guild, MessageChannel channel)
+			throws CommandException {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withTitle("Other bots:");
 
@@ -31,7 +32,7 @@ public class CommandBots extends JavaCommand {
 		builder.appendDesc("[DiscordBots.org](https://discordbots.org/bot/578326030603780126)\n");
 
 		builder.appendDesc("\n**Point Bot (WIP)**: Quest-based bot for some friendly competition.\n");
-		channel.sendMessage(builder.build());
+		channel.createEmbed(builder.build()).block();
 	}
 
 }

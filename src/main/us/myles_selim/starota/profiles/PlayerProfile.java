@@ -4,18 +4,22 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.util.Snowflake;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.EventFactory;
+import us.myles_selim.starota.EventFactory.ExtraField;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.embed_converter.ExtraField;
 import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.lua.events.GetProfileEvent;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.RolePermHelper;
 import us.myles_selim.starota.silph_road.SilphRoadCardUtils;
@@ -103,8 +107,12 @@ public class PlayerProfile {
 		return this.discordId;
 	}
 
-	public IUser getDiscordUser() {
-		return Starota.getClient().getUserByID(this.discordId);
+	public User getDiscordUser() {
+		return Starota.getClient().getUserById(Snowflake.of(this.discordId)).block();
+	}
+
+	public Member getDiscordMember(Guild guild) {
+		return getDiscordUser().asMember(guild.getId()).block();
 	}
 
 	public PlayerProfile setDiscordId(long id) {
@@ -125,20 +133,20 @@ public class PlayerProfile {
 	}
 
 	public String getDonorRoleName() {
-		IRole donorRole = RolePermHelper.getDonorRole(Starota.getUser(this.discordId));
+		Role donorRole = RolePermHelper.getDonorRole(Starota.getUser(this.discordId));
 		if (donorRole != null)
 			return donorRole.getName();
 		return null;
 	}
 
-	public EmbedObject toEmbed(StarotaServer server) {
+	public Consumer<? super EmbedCreateSpec> toEmbed(StarotaServer server) {
 		return toEmbed(EventFactory.fireProfileEvent(server, this));
 	}
 
-	private EmbedObject toEmbed(GetProfileEvent event) {
+	private Consumer<? super EmbedCreateSpec> toEmbed(GetProfileEvent event) {
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.withAuthorIcon(Starota.getUser(this.discordId).getAvatarURL());
-		builder.withAuthorName(Starota.getUser(this.discordId).getName());
+		User user = getDiscordUser();
+		builder.withAuthorName(user.getUsername()).withAuthorUrl(user.getAvatarUrl());
 		builder.withTitle("Profile for " + this.poGoName + ":");
 		for (ExtraField f : event.getFields()) {
 			if (f == null)

@@ -3,19 +3,47 @@ package us.myles_selim.starota.misc.utils;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IRegion;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.DiscordClient;
+import discord4j.core.object.Region;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.GuildChannel;
+import discord4j.core.object.entity.GuildEmoji;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.reaction.ReactionEmoji;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
+import discord4j.core.object.util.Snowflake;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumTeam;
 
 public class MiscUtils {
+
+	public static String getEmojiName(ReactionEmoji emoji) {
+		if (emoji.asCustomEmoji().isPresent())
+			return emoji.asCustomEmoji().get().getName();
+		return emoji.asUnicodeEmoji().get().getRaw();
+	}
+
+	public static String getEmojiDisplay(ReactionEmoji emoji) {
+		if (emoji.asUnicodeEmoji().isPresent())
+			return emoji.asUnicodeEmoji().get().getRaw();
+		ReactionEmoji.Custom custom = emoji.asCustomEmoji().get();
+		return "<" + (custom.isAnimated() ? "a" : "") + ":" + custom.getName() + ":"
+				+ custom.getId().asString() + ">";
+	}
+
+	public static String getEmojiDisplay(GuildEmoji emoji) {
+		return emoji.asFormat();
+	}
 
 	public static String fixCharacters(String in) {
 		if (in == null)
@@ -49,8 +77,61 @@ public class MiscUtils {
 		return false;
 	}
 
-	public static IRole getTeamRole(IGuild guild, EnumTeam team) {
-		for (IRole r : guild.getRoles()) {
+	public static List<Member> getMembersHere(GuildChannel ch) {
+		Guild guild = ch.getGuild().block();
+		return guild.getMembers().filter((user) -> {
+			PermissionSet permissions = ch.getEffectivePermissions(user.getId()).block();
+			return hasPermission(Permission.VIEW_CHANNEL, generatePermissionNumber(permissions), true);
+		}).collect(Collectors.toList()).block();
+	}
+
+	public static boolean hasPermission(Permission perm, int permissionsNumber, boolean checkAdmin) {
+		if ((perm.getValue() & permissionsNumber) > 0)
+			return true;
+		else if (!perm.equals(Permission.ADMINISTRATOR) && checkAdmin)
+			return hasPermission(Permission.ADMINISTRATOR, permissionsNumber);
+		return false;
+	}
+
+	public static boolean hasPermission(Permission perm, int permissionsNumber) {
+		return hasPermission(perm, permissionsNumber, true);
+	}
+
+	public static boolean hasRole(Member member, Role role) {
+		return hasRole(member, role.getId());
+	}
+
+	public static boolean hasRole(Member member, Snowflake roleId) {
+		return member.getRoles().any((r) -> r.getId().equals(roleId)).block();
+	}
+
+	public static PermissionSet getAllowedPermissionForNumber(int permissionsNumber) {
+		PermissionSet permissionsSet = PermissionSet.none();
+		for (Permission permission : PermissionSet.all())
+			if (hasPermission(permission, permissionsNumber))
+				permissionsSet.add(permission);
+		return permissionsSet;
+	}
+
+	public static PermissionSet getDeniedPermissionForNumber(int permissionsNumber) {
+		PermissionSet permissionsSet = PermissionSet.none();
+		for (Permission permission : PermissionSet.all())
+			if (hasPermission(permission, permissionsNumber, false))
+				permissionsSet.add(permission);
+		return permissionsSet;
+	}
+
+	public static int generatePermissionNumber(PermissionSet permissions) {
+		if (permissions == null)
+			permissions = PermissionSet.none();
+		int number = 0;
+		for (Permission permission : permissions)
+			number |= (permission.getValue());
+		return number;
+	}
+
+	public static Role getTeamRole(Guild guild, EnumTeam team) {
+		for (Role r : guild.getRoles().collectList().block()) {
 			if (team.name().equalsIgnoreCase(r.getName().replaceAll(" ", "_")))
 				return r;
 		}
@@ -58,8 +139,8 @@ public class MiscUtils {
 	}
 
 	// TODO: update when adding new regions
-	public static TimeZone getTimezone(IRegion region) {
-		switch (region.getID()) {
+	public static TimeZone getTimezone(Region region) {
+		switch (region.getId()) {
 		case "us-central":
 			return TimeZone.getTimeZone("US/Central");
 		case "us-east":
@@ -75,7 +156,7 @@ public class MiscUtils {
 		case "brazil":
 			return TimeZone.getTimeZone("America/Belem");
 		default:
-			TwitterHelper.sendDirectMessage("Selim_042", "Region " + region.getID() + " not configured");
+			TwitterHelper.sendDirectMessage("Selim_042", "Region " + region.getId() + " not configured");
 			if (Starota.IS_DEV)
 				for (String id : TimeZone.getAvailableIDs())
 					System.out.println("timezone id: " + id);
@@ -88,6 +169,80 @@ public class MiscUtils {
 			if (s.equalsIgnoreCase(key))
 				return map.get(s);
 		return null;
+	}
+
+	public static List<Role> getRolesByName(Guild guild, String name, boolean caseSensitive) {
+		return guild.getRoles().collect(() -> new LinkedList<>(), (List<Role> l, Role u) -> {
+			if (caseSensitive) {
+				if (u.getName().equals(name))
+					l.add(u);
+			} else if (u.getName().equalsIgnoreCase(name))
+				l.add(u);
+		}).block();
+	}
+
+	public static List<User> getUsersByName(DiscordClient client, String name, boolean caseSensitive) {
+		return client.getUsers().collect(() -> new LinkedList<>(), (List<User> l, User u) -> {
+			if (caseSensitive) {
+				if (u.getUsername().equals(name))
+					l.add(u);
+			} else if (u.getUsername().equalsIgnoreCase(name))
+				l.add(u);
+		}).block();
+	}
+
+	public static List<Member> getMembersByRole(Guild guild, Role role) {
+		return getMembersByRole(guild, role.getId());
+	}
+
+	public static List<Member> getMembersByRole(Guild guild, Snowflake roleId) {
+		return guild.getMembers().collect(() -> new LinkedList<>(), (List<Member> l, Member m) -> {
+			if (MiscUtils.hasRole(m, roleId))
+				l.add(m);
+		}).block();
+	}
+
+	public static List<Member> getMembersByName(Guild guild, String name) {
+		return getMembersByName(guild, name, false);
+	}
+
+	public static List<Member> getMembersByName(Guild guild, String name, boolean includeNickname) {
+		return guild.getMembers().collect(() -> new LinkedList<>(), (List<Member> l, Member m) -> {
+			if (includeNickname && m.getDisplayName().equals(name))
+				l.add(m);
+			else if (m.getUsername().equals(name))
+				l.add(m);
+		}).block();
+	}
+
+	public static List<Member> getMembersByNameIgnoreCase(Guild guild, String name) {
+		return getMembersByNameIgnoreCase(guild, name, false);
+	}
+
+	public static List<Member> getMembersByNameIgnoreCase(Guild guild, String name,
+			boolean includeNickname) {
+		return guild.getMembers().collect(() -> new LinkedList<>(), (List<Member> l, Member m) -> {
+			if (includeNickname && m.getDisplayName().equalsIgnoreCase(name))
+				l.add(m);
+			else if (m.getUsername().equalsIgnoreCase(name))
+				l.add(m);
+		}).block();
+	}
+
+	public static List<GuildChannel> getChannelsByName(Guild guild, String name) {
+		return guild.getChannels()
+				.collect(() -> new LinkedList<>(), (List<GuildChannel> l, GuildChannel m) -> {
+					if (m.getName().equals(name))
+						l.add(m);
+				}).block();
+	}
+
+	public static List<GuildChannel> getChannelsByNameIgnoreCase(Guild guild, String name) {
+		return guild.getChannels()
+				.collect(() -> new LinkedList<>(), (List<GuildChannel> l, GuildChannel m) -> {
+					if (m.getName().equalsIgnoreCase(name))
+						l.add(m);
+				}).block();
 	}
 
 	public static EnumPokemon[] getSuggestedPokemon(String input, int count) {
@@ -219,30 +374,28 @@ public class MiscUtils {
 		return Arrays.stream(numbers).min().orElse(Integer.MAX_VALUE);
 	}
 
-	public static EnumPermissionType getPermissionType(Permissions perm) {
+	public static EnumPermissionType getPermissionType(Permission perm) {
 		switch (perm) {
 		case ADMINISTRATOR:
 		case VIEW_AUDIT_LOG:
-		case MANAGE_SERVER:
-		case MANAGE_ROLES:
-		case MANAGE_CHANNELS:
-		case KICK:
-		case BAN:
+		case MANAGE_GUILD:
+		case KICK_MEMBERS:
+		case BAN_MEMBERS:
 		case CHANGE_NICKNAME:
 		case MANAGE_NICKNAMES:
 		case MANAGE_EMOJIS:
-		case VOICE_CONNECT:
-		case VOICE_SPEAK:
-		case VOICE_MUTE_MEMBERS:
-		case VOICE_DEAFEN_MEMBERS:
-		case VOICE_MOVE_MEMBERS:
-		case VOICE_USE_VAD:
+		case CONNECT:
+		case SPEAK:
+		case MUTE_MEMBERS:
+		case DEAFEN_MEMBERS:
+		case MOVE_MEMBERS:
+		case USE_VAD:
 			return EnumPermissionType.SERVER;
-		case CREATE_INVITE:
-		case MANAGE_CHANNEL:
-		case MANAGE_PERMISSIONS:
+		case CREATE_INSTANT_INVITE:
+		case MANAGE_CHANNELS:
+		case MANAGE_ROLES:
 		case MANAGE_WEBHOOKS:
-		case READ_MESSAGES:
+		case VIEW_CHANNEL:
 		case SEND_MESSAGES:
 		case SEND_TTS_MESSAGES:
 		case MANAGE_MESSAGES:

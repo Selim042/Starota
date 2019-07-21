@@ -3,11 +3,12 @@ package us.myles_selim.starota.assistants.points.commands;
 import java.util.List;
 import java.util.Random;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
 import us.myles_selim.starota.assistants.points.PointServer;
 import us.myles_selim.starota.assistants.points.QuestType;
 import us.myles_selim.starota.commands.BotCommand;
+import us.myles_selim.starota.commands.registry.CommandException;
 
 public class CommandGetQuests extends BotCommand<PointServer> {
 
@@ -23,8 +24,8 @@ public class CommandGetQuests extends BotCommand<PointServer> {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, PointServer server, IChannel channel)
-			throws Exception {
+	public void execute(String[] args, Message message, PointServer server, MessageChannel channel)
+			throws CommandException {
 		Random rand = new Random();
 		// server.setFastQuest(
 		// QuestType.getRandomQuest(rand, true,
@@ -45,12 +46,13 @@ public class CommandGetQuests extends BotCommand<PointServer> {
 		// doneOne = true;
 		// }
 		// if (doneOne)
-		// channel.sendMessage(builder.build());
+		// channel.createMessage(builder.build());
 		// else
-		// channel.sendMessage(new EmbedBuilder().appendDesc("No quests
+		// channel.createMessage(new EmbedBuilder().appendDesc("No quests
 		// active").build());
-		channel.sendMessage(QuestType
-				.getRandomQuest(rand, rand.nextBoolean(), System.currentTimeMillis() + 36000).toEmbed());
+		channel.createEmbed(QuestType
+				.getRandomQuest(rand, rand.nextBoolean(), System.currentTimeMillis() + 36000).toEmbed())
+				.block();
 	}
 
 }

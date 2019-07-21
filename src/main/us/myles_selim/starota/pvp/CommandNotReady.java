@@ -1,8 +1,9 @@
 package us.myles_selim.starota.pvp;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
 import us.myles_selim.starota.commands.BotCommand;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -13,14 +14,14 @@ public class CommandNotReady extends BotCommand<StarotaServer> {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, StarotaServer server, IChannel channel)
-			throws Exception {
-		PlayerProfile profile = server.getProfile(message.getAuthor());
+	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
+			throws CommandException {
+		PlayerProfile profile = server.getProfile(message.getAuthorAsMember().block());
 		if (profile == null || server.isBattleReady(profile.getPoGoName()) < 0)
-			channel.sendMessage("You are not battle ready.");
+			channel.createMessage("You are not battle ready.").block();
 		else {
 			server.notReady(profile.getPoGoName());
-			channel.sendMessage("You are no longer marked as battle ready.");
+			channel.createMessage("You are no longer marked as battle ready.").block();
 		}
 	}
 

@@ -6,15 +6,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IEmoji;
-import sx.blah.discord.util.EmbedBuilder;
+import discord4j.core.object.reaction.ReactionEmoji;
+import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
 import us.myles_selim.starota.enums.EnumWeather;
 import us.myles_selim.starota.misc.data_types.EggEntry;
 import us.myles_selim.starota.misc.data_types.RaidBoss;
+import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
 import us.myles_selim.starota.misc.utils.ImageHelper;
 import us.myles_selim.starota.misc.utils.MiscUtils;
@@ -240,7 +241,7 @@ public class PokedexEntry extends ReactionMessage {
 	}
 
 	// embeds
-	private final Map<String, EmbedObject> embeds = new ConcurrentHashMap<>();
+	private final Map<String, Consumer<? super EmbedCreateSpec>> embeds = new ConcurrentHashMap<>();
 
 	public boolean hasEmbedPrepared(String form) {
 		if (form == null)
@@ -248,11 +249,11 @@ public class PokedexEntry extends ReactionMessage {
 		return embeds.containsKey(form);
 	}
 
-	public EmbedObject toEmbed() {
+	public Consumer<? super EmbedCreateSpec> toEmbed() {
 		return toEmbed("Normal");
 	}
 
-	public EmbedObject toEmbed(String form) {
+	public Consumer<? super EmbedCreateSpec> toEmbed(String form) {
 		if (form == null)
 			form = "Normal";
 		if (embeds.containsKey(form))
@@ -279,12 +280,14 @@ public class PokedexEntry extends ReactionMessage {
 
 		// stats
 		builder.appendField("Type:",
-				(entry.type2 != null ? entry.type1.getEmoji() + "" + entry.type2.getEmoji()
-						: entry.type1.getEmoji() + ""),
+				(entry.type2 != null
+						? MiscUtils.getEmojiDisplay(entry.type1.getEmoji()) + ""
+								+ MiscUtils.getEmojiDisplay(entry.type2.getEmoji())
+						: MiscUtils.getEmojiDisplay(entry.type1.getEmoji()) + ""),
 				true);
 		String weatherString = "";
 		for (EnumWeather w : entry.weatherInfluences)
-			weatherString += w.getEmoji();
+			weatherString += MiscUtils.getEmojiDisplay(w.getEmoji());
 		builder.appendField("Weather Boosts:", weatherString, true);
 		if (entry.forms.length != 1) {
 			String formString = "";
@@ -397,7 +400,7 @@ public class PokedexEntry extends ReactionMessage {
 					"React with a form of the Pokemon shown to get information about the given form.",
 					false);
 
-		EmbedObject embed = builder.build();
+		Consumer<? super EmbedCreateSpec> embed = builder.build();
 		embeds.put(form, embed);
 		return embed;
 	}
@@ -417,10 +420,10 @@ public class PokedexEntry extends ReactionMessage {
 		public String name;
 		public String value;
 
-		public IEmoji getEmoji(PokedexEntry entry) {
+		public ReactionEmoji.Custom getEmoji(PokedexEntry entry) {
 			if (entry.getPokemon().equals(EnumPokemon.ARCEUS)) {
 				EnumPokemonType type = EnumPokemonType.valueOf(name.toUpperCase());
-				return type.getEmoji();
+				return ReactionEmoji.custom(type.getEmoji());
 			}
 			return EmojiServerHelper.getEmoji(entry.name + "_" + name,
 					ImageHelper.getOfficalArtwork(entry.getPokemon(), entry.getFormId(name)));
@@ -437,7 +440,8 @@ public class PokedexEntry extends ReactionMessage {
 
 		@Override
 		public String toString() {
-			return String.format("%s: %.1f%%", type.getEmoji(), effectiveness * 100);
+			return String.format("%s: %.1f%%", MiscUtils.getEmojiDisplay(type.getEmoji()),
+					effectiveness * 100);
 		}
 
 	}
@@ -498,7 +502,7 @@ public class PokedexEntry extends ReactionMessage {
 				out += EXCLUSIVE_MARKER;
 				marked = true;
 			}
-			out += type.getEmoji();
+			out += MiscUtils.getEmojiDisplay(type.getEmoji());
 			return out;
 		}
 
@@ -518,7 +522,7 @@ public class PokedexEntry extends ReactionMessage {
 				out += EXCLUSIVE_MARKER;
 				marked = true;
 			}
-			out += type.getEmoji();
+			out += type.getEmoji().asFormat();
 			return out;
 		}
 

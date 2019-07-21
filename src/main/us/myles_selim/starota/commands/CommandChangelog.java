@@ -2,10 +2,11 @@ package us.myles_selim.starota.commands;
 
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
 
 public class CommandChangelog extends JavaCommand {
@@ -23,8 +24,9 @@ public class CommandChangelog extends JavaCommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel) {
-		channel.sendMessage("```" + Starota.CHANGELOG + "```");
+	public void execute(String[] args, Message message, Guild guild, MessageChannel channel)
+			throws CommandException {
+		channel.createMessage("```" + Starota.CHANGELOG + "```").block();
 	}
 
 }

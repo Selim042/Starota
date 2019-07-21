@@ -1,14 +1,16 @@
 package us.myles_selim.starota.commands.registry.java;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.Permissions;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.Role;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
+import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.commands.registry.ICommand;
 import us.myles_selim.starota.commands.registry.ICommandHandler;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
@@ -35,22 +37,22 @@ public class JavaCommand implements ICommand {
 	}
 
 	@Override
-	public Permissions requiredUsePermission() {
+	public Permission requiredUsePermission() {
 		return null;
 	}
 
 	@Override
-	public EnumSet<Permissions> getCommandPermissions() {
-		return EnumSet.of(Permissions.SEND_MESSAGES);
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.SEND_MESSAGES);
 	}
 
 	@Override
-	public IRole requiredRole(IGuild guild) {
+	public Role requiredRole(Guild guild) {
 		return null;
 	}
 
 	@Override
-	public IChannel requiredChannel(IGuild guild) {
+	public TextChannel requiredChannel(Guild guild) {
 		return null;
 	}
 
@@ -77,8 +79,8 @@ public class JavaCommand implements ICommand {
 	}
 
 	@Override
-	public void execute(String[] args, IMessage message, IGuild guild, IChannel channel)
-			throws Exception {}
+	public void execute(String[] args, Message message, Guild guild, MessageChannel channel)
+			throws CommandException {}
 
 	@Override
 	public int compareTo(ICommand o) {
@@ -87,17 +89,18 @@ public class JavaCommand implements ICommand {
 		return this.category.compareTo(o.getCategory());
 	}
 
-	protected void sendUsage(String prefix, IChannel channel) {
+	protected void sendUsage(String prefix, MessageChannel channel) {
 		sendUsage(prefix, channel, false);
 	}
 
-	protected void sendUsage(String prefix, IChannel channel, boolean adminUsage) {
+	protected void sendUsage(String prefix, MessageChannel channel, boolean adminUsage) {
 		if (adminUsage)
-			channel.sendMessage(
-					String.format("**Admin Usage**: %s%s %s", prefix, getName(), getAdminUsage()));
+			channel.createMessage(
+					String.format("**Admin Usage**: %s%s %s", prefix, getName(), getAdminUsage()))
+					.block();
 		else
-			channel.sendMessage(
-					String.format("**Usage**: %s%s %s", prefix, getName(), getGeneralUsage()));
+			channel.createMessage(
+					String.format("**Usage**: %s%s %s", prefix, getName(), getGeneralUsage())).block();
 	}
 
 	@Override

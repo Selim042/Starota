@@ -51,7 +51,7 @@ public abstract class ServerSetting<V> extends Setting<V> {
 		if (getServer() == null)
 			stor.writeLong(-1);
 		else
-			stor.writeLong(getServer().getLongID());
+			stor.writeLong(getServer().getDiscordGuild().getId().asLong());
 	}
 
 	@Override
