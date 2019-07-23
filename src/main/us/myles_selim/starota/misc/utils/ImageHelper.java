@@ -22,9 +22,22 @@ public class ImageHelper {
 	}
 
 	public static String getOfficalArtwork(EnumPokemon pokemon, int goHubFormId) {
-		return String.format("https://db.pokemongohub.net/images/official/full/%03d"
-				+ (goHubFormId != 0 && goHubFormId != -1 ? "_f" + (goHubFormId + 1) : "") + ".png",
-				pokemon.getId());
+		switch (pokemon) {
+		case MEWTWO:
+			return String.format(
+					"https://db.pokemongohub.net/images/official/full/%03d"
+							+ (goHubFormId < 0 || goHubFormId > 0 ? "_f" + 4 : "") + ".png",
+					pokemon.getId());
+		case WORMADAM:
+		case ROTOM:
+		case ARCEUS:
+			return String.format("https://db.pokemongohub.net/images/official/full/%03d" + ".png",
+					pokemon.getId());
+		default:
+			return String.format("https://db.pokemongohub.net/images/official/full/%03d"
+					+ (goHubFormId != 0 && goHubFormId != -1 ? "_f" + (goHubFormId + 1) : "") + ".png",
+					pokemon.getId());
+		}
 	}
 
 	public static String getRaidEgg(int level) {

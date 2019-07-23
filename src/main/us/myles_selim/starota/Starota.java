@@ -30,7 +30,6 @@ import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.assistants.CommandBots;
-import us.myles_selim.starota.assistants.points.PointBot;
 import us.myles_selim.starota.assistants.pokedex.PokedexBot;
 import us.myles_selim.starota.assistants.registration.RegistrationBot;
 import us.myles_selim.starota.commands.CommandArticleMessage;
@@ -236,7 +235,7 @@ public class Starota {
 							continue;
 						String latestChangelog = (String) server.getDataValue("changesVersion");
 						if (!StarotaConstants.VERSION.equalsIgnoreCase(latestChangelog)) {
-							changesChannel.createMessage("```" + CHANGELOG + "```");
+							changesChannel.createMessage("```" + CHANGELOG + "```").block();
 							server.setDataValue("changesVersion", StarotaConstants.VERSION);
 						} else
 							sentToAll = false;
@@ -290,7 +289,6 @@ public class Starota {
 			updateOwners();
 
 			// hacky, weird thing just to hide the deprecation warning
-			@SuppressWarnings("deprecation")
 			Predicate<Void> f = (v) -> {
 				Timer timer = new Timer();
 				Date midnight = new Date();
@@ -583,9 +581,13 @@ public class Starota {
 	}
 
 	public static void submitStats() {
+		if (!FULLY_STARTED)
+			return;
 		try {
 			getBotListAPI();
-			if (!IS_DEV) {
+			if (IS_DEV)
+				System.out.println("attempting to submit stats (but in dev)");
+			else {
 				System.out.println("Submitting server info to the bot list");
 				BOT_LIST.setStats(CLIENT.getGuilds().collectList().block().size())
 						.whenComplete((v, e) -> {
@@ -604,28 +606,27 @@ public class Starota {
 									System.out.println("Pokedex Submitted");
 							});
 				}
-				if (RegistrationBot.CLIENT != null) {
-					RegistrationBot.getBotListAPI()
-							.setStats(RegistrationBot.CLIENT.getGuilds().collectList().block().size())
-							.whenComplete((v, e) -> {
-								if (e != null)
-									e.printStackTrace();
-								else
-									System.out.println("RegBot Submitted");
-							});
-				}
-				if (PointBot.CLIENT != null) {
-					PointBot.getBotListAPI()
-							.setStats(PointBot.CLIENT.getGuilds().collectList().block().size())
-							.whenComplete((v, e) -> {
-								if (e != null)
-									e.printStackTrace();
-								else
-									System.out.println("Pokedex Submitted");
-							});
-				}
-			} else
-				System.out.println("BOT LIST TOKEN NOT FOUND");
+				// if (RegistrationBot.CLIENT != null) {
+				// RegistrationBot.getBotListAPI()
+				// .setStats(RegistrationBot.CLIENT.getGuilds().collectList().block().size())
+				// .whenComplete((v, e) -> {
+				// if (e != null)
+				// e.printStackTrace();
+				// else
+				// System.out.println("RegBot Submitted");
+				// });
+				// }
+				// if (PointBot.CLIENT != null) {
+				// PointBot.getBotListAPI()
+				// .setStats(PointBot.CLIENT.getGuilds().collectList().block().size())
+				// .whenComplete((v, e) -> {
+				// if (e != null)
+				// e.printStackTrace();
+				// else
+				// System.out.println("Pokedex Submitted");
+				// });
+				// }
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -638,6 +639,8 @@ public class Starota {
 		Snowflake ownerRole = Snowflake.of(539645716583284776L);
 		List<Member> currentOwners = new ArrayList<>();
 		for (Guild g : CLIENT.getGuilds().collectList().block()) {
+			if (!supportServer.getMembers().any((m) -> m.getId().equals(g.getOwnerId())).block())
+				continue;
 			Member owner = supportServer.getMemberById(g.getOwnerId()).block();
 			if (owner == null)
 				continue;

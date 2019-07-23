@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import org.reflections.Reflections;
@@ -12,6 +13,7 @@ import org.reflections.scanners.MethodAnnotationsScanner;
 import discord4j.core.event.domain.guild.GuildCreateEvent;
 import discord4j.core.event.domain.guild.GuildDeleteEvent;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
+import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.event.domain.role.RoleUpdateEvent;
 import discord4j.core.object.entity.Guild;
@@ -20,6 +22,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.PrivateChannel;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.Snowflake;
 import us.myles_selim.starota.debug_server.DebugServer;
 import us.myles_selim.starota.misc.data_types.cache.ClearCache;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
@@ -28,6 +31,20 @@ import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class EventHandler implements EventListener {
+
+	private Set<ReadyEvent.Guild> guildsWereIn;
+
+	private boolean isInGuild(Snowflake guildId) {
+		for (ReadyEvent.Guild g : guildsWereIn)
+			if (g.getId().equals(guildId))
+				return true;
+		return false;
+	}
+
+	@EventSubscriber
+	public void onReady(ReadyEvent event) {
+		guildsWereIn = event.getGuilds();
+	}
 
 	@EventSubscriber
 	public void onMessageRecieved(MessageCreateEvent event) {
@@ -43,11 +60,13 @@ public class EventHandler implements EventListener {
 
 	@EventSubscriber
 	public void onServerCreate(GuildCreateEvent event) {
-		Starota.submitStats();
-		Starota.updateOwners();
+		if (!Starota.FULLY_STARTED || isInGuild(event.getGuild().getId()))
+			return;
 		Guild server = event.getGuild();
 		if (!server.getMembers().collectList().block().contains(Starota.getOurUser()))
 			return;
+		Starota.submitStats();
+		Starota.updateOwners();
 		User selimUser = Starota.getUser(StarotaConstants.SELIM_USER_ID.asLong());
 		PrivateChannel selimPm = selimUser.getPrivateChannel().block();
 		selimPm.createMessage("Starota was added to the server: " + server.getName());

@@ -13,7 +13,7 @@ public class FormSetMewtwo extends FormSet {
 
 			@Override
 			public String getSpritePostfix(EnumPokemon pokemon) {
-				return "armored";
+				return "Armored";
 			}
 		});
 	}
