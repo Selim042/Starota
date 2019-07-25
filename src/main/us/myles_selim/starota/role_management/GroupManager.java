@@ -34,7 +34,7 @@ public class GroupManager {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static void setAsGroup(StarotaServer server, Role role, boolean isGroup) {
+	public static boolean setAsGroup(StarotaServer server, Role role, boolean isGroup) {
 		EBList<Long> roles;
 		if (server.hasDataKey(ROLES_KEY))
 			roles = (EBList<Long>) server.getDataValue(ROLES_KEY);
@@ -43,9 +43,9 @@ public class GroupManager {
 			server.setDataValue(ROLES_KEY, roles);
 		}
 		if (isGroup)
-			roles.addWrapped(role.getId().asLong());
+			return roles.addWrapped(role.getId().asLong());
 		else
-			roles.removeWrapped(role.getId().asLong());
+			return roles.removeWrapped(role.getId().asLong());
 	}
 
 }

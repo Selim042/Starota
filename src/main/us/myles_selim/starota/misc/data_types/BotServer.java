@@ -10,8 +10,10 @@ import java.util.function.Consumer;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.object.entity.Guild;
+import us.myles_selim.ebs.EBList;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.ebs.IOHelper;
+import us.myles_selim.ebs.callbacks.OnWriteCallback;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.settings.Setting;
 import us.myles_selim.starota.commands.settings.SettingSet;
@@ -30,9 +32,10 @@ public abstract class BotServer {
 
 	public BotServer(DiscordClient client, Guild guild) {
 		this.client = client;
-		this.guild = guild;
-		if (!client.equals(guild.getClient()))
-			throw new IllegalArgumentException("guild client does not match supplied client");
+		this.guild = client.getGuildById(guild.getId()).block();
+		// if (!client.equals(guild.getClient()))
+		// throw new IllegalArgumentException("guild client does not match
+		// supplied client");
 	}
 
 	public static <S extends BotServer> void registerServerType(DiscordClient client,
@@ -89,6 +92,22 @@ public abstract class BotServer {
 	public Object getDataValue(String key) {
 		EBStorage ebs = getDataInternal();
 		Object obj = ebs.get(key);
+		if (obj instanceof EBStorage)
+			((EBStorage) obj).setOnWriteCallback(new OnWriteCallback() {
+
+				@Override
+				public void onWriteEBS(EBStorage ebsInner) {
+					ebs.flush();
+				}
+			});
+		if (obj instanceof EBList)
+			((EBList<?>) obj).setOnWriteCallback(new OnWriteCallback() {
+
+				@Override
+				public void onWriteEBL(EBList<?> eblInner) {
+					ebs.flush();
+				}
+			});
 		if (obj instanceof SettingSet)
 			((SettingSet) obj).setWriteCallback(() -> ebs.flush());
 		return obj;

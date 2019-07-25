@@ -3,6 +3,7 @@ package us.myles_selim.starota.misc.utils;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -172,6 +173,9 @@ public class MiscUtils {
 	}
 
 	public static List<Role> getRolesByName(Guild guild, String name, boolean caseSensitive) {
+		if (name.matches("<@&\\d{18}>"))
+			return Collections.singletonList(
+					guild.getRoleById(Snowflake.of(name.substring(3, name.length() - 1))).block());
 		return guild.getRoles().collect(() -> new LinkedList<>(), (List<Role> l, Role u) -> {
 			if (caseSensitive) {
 				if (u.getName().equals(name))

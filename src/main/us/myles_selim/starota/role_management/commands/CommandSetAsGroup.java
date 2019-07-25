@@ -39,7 +39,11 @@ public class CommandSetAsGroup extends BotCommand<StarotaServer> {
 			return;
 		}
 		boolean isGroup = args[2].equalsIgnoreCase("true");
-		GroupManager.setAsGroup(server, targetRole, isGroup);
+		boolean changed = GroupManager.setAsGroup(server, targetRole, isGroup);
+		if (!changed) {
+			channel.createMessage("An unknown error has occured.").block();
+			return;
+		}
 		if (isGroup)
 			channel.createMessage("Role \"" + targetRole.getName() + "\" is now an assignable group.")
 					.block();
