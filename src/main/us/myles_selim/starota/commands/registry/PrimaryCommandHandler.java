@@ -159,7 +159,7 @@ public class PrimaryCommandHandler implements EventListener {
 				builder.appendDesc("- " + prefix + cmd.getName()
 						+ (desciption == null ? "" : ", _" + cmd.getDescription() + "_") + "\n");
 			}
-			channel.createEmbed(builder.build());
+			channel.createEmbed(builder.build()).block();
 		}
 		// if (channel.getTypingStatus()
 		// &&
