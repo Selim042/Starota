@@ -62,6 +62,19 @@ public class ReactionMessage {
 		return this;
 	}
 
+	public boolean isButton(ReactionEmoji emoji) {
+		return buttons.containsKey(emoji);
+	}
+
+	public boolean removeButton(ReactionEmoji emoji) {
+		if (buttons.containsKey(emoji)) {
+			buttons.remove(emoji);
+			return true;
+		}
+		return false;
+	}
+
+	@SuppressWarnings("deprecation")
 	public final Message createMessage(TextChannel channel) {
 		registry = ReactionMessageRegistry.getRegistry(channel.getClient());
 		Consumer<? super EmbedCreateSpec> emb = getEmbed(
@@ -69,6 +82,8 @@ public class ReactionMessage {
 		msg = channel.createEmbed(emb).block();
 		registry.messages.put(msg.getId().asString(), this);
 		StarotaServer sserver = StarotaServer.getServer(channel.getGuild().block());
+		if (this instanceof IHelpReactionMessage)
+			((IHelpReactionMessage) this).addHelpButton(this, sserver);
 		onSend(sserver, channel, msg);
 		if (this instanceof PersistReactionMessage)
 			registry.serialize(sserver, msg, (PersistReactionMessage) this);
@@ -144,6 +159,15 @@ public class ReactionMessage {
 
 	public interface IButtonAction {
 
+		/**
+		 * @param message
+		 *            The message that was reacted to
+		 * @param user
+		 *            The member that reacted
+		 * @param added
+		 *            Whether the reaction was added or removed
+		 * @return Whether the reaction should be removed after handling
+		 */
 		public boolean execute(Message message, Member user, boolean added);
 
 	}

@@ -13,6 +13,7 @@ import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumWeather;
+import us.myles_selim.starota.misc.data_types.BotServer;
 import us.myles_selim.starota.misc.data_types.RaidBoss;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
@@ -23,12 +24,13 @@ import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.pokedex.GoHubDatabase;
 import us.myles_selim.starota.pokedex.PokedexEntry;
 import us.myles_selim.starota.pokedex.PokedexEntry.DexCounter;
+import us.myles_selim.starota.reaction_messages.IHelpReactionMessage;
 import us.myles_selim.starota.reaction_messages.ReactionMessage;
 import us.myles_selim.starota.silph_road.SilphRoadData;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class RaidReactionMessage extends ReactionMessage {
+public class RaidReactionMessage extends ReactionMessage implements IHelpReactionMessage {
 
 	private static final String EX_RAID_EMOJI = "ex_raid";
 	private static final String RAID_EMOJI = "raid";
@@ -65,6 +67,7 @@ public class RaidReactionMessage extends ReactionMessage {
 		this.location = location;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onReactionAdded(StarotaServer server, TextChannel channel, Message msg, Member user,
 			ReactionEmoji react) {
@@ -82,6 +85,10 @@ public class RaidReactionMessage extends ReactionMessage {
 			if (boss == null)
 				return;
 			msg.removeAllReactions().block();
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {}
+			this.addHelpButton(this, server);
 			for (int i = 0; i < EMOJI_NAMES.length - 2; i++) {
 				int iF = i;
 				msg.addReaction(ReactionEmoji.unicode(EMOJI_NAMES[iF])).block();
@@ -182,18 +189,6 @@ public class RaidReactionMessage extends ReactionMessage {
 			if (!counterString.isEmpty())
 				builder.appendField("Counters:", counterString, false);
 		}
-		if (pokemon == null)
-			builder.appendField("Reaction Usage:",
-					"React with the raid Pokemon to indicate what Pokemon the raid is for.", false);
-		else
-			builder.appendField("Reaction Usage:",
-					"React with a numbered emoji to indicate how many people you will be bringing to the raid.\n"
-							+ "React with "
-							+ MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("here"))
-							+ " to indicate that you and your other people are at the raid location.\n"
-							+ "React with " + ReactionEmoji.unicode(EMOJI_NAMES[6]).getRaw()
-							+ " if you are no longer able to attend.",
-					false);
 		return builder.build();
 	}
 
@@ -216,6 +211,22 @@ public class RaidReactionMessage extends ReactionMessage {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {}
 		}
+	}
+
+	@Override
+	public Consumer<? super EmbedCreateSpec> getHelpEmbed(BotServer server) {
+		EmbedBuilder builder = new EmbedBuilder();
+		if (pokemon == null)
+			builder.appendDescription("**Reaction Usage**:\n"
+					+ "React with the raid Pokemon to indicate what Pokemon the raid is for.");
+		else
+			builder.appendDescription("**Reaction Usage**:\n"
+					+ "React with a numbered emoji to indicate how many people you will be bringing to the raid.\n"
+					+ "React with " + MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("here"))
+					+ " to indicate that you and your other people are at the raid location.\n"
+					+ "React with " + ReactionEmoji.unicode(EMOJI_NAMES[6]).getRaw()
+					+ " if you are no longer able to attend.");
+		return builder.build();
 	}
 
 }

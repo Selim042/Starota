@@ -14,6 +14,11 @@ public class FormSetRaichuHat extends FormSetPikachuHat {
 			public boolean canBeShiny(EnumPokemon pokemon) {
 				return false;
 			}
+
+			@Override
+			public String getSpritePostfix(EnumPokemon pokemon) {
+				return "Alola";
+			}
 		});
 	}
 

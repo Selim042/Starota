@@ -7,6 +7,7 @@ import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.message.MessageDeleteEvent;
 import discord4j.core.event.domain.message.MessageUpdateEvent;
 import discord4j.core.event.domain.message.ReactionAddEvent;
+import discord4j.core.event.domain.message.ReactionRemoveAllEvent;
 import discord4j.core.event.domain.message.ReactionRemoveEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Message;
@@ -78,8 +79,18 @@ public class ReactionMessageRegistry implements EventListener {
 		rMsg.onReactionRemoved(StarotaServer.getServer(event.getGuild().block()),
 				(TextChannel) event.getChannel().block(), msg,
 				event.getUser().block().asMember(event.getGuildId().get()).block(), event.getEmoji());
+		rMsg.removeButton(event.getEmoji());
 		// }
 		// });
+	}
+
+	@EventSubscriber
+	public void onReactRemove(ReactionRemoveAllEvent event) {
+		Message msg = event.getMessage().block();
+		if (!messages.containsKey(msg.getId().asString()))
+			return;
+		ReactionMessage rMsg = messages.get(msg.getId().asString());
+		rMsg.clearButtons();
 	}
 
 	@EventSubscriber
