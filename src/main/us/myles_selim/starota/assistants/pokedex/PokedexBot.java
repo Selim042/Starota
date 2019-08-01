@@ -15,7 +15,7 @@ import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.GuildChannel;
 import discord4j.core.object.entity.Member;
-import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.PrivateChannel;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
@@ -34,6 +34,7 @@ import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 import us.myles_selim.starota.misc.data_types.BotServer;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
+import us.myles_selim.starota.misc.utils.StatusUpdater;
 import us.myles_selim.starota.pokedex.CommandPokedex;
 import us.myles_selim.starota.reaction_messages.ReactionMessageRegistry;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -67,7 +68,7 @@ public class PokedexBot {
 		}
 		DiscordClientBuilder builder = new DiscordClientBuilder(PROPERTIES.getProperty("pokedex_bot"));
 		CLIENT = builder.build();
-		Thread botRun = new Thread() {
+		Thread botRun = new Thread("PokedexClient") {
 
 			@Override
 			public void run() {
@@ -78,32 +79,20 @@ public class PokedexBot {
 
 		BotServer.registerServerType(CLIENT, StarotaServer.class);
 		COMMAND_HANDLER = new PrimaryCommandHandler(CLIENT, (Channel ch) -> {
-			if (!(ch instanceof TextChannel))
+			if (ch instanceof PrivateChannel)
 				return false;
-			User starota = CLIENT.getUserById(StarotaConstants.STAROTA_ID).block();
-			User starotaDev = CLIENT.getUserById(StarotaConstants.STAROTA_DEV_ID).block();
-			List<Member> users = MiscUtils.getMembersHere((GuildChannel) ch);
-			if (users.contains(starota) || users.contains(starotaDev))
+			if (MiscUtils.getMembersHereFlux((GuildChannel) ch)
+					.any((m) -> m.getId().equals(StarotaConstants.STAROTA_ID)
+							|| m.getId().equals(StarotaConstants.STAROTA_DEV_ID))
+					.block())
 				return false;
 			return true;
 		});
 		REACTION_MESSAGES_REGISTRY = new ReactionMessageRegistry(CLIENT);
-		Thread statusUpdater = new Thread("PokedexStatusUpdater") {
-
-			@Override
-			public void run() {
-				while (true) {
-					CLIENT.updatePresence(Presence.online(Activity.playing("v" + StarotaConstants.VERSION
-							+ (Starota.DEBUG || Starota.IS_DEV ? "d" : ""))));
-					try {
-						Thread.sleep(3600000); // 1 hour
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		};
-		statusUpdater.start();
+		StatusUpdater statuses = new StatusUpdater(CLIENT);
+		statuses.addPresence(Presence.online(Activity.playing(
+				"v" + StarotaConstants.VERSION + (Starota.DEBUG || Starota.IS_DEV ? "d" : ""))));
+		statuses.start();
 
 		JavaCommandHandler jCmdHandler = new JavaCommandHandler(CLIENT);
 		COMMAND_HANDLER.registerCommandHandler(jCmdHandler);

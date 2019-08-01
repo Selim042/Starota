@@ -22,6 +22,7 @@ import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.PermissionSet;
 import discord4j.core.object.util.Snowflake;
+import reactor.core.publisher.Flux;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumTeam;
@@ -76,6 +77,14 @@ public class MiscUtils {
 			if (v == val || v.equalsIgnoreCase(val))
 				return true;
 		return false;
+	}
+
+	public static Flux<Member> getMembersHereFlux(GuildChannel ch) {
+		Guild guild = ch.getGuild().block();
+		return guild.getMembers().filter((user) -> {
+			PermissionSet permissions = ch.getEffectivePermissions(user.getId()).block();
+			return hasPermission(Permission.VIEW_CHANNEL, generatePermissionNumber(permissions), true);
+		});
 	}
 
 	public static List<Member> getMembersHere(GuildChannel ch) {

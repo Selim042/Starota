@@ -31,9 +31,10 @@ public class StatusUpdater extends Thread {
 			Presence presence = this.presences.get(statusIndex++);
 			this.client.updatePresence(presence).block();
 			if (Starota.IS_DEV)
-				System.out.println("updating presence: " + presence.getStatus() + ", "
-						+ presence.getActivity().get().getType() + ", "
-						+ presence.getActivity().get().getName());
+				System.out.println(
+						this.client.getApplicationInfo().block().getName() + ": updating presence: "
+								+ presence.getStatus() + ", " + presence.getActivity().get().getType()
+								+ ", " + presence.getActivity().get().getName());
 			try {
 				Thread.sleep(300000); // 5 mins
 			} catch (InterruptedException e) {
