@@ -34,10 +34,12 @@ public class EventHandler implements EventListener {
 
 	private Set<ReadyEvent.Guild> guildsWereIn;
 
-	private boolean isInGuild(Snowflake guildId) {
+	private boolean isInGuildAtStart(Snowflake guildId) {
 		for (ReadyEvent.Guild g : guildsWereIn)
-			if (g.getId().equals(guildId))
+			if (g.getId().asLong() == guildId.asLong()) {
+				System.out.println("was in guild at start");
 				return true;
+			}
 		return false;
 	}
 
@@ -60,7 +62,11 @@ public class EventHandler implements EventListener {
 
 	@EventSubscriber
 	public void onServerCreate(GuildCreateEvent event) {
-		if (!Starota.FULLY_STARTED || isInGuild(event.getGuild().getId()))
+		if (isInGuildAtStart(event.getGuild().getId())) {
+			System.out.println("skipped stats submission");
+			return;
+		}
+		if (!Starota.FULLY_STARTED || Starota.FULLY_STARTED)
 			return;
 		Guild server = event.getGuild();
 		if (!server.getMembers().collectList().block().contains(Starota.getOurUser()))
@@ -86,12 +92,12 @@ public class EventHandler implements EventListener {
 					+ " requires the `SEND_MESSAGES` permission for all command functionality.");
 	}
 
-	@EventSubscriber
-	public void onServerLeave(GuildDeleteEvent event) {
-		if (!event.isUnavailable())
-			StarotaServer.getServer(event.getGuild().get()).clearDataOptions();
-		Starota.updateOwners();
-	}
+//	@EventSubscriber
+//	public void onServerLeave(GuildDeleteEvent event) {
+//		if (!event.isUnavailable())
+//			StarotaServer.getServer(event.getGuild().get()).clearDataOptions();
+//		Starota.updateOwners();
+//	}
 
 	@EventSubscriber
 	public void onUserJoin(MemberJoinEvent event) {

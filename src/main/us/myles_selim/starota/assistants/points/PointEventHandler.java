@@ -2,8 +2,10 @@ package us.myles_selim.starota.assistants.points;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import discord4j.core.event.domain.guild.GuildCreateEvent;
+import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Attachment;
 import discord4j.core.object.entity.Guild;
@@ -11,6 +13,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.PrivateChannel;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.Snowflake;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.EventListener;
@@ -18,12 +21,33 @@ import us.myles_selim.starota.misc.utils.IJournalEntry;
 import us.myles_selim.starota.misc.utils.ImageHelper;
 import us.myles_selim.starota.misc.utils.OcrHelper;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
+import us.myles_selim.starota.misc.utils.EventListener.EventSubscriber;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class PointEventHandler implements EventListener {
 
+	private Set<ReadyEvent.Guild> guildsWereIn;
+
+	private boolean isInGuildAtStart(Snowflake guildId) {
+		for (ReadyEvent.Guild g : guildsWereIn)
+			if (g.getId().asLong() == guildId.asLong()) {
+				System.out.println("was in guild at start");
+				return true;
+			}
+		return false;
+	}
+
+	@EventSubscriber
+	public void onReady(ReadyEvent event) {
+		guildsWereIn = event.getGuilds();
+	}
+
 	@EventSubscriber
 	public void onServerCreate(GuildCreateEvent event) {
+		if (isInGuildAtStart(event.getGuild().getId())) {
+			System.out.println("skipped stats submission");
+			return;
+		}
 		if (!event.getGuild().getMembers().collectList().block()
 				.contains(PointBot.CLIENT.getUserById(StarotaConstants.STAROTA_ID).block())) {
 			PrivateChannel pm = event.getGuild().getOwner().block().getPrivateChannel().block();

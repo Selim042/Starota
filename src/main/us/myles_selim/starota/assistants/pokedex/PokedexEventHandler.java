@@ -1,6 +1,9 @@
 package us.myles_selim.starota.assistants.pokedex;
 
+import java.util.Set;
+
 import discord4j.core.event.domain.guild.GuildCreateEvent;
+import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.PrivateChannel;
@@ -14,8 +17,24 @@ import us.myles_selim.starota.misc.utils.StarotaConstants;
 
 public class PokedexEventHandler implements EventListener {
 
+	private Set<ReadyEvent.Guild> guildsWereIn;
+
+	private boolean isInGuildAtStart(Snowflake guildId) {
+		for (ReadyEvent.Guild g : guildsWereIn)
+			if (g.getId().asLong() == guildId.asLong())
+				return true;
+		return false;
+	}
+
+	@EventSubscriber
+	public void onReady(ReadyEvent event) {
+		guildsWereIn = event.getGuilds();
+	}
+
 	@EventSubscriber
 	public void onServerCreate(GuildCreateEvent event) {
+		if (isInGuildAtStart(event.getGuild().getId()))
+			return;
 		Starota.submitStats();
 		PokedexBot.updateOwners();
 		Guild server = event.getGuild();

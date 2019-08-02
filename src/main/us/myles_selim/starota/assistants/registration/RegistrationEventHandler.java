@@ -1,6 +1,9 @@
 package us.myles_selim.starota.assistants.registration;
 
+import java.util.Set;
+
 import discord4j.core.event.domain.guild.GuildCreateEvent;
+import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Attachment;
 import discord4j.core.object.entity.Guild;
@@ -8,6 +11,7 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.PrivateChannel;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.Snowflake;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.EventListener;
@@ -19,10 +23,28 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class RegistrationEventHandler implements EventListener {
 
+	private Set<ReadyEvent.Guild> guildsWereIn;
+
+	private boolean isInGuildAtStart(Snowflake guildId) {
+		for (ReadyEvent.Guild g : guildsWereIn)
+			if (g.getId().asLong() == guildId.asLong()) {
+				System.out.println("was in guild at start");
+				return true;
+			}
+		return false;
+	}
+
+	@EventSubscriber
+	public void onReady(ReadyEvent event) {
+		guildsWereIn = event.getGuilds();
+	}
+
 	@EventSubscriber
 	public void onServerCreate(GuildCreateEvent event) {
-		if (!event.getGuild().getMembers().collectList().block()
-				.contains(RegistrationBot.CLIENT.getUserById(StarotaConstants.STAROTA_ID))) {
+		if (isInGuildAtStart(event.getGuild().getId()))
+			return;
+		if (!event.getGuild().getMembers().any((m) -> m.getId().equals(StarotaConstants.STAROTA_ID))
+				.block()) {
 			PrivateChannel pm = event.getGuild().getOwner().block().getPrivateChannel().block();
 			pm.createMessage("This bot requires Starota to also be added to the server.  "
 					+ "Follow the link below to add it.  "
