@@ -48,8 +48,12 @@ public class CommandLookingFor extends BotCommand<StarotaServer> {
 			channel.createMessage("Pokemon \"" + args[1] + "\" not found").block();
 			return;
 		}
-		if (!pokemon.isShinyable()) {
+		if (!pokemon.isAvailable()) {
 			channel.createMessage("Pokemon **" + pokemon + "** is not available").block();
+			return;
+		}
+		if (pokemonInst.getShiny() && !pokemon.isShinyable()) {
+			channel.createMessage("Pokemon **" + pokemon + "** is not shinyable").block();
 			return;
 		}
 		if (!pokemon.isTradable()) {

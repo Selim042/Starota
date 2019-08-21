@@ -52,6 +52,10 @@ public class CommandForTrade extends BotCommand<StarotaServer> {
 			channel.createMessage("Pokemon **" + pokemon + "** is not available").block();
 			return;
 		}
+		if (pokemonInst.getShiny() && !pokemon.isShinyable()) {
+			channel.createMessage("Pokemon **" + pokemon + "** is not shinyable").block();
+			return;
+		}
 		if (!pokemon.isTradable()) {
 			channel.createMessage("Pokemon **" + pokemon + "** is not tradable").block();
 			return;
