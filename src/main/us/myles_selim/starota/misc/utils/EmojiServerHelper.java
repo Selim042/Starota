@@ -34,7 +34,7 @@ public class EmojiServerHelper {
 		return EMOJI_SERVERS.length;
 	}
 
-	public static ReactionEmoji.Custom getEmoji(String name) {
+	public static GuildEmoji getGuildEmoji(String name) {
 		final String name2 = name.replaceAll("-", "_");
 		for (long id : EMOJI_SERVERS) {
 			Guild guild = Starota.getGuild(id);
@@ -44,14 +44,18 @@ public class EmojiServerHelper {
 							l.add(e);
 					}).block();
 			if (emojis.size() >= 1)
-				return ReactionEmoji.custom(emojis.get(0));
+				return emojis.get(0);
 		}
 		return null;
 	}
 
-	public static ReactionEmoji.Custom getEmoji(String name, String fallback) {
+	public static ReactionEmoji.Custom getEmoji(String name) {
+		return ReactionEmoji.custom(getGuildEmoji(name));
+	}
+
+	public static GuildEmoji getGuildEmoji(String name, String fallback) {
 		String namef = name.replaceAll("-", "_").replaceAll("♂", "M").replaceAll("♀", "F");
-		ReactionEmoji.Custom emoji = getEmoji(namef);
+		GuildEmoji emoji = getGuildEmoji(namef);
 		if (emoji != null)
 			return emoji;
 		Image img = getImage(fallback);
@@ -69,13 +73,17 @@ public class EmojiServerHelper {
 			if (gemoji != null) {
 				System.out.println(
 						"uploading missing emoji " + namef + " to " + guild.getName() + ", " + fallback);
-				return ReactionEmoji.custom(gemoji);
+				return gemoji;
 			}
 		}
 		Starota.getClient().getUserById(StarotaConstants.SELIM_USER_ID).block().getPrivateChannel()
 				.block().createMessage(
 						"Emoji servers are full, trying to upload " + namef + " with image " + fallback);
 		return null;
+	}
+
+	public static ReactionEmoji.Custom getEmoji(String name, String fallback) {
+		return ReactionEmoji.custom(getGuildEmoji(name, fallback));
 	}
 
 	private static Image getImage(String url) {

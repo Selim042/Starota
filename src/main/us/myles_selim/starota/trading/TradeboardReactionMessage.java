@@ -5,7 +5,8 @@ import java.util.function.Consumer;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.User;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -39,7 +40,7 @@ public class TradeboardReactionMessage extends PersistReactionMessage {
 	}
 
 	@Override
-	public void onSend(StarotaServer server, TextChannel channel, Message msg) {
+	public void onSend(StarotaServer server, MessageChannel channel, Message msg) {
 		this.guild = server.getDiscordGuild();
 
 		msg.addReaction(ReactionEmoji.unicode(CONFIRM_EMOJI)).block();
@@ -47,7 +48,7 @@ public class TradeboardReactionMessage extends PersistReactionMessage {
 	}
 
 	@Override
-	public void onReactionAdded(StarotaServer server, TextChannel channel, Message msg, Member user,
+	public void onReactionAdded(StarotaServer server, MessageChannel channel, Message msg, User user,
 			ReactionEmoji react) {
 		if (!react.asUnicodeEmoji().isPresent())
 			return;
@@ -57,7 +58,7 @@ public class TradeboardReactionMessage extends PersistReactionMessage {
 			TradeboardPost post = server.getPost(this.postId);
 			Member poster = server.getDiscordGuild().getMemberById(Snowflake.of(post.getOwner()))
 					.block();
-			String nickname = user.getDisplayName();
+			String nickname = user.asMember(server.getDiscordGuild().getId()).block().getDisplayName();
 			if (nickname != null)
 				nickname += " (_" + poster.getUsername() + "#" + poster.getDiscriminator() + "_)";
 			else

@@ -27,13 +27,7 @@ public class FormSetAlolan extends FormSet {
 
 		@Override
 		public boolean canBeShiny(EnumPokemon pokemon) {
-			switch (pokemon) {
-			case MAROWAK:
-			case RAICHU:
-				return true;
-			default:
-				return false;
-			}
+			return true;
 		}
 
 		@Override
@@ -106,6 +100,22 @@ public class FormSetAlolan extends FormSet {
 
 		public FormKantonian() {
 			super(0);
+		}
+
+		@Override
+		public boolean canBeShiny(EnumPokemon pokemon) {
+			switch (pokemon) {
+			case VULPIX:
+			case NINETALES:
+				return false;
+			case MEOWTH:
+			case PERSIAN:
+				return false;
+			case EXEGGUTOR:
+				return false;
+			default:
+				return pokemon.isShinyable();
+			}
 		}
 
 		@Override

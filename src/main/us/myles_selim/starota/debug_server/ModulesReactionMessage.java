@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import discord4j.core.object.entity.Guild;
-import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.User;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.ebs.Storage;
@@ -27,14 +27,14 @@ public class ModulesReactionMessage extends PersistReactionMessage {
 	private int index = 0;
 
 	@Override
-	public void onSend(StarotaServer server, TextChannel channel, Message msg) {
+	public void onSend(StarotaServer server, MessageChannel channel, Message msg) {
 		msg.addReaction(ReactionEmoji.unicode(LEFT_EMOJI)).block();
 		msg.addReaction(ReactionEmoji.unicode(RIGHT_EMOJI)).block();
 		msg.addReaction(ReactionEmoji.unicode(REFRESH_EMOJI)).block();
 	}
 
 	@Override
-	public void onReactionAdded(StarotaServer server, TextChannel channel, Message msg, Member user,
+	public void onReactionAdded(StarotaServer server, MessageChannel channel, Message msg, User user,
 			ReactionEmoji react) {
 		int numPages = (Starota.getClient().getGuilds().collectList().block().size()
 				- EmojiServerHelper.getNumberServers() - 1) / SERVERS_PER_PAGE;

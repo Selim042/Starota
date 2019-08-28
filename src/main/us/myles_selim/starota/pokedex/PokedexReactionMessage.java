@@ -2,9 +2,9 @@ package us.myles_selim.starota.pokedex;
 
 import java.util.function.Consumer;
 
-import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.User;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.reaction.ReactionEmoji.Custom;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -33,7 +33,7 @@ public class PokedexReactionMessage extends ReactionMessage {
 	}
 
 	@Override
-	public void onSend(StarotaServer server, TextChannel channel, Message msg) {
+	public void onSend(StarotaServer server, MessageChannel channel, Message msg) {
 		if (entry.forms.length <= 1)
 			return;
 		for (int i = 0; i < entry.forms.length; i++) {
@@ -48,13 +48,13 @@ public class PokedexReactionMessage extends ReactionMessage {
 	}
 
 	@Override
-	public void onEdit(StarotaServer server, TextChannel channel, Message msg) {
+	public void onEdit(StarotaServer server, MessageChannel channel, Message msg) {
 		if (!sendForms)
 			onSend(server, channel, msg);
 	}
 
 	@Override
-	public void onReactionAdded(StarotaServer server, TextChannel channel, Message msg, Member user,
+	public void onReactionAdded(StarotaServer server, MessageChannel channel, Message msg, User user,
 			ReactionEmoji react) {
 		if (!react.asCustomEmoji().isPresent())
 			return;
@@ -91,7 +91,7 @@ public class PokedexReactionMessage extends ReactionMessage {
 	}
 
 	@Override
-	public void onReactionRemoved(StarotaServer server, TextChannel channel, Message msg, Member user,
+	public void onReactionRemoved(StarotaServer server, MessageChannel channel, Message msg, User user,
 			ReactionEmoji react) {}
 
 	@Override

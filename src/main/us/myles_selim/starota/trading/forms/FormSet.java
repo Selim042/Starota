@@ -27,6 +27,8 @@ public abstract class FormSet {
 	}
 
 	public Form getForm(String form) {
+		if (form == null || form.equalsIgnoreCase("Normal"))
+			return getDefaultForm();
 		for (Form f : forms) {
 			String formName = f.toString().replaceAll("\\.", "").replaceAll(" ", "_");
 			String postfix = f.getSpritePostfix(null);

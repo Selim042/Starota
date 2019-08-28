@@ -8,6 +8,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.PermissionSet;
 
@@ -30,9 +31,16 @@ public interface ICommand extends Comparable<ICommand> {
 	@Deprecated
 	public Role requiredRole(Guild guild);
 
-	public default boolean hasRequiredRole(Guild guild, Member user) {
+	public default boolean hasRequiredRole(Guild guild, User user) {
+		if (guild == null || user == null)
+			return true;
+		Member member = user.asMember(guild.getId()).block();
+		if (member == null)
+			return false;
 		Role reqRole = requiredRole(guild);
-		return reqRole == null || user.getRoleIds().contains(reqRole.getId());
+		if (reqRole == null)
+			return true;
+		return member.getRoleIds().contains(reqRole.getId());
 	}
 
 	/**
@@ -45,7 +53,7 @@ public interface ICommand extends Comparable<ICommand> {
 
 	public default boolean isRequiredChannel(Guild guild, MessageChannel ch) {
 		TextChannel reqCh = requiredChannel(guild);
-		return reqCh == null || requiredChannel(guild).equals(ch);
+		return reqCh == null || reqCh.equals(ch);
 	}
 
 	public String getName();

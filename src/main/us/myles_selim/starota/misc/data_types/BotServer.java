@@ -156,6 +156,13 @@ public abstract class BotServer {
 		return getSettings().getSetting(name);
 	}
 
+	public String getSettingString(String name) {
+		for (Setting<?> s : getSettings())
+			if (s.getName().equalsIgnoreCase(name))
+				return s.getValueString();
+		return "null";
+	}
+
 	public EnumReturnSetStatus setSetting(String name, String value) {
 		return getSettings().setSetting(name, value);
 	}

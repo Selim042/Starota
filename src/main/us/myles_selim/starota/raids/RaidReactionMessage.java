@@ -8,7 +8,8 @@ import java.util.function.Consumer;
 
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.User;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.enums.EnumPokemon;
@@ -69,7 +70,7 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void onReactionAdded(StarotaServer server, TextChannel channel, Message msg, Member user,
+	public void onReactionAdded(StarotaServer server, MessageChannel channel, Message msg, User user,
 			ReactionEmoji react) {
 		msg.removeReaction(react, user.getId()).block();
 		String emojiName = MiscUtils.getEmojiName(react);
@@ -109,7 +110,7 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 					emoji = attending.get(user);
 				else
 					emoji = ReactionEmoji.unicode(EMOJI_NAMES[0]);
-				here.put(user, emoji);
+				here.put(user.asMember(server.getDiscordGuild().getId()).block(), emoji);
 				if (attending.containsKey(user))
 					attending.remove(user);
 			} else if (emojiName.equals(EMOJI_NAMES[6])) {
@@ -120,7 +121,7 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 			} else {
 				if (here.containsKey(user))
 					here.remove(user);
-				attending.put(user, react);
+				attending.put(user.asMember(server.getDiscordGuild().getId()).block(), react);
 			}
 		}
 		msg.edit((m) -> m.setEmbed(getEmbed(server))).block();
@@ -193,7 +194,7 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 	}
 
 	@Override
-	public void onSend(StarotaServer server, TextChannel channel, Message msg) {
+	public void onSend(StarotaServer server, MessageChannel channel, Message msg) {
 		if (boss != null) {
 			for (int i = 0; i < EMOJI_NAMES.length - 2; i++)
 				msg.addReaction(ReactionEmoji.unicode(EMOJI_NAMES[i])).block();

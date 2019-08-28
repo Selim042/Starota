@@ -5,10 +5,8 @@ import java.util.function.Consumer;
 import com.google.gson.Gson;
 
 import discord4j.core.object.entity.Guild;
-import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
-import discord4j.core.object.entity.TextChannel;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -40,7 +38,7 @@ public class CommandOwnerMessage extends JavaCommand {
 		if (guild != null)
 			return;
 		new ReactionMessageOwnerMessage(message.getContent().get(), message.getAuthor().get())
-				.createMessage((TextChannel) channel);
+				.createMessage((MessageChannel) channel);
 	}
 
 	private static class ReactionMessageOwnerMessage extends ReactionMessage {
@@ -75,7 +73,7 @@ public class CommandOwnerMessage extends JavaCommand {
 		}
 
 		@Override
-		public void onSend(StarotaServer server, TextChannel channel, Message msg) {
+		public void onSend(StarotaServer server, MessageChannel channel, Message msg) {
 			if (content == null)
 				msg.edit((m) -> m.setEmbed(getEmbed(server))).block();
 			else
@@ -85,28 +83,28 @@ public class CommandOwnerMessage extends JavaCommand {
 		}
 
 		@Override
-		public void onEdit(StarotaServer server, TextChannel channel, Message msg) {
+		public void onEdit(StarotaServer server, MessageChannel channel, Message msg) {
 			if (content == null)
-				msg.edit((m)->m.setEmbed(getEmbed(server))).block();
+				msg.edit((m) -> m.setEmbed(getEmbed(server))).block();
 			else
 				msg.edit((m) -> m.setContent(content).setEmbed(getEmbed(server))).block();
-				msg.addReaction(EmojiConstants.getBooleanEmoji(true)).block();
-				msg.addReaction(EmojiConstants.getBooleanEmoji(false)).block();
+			msg.addReaction(EmojiConstants.getBooleanEmoji(true)).block();
+			msg.addReaction(EmojiConstants.getBooleanEmoji(false)).block();
 		}
 
 		@Override
-		public void onReactionAdded(StarotaServer server, TextChannel channel, Message msg, Member user,
+		public void onReactionAdded(StarotaServer server, MessageChannel channel, Message msg, User user,
 				ReactionEmoji react) {
-			if (react.asUnicodeEmoji().get().getRaw().equals(EmojiConstants.getBooleanEmoji(true))) {
+			if (react.asUnicodeEmoji().get().equals(EmojiConstants.getBooleanEmoji(true))) {
 				if (embed != null && !emptyEmbed)
 					Starota.sendOwnersMessage(content, embed, author);
 				else if (emptyEmbed)
 					Starota.sendOwnersMessage(content, author);
 				else
 					Starota.sendOwnersMessage(content, author);
-				channel.createMessage("Sent");
-			} else if (react.asUnicodeEmoji().get().getRaw().equals(EmojiConstants.getBooleanEmoji(false)))
-				msg.delete();
+				channel.createMessage("Sent").block();
+			} else if (react.asUnicodeEmoji().get().equals(EmojiConstants.getBooleanEmoji(false)))
+				msg.delete().block();
 		}
 
 		@Override

@@ -31,10 +31,31 @@ public interface EventListener {
 					try {
 						m.invoke(this, obj);
 					} catch (IllegalAccessException | IllegalArgumentException
-							| InvocationTargetException e) {}
+							| InvocationTargetException e) {
+						throw new EventHandleException(paramTypes[0], e);
+					}
 				});
 			}
 		}
+	}
+
+	static class EventHandleException extends RuntimeException {
+
+		private static final long serialVersionUID = 6470933899853379423L;
+
+		private final Class<?> event;
+
+		public EventHandleException(Class<?> event, Exception e) {
+			super(e);
+			this.event = event;
+		}
+
+		@Override
+		public String getMessage() {
+			Throwable cause = this.getCause();
+			return String.format("%s thrown in %s handler", cause.getClass().getName(), event.getName());
+		}
+
 	}
 
 }

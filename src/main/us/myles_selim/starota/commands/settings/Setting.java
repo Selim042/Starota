@@ -61,6 +61,13 @@ public abstract class Setting<V> {
 		return value;
 	}
 
+	public String getValueString() {
+		V val = getValue();
+		if (val == null)
+			return "null";
+		return val.toString();
+	}
+
 	@SuppressWarnings("unchecked")
 	public boolean setValue(Object newVal) {
 		if (newVal == null) {

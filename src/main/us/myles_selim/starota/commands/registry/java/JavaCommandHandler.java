@@ -113,7 +113,7 @@ public class JavaCommandHandler implements ICommandHandler {
 		for (JavaCommand c : COMMANDS) {
 			if (!StarotaModule.isCategoryEnabled(StarotaServer.getServer(server), c.getCategory()))
 				continue;
-			if (c.hasRequiredRole(server, msg.getAuthorAsMember().block())
+			if (c.hasRequiredRole(server, msg.getAuthor().get())
 					&& c.isRequiredChannel(server, msg.getChannel().block())) {
 				if (c != null && c.getName() != null && c.getName().equalsIgnoreCase(name))
 					return c;

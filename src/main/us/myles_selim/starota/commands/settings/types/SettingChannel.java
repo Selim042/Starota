@@ -51,13 +51,22 @@ public class SettingChannel extends ServerSetting<TextChannel> {
 			}
 		} else if (str.matches("<#[0-9]{18}>")) {
 			try {
-				return this.setValue(this.getServer().getDiscordGuild()
-						.getChannelById(Snowflake.of(str.substring(2, str.length() - 1))));
+				GuildChannel ch = this.getServer().getDiscordGuild()
+						.getChannelById(Snowflake.of(str.substring(2, str.length() - 1))).block();
+				return this.setValue(ch);
 			} catch (NumberFormatException e) {
 				return false;
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public String getValueString() {
+		TextChannel ch = getValue();
+		if (ch == null)
+			return "null";
+		return ch.getMention();
 	}
 
 	@Override

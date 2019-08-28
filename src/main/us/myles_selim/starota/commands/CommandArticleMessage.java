@@ -5,7 +5,6 @@ import java.util.function.Consumer;
 import com.google.gson.Gson;
 
 import discord4j.core.object.entity.Guild;
-import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.Role;
@@ -87,7 +86,7 @@ public class CommandArticleMessage extends JavaCommand {
 		}
 
 		@Override
-		public void onSend(StarotaServer server, TextChannel channel, Message msg) {
+		public void onSend(StarotaServer server, MessageChannel channel, Message msg) {
 			if (content == null)
 				msg.edit((m) -> m.setEmbed(getEmbed(server))).block();
 			else
@@ -97,7 +96,7 @@ public class CommandArticleMessage extends JavaCommand {
 		}
 
 		@Override
-		public void onEdit(StarotaServer server, TextChannel channel, Message msg) {
+		public void onEdit(StarotaServer server, MessageChannel channel, Message msg) {
 			if (content == null)
 				msg.edit((m) -> m.setEmbed(getEmbed(server))).block();
 			else
@@ -107,7 +106,7 @@ public class CommandArticleMessage extends JavaCommand {
 		}
 
 		@Override
-		public void onReactionAdded(StarotaServer server, TextChannel channel, Message msg, Member user,
+		public void onReactionAdded(StarotaServer server, MessageChannel channel, Message msg, User user,
 				ReactionEmoji react) {
 			if (react.asUnicodeEmoji().get().equals(EmojiConstants.getBooleanEmoji(true))) {
 				if (embed != null && !emptyEmbed)
@@ -116,9 +115,9 @@ public class CommandArticleMessage extends JavaCommand {
 					Starota.sendOwnersMessage(content, author);
 				else
 					Starota.sendOwnersMessage(content, author);
-				channel.createMessage("Sent");
+				channel.createMessage("Sent").block();
 			} else if (react.asUnicodeEmoji().get().equals(EmojiConstants.getBooleanEmoji(false)))
-				msg.delete();
+				msg.delete().block();
 		}
 
 		@Override

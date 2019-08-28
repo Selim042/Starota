@@ -13,6 +13,11 @@ public class FormSetCastform extends FormSet {
 		this.addForm(new FormString(-1, "Sunny") {
 
 			@Override
+			public boolean canBeShiny(EnumPokemon pokemon) {
+				return false;
+			}
+
+			@Override
 			public EnumPokemonType getType1(EnumPokemon pokemon) {
 				return EnumPokemonType.FIRE;
 			}
@@ -25,6 +30,11 @@ public class FormSetCastform extends FormSet {
 		this.addForm(new FormString(-1, "Rainy") {
 
 			@Override
+			public boolean canBeShiny(EnumPokemon pokemon) {
+				return false;
+			}
+
+			@Override
 			public EnumPokemonType getType1(EnumPokemon pokemon) {
 				return EnumPokemonType.WATER;
 			}
@@ -35,6 +45,11 @@ public class FormSetCastform extends FormSet {
 			}
 		});
 		this.addForm(new FormString(-1, "Snowy") {
+
+			@Override
+			public boolean canBeShiny(EnumPokemon pokemon) {
+				return false;
+			}
 
 			@Override
 			public EnumPokemonType getType1(EnumPokemon pokemon) {

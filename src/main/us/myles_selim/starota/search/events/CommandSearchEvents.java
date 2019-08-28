@@ -90,7 +90,7 @@ public class CommandSearchEvents extends BotCommand<StarotaServer> {
 		}
 
 		@Override
-		public void onSend(StarotaServer server, TextChannel channel, Message msg) {
+		public void onSend(StarotaServer server, MessageChannel channel, Message msg) {
 			this.addPageButtons(pageIndex, results.size());
 		}
 

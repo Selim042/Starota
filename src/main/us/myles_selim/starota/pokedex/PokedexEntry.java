@@ -271,6 +271,9 @@ public class PokedexEntry extends ReactionMessage {
 		String embForm = entry.form;
 		if (entry.form == null)
 			embForm = "Normal";
+		FormSet.Form formS = null;
+		if (entry.getPokemon().getFormSet() != null)
+			formS = entry.getPokemon().getFormSet().getForm(embForm);
 		if (entry.forms.length > 1)
 			pokeName += String.format(" (%s)", embForm);
 		builder.withTitle(String.format("%s #%d", pokeName, entry.id))
@@ -297,18 +300,24 @@ public class PokedexEntry extends ReactionMessage {
 			}
 			builder.appendField("Forms:", formString.substring(0, formString.length() - 2), false);
 		}
+		String detailsString = "Generation: %d\nCatch Rate: %d%%\nFlee Rate: %d%%\nBuddy Distance: %dkm";
+		if (formS != null) {
+			if (formS.canBeShiny(entry.getPokemon()))
+				detailsString += "\nShinyable: True";
+		} else if (entry.getPokemon().isShinyable())
+			detailsString += "\nShinyable: True";
+		if (entry.getPokemon().isNesting())
+			detailsString += "\nNesting: True";
+		if (entry.getPokemon().isShadowable())
+			detailsString += "\nShadowable: True";
 		builder.appendField("Details:",
-				String.format("Generation: %d\nCatch Rate: %d%%\nFlee Rate: %d%%\nBuddy Distance: %dkm",
-						entry.generation, (int) (entry.baseCaptureRate * 100),
+				String.format(detailsString, entry.generation, (int) (entry.baseCaptureRate * 100),
 						(int) (entry.baseFleeRate * 100), entry.kmBuddyDistance),
 				true);
 		builder.appendField("Stats:", String.format("Max CP: %d\nAttack: %d\nDefense: %d\nStamina: %d",
 				entry.maxcp, entry.atk, entry.def, entry.sta), true);
 
 		// egg & raid cp stuff
-		FormSet.Form formS = null;
-		if (entry.getPokemon().getFormSet() != null)
-			formS = entry.getPokemon().getFormSet().getForm(embForm);
 		StringBuilder cps = new StringBuilder();
 		RaidBoss boss = SilphRoadData.getBoss(entry.getPokemon(), formS);
 		if (boss != null) {
@@ -327,11 +336,11 @@ public class PokedexEntry extends ReactionMessage {
 		// types
 		String resistString = "";
 		for (DexTypeEffectiveness te : entry.getResistances())
-			resistString += te + "\n";
+			resistString += te;
 		builder.appendField("Type Resistances:", resistString, true);
 		String weakString = "";
 		for (DexTypeEffectiveness te : entry.getWeaknesses())
-			weakString += te + "\n";
+			weakString += te;
 		builder.appendField("Type Weaknesses:", weakString, true);
 
 		// moves
@@ -347,7 +356,7 @@ public class PokedexEntry extends ReactionMessage {
 			}
 		}
 		fastStrings.add(newFastString);
-		if (!fastStrings.isEmpty()) {
+		if (!fastStrings.isEmpty() && !fastStrings.get(0).isEmpty()) {
 			if (fastStrings.size() == 1)
 				builder.appendField("Fast Moves:", fastStrings.get(0), true);
 			else
@@ -366,7 +375,7 @@ public class PokedexEntry extends ReactionMessage {
 			}
 		}
 		chargedStrings.add(newChargedString);
-		if (!chargedStrings.isEmpty()) {
+		if (!chargedStrings.isEmpty() && !chargedStrings.get(0).isEmpty()) {
 			if (chargedStrings.size() == 1)
 				builder.appendField("Charged Moves:", chargedStrings.get(0), true);
 			else
@@ -440,8 +449,13 @@ public class PokedexEntry extends ReactionMessage {
 
 		@Override
 		public String toString() {
-			return String.format("%s: %.1f%%", MiscUtils.getEmojiDisplay(type.getEmoji()),
-					effectiveness * 100);
+			if (effectiveness > 1.7)
+				return MiscUtils.getEmojiDisplay(type.getEmojiDoubleEffective());
+			if (effectiveness > 1.1)
+				return MiscUtils.getEmojiDisplay(type.getEmoji());
+			if (effectiveness > 0.6)
+				return MiscUtils.getEmojiDisplay(type.getEmoji());
+			return MiscUtils.getEmojiDisplay(type.getEmojiDoubleEffective());
 		}
 
 	}

@@ -83,7 +83,7 @@ public class CommandSearchPoke extends BotCommand<StarotaServer> {
 		}
 
 		@Override
-		public void onSend(StarotaServer server, TextChannel channel, Message msg) {
+		public void onSend(StarotaServer server, MessageChannel channel, Message msg) {
 			if (results.size() / RESULTS_PER_PAGE == 0)
 				return;
 			this.addPageButtons(pageIndex, results.size() / RESULTS_PER_PAGE);

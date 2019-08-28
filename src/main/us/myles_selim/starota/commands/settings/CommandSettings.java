@@ -49,8 +49,8 @@ public class CommandSettings extends BotCommand<StarotaServer> {
 					.block();
 			break;
 		case SUCCESS:
-			channel.createMessage("Setting \"" + args[1] + "\" set to " + server.getSetting(args[1]))
-					.block();
+			channel.createMessage(
+					"Setting \"" + args[1] + "\" set to " + server.getSettingString(args[1])).block();
 			break;
 		}
 	}
@@ -60,7 +60,8 @@ public class CommandSettings extends BotCommand<StarotaServer> {
 
 		builder.withTitle(server.getDiscordGuild().getName() + " Options:");
 		server.forEachSetting((setting) -> {
-			builder.appendDesc(String.format(" - %s: %s\n", setting.getName(), setting.getValue()));
+			builder.appendDesc(
+					String.format(" - %s: %s\n", setting.getName(), setting.getValueString()));
 			if (setting.getDescription() != null)
 				builder.appendDesc(String.format("%s\n\n", setting.getDescription()));
 			else

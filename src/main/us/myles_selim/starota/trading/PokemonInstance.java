@@ -107,9 +107,21 @@ public class PokemonInstance {
 				if (form != null)
 					continue;
 			}
+			return new ErrorPokemonInstance(arg);
 		}
 
 		return new PokemonInstance(pokemon, form, shiny, gender, legacy);
+	}
+
+	public static class ErrorPokemonInstance extends PokemonInstance {
+
+		public String badArg;
+
+		protected ErrorPokemonInstance(String arg) {
+			super(null, null, false, null, false);
+			this.badArg = arg;
+		}
+
 	}
 
 }

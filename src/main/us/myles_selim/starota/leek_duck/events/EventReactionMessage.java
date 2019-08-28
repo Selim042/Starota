@@ -3,7 +3,7 @@ package us.myles_selim.starota.leek_duck.events;
 import java.util.function.Consumer;
 
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
@@ -20,7 +20,7 @@ public class EventReactionMessage extends ReactionMessage {
 	public EventReactionMessage() {}
 
 	@Override
-	public void onSend(StarotaServer server, TextChannel channel, Message msg) {
+	public void onSend(StarotaServer server, MessageChannel channel, Message msg) {
 		this.addPageButtons(eventIndex, EventData.getRunningUpcomingEvents().length);
 		this.addButton(
 				new ReactionButton(ReactionEmoji.unicode(REFRESH_EMOJI), (message, user, added) -> {
@@ -32,7 +32,7 @@ public class EventReactionMessage extends ReactionMessage {
 	}
 
 	@Override
-	public void onEdit(StarotaServer server, TextChannel channel, Message msg) {
+	public void onEdit(StarotaServer server, MessageChannel channel, Message msg) {
 		onSend(server, channel, msg);
 	}
 

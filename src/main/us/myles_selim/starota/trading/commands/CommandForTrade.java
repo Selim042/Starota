@@ -11,6 +11,7 @@ import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.enums.EnumGender;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.trading.PokemonInstance;
+import us.myles_selim.starota.trading.PokemonInstance.ErrorPokemonInstance;
 import us.myles_selim.starota.trading.TradeboardPost;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -40,6 +41,12 @@ public class CommandForTrade extends BotCommand<StarotaServer> {
 			return;
 		}
 		PokemonInstance pokemonInst = PokemonInstance.getInstance(args);
+		if (pokemonInst instanceof ErrorPokemonInstance) {
+			channel.createMessage(
+					"Cannot find parameter \"" + ((ErrorPokemonInstance) pokemonInst).badArg + "\".")
+					.block();
+			return;
+		}
 		EnumPokemon pokemon = pokemonInst.getPokemon();
 		Form form = pokemonInst.getForm();
 		boolean shiny = pokemonInst.getShiny();
@@ -90,7 +97,7 @@ public class CommandForTrade extends BotCommand<StarotaServer> {
 			TradeboardPost post = server.newPost(false, message.getAuthor().get().getId().asLong(),
 					pokemon, form, shiny, gender, pokemonInst.isLegacy());
 			channel.createMessage((e) -> e.setContent("Posted a new trade for your search")
-					.setEmbed(post.getPostEmbed(server))).block();
+					.setEmbed(post.getPostEmbed(server, false))).block();
 		}
 	}
 

@@ -109,12 +109,20 @@ public class CommandHelp extends JavaCommand {
 
 		List<ICommand> cmds = this.getCommandHandler().getCommandsByCategory(guild, category);
 		List<ICommand> disp = new LinkedList<>();
-		Member authorM = author.asMember(guild.getId()).block();
+		Member authorM = null;
+		if (guild != null)
+			authorM = author.asMember(guild.getId()).block();
+		PermissionSet authorPerms;
+		if (authorM == null)
+			authorPerms = PermissionSet.of(Permission.ADD_REACTIONS, Permission.ATTACH_FILES,
+					Permission.EMBED_LINKS, Permission.MENTION_EVERYONE, Permission.SEND_MESSAGES,
+					Permission.USE_EXTERNAL_EMOJIS, Permission.VIEW_CHANNEL);
+		else
+			authorPerms = authorM.getBasePermissions().block();
 		for (ICommand cmd : cmds) {
 			if (guild == null)
 				disp.add(cmd);
-			PermissionSet authorPerms = authorM.getBasePermissions().block();
-			if (guild != null && (authorPerms.contains(Permission.ADMINISTRATOR)
+			else if (guild != null && (authorPerms.contains(Permission.ADMINISTRATOR)
 					|| ((authorPerms.contains(cmd.requiredUsePermission())
 							|| cmd.requiredUsePermission() == null)
 							&& cmd.hasRequiredRole(guild, authorM)

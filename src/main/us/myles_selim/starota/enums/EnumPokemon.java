@@ -22,6 +22,7 @@ import us.myles_selim.starota.trading.forms.FormSetAlolan;
 import us.myles_selim.starota.trading.forms.FormSetArceus;
 import us.myles_selim.starota.trading.forms.FormSetBurmyFamily;
 import us.myles_selim.starota.trading.forms.FormSetCastform;
+import us.myles_selim.starota.trading.forms.FormSetCherrim;
 import us.myles_selim.starota.trading.forms.FormSetDeoxys;
 import us.myles_selim.starota.trading.forms.FormSetEevee;
 import us.myles_selim.starota.trading.forms.FormSetGiratina;
@@ -489,8 +490,7 @@ public enum EnumPokemon {
 	BUIZEL(EnumPokemonStage.BASE, EnumPokemonType.WATER),
 	FLOATZEL(EnumPokemonStage.FINAL, EnumPokemonType.WATER),
 	CHERUBI(EnumPokemonStage.BASE, EnumPokemonType.GRASS),
-	CHERRIM(EnumPokemonStage.FINAL, EnumPokemonType.GRASS), // TODO: Add form if
-															// necessary later
+	CHERRIM(EnumPokemonStage.FINAL, EnumPokemonType.GRASS, FormSetCherrim.FORM_SET),
 	SHELLOS(EnumPokemonStage.BASE, EnumPokemonType.WATER, FormSetShellosFamily.FORM_SET),
 	GASTRODON(	EnumPokemonStage.FINAL,
 				EnumPokemonType.WATER,
@@ -895,8 +895,8 @@ public enum EnumPokemon {
 	BLACEPHALON(EnumPokemonStage.MYTHIC, EnumPokemonType.FIRE, EnumPokemonType.GHOST),
 	ZERAORA(EnumPokemonStage.MYTHIC, EnumPokemonType.ELECTRIC),
 	// MELTAN (gen 7?)
-	MELTAN(EnumPokemonStage.MYTHIC, EnumPokemonType.STEEL),
-	MELMETAL(EnumPokemonStage.MYTHIC, EnumPokemonType.STEEL),;
+	MELTAN(EnumPokemonStage.MYTHIC, EnumPokemonType.STEEL, EnumGender.UNKNOWN),
+	MELMETAL(EnumPokemonStage.MYTHIC, EnumPokemonType.STEEL, EnumGender.UNKNOWN),;
 
 	private String name;
 	private EnumPokemonStage stage;
@@ -1053,6 +1053,8 @@ public enum EnumPokemon {
 
 	// TODO: new gen, update trade exceptions
 	public boolean isTradable() {
+		if (!isAvailable())
+			return false;
 		switch (this) {
 		case MELTAN:
 		case MELMETAL:
@@ -1221,6 +1223,42 @@ public enum EnumPokemon {
 		}
 	}
 
+	public boolean isRegional() {
+		switch (this) {
+		// gen 1
+		case FARFETCHD:
+		case KANGASKHAN:
+		case MR_MIME:
+		case TAUROS:
+			return true;
+		// gen 2
+		case HERACROSS:
+		case CORSOLA:
+			return true;
+		// gen 3
+		case VOLBEAT:
+		case ILLUMISE:
+		case TORKOAL:
+		case ZANGOOSE:
+		case SEVIPER:
+		case LUNATONE:
+		case SOLROCK:
+		case TROPIUS:
+		case RELICANTH:
+			return true;
+		// gen 4
+		case PACHIRISU:
+		case CHATOT:
+		case CARNIVINE:
+		case UXIE:
+		case MESPRIT:
+		case AZELF:
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	public String getArtwork(int formId) {
 		return ImageHelper.getOfficalArtwork(this, formId);
 	}
@@ -1238,6 +1276,8 @@ public enum EnumPokemon {
 	}
 
 	public static EnumPokemon getPokemon(String name) {
+		if (name == null)
+			return null;
 		try {
 			int id = Integer.parseInt(name);
 			return getPokemon(id);
@@ -1262,6 +1302,8 @@ public enum EnumPokemon {
 
 	private static CachedData<List<EnumPokemon>> AVAILABLE;
 	private static CachedData<List<EnumPokemon>> SHINYABLE;
+	private static CachedData<List<EnumPokemon>> SHADOWABLE;
+	private static CachedData<List<EnumPokemon>> NESTING;
 
 	private static final String SILPH_DEX = "https://thesilphroad.com/catalog";
 	private static final Pattern POKEMON_GENERAL_PATTERN = Pattern
@@ -1270,9 +1312,13 @@ public enum EnumPokemon {
 
 	private static void checkCaches() {
 		if (AVAILABLE == null || AVAILABLE.hasPassed(86400000L) || SHINYABLE == null
-				|| SHINYABLE.hasPassed(86400000L)) { // 1 day
+				|| SHINYABLE.hasPassed(86400000L) || SHADOWABLE == null
+				|| SHADOWABLE.hasPassed(86400000L) || NESTING == null || NESTING.hasPassed(86400000L)) { // 1
+																											// day
 			AVAILABLE = new CachedData<>(new LinkedList<>());
 			SHINYABLE = new CachedData<>(new LinkedList<>());
+			SHADOWABLE = new CachedData<>(new LinkedList<>());
+			NESTING = new CachedData<>(new LinkedList<>());
 
 			try {
 				URL url = new URL(SILPH_DEX);
@@ -1297,6 +1343,10 @@ public enum EnumPokemon {
 							AVAILABLE.getValue().add(pokemon);
 							if (match.contains("data-shiny-released=\"1\""))
 								SHINYABLE.getValue().add(pokemon);
+							if (match.contains("data-shadow-released=\"1\""))
+								SHADOWABLE.getValue().add(pokemon);
+							if (match.contains("data-nests=\"1\""))
+								NESTING.getValue().add(pokemon);
 						}
 					}
 				}
@@ -1310,6 +1360,8 @@ public enum EnumPokemon {
 	public static void dumpCache() {
 		AVAILABLE = null;
 		SHINYABLE = null;
+		SHADOWABLE = null;
+		NESTING = null;
 	}
 
 	public boolean isAvailable() {
@@ -1320,6 +1372,16 @@ public enum EnumPokemon {
 	public boolean isShinyable() {
 		checkCaches();
 		return SHINYABLE.getValue().contains(this);
+	}
+
+	public boolean isShadowable() {
+		checkCaches();
+		return SHADOWABLE.getValue().contains(this);
+	}
+
+	public boolean isNesting() {
+		checkCaches();
+		return NESTING.getValue().contains(this);
 	}
 
 	public static void main(String... args) {

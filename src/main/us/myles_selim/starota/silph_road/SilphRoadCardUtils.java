@@ -129,7 +129,8 @@ public class SilphRoadCardUtils {
 	}
 
 	public static SilphCard getCard(String pogoName) {
-		if (!hasCard(pogoName) && HAS_CARD_CACHE.get(pogoName).getValue() == false)
+		if (!hasCard(pogoName) && HAS_CARD_CACHE.get(pogoName) != null
+				&& HAS_CARD_CACHE.get(pogoName).getValue() == false)
 			return null;
 		if (isCached(CARD_CACHE, pogoName))
 			return CARD_CACHE.get(pogoName).getValue();

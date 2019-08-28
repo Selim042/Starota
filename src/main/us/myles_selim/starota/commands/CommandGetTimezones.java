@@ -45,7 +45,7 @@ public class CommandGetTimezones extends BotCommand<StarotaServer> {
 		private IndexHolder pageIndex = new IndexHolder();
 
 		@Override
-		public void onSend(StarotaServer server, TextChannel channel, Message msg) {
+		public void onSend(StarotaServer server, MessageChannel channel, Message msg) {
 			this.addPageButtons(pageIndex, REGIONS.size());
 		}
 

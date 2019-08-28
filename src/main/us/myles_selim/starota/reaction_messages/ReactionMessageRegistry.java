@@ -11,7 +11,7 @@ import discord4j.core.event.domain.message.ReactionRemoveAllEvent;
 import discord4j.core.event.domain.message.ReactionRemoveEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.starota.Starota;
@@ -56,10 +56,11 @@ public class ReactionMessageRegistry implements EventListener {
 		//
 		// @Override
 		// public void run() {
+		boolean inGuild = event.getGuildId().isPresent();
 		ReactionMessage rMsg = messages.get(msg.getId().asString());
-		rMsg.onReactionAdded(StarotaServer.getServer(event.getGuild().block()),
-				(TextChannel) event.getChannel().block(), msg,
-				event.getUser().block().asMember(event.getGuildId().get()).block(), event.getEmoji());
+		rMsg.onReactionAdded(inGuild ? StarotaServer.getServer(event.getGuild().block()) : null,
+				(MessageChannel) event.getChannel().block(), msg, event.getUser().block(),
+				event.getEmoji());
 		// }
 		// });
 	}
@@ -75,10 +76,11 @@ public class ReactionMessageRegistry implements EventListener {
 		//
 		// @Override
 		// public void run() {
+		boolean inGuild = event.getGuildId().isPresent();
 		ReactionMessage rMsg = messages.get(msg.getId().asString());
-		rMsg.onReactionRemoved(StarotaServer.getServer(event.getGuild().block()),
-				(TextChannel) event.getChannel().block(), msg,
-				event.getUser().block().asMember(event.getGuildId().get()).block(), event.getEmoji());
+		rMsg.onReactionRemoved(inGuild ? StarotaServer.getServer(event.getGuild().block()) : null,
+				(MessageChannel) event.getChannel().block(), msg, event.getUser().block(),
+				event.getEmoji());
 		rMsg.removeButton(event.getEmoji());
 		// }
 		// });

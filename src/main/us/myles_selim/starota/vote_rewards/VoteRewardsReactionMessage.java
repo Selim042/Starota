@@ -3,9 +3,9 @@ package us.myles_selim.starota.vote_rewards;
 import java.util.List;
 import java.util.function.Consumer;
 
-import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
-import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.User;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.enums.EnumDonorPerm;
@@ -24,7 +24,7 @@ public class VoteRewardsReactionMessage extends ReactionMessage {
 	private Pair<ReactionEmoji, EnumDonorPerm>[] displayedPerms;
 
 	@Override
-	public void onReactionAdded(StarotaServer server, TextChannel channel, Message msg, Member user,
+	public void onReactionAdded(StarotaServer server, MessageChannel channel, Message msg, User user,
 			ReactionEmoji react) {
 		msg.removeReaction(react, user.getId()).block();
 		if (!server.getDiscordGuild().getOwnerId().equals(user.getId()))
@@ -55,7 +55,7 @@ public class VoteRewardsReactionMessage extends ReactionMessage {
 	}
 
 	@Override
-	public void onSend(StarotaServer server, TextChannel channel, Message msg) {
+	public void onSend(StarotaServer server, MessageChannel channel, Message msg) {
 		for (Pair<ReactionEmoji, EnumDonorPerm> e : displayedPerms)
 			if (e != null)
 				msg.addReaction(e.left).block();

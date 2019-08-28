@@ -4,9 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.User;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
@@ -33,7 +35,7 @@ public class ReactionMessage {
 
 	public final ReactionMessage addPageButtons(IndexHolder index, int max) {
 		addButton(new ReactionButton(EmojiConstants.getLeftArrowEmoji(),
-				(Message message, Member user, boolean added) -> {
+				(Message message, User user, boolean added) -> {
 					if (!added)
 						return false;
 					if (index.value >= 0)
@@ -43,7 +45,7 @@ public class ReactionMessage {
 					return true;
 				}));
 		addButton(new ReactionButton(EmojiConstants.getRightArrowEmoji(),
-				(Message message, Member user, boolean added) -> {
+				(Message message, User user, boolean added) -> {
 					if (!added)
 						return false;
 					if (index.value >= max)
@@ -75,13 +77,13 @@ public class ReactionMessage {
 	}
 
 	@SuppressWarnings("deprecation")
-	public final Message createMessage(TextChannel channel) {
+	public final Message createMessage(MessageChannel channel) {
+		Guild guild = channel instanceof TextChannel ? ((TextChannel) channel).getGuild().block() : null;
 		registry = ReactionMessageRegistry.getRegistry(channel.getClient());
-		Consumer<? super EmbedCreateSpec> emb = getEmbed(
-				StarotaServer.getServer(channel.getGuild().block()));
+		Consumer<? super EmbedCreateSpec> emb = getEmbed(StarotaServer.getServer(guild));
 		msg = channel.createEmbed(emb).block();
 		registry.messages.put(msg.getId().asString(), this);
-		StarotaServer sserver = StarotaServer.getServer(channel.getGuild().block());
+		StarotaServer sserver = StarotaServer.getServer(guild);
 		if (this instanceof IHelpReactionMessage)
 			((IHelpReactionMessage) this).addHelpButton(this, sserver);
 		onSend(sserver, channel, msg);
@@ -90,16 +92,16 @@ public class ReactionMessage {
 		return msg;
 	}
 
-	public final Message editMessage(TextChannel channel, Message msg) {
+	public final Message editMessage(MessageChannel channel, Message msg) {
 		if (msg == null)
 			return createMessage(channel);
+		Guild guild = channel instanceof TextChannel ? ((TextChannel) channel).getGuild().block() : null;
 		registry = ReactionMessageRegistry.getRegistry(channel.getClient());
 		this.msg = msg;
-		Consumer<? super EmbedCreateSpec> emb = getEmbed(
-				StarotaServer.getServer(channel.getGuild().block()));
+		Consumer<? super EmbedCreateSpec> emb = getEmbed(StarotaServer.getServer(guild));
 		msg.edit((ed) -> ed.setEmbed(emb)).block();
 		registry.messages.put(msg.getId().asString(), this);
-		StarotaServer sserver = StarotaServer.getServer(channel.getGuild().block());
+		StarotaServer sserver = StarotaServer.getServer(guild);
 		// onSend(sserver, channel, msg);
 		onEdit(sserver, channel, msg);
 		if (this instanceof PersistReactionMessage)
@@ -111,18 +113,18 @@ public class ReactionMessage {
 		return this.msg;
 	}
 
-	public void onSend(StarotaServer server, TextChannel channel, Message msg) {}
+	public void onSend(StarotaServer server, MessageChannel channel, Message msg) {}
 
-	public void onEdit(StarotaServer server, TextChannel channel, Message msg) {}
+	public void onEdit(StarotaServer server, MessageChannel channel, Message msg) {}
 
-	public void onReactionAdded(StarotaServer server, TextChannel channel, Message msg, Member user,
+	public void onReactionAdded(StarotaServer server, MessageChannel channel, Message msg, User user,
 			ReactionEmoji react) {
 		ReactionButton button = this.buttons.get(react);
 		if (button != null)
 			button.execute(msg, user, true);
 	}
 
-	public void onReactionRemoved(StarotaServer server, TextChannel channel, Message msg, Member user,
+	public void onReactionRemoved(StarotaServer server, MessageChannel channel, Message msg, User user,
 			ReactionEmoji react) {
 		ReactionButton button = this.buttons.get(react);
 		if (button != null)
@@ -147,7 +149,7 @@ public class ReactionMessage {
 			return this.emoji;
 		}
 
-		public void execute(Message message, Member user, boolean added) {
+		public void execute(Message message, User user, boolean added) {
 			boolean toRemoveUpdate = handler.execute(message, user, added);
 			if (added && toRemoveUpdate)
 				message.removeReaction(emoji, user.getId()).block();
@@ -168,7 +170,7 @@ public class ReactionMessage {
 		 *            Whether the reaction was added or removed
 		 * @return Whether the reaction should be removed after handling
 		 */
-		public boolean execute(Message message, Member user, boolean added);
+		public boolean execute(Message message, User user, boolean added);
 
 	}
 

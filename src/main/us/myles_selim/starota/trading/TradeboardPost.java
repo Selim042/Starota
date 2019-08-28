@@ -200,6 +200,7 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 		this.form = value.form;
 		this.shiny = value.shiny;
 		this.timePosted = value.timePosted;
+		this.gender = value.gender;
 		this.legacy = value.legacy;
 	}
 

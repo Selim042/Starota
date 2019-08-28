@@ -1,10 +1,11 @@
 package us.myles_selim.starota.commands;
 
-import java.util.TimeZone;
-
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.User;
+import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.CommandException;
+import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandTest extends BotCommand<StarotaServer> {
@@ -132,17 +133,25 @@ public class CommandTest extends BotCommand<StarotaServer> {
 		// out.append(entry + "\n");
 		// channel.createMessage(out.append("```").toString());
 
-		channel.createMessage(server.getTimezone().toString());
-		String msg = "";
-		for (String id : TimeZone.getAvailableIDs()) {
-			if (msg.length() + id.length() > 1500) {
-				String fMsg = msg;
-				channel.createMessage(fMsg).block();
-				msg = id + '\n';
-			}
-			msg += id + '\n';
-		}
-		channel.createMessage("done").block();
+		// channel.createMessage(server.getTimezone().toString());
+		// String msg = "";
+		// for (String id : TimeZone.getAvailableIDs()) {
+		// if (msg.length() + id.length() > 1500) {
+		// String fMsg = msg;
+		// channel.createMessage(fMsg).block();
+		// msg = id + '\n';
+		// }
+		// msg += id + '\n';
+		// }
+		// channel.createMessage("done").block();
+
+		channel.createEmbed((e) -> {
+			User selim = Starota.getUser(StarotaConstants.SELIM_USER_ID.asLong());
+			e.setAuthor(selim.getUsername(), null, selim.getAvatarUrl());
+			e.setTitle("042Selim Friend Code");
+			e.setImage("https://zxing.org/w/chart?cht=qr&chs=500x500&chld=H&chl=479589234254");
+			e.setDescription("4795 8923 4254");
+		}).block();
 	}
 
 }

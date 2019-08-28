@@ -2,12 +2,14 @@ package us.myles_selim.starota.trading.forms;
 
 import us.myles_selim.starota.enums.EnumPokemon;
 
-public class FormSetRaichuHat extends FormSetPikachuHat {
+public class FormSetRaichuHat extends FormSetPichuHat {
 
 	public static final FormSetRaichuHat FORM_SET = new FormSetRaichuHat();
 
 	private FormSetRaichuHat() {
-		super();
+		this.addForm(new FormString(-1, "H.F. Hat"));
+		this.addForm(new FormString(-1, "Flower"));
+		this.addForm(new FormString(-1, "Detective"));
 		this.addForm(new FormString(1, "Alolan") {
 
 			@Override

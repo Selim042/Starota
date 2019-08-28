@@ -3,6 +3,7 @@ package us.myles_selim.starota.enums;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.GuildEmoji;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.misc.utils.EmojiServerHelper;
 
 public enum EnumPokemonType {
 	NORMAL(0xa8a878, 1.0f),
@@ -64,6 +65,12 @@ public enum EnumPokemonType {
 		if (EMOJI_SERVER == null)
 			EMOJI_SERVER = Starota.getGuild(EMOJI_SERVER_ID);
 		return EMOJI_SERVER.getEmojis().filter((e) -> e.getName().equals(emojiName)).blockFirst();
+	}
+
+	public GuildEmoji getEmojiDoubleEffective() {
+		if (EMOJI_SERVER == null)
+			EMOJI_SERVER = Starota.getGuild(EMOJI_SERVER_ID);
+		return EmojiServerHelper.getGuildEmoji(emojiName + "_2x");
 	}
 
 	public static EnumPokemonType fromOrdinal(int ordinal) {

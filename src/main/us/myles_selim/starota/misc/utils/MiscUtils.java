@@ -19,6 +19,7 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.reaction.ReactionEmoji;
+import discord4j.core.object.util.Image.Format;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.PermissionSet;
 import discord4j.core.object.util.Snowflake;
@@ -44,6 +45,8 @@ public class MiscUtils {
 	}
 
 	public static String getEmojiDisplay(GuildEmoji emoji) {
+		if (emoji == null)
+			return "null";
 		return emoji.asFormat();
 	}
 
@@ -77,6 +80,20 @@ public class MiscUtils {
 			if (v == val || v.equalsIgnoreCase(val))
 				return true;
 		return false;
+	}
+
+	public static String getGuildIconURL(Guild guild) {
+		return guild.getIconUrl(Format.GIF).orElse(guild.getIconUrl(Format.JPEG).orElse(
+				guild.getIconUrl(Format.PNG).orElse(guild.getIconUrl(Format.WEB_P).orElse(null))));
+	}
+
+	public static Role getSidebarRole(Member member) {
+		Flux<Role> hoistedRoles = member.getRoles()
+				.sort((Role r1, Role r2) -> Integer.compare(r2.getRawPosition(), r1.getRawPosition()))
+				.filter((r) -> r.isHoisted());
+		if (hoistedRoles.hasElements().block())
+			return hoistedRoles.blockFirst();
+		return member.getGuild().block().getEveryoneRole().block();
 	}
 
 	public static Flux<Member> getMembersHereFlux(GuildChannel ch) {

@@ -5,7 +5,7 @@ import discord4j.core.object.util.Snowflake;
 public class StarotaConstants {
 
 	/** Starota version */
-	public final static String VERSION = "3.0.1";
+	public final static String VERSION = "3.0.2";
 
 	/** Starota user ID */
 	public static final Snowflake STAROTA_ID = Snowflake.of(489245655710040099L);
@@ -20,6 +20,8 @@ public class StarotaConstants {
 	public static final Snowflake EDITOR_ROLE_ID = Snowflake.of(572498311525695498L);
 	/** Editor channel on the support server */
 	public static final Snowflake EDITOR_CHANNEL_ID = Snowflake.of(572498506359635968L);
+	/** Tutorial channel on the support server */
+	public static final Snowflake TUTORIAL_CHANNEL_ID = Snowflake.of(569938166988013588L);
 
 	/** Permament invite link to the support server */
 	public static final String SUPPORT_SERVER_LINK = "https://discord.gg/NxverNw";

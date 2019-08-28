@@ -15,6 +15,8 @@ public class PokemonOperators {
 			EnumPokemon.class, p -> !p.isAvailable(), "available");
 	public static final SearchOperator<EnumPokemon> SHINYABLE = new LlambadaSearchOperator<EnumPokemon>(
 			EnumPokemon.class, p -> !p.isShinyable(), "shiny", "shinyable");
+	public static final SearchOperator<EnumPokemon> SHADOWABLE = new LlambadaSearchOperator<EnumPokemon>(
+			EnumPokemon.class, p -> !p.isShadowable(), "shadow", "shadowable");
 	public static final SearchOperator<EnumPokemon> TRADABLE = new LlambadaSearchOperator<EnumPokemon>(
 			EnumPokemon.class, p -> !p.isTradable(), "canTrade", "tradable", "trade");
 	public static final SearchOperator<EnumPokemon> LEGENDARY = new LlambadaSearchOperator<>(
@@ -27,6 +29,8 @@ public class PokemonOperators {
 			EnumPokemon.class, p -> !p.isBaby(), "baby");
 	public static final SearchOperator<EnumPokemon> ITEM_EVOLVE = new LlambadaSearchOperator<>(
 			EnumPokemon.class, p -> !p.evolvesWithItem(), "item");
+	public static final SearchOperator<EnumPokemon> REGIONAL = new LlambadaSearchOperator<>(
+			EnumPokemon.class, p -> !p.isRegional(), "regional");
 
 	public static final Map<EnumPokemonType, SearchOperator<EnumPokemon>> TYPING = new HashMap<>();
 

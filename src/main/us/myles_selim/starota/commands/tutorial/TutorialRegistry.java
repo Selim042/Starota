@@ -9,18 +9,15 @@ import us.myles_selim.starota.misc.utils.EmbedBuilder;
 
 public class TutorialRegistry {
 
-	private static final List<TutorialChapter> NORMAL_TUTORIALS = new ArrayList<>();
-	private static final List<TutorialChapter> ADMIN_TUTORIALS = new ArrayList<>();
-
 	public static List<TutorialChapter> getTutorials() {
 		return getTutorials(false);
 	}
 
 	public static List<TutorialChapter> getTutorials(boolean includeAdmin) {
 		List<TutorialChapter> ret = new ArrayList<>();
-		ret.addAll(NORMAL_TUTORIALS);
-		if (includeAdmin)
-			ret.addAll(ADMIN_TUTORIALS);
+//		ret.addAll(NORMAL_TUTORIALS);
+//		if (includeAdmin)
+//			ret.addAll(ADMIN_TUTORIALS);
 		return ret;
 	}
 

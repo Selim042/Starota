@@ -22,12 +22,13 @@ public class ImageHelper {
 	}
 
 	public static String getOfficalArtwork(EnumPokemon pokemon, int goHubFormId) {
+		if (pokemon == null)
+			return null;
 		switch (pokemon) {
 		case MEWTWO:
-			return String.format(
-					"https://db.pokemongohub.net/images/official/full/%03d"
-							+ (goHubFormId < 0 || goHubFormId > 0 ? "_f" + 4 : "") + ".png",
-					pokemon.getId());
+			return String.format("https://db.pokemongohub.net/images/official/full/%03d"
+					+ (goHubFormId != -1 && (goHubFormId < 0 || goHubFormId > 0) ? "_f" + 4 : "")
+					+ ".png", pokemon.getId());
 		case WORMADAM:
 		case ROTOM:
 		case ARCEUS:

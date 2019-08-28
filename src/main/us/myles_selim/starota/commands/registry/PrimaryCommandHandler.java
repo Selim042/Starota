@@ -3,6 +3,7 @@ package us.myles_selim.starota.commands.registry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -103,7 +104,9 @@ public class PrimaryCommandHandler implements EventListener {
 				hasPerms = ((GuildChannel) channel).getEffectivePermissions(client.getSelfId().get())
 						.block();
 			else
-				hasPerms = PermissionSet.of(Permission.SEND_MESSAGES);
+				hasPerms = PermissionSet.of(Permission.ADD_REACTIONS, Permission.ATTACH_FILES,
+						Permission.EMBED_LINKS, Permission.MENTION_EVERYONE, Permission.SEND_MESSAGES,
+						Permission.USE_EXTERNAL_EMOJIS, Permission.VIEW_CHANNEL);
 			if (!hasPerms.contains(Permission.SEND_MESSAGES))
 				return;
 			for (ICommandHandler h : COMMAND_HANDLERS) {
@@ -115,7 +118,7 @@ public class PrimaryCommandHandler implements EventListener {
 								&& !message.getAuthorAsMember().block().getBasePermissions().block()
 										.contains(cmd.requiredUsePermission())))
 					continue;
-				PermissionSet reqPerms = cmd.getCommandPermission();
+				EnumSet<Permission> reqPerms = cmd.getCommandPermission().asEnumSet().clone();
 				if (!hasPerms.containsAll(reqPerms)) {
 					reqPerms.removeAll(hasPerms);
 					channel.createEmbed(getPermissionError(reqPerms));
@@ -167,7 +170,7 @@ public class PrimaryCommandHandler implements EventListener {
 		// RequestBuffer.request(() -> channel.setTypingStatus(false));
 	}
 
-	private Consumer<? super EmbedCreateSpec> getPermissionError(PermissionSet reqPerms) {
+	private Consumer<? super EmbedCreateSpec> getPermissionError(EnumSet<Permission> reqPerms) {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withTitle("This command cannot be used here");
 		builder.withDesc(
