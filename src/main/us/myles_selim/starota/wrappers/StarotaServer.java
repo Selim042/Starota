@@ -37,6 +37,7 @@ import us.myles_selim.starota.leaderboards.DefaultLeaderboard.EnumBadgeLeaderboa
 import us.myles_selim.starota.leaderboards.Leaderboard;
 import us.myles_selim.starota.misc.data_types.BotServer;
 import us.myles_selim.starota.misc.data_types.Pair;
+import us.myles_selim.starota.misc.data_types.cache.CachedData;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.RolePermHelper;
 import us.myles_selim.starota.misc.utils.ServerDataHelper;
@@ -182,6 +183,16 @@ public class StarotaServer extends BotServer {
 		return getTradeboardInternal().values();
 	}
 
+	public List<TradeboardPost> getPostsByMember(Member member) {
+		if (!StarotaModule.isModuleEnabled(this, BaseModules.TRADEBOARD))
+			return null;
+		List<TradeboardPost> ret = new LinkedList<>();
+		for (TradeboardPost p : getTradeboardInternal().values())
+			if (p.getOwner() == member.getId().asLong())
+				ret.add(p);
+		return Collections.unmodifiableList(ret);
+	}
+
 	public List<TradeboardPost> findPosts(boolean lookingFor, Guild server, EnumPokemon pokemon) {
 		return findPosts(lookingFor, pokemon, false);
 	}
@@ -207,7 +218,7 @@ public class StarotaServer extends BotServer {
 		FormSet fSet = pokemon.getFormSet();
 		for (TradeboardPost p : tradeboard.values())
 			if (p.isLookingFor() != lookingFor && p.getPokemon().equals(pokemon)
-					&& (fSet == null || p.getForm() == null || form.equals(p.getForm()))
+					&& (fSet == null || p.getForm() == form || form.equals(p.getForm()))
 					&& (!shiny || p.isShiny() == shiny) && (p.getGender() == EnumGender.EITHER
 							|| gender == EnumGender.EITHER || gender == p.getGender())
 					&& (!legacy || p.isLegacy()))
@@ -455,12 +466,17 @@ public class StarotaServer extends BotServer {
 	// end pvp stuffs
 
 	// start vote stuff
+	private CachedData<List<SimpleUser>> votes;
+
 	@SuppressWarnings("deprecation")
 	public float getVoterPercent() {
 		try {
 			Calendar today = Calendar.getInstance();
-			List<SimpleUser> voters = Starota.getBotListAPI()
-					.getVoters(StarotaConstants.STAROTA_ID.asString()).toCompletableFuture().get();
+			List<SimpleUser> voters;
+			if (votes == null || votes.hasPassed(900000L)) // 15 mins
+				votes = new CachedData<>(Starota.getBotListAPI()
+						.getVoters(StarotaConstants.STAROTA_ID.asString()).toCompletableFuture().get());
+			voters = votes.getValue();
 			int numVoters = 0;
 			List<Snowflake> members = getDiscordGuild().getMembers().map((m) -> m.getId()).collectList()
 					.block();
