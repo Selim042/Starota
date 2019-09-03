@@ -115,7 +115,7 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
 	public final static String CHANGELOG = "Changelog for v" + StarotaConstants.VERSION + "\n"
-			+ "Public changes:\n" + " * Fix server count on DiscordBots.org\n * Fix Pokedex bot";
+			+ "Public changes:\n" + " * Fix battleReady and other things";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static PrimaryCommandHandler COMMAND_HANDLER;
@@ -210,12 +210,13 @@ public class Starota {
 			StatusUpdater statusUpdater = new StatusUpdater(CLIENT);
 			statusUpdater.addPresence(Presence.online(
 					Activity.playing("v" + StarotaConstants.VERSION + (DEBUG || IS_DEV ? "d" : ""))));
-			statusUpdater.addPresence(
-					Presence.online(Activity.watching("people organize raids with `raid`")));
+			statusUpdater
+					.addPresence(Presence.online(Activity.watching("people organize raids with .raid")));
 			statusUpdater.addPresence(
 					Presence.online(Activity.listening("to people search for events and Pokemon")));
-			statusUpdater.addPresence(Presence.online(Activity.playing("with the new event system")));
 			statusUpdater.addPresence(Presence.online(Activity.watching(".bots for new bots")));
+			statusUpdater.addPresence(
+					Presence.online(Activity.watching("people research counters with .dex")));
 			statusUpdater.start();
 
 			EXECUTOR.execute(new Runnable() {

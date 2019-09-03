@@ -40,9 +40,7 @@ public class SettingChannel extends ServerSetting<TextChannel> {
 
 	@Override
 	public boolean setValue(String str) {
-		if (this.getServer() == null)
-			throw new IllegalArgumentException("server isn't set?");
-		if (str == null)
+		if (this.getServer() == null || str == null)
 			return this.setValue((Object) null);
 		if (str.startsWith("#")) {
 			for (GuildChannel ch : MiscUtils.getChannelsByName(this.getServer().getDiscordGuild(),
