@@ -644,12 +644,12 @@ public class Starota {
 			if (owner == null)
 				continue;
 			if (!owner.getRoleIds().contains(ownerRole))
-				owner.addRole(ownerRole);
+				owner.addRole(ownerRole).block();
 			currentOwners.add(owner);
 		}
 		for (Member u : MiscUtils.getMembersByRole(supportServer, ownerRole))
 			if (!currentOwners.contains(u))
-				u.removeRole(ownerRole);
+				u.removeRole(ownerRole).block();
 	}
 
 	private static final Long[] SKIPPED_SERVERS = new Long[] { //
