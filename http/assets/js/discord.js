@@ -69,7 +69,7 @@ function getGuilds(token, profile) {
     var ret = [];
     $.ajax({
         type: "GET",
-        url: "/guilds",
+        url: "/data/guilds",
         async: false,
         success: function(data, status) {
             ret = JSON.parse(data);
