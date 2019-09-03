@@ -60,9 +60,9 @@ public class TradeboardReactionMessage extends PersistReactionMessage {
 					.block();
 			String nickname = user.asMember(server.getDiscordGuild().getId()).block().getDisplayName();
 			if (nickname != null)
-				nickname += " (_" + poster.getUsername() + "#" + poster.getDiscriminator() + "_)";
+				nickname += " (_" + user.getUsername() + "#" + user.getDiscriminator() + "_)";
 			else
-				nickname = poster.getUsername() + "#" + poster.getDiscriminator();
+				nickname = user.getUsername() + "#" + user.getDiscriminator();
 			final String finalNick = nickname;
 			poster.getPrivateChannel().block().createMessage((e) -> e
 					.setContent(finalNick + " from " + server.getDiscordGuild().getName()

@@ -123,7 +123,7 @@ public class PlayerProfile {
 	public Map<String, Long> getAlts() {
 		if (this.alts == null)
 			this.alts = new HashMap<>();
-		return this.alts;
+		return new HashMap<>(this.alts);
 	}
 
 	public Instant getLastUpdated() {
@@ -146,7 +146,7 @@ public class PlayerProfile {
 	private Consumer<? super EmbedCreateSpec> toEmbed(GetProfileEvent event) {
 		EmbedBuilder builder = new EmbedBuilder();
 		User user = getDiscordUser();
-		builder.withAuthorName(user.getUsername()).withAuthorUrl(user.getAvatarUrl());
+		builder.withAuthorName(user.getUsername()).withAuthorIcon(user.getAvatarUrl());
 		builder.withTitle("Profile for " + this.poGoName + ":");
 		for (ExtraField f : event.getFields()) {
 			if (f == null)

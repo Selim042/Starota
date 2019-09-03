@@ -405,7 +405,7 @@ public class StarotaServer extends BotServer {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.LEADERBOARDS))
 			return null;
 		Leaderboard board = getLeaderboard(name);
-		if (!board.isActive())
+		if (board == null || !board.isActive())
 			return null;
 		return board;
 	}

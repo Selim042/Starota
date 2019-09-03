@@ -1,11 +1,27 @@
 package us.myles_selim.starota.enums;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public enum EnumTeam {
 	// TODO: Replace NO_TEAM URL with a representative image
 	NO_TEAM("No team", 0x777777, "http://assets.myles-selim.us/starota/teams/instinct.png", 0),
 	INSTINCT("Instinct", 0xF1C40F, "http://assets.myles-selim.us/starota/teams/instinct.png", 3),
 	MYSTIC("Mystic", 0x277ECD, "http://assets.myles-selim.us/starota/teams/mystic.png", 1),
 	VALOR("Valor", 0x992D22, "http://assets.myles-selim.us/starota/teams/valor.png", 2);
+
+	private static final Map<String, EnumTeam> NAME_MAP = new HashMap<>();
+
+	static {
+		for (EnumTeam t : EnumTeam.values())
+			NAME_MAP.put(t.getName().toLowerCase(), t);
+	}
+
+	public static EnumTeam getTeam(String name) {
+		if (!NAME_MAP.containsKey(name.toLowerCase()))
+			return null;
+		return NAME_MAP.get(name.toLowerCase());
+	}
 
 	private String name;
 	private int color;
