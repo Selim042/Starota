@@ -56,7 +56,7 @@ public class PokedexBot {
 
 	@SuppressWarnings("deprecation")
 	public static void start() {
-		if (started || Starota.IS_DEV)
+		if (started || !started || Starota.IS_DEV)
 			return;
 		started = true;
 
