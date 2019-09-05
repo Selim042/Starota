@@ -30,7 +30,6 @@ import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.assistants.CommandBots;
-import us.myles_selim.starota.assistants.pokedex.PokedexBot;
 import us.myles_selim.starota.assistants.registration.RegistrationBot;
 import us.myles_selim.starota.commands.CommandArticleMessage;
 import us.myles_selim.starota.commands.CommandChangelog;
@@ -201,7 +200,6 @@ public class Starota {
 			new EventHandler().setup(dispatcher);
 			// ReactionMessageRegistry.init();
 			WebServer.init();
-			PokedexBot.start();
 			RegistrationBot.start();
 			// PointBot.start();
 			submitStats();
@@ -225,8 +223,6 @@ public class Starota {
 				public void run() {
 					boolean sentToAll = true;
 					List<Guild> guilds = new ArrayList<>(CLIENT.getGuilds().collectList().block());
-					if (!IS_DEV)
-						guilds.addAll(PokedexBot.CLIENT.getGuilds().collectList().block());
 					for (Guild g : guilds) {
 						StarotaServer server = StarotaServer.getServer(g);
 						TextChannel changesChannel = server
@@ -596,16 +592,6 @@ public class Starota {
 							else
 								System.out.println("Starota Submitted");
 						});
-				if (PokedexBot.CLIENT != null) {
-					PokedexBot.getBotListAPI()
-							.setStats(PokedexBot.CLIENT.getGuilds().collectList().block().size())
-							.whenComplete((v, e) -> {
-								if (e != null)
-									e.printStackTrace();
-								else
-									System.out.println("Pokedex Submitted");
-							});
-				}
 				// if (RegistrationBot.CLIENT != null) {
 				// RegistrationBot.getBotListAPI()
 				// .setStats(RegistrationBot.CLIENT.getGuilds().collectList().block().size())
