@@ -88,7 +88,7 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 			msg.removeAllReactions().block();
 			try {
 				Thread.sleep(100);
-			} catch (InterruptedException e) {}
+			} catch (InterruptedException e) { /* */ }
 			this.addHelpButton(this, server);
 			for (int i = 0; i < EMOJI_NAMES.length - 2; i++) {
 				int iF = i;
@@ -210,7 +210,7 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 					ImageHelper.getOfficalArtwork(b.getPokemon(), b.getForm()))).block();
 			try {
 				Thread.sleep(500);
-			} catch (InterruptedException e) {}
+			} catch (InterruptedException e) { /* */ }
 		}
 	}
 

@@ -35,7 +35,9 @@ public class CommandFindBattles extends BotCommand<StarotaServer> {
 		if (args.length > 1) {
 			try {
 				page = Integer.parseInt(args[1]);
-			} catch (NumberFormatException e) {}
+			} catch (NumberFormatException e) {
+				page = 1;
+			}
 		}
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withTitle("Available Trainers:");

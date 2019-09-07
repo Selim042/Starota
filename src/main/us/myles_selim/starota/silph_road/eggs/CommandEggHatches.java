@@ -108,27 +108,43 @@ public class CommandEggHatches extends BotCommand<StarotaServer> {
 			switch (e.getDistance()) {
 			case 2:
 				if (e.isShinyable())
-					shinies2k += e.getPokemon().getName() + ", ";
+					shinies2k += (e.getForm() == null ? e.getPokemon().getName()
+							: String.format("%s (%s)", e.getPokemon().getName(), e.getForm().toString()))
+							+ ", ";
 				else
-					nonShinies2k += e.getPokemon().getName() + ", ";
+					nonShinies2k += (e.getForm() == null ? e.getPokemon().getName()
+							: String.format("%s (%s)", e.getPokemon().getName(), e.getForm().toString()))
+							+ ", ";
 				break;
 			case 5:
 				if (e.isShinyable())
-					shinies5k += e.getPokemon().getName() + ", ";
+					shinies5k += (e.getForm() == null ? e.getPokemon().getName()
+							: String.format("%s (%s)", e.getPokemon().getName(), e.getForm().toString()))
+							+ ", ";
 				else
-					nonShinies5k += e.getPokemon().getName() + ", ";
+					nonShinies5k += (e.getForm() == null ? e.getPokemon().getName()
+							: String.format("%s (%s)", e.getPokemon().getName(), e.getForm().toString()))
+							+ ", ";
 				break;
 			case 7:
 				if (e.isShinyable())
-					shinies7k += e.getPokemon().getName() + ", ";
+					shinies7k += (e.getForm() == null ? e.getPokemon().getName()
+							: String.format("%s (%s)", e.getPokemon().getName(), e.getForm().toString()))
+							+ ", ";
 				else
-					nonShinies7k += e.getPokemon().getName() + ", ";
+					nonShinies7k += (e.getForm() == null ? e.getPokemon().getName()
+							: String.format("%s (%s)", e.getPokemon().getName(), e.getForm().toString()))
+							+ ", ";
 				break;
 			case 10:
 				if (e.isShinyable())
-					shinies10k += e.getPokemon().getName() + ", ";
+					shinies10k += (e.getForm() == null ? e.getPokemon().getName()
+							: String.format("%s (%s)", e.getPokemon().getName(), e.getForm().toString()))
+							+ ", ";
 				else
-					nonShinies10k += e.getPokemon().getName() + ", ";
+					nonShinies10k += (e.getForm() == null ? e.getPokemon().getName()
+							: String.format("%s (%s)", e.getPokemon().getName(), e.getForm().toString()))
+							+ ", ";
 				break;
 			}
 		}

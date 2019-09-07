@@ -102,9 +102,11 @@ public abstract class Setting<V> {
 		try {
 			return (Setting<V>) clazz.getConstructor(clazz).newInstance(this);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException | NoSuchMethodException | SecurityException e) {}
-		throw new IllegalArgumentException(
-				"Setting classes must have a public copy constructor, missing in " + clazz.getName());
+				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			throw new IllegalArgumentException(
+					"Setting classes must have a public copy constructor, missing in "
+							+ clazz.getName());
+		}
 	}
 
 }

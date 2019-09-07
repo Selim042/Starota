@@ -35,10 +35,12 @@ public class CommandChannelInfo extends JavaCommand {
 			this.sendUsage(PrimaryCommandHandler.DEFAULT_PREFIX, channel);
 			return;
 		}
-		TextChannel targetChannel = null;
+		TextChannel targetChannel;
 		try {
 			targetChannel = Starota.getChannel(Long.parseLong(args[1]));
-		} catch (NumberFormatException e) {}
+		} catch (NumberFormatException e) {
+			targetChannel = null;
+		}
 		if (targetChannel == null) {
 			channel.createMessage("Channel with id \"" + args[1] + "\" not found.");
 			return;

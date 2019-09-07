@@ -446,8 +446,13 @@ public class SilphRoadData {
 			return parts;
 		} else if (name.matches(".*? .*?")) {
 			String[] iParts = name.split(" ");
-			parts[0] = iParts[1];
-			parts[1] = iParts[0];
+			if (iParts[0].equals("Unown")) {
+				parts[0] = iParts[0];
+				parts[1] = iParts[1];
+			} else {
+				parts[0] = iParts[1];
+				parts[1] = iParts[0];
+			}
 			return parts;
 		} else
 			parts[0] = name;

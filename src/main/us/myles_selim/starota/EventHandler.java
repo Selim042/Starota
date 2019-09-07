@@ -14,11 +14,9 @@ import discord4j.core.event.domain.guild.GuildCreateEvent;
 import discord4j.core.event.domain.guild.GuildDeleteEvent;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
-import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.event.domain.role.RoleUpdateEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
-import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.PrivateChannel;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Permission;
@@ -46,18 +44,6 @@ public class EventHandler implements EventListener {
 	@EventSubscriber
 	public void onReady(ReadyEvent event) {
 		guildsWereIn = event.getGuilds();
-	}
-
-	@EventSubscriber
-	public void onMessageRecieved(MessageCreateEvent event) {
-		if (event.getGuild() == null
-				|| event.getGuild().block().getId().equals(StarotaConstants.SUPPORT_SERVER))
-			return;
-		if (Starota.DEBUG) {
-			Message msg = event.getMessage();
-			System.out.println("Channel: " + msg.getChannel().block() + ", Author: " + msg.getAuthor()
-					+ ", Message: " + event.getMessage());
-		}
 	}
 
 	@EventSubscriber
@@ -92,12 +78,13 @@ public class EventHandler implements EventListener {
 					+ " requires the `SEND_MESSAGES` permission for all command functionality.");
 	}
 
-//	@EventSubscriber
-//	public void onServerLeave(GuildDeleteEvent event) {
-//		if (!event.isUnavailable())
-//			StarotaServer.getServer(event.getGuild().get()).clearDataOptions();
-//		Starota.updateOwners();
-//	}
+	@EventSubscriber
+	public void onServerLeave(GuildDeleteEvent event) {
+		if (!event.isUnavailable()) {
+			StarotaServer.getServer(event.getGuild().get()).clearDataOptions();
+			Starota.updateOwners();
+		}
+	}
 
 	@EventSubscriber
 	public void onUserJoin(MemberJoinEvent event) {

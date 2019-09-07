@@ -124,8 +124,10 @@ public class StarotaServer extends BotServer {
 			return null;
 		if ((boolean) this.getSetting(StarotaConstants.Settings.PROFILE_NICKNAME))
 			try {
-				user.edit((mem) -> mem.setNickname(profile.getPoGoName()));
-			} catch (Exception e) {}
+				user.edit((mem) -> mem.setNickname(profile.getPoGoName())).block();
+			} catch (Exception e) { /*
+									 * catch errors, mainly user has higher role
+									 */ }
 		getProfilesInternal().set(user.getId().asString(), profile);
 		return profile;
 	}

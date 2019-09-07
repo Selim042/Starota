@@ -1281,7 +1281,7 @@ public enum EnumPokemon {
 		try {
 			int id = Integer.parseInt(name);
 			return getPokemon(id);
-		} catch (NumberFormatException e) {}
+		} catch (NumberFormatException e) { /* */ }
 		for (EnumPokemon p : values()) {
 			List<String> names = new ArrayList<>();
 			names.add(p.name.toLowerCase());

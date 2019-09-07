@@ -113,9 +113,9 @@ public class ReactionMessage {
 		return this.msg;
 	}
 
-	public void onSend(StarotaServer server, MessageChannel channel, Message msg) {}
+	public void onSend(StarotaServer server, MessageChannel channel, Message msg) { /* */ }
 
-	public void onEdit(StarotaServer server, MessageChannel channel, Message msg) {}
+	public void onEdit(StarotaServer server, MessageChannel channel, Message msg) { /* */ }
 
 	public void onReactionAdded(StarotaServer server, MessageChannel channel, Message msg, User user,
 			ReactionEmoji react) {

@@ -1,6 +1,5 @@
 package us.myles_selim.starota.commands.tutorial;
 
-
 public class Tutorial {
 
 	private String name;
@@ -9,9 +8,7 @@ public class Tutorial {
 	private TutorialPart[] parts;
 
 	private class TutorialPart {
-	
-		
-		
+		/* WIP */
 	}
 
 }

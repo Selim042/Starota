@@ -70,10 +70,11 @@ public abstract class ServerSetting<V> extends Setting<V> {
 			return (ServerSetting<V>) clazz.getConstructor(BotServer.class, clazz).newInstance(server,
 					this);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException | NoSuchMethodException | SecurityException e) {}
-		throw new IllegalArgumentException(
-				"ServerSetting classes must have a public copy constructor with BotServer "
-						+ "as first param, missing in " + clazz.getName());
+				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			throw new IllegalArgumentException(
+					"ServerSetting classes must have a public copy constructor with BotServer "
+							+ "as first param, missing in " + clazz.getName());
+		}
 	}
 
 }

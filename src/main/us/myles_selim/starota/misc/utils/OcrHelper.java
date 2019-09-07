@@ -184,12 +184,12 @@ public class OcrHelper {
 				BufferedImage valImageCrop = valImage.getSubimage(0, start, valImage.getWidth(), end);
 				try {
 					ImageIO.write(valImageCrop, "PNG", new File("test-crop.png"));
-				} catch (IOException e) {}
+				} catch (IOException e) { /* */ }
 				if (i >= 1)
 					valImageCrop = fixBadgeValue(valImageCrop);
 				try {
 					ImageIO.write(valImageCrop, "PNG", new File("test-crop-edit.png"));
-				} catch (IOException e) {}
+				} catch (IOException e) { /* */ }
 				String valueS = OCR_ENGINE.doOCR(valImageCrop).split("\n")[0].replaceAll("[^\\d\\.]",
 						"");
 				if (valueS.isEmpty())
@@ -205,11 +205,11 @@ public class OcrHelper {
 				try {
 					value = (long) Double.parseDouble(valueS);
 					break;
-				} catch (NumberFormatException e) {}
+				} catch (NumberFormatException e) { /* */ }
 			}
 			try {
 				ImageIO.write(valImage, "PNG", new File("test-center-crop.png"));
-			} catch (IOException e) {}
+			} catch (IOException e) { /* */ }
 			if (value == -1)
 				return null;
 			return new BadgeData(name, value);

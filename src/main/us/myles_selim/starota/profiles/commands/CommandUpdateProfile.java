@@ -115,7 +115,7 @@ public class CommandUpdateProfile extends BotCommand<StarotaServer> {
 					continue;
 				try {
 					profile.getAlts().put(altName, Long.valueOf(altCode));
-				} catch (NumberFormatException e) {}
+				} catch (NumberFormatException e) { /* */ }
 			}
 			executed = true;
 			break;

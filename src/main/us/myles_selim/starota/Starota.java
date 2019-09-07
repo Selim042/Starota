@@ -276,7 +276,7 @@ public class Starota {
 						isReady = inReady;
 						try {
 							Thread.sleep(60000); // 1 min
-						} catch (InterruptedException e) {}
+						} catch (InterruptedException e) { /* */ }
 					}
 				}
 			};
@@ -450,7 +450,7 @@ public class Starota {
 			User user = getUser(userId);
 			if (user != null)
 				return user;
-		} catch (NumberFormatException e) {}
+		} catch (NumberFormatException e) { /* */ }
 		String user = name.replaceAll("@", "").replaceAll("#\\d{4}", "");
 		if (user.matches("<\\d{18}>")) {
 			long userId = Long.parseLong(user.substring(1, 19));
@@ -469,10 +469,9 @@ public class Starota {
 			try {
 				long id = Long.parseLong(name.substring(3, name.length() - 1));
 				User idUser = getUser(id);
-				if (idUser != null) {
+				if (idUser != null)
 					return idUser;
-				}
-			} catch (NumberFormatException e) {}
+			} catch (NumberFormatException e) { /* */ }
 		}
 		DiscordClient client = Starota.getClient();
 		List<User> users;
@@ -511,7 +510,7 @@ public class Starota {
 				TextChannel idChannel = getChannel(id);
 				if (idChannel != null)
 					return idChannel;
-			} catch (NumberFormatException e) {}
+			} catch (NumberFormatException e) { /* */ }
 		}
 		name = name.substring(1);
 		DiscordClient client = Starota.getClient();
@@ -664,8 +663,7 @@ public class Starota {
 					if (MiscUtils.arrContains(SKIPPED_SERVERS, g.getId().asLong()))
 						continue;
 					Member owner = g.getOwner().block();
-					if (author.getId().asLong() == owner.getId().asLong()
-							|| alreadySent.contains(owner.getId().asLong()))
+					if (alreadySent.contains(owner.getId().asLong()))
 						continue;
 					alreadySent.add(owner.getId().asLong());
 					if ((msg == null || msg.isEmpty()) && fEmbed != null)

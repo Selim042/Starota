@@ -4,17 +4,17 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import discord4j.core.event.EventDispatcher;
 import discord4j.core.event.domain.Event;
+import reactor.core.publisher.Flux;
 
 public interface EventListener {
 
 	@Target(ElementType.METHOD)
 	@Retention(RetentionPolicy.RUNTIME)
-	public @interface EventSubscriber {}
+	public @interface EventSubscriber { /* */ }
 
 	/***
 	 * @deprecated Call, don't override
@@ -27,13 +27,16 @@ public interface EventListener {
 				continue;
 			Class<?>[] paramTypes = m.getParameterTypes();
 			if (paramTypes.length == 1 && Event.class.isAssignableFrom(paramTypes[0])) {
-				dispatch.on((Class) paramTypes[0]).subscribe((Object obj) -> {
+				Flux<Event> f = dispatch.on((Class) paramTypes[0]);
+				f.subscribe((Object obj) -> {
 					try {
 						m.invoke(this, obj);
-					} catch (IllegalAccessException | IllegalArgumentException
-							| InvocationTargetException e) {
+					} catch (Exception e) {
+						e.printStackTrace();
 						throw new EventHandleException(paramTypes[0], e);
 					}
+				}, (err) -> {
+					err.printStackTrace();
 				});
 			}
 		}

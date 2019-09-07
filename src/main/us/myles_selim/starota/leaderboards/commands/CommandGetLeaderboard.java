@@ -47,7 +47,7 @@ public class CommandGetLeaderboard extends BotCommand<StarotaServer> {
 		if (args.length > 3)
 			try {
 				page = Integer.parseInt(args[1]) - 1;
-			} catch (NumberFormatException e) {}
+			} catch (NumberFormatException e) { /* */ }
 		Leaderboard board;
 		if (message.getAuthorAsMember().block().getBasePermissions().block()
 				.contains(Permission.ADMINISTRATOR)) {
