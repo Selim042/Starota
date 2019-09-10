@@ -43,8 +43,10 @@ public class CommandBattleReady extends BotCommand<StarotaServer> {
 		int hours = (int) ((time / 3600000) % 24);
 		int minutes = (int) ((time / 60000) % 60);
 		server.setReady(profile.getPoGoName(), time);
-		channel.createMessage(message.getAuthor() + " has been marked as battle ready for the next "
-				+ hours + " hours and " + minutes + " minutes.").block();
+		channel.createMessage(
+				message.getAuthor().get().getMention() + " has been marked as battle ready for the next "
+						+ hours + " hours and " + minutes + " minutes.")
+				.block();
 	}
 
 }
