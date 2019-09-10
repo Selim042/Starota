@@ -114,7 +114,9 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
 	public final static String CHANGELOG = "Changelog for v" + StarotaConstants.VERSION + "\n"
-			+ "Public changes:\n" + " * Fix battleReady and other things";
+			+ "Public changes:\n" + " * Fix battleReady (again)\n"
+			+ " * Fix typo in register and sRegister\n" + " * Fix characters in dex and events\n"
+			+ " * Re-implement the \"Starota is typing\" status\n" + " * Fix Deoxys form raids";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static PrimaryCommandHandler COMMAND_HANDLER;
