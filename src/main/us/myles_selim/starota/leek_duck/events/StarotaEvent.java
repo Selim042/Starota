@@ -113,7 +113,7 @@ public class StarotaEvent {
 		builder.withTitle(
 				this.location != null && !this.location.isEmpty() ? this.name + ": " + this.location
 						: this.name)
-				.withDesc(this.description);
+				.withDesc(MiscUtils.fixCharacters(this.description));
 		String timeLeft = this.getTimeLeft(server.getTimezone());
 		if (timeLeft != null)
 			builder.appendDesc("\n\n**" + timeLeft + "**");
@@ -156,7 +156,8 @@ public class StarotaEvent {
 		for (String b : this.bonuses)
 			bonuses.append(String.format(" - %s\n", b));
 		if (bonuses.length() != 0)
-			builder.appendField("Bonuses:", bonuses.toString().substring(0, bonuses.length() - 1),
+			builder.appendField("Bonuses:",
+					MiscUtils.fixCharacters(bonuses.toString().substring(0, bonuses.length() - 1)),
 					false);
 
 		StringBuilder tieredBonuses = new StringBuilder();
@@ -166,7 +167,8 @@ public class StarotaEvent {
 				tieredBonuses.append(" - " + b + "\n");
 		}
 		if (tieredBonuses.length() != 0)
-			builder.appendField("Tiered Bonuses:", tieredBonuses.toString(), false);
+			builder.appendField("Tiered Bonuses:", MiscUtils.fixCharacters(tieredBonuses.toString()),
+					false);
 
 		StringBuilder research = new StringBuilder();
 		for (EventFieldResearch fr : this.fieldResearch) {
@@ -176,7 +178,7 @@ public class StarotaEvent {
 			}
 		}
 		if (research.length() != 0)
-			builder.appendField("Field Research:", research.toString(), false);
+			builder.appendField("Field Research:", MiscUtils.fixCharacters(research.toString()), false);
 
 		if (index != -1)
 			builder.withFooterText("Event " + index + "/" + max + " | Last updated")

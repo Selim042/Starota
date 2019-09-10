@@ -279,7 +279,7 @@ public class PokedexEntry extends ReactionMessage {
 		builder.withTitle(String.format("%s #%d", pokeName, entry.id))
 				.withUrl(String.format("https://db.pokemongohub.net/pokemon/%d", entry.id));
 		builder.withThumbnail(entry.getPokemon().getArtwork(formId));
-		builder.appendDesc(entry.getDescription());
+		builder.appendDesc(MiscUtils.fixCharacters(entry.getDescription()));
 
 		// stats
 		builder.appendField("Type:",
