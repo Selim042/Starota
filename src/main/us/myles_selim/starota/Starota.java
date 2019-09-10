@@ -217,29 +217,31 @@ public class Starota {
 					Presence.online(Activity.watching("people research counters with .dex")));
 			statusUpdater.start();
 
-			EXECUTOR.execute(new Runnable() {
+			if (!IS_DEV) {
+				EXECUTOR.execute(new Runnable() {
 
-				@Override
-				public void run() {
-					boolean sentToAll = true;
-					List<Guild> guilds = new ArrayList<>(CLIENT.getGuilds().collectList().block());
-					for (Guild g : guilds) {
-						StarotaServer server = StarotaServer.getServer(g);
-						TextChannel changesChannel = server
-								.getSetting(StarotaConstants.Settings.CHANGES_CHANNEL);
-						if (changesChannel == null)
-							continue;
-						String latestChangelog = (String) server.getDataValue("changesVersion");
-						if (!StarotaConstants.VERSION.equalsIgnoreCase(latestChangelog)) {
-							changesChannel.createMessage("```" + CHANGELOG + "```").block();
-							server.setDataValue("changesVersion", StarotaConstants.VERSION);
-						} else
-							sentToAll = false;
+					@Override
+					public void run() {
+						boolean sentToAll = true;
+						List<Guild> guilds = new ArrayList<>(CLIENT.getGuilds().collectList().block());
+						for (Guild g : guilds) {
+							StarotaServer server = StarotaServer.getServer(g);
+							TextChannel changesChannel = server
+									.getSetting(StarotaConstants.Settings.CHANGES_CHANNEL);
+							if (changesChannel == null)
+								continue;
+							String latestChangelog = (String) server.getDataValue("changesVersion");
+							if (!StarotaConstants.VERSION.equalsIgnoreCase(latestChangelog)) {
+								changesChannel.createMessage("```" + CHANGELOG + "```").block();
+								server.setDataValue("changesVersion", StarotaConstants.VERSION);
+							} else
+								sentToAll = false;
+						}
+						if (!IS_DEV && sentToAll)
+							TwitterHelper.sendTweet(CHANGELOG);
 					}
-					if (!IS_DEV && sentToAll)
-						TwitterHelper.sendTweet(CHANGELOG);
-				}
-			});
+				});
+			}
 
 			// LuaUtils.registerConverters();
 			// new LuaEventHandler().setup(dispatcher);
