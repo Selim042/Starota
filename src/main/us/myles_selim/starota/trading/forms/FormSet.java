@@ -27,7 +27,7 @@ public abstract class FormSet {
 	}
 
 	public Form getForm(String form) {
-		if (form == null || form.equalsIgnoreCase("Normal"))
+		if (form == null || form.equalsIgnoreCase("Normal") || form.equalsIgnoreCase("null"))
 			return getDefaultForm();
 		for (Form f : forms) {
 			String formName = f.toString().replaceAll("\\.", "").replaceAll(" ", "_");
@@ -77,6 +77,9 @@ public abstract class FormSet {
 			return null;
 		}
 
+		/**
+		 * Returns the form name, should be the same as GoHub's name
+		 */
 		@Override
 		public abstract String toString();
 

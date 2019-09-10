@@ -26,7 +26,15 @@ public class ReactionMessage {
 	private Map<ReactionEmoji, ReactionButton> buttons = new HashMap<>();
 
 	public final ReactionMessage addButton(ReactionButton button) {
-		if (buttons.containsKey(button.emoji))
+		if (buttons.keySet().stream().anyMatch((r) -> {
+			if (!r.getClass().equals(button.emoji.getClass()))
+				return false;
+			if (r instanceof ReactionEmoji.Custom)
+				return ((ReactionEmoji.Custom) r).getId()
+						.equals(((ReactionEmoji.Custom) button.emoji).getId());
+			return ((ReactionEmoji.Unicode) r).getRaw()
+					.equals(((ReactionEmoji.Unicode) button.emoji).getRaw());
+		}))
 			return this;
 		this.buttons.put(button.getEmoji(), button);
 		this.msg.addReaction(button.emoji).block();
@@ -48,10 +56,10 @@ public class ReactionMessage {
 				(Message message, User user, boolean added) -> {
 					if (!added)
 						return false;
-					if (index.value >= max)
-						index.value = 0;
-					else
+					if (index.value < max - 1)
 						index.value++;
+					else
+						index.value = 0;
 					return true;
 				}));
 		return this;

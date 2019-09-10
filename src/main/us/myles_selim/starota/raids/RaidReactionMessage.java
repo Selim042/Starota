@@ -73,15 +73,15 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 	public void onReactionAdded(StarotaServer server, MessageChannel channel, Message msg, User user,
 			ReactionEmoji react) {
 		msg.removeReaction(react, user.getId()).block();
+		if (user.isBot())
+			return;
 		String emojiName = MiscUtils.getEmojiName(react);
 		if (pokemon != null && !MiscUtils.arrContains(EMOJI_NAMES, emojiName))
 			return;
 		if (pokemon == null) {
 			String[] parts = react.asCustomEmoji().get().getName().split("_");
 			pokemon = EnumPokemon.getPokemon(parts[0]);
-			form = parts.length > 1 && pokemon.getFormSet() != null
-					? pokemon.getFormSet().getForm(parts[1])
-					: null;
+			form = getForm(parts);
 			boss = SilphRoadData.getBoss(pokemon, form);
 			if (boss == null)
 				return;
@@ -127,15 +127,18 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 		msg.edit((m) -> m.setEmbed(getEmbed(server))).block();
 	}
 
+	private Form getForm(String[] parts) {
+		if (parts.length < 2 || pokemon.getFormSet() == null)
+			return null;
+		return pokemon.getFormSet().getForm(parts[1]);
+	}
+
 	@Override
 	protected Consumer<? super EmbedCreateSpec> getEmbed(StarotaServer server) {
 		EmbedBuilder builder = new EmbedBuilder();
 		PokedexEntry entry = null;
 		if (pokemon != null && StarotaModule.isModuleEnabled(server, BaseModules.POKEDEX))
-			entry = GoHubDatabase.getEntry(pokemon,
-					form == null ? null
-							: (form.getSpritePostfix(pokemon) == null ? form.toString()
-									: form.getSpritePostfix(pokemon)));
+			entry = GoHubDatabase.getEntry(pokemon, form == null ? null : form.toString());
 		if (pokemon != null) {
 			String titleString = (form == null ? "" : form + " ") + pokemon + " Raid ";
 			// if (boss.getTier() == 6)
