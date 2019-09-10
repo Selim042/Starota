@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
 import org.squiddev.cobalt.LuaError;
 
 import discord4j.core.DiscordClient;
@@ -19,7 +21,6 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.PrivateChannel;
 import discord4j.core.object.entity.User;
-import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.PermissionSet;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -74,57 +75,79 @@ public class PrimaryCommandHandler implements EventListener {
 
 	@EventSubscriber
 	public void onMessageEvent(MessageCreateEvent event) {
-		User author = event.getMessage().getAuthor().get();
+		// check if author is bot and if Starota is started
+		User author = event.getMessage().getAuthor().orElse(null);
 		if (author == null || author.isBot() || !Starota.FULLY_STARTED)
 			return;
-		Guild guild = event.getGuild().block();
-		// if (guild == null)
-		// return;
 		MessageChannel channel = event.getMessage().getChannel().block();
+
+		// check if the handler should even execute
 		if (!shouldExecute.shouldExecute(channel))
 			return;
+
+		// get other params
+		Guild guild = event.getGuild().block();
 		Message message = event.getMessage();
+		if (!message.getContent().isPresent())
+			return;
 		String cmdS = message.getContent().get();
 		String prefix = getPrefix(guild);
+
+		// check if msg starts with a valid prefix
 		if (!cmdS.startsWith(prefix)
 				&& !cmdS.startsWith(client.getSelf().block().getMention().replaceAll("@!", "@") + " "))
 			return;
 		String[] args = getArgs(message, guild);
-		// User ourUser = Starota.getOurUser();
-		// if (!channel.t.getTypingStatus()
-		// &&
-		// channel.getModifiedPermission(ourUser).contains(Permission.SEND_MESSAGES))
-		// RequestBuffer.request(() -> channel.setTypingStatus(true));
-		if (Starota.DEBUG)
-			message.addReaction(ReactionEmoji.unicode("�?"));
+
+		PermissionSet authorPerms = message.getAuthorAsMember().block().getBasePermissions().block();
+		StarotaServer server = StarotaServer.getServer(guild);
 		boolean cmdFound = false;
+
+		// get Starota's perms for channel
+		PermissionSet hasPerms;
+		if (channel instanceof GuildChannel)
+			hasPerms = ((GuildChannel) channel).getEffectivePermissions(client.getSelfId().get())
+					.block();
+		else
+			hasPerms = PermissionSet.of(Permission.ADD_REACTIONS, Permission.ATTACH_FILES,
+					Permission.EMBED_LINKS, Permission.MENTION_EVERYONE, Permission.SEND_MESSAGES,
+					Permission.USE_EXTERNAL_EMOJIS, Permission.VIEW_CHANNEL);
+		if (!hasPerms.contains(Permission.SEND_MESSAGES))
+			return;
+
+		List<Subscriber<? super Void>> typeSub = new ArrayList<>();
 		try {
-			PermissionSet hasPerms;
-			if (channel instanceof GuildChannel)
-				hasPerms = ((GuildChannel) channel).getEffectivePermissions(client.getSelfId().get())
-						.block();
-			else
-				hasPerms = PermissionSet.of(Permission.ADD_REACTIONS, Permission.ATTACH_FILES,
-						Permission.EMBED_LINKS, Permission.MENTION_EVERYONE, Permission.SEND_MESSAGES,
-						Permission.USE_EXTERNAL_EMOJIS, Permission.VIEW_CHANNEL);
-			if (!hasPerms.contains(Permission.SEND_MESSAGES))
-				return;
+			channel.typeUntil(new Publisher<Void>() {
+
+				@Override
+				public void subscribe(Subscriber<? super Void> s) {
+					typeSub.add(s);
+				}
+			}).blockFirst();
+
+			// try to find valid command
 			for (ICommandHandler h : COMMAND_HANDLERS) {
 				ICommand cmd = h.findCommand(guild, message, args[0]);
+				// check if cmd not found, or if cmd isn't allowed here, or if
+				// the user doesn't have perms for the found cmd
 				if (cmd == null
-						|| !ChannelCommandManager.isAllowedHere(StarotaServer.getServer(guild),
-								cmd.getCategory(), channel)
+						|| !ChannelCommandManager.isAllowedHere(server, cmd.getCategory(), channel)
 						|| (cmd.requiredUsePermission() != null && guild != null
-								&& !message.getAuthorAsMember().block().getBasePermissions().block()
-										.contains(cmd.requiredUsePermission())))
+								&& !authorPerms.contains(cmd.requiredUsePermission())))
 					continue;
+
+				// if Starota doesn't have necessary perms, create error msg
 				EnumSet<Permission> reqPerms = cmd.getCommandPermission().asEnumSet().clone();
 				if (!hasPerms.containsAll(reqPerms)) {
 					reqPerms.removeAll(hasPerms);
-					channel.createEmbed(getPermissionError(reqPerms));
+					if (hasPerms.contains(Permission.EMBED_LINKS))
+						channel.createEmbed(getPermissionError(reqPerms)).block();
+					else
+						channel.createMessage("Starota is missing the \"EMBED_LINKS\" permission");
 					cmdFound = true;
 					continue;
 				}
+				// run the command on Starota's executor
 				Starota.EXECUTOR.execute(new Runnable() {
 
 					@Override
@@ -138,25 +161,22 @@ public class PrimaryCommandHandler implements EventListener {
 				});
 				cmdFound = true;
 				continue;
-				// if (h.executeCommand(args, message, server, channel)) {
-				// cmdFound = true;
-				// continue;
-				// }
 			}
 		} catch (Throwable e) {
 			cmdFound = true;
 			handleException(e, guild, channel, message);
 		}
+		typeSub.forEach((s) -> s.onComplete());
+
+		// give cmd suggestions if a cmd was not found
 		if (!cmdFound) {
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.withTitle("Did you mean...?");
 			for (ICommand cmd : getSuggestions(guild, message, args[0], 5)) {
 				if (cmd == null
-						|| !ChannelCommandManager.isAllowedHere(StarotaServer.getServer(guild),
-								cmd.getCategory(), channel)
+						|| !ChannelCommandManager.isAllowedHere(server, cmd.getCategory(), channel)
 						|| (cmd.requiredUsePermission() != null && guild != null
-								&& !message.getAuthorAsMember().block().getBasePermissions().block()
-										.contains(cmd.requiredUsePermission())))
+								&& !authorPerms.contains(cmd.requiredUsePermission())))
 					continue;
 				String desciption = cmd.getDescription();
 				builder.appendDesc("- " + prefix + cmd.getName()
@@ -164,10 +184,6 @@ public class PrimaryCommandHandler implements EventListener {
 			}
 			channel.createEmbed(builder.build()).block();
 		}
-		// if (channel.getTypingStatus()
-		// &&
-		// channel.getModifiedPermission(ourUser).contains(Permission.SEND_MESSAGES))
-		// RequestBuffer.request(() -> channel.setTypingStatus(false));
 	}
 
 	private Consumer<? super EmbedCreateSpec> getPermissionError(EnumSet<Permission> reqPerms) {
