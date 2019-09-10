@@ -32,7 +32,6 @@ public interface EventListener {
 					try {
 						m.invoke(this, obj);
 					} catch (Exception e) {
-						e.printStackTrace();
 						throw new EventHandleException(paramTypes[0], e);
 					}
 				}, (err) -> {

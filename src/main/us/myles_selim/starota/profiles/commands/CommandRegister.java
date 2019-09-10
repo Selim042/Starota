@@ -91,7 +91,7 @@ public class CommandRegister extends BotCommand<StarotaServer> {
 		if (teamRole != null)
 			target.addRole(teamRole.getId()).block();
 
-		channel.createMessage((m) -> m.setContent("Sucessfully registered " + target.getUsername())
+		channel.createMessage((m) -> m.setContent("Successfully registered " + target.getUsername())
 				.setEmbed(profile.toEmbed(server))).block();
 		PrivateChannel targetPm = target.getPrivateChannel().block();
 		targetPm.createMessage(String.format(REGISTERED_PM, server.getDiscordGuild().getName())).block();
