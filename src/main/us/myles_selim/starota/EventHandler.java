@@ -13,6 +13,7 @@ import org.reflections.scanners.MethodAnnotationsScanner;
 import discord4j.core.event.domain.guild.GuildCreateEvent;
 import discord4j.core.event.domain.guild.GuildDeleteEvent;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
+import discord4j.core.event.domain.guild.MemberLeaveEvent;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.role.RoleUpdateEvent;
 import discord4j.core.object.entity.Guild;
@@ -61,7 +62,7 @@ public class EventHandler implements EventListener {
 		Starota.updateOwners();
 		User selimUser = Starota.getUser(StarotaConstants.SELIM_USER_ID.asLong());
 		PrivateChannel selimPm = selimUser.getPrivateChannel().block();
-		selimPm.createMessage("Starota was added to the server: " + server.getName());
+		selimPm.createMessage("Starota was added to the server: " + server.getName()).block();
 
 		Member serverOwner = server.getOwner().block();
 		PrivateChannel ownerPm = serverOwner.getPrivateChannel().block();
@@ -71,11 +72,11 @@ public class EventHandler implements EventListener {
 		builder.appendDesc("If you need any assistance with " + ourName
 				+ " or it's features, feel free to join our support server at "
 				+ StarotaConstants.SUPPORT_SERVER_LINK);
-		ownerPm.createEmbed(builder.build());
+		ownerPm.createEmbed(builder.build()).block();
 		if (!Starota.getOurUser().asMember(server.getId()).block().getBasePermissions().block()
 				.contains(Permission.SEND_MESSAGES))
 			ownerPm.createMessage(Starota.getOurName(server)
-					+ " requires the `SEND_MESSAGES` permission for all command functionality.");
+					+ " requires the `SEND_MESSAGES` permission for all command functionality.").block();
 	}
 
 	@EventSubscriber
@@ -90,6 +91,14 @@ public class EventHandler implements EventListener {
 	public void onUserJoin(MemberJoinEvent event) {
 		if (event.getGuild().block().getId().equals(StarotaConstants.SUPPORT_SERVER))
 			Starota.updateOwners();
+	}
+
+	@EventSubscriber
+	public void onUserJoin(MemberLeaveEvent event) {
+		StarotaServer server = event.getGuild().map((g) -> StarotaServer.getServer(g)).block();
+		Snowflake user = event.getUser().getId();
+		if (server.hasProfile(user))
+			server.deleteProfile(user);
 	}
 
 	private static final Map<String, Consumer<String>> CACHES = new HashMap<>();
