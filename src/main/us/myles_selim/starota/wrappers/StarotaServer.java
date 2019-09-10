@@ -101,6 +101,12 @@ public class StarotaServer extends BotServer {
 				.registerType(new PlayerProfile.DataTypePlayerProfile());
 	}
 
+	public boolean hasProfile(Snowflake id) {
+		if (!StarotaModule.isModuleEnabled(this, BaseModules.PROFILES))
+			return false;
+		return getProfilesInternal().containsKey(id.asString());
+	}
+
 	public boolean hasProfile(Member user) {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.PROFILES))
 			return false;
@@ -117,6 +123,10 @@ public class StarotaServer extends BotServer {
 			return profile;
 		}
 		return null;
+	}
+
+	public void deleteProfile(Snowflake id) {
+		getProfilesInternal().clearKey(id.asString());
 	}
 
 	public PlayerProfile setProfile(Member user, PlayerProfile profile) {
@@ -136,9 +146,10 @@ public class StarotaServer extends BotServer {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.PROFILES))
 			return null;
 		List<PlayerProfile> profilesL = new LinkedList<>();
-		for (String k : getProfilesInternal().getKeys()) {
-			PlayerProfile profile = getProfilesInternal().get(k, PlayerProfile.class);
-			updateLevel(profile);
+		EBStorage profsInt = getProfilesInternal();
+		for (String k : profsInt.getKeys()) {
+			PlayerProfile profile = profsInt.get(k, PlayerProfile.class);
+			// updateLevel(profile);
 			profilesL.add(profile);
 		}
 		return Collections.unmodifiableList(profilesL);

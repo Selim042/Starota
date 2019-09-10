@@ -1,11 +1,15 @@
 package us.myles_selim.starota.webserver;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -15,6 +19,7 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Snowflake;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.trading.TradeboardPost;
@@ -52,20 +57,15 @@ public class HttpHandlerProfiles implements HttpHandler {
 	public void handle(HttpExchange ex) throws IOException {
 		try {
 			if (!WebServer.isLoggedIn(ex)) {
-				WebServer.return404(ex, "Please login");
+				WebServer.return404(ex, "Please " + WebServer.getLoginHTML(ex, "login"));
 				return;
 			}
 			Cookie tokenCookie = WebServer.getCookies(ex).get("token");
-			Cookie serverCookie = WebServer.getCookies(ex).get("current_server");
-			if (serverCookie == null) {
-				WebServer.returnServer404(ex, "Please select a server");
-				return;
-			}
-			Snowflake serverId = Snowflake.of(serverCookie.value);
+			Snowflake serverId = WebServer.getGuild(ex);
 			boolean inGuild = Starota.getClient().getGuilds().any((g) -> g.getId().equals(serverId))
 					.block();
 			if (!inGuild) {
-				WebServer.return404(ex, "Tradeboard not found");
+				WebServer.returnServer404(ex, "Please select a server");
 				return;
 			}
 			Guild guild = inGuild ? Starota.getGuild(serverId) : null;
@@ -85,7 +85,8 @@ public class HttpHandlerProfiles implements HttpHandler {
 				}
 			}
 
-			BufferedReader profTempFile = new BufferedReader(new FileReader("http/profiles.html"));
+			InputStream file = WebServer.getResourceFile("http/profiles.html");
+			BufferedReader profTempFile = new BufferedReader(new InputStreamReader(file));
 			StringBuilder tempBuilder = new StringBuilder();
 			profTempFile.lines().forEach(tempBuilder::append);
 			profTempFile.close();
@@ -93,20 +94,18 @@ public class HttpHandlerProfiles implements HttpHandler {
 
 			Map<String, String> get = WebServer.getGET(ex);
 			ProfilesSearch search = new ProfilesSearch();
-			// if (get.containsKey("q")) {
-			// String query = get.get("q");
-			// temp = temp.replaceAll("\\{SEARCH_PLACEHOLDER\\}", query);
-			// search.fillValues(query);
-			// } else
-			// temp = temp.replaceAll("\\{SEARCH_PLACEHOLDER\\}", "");
-			// if (get.containsKey("t") && get.get("t").matches("(01)"))
-			// search.lookingFor = get.get("t").equals("0");
+			if (get.containsKey("q")) {
+				String query = get.get("q");
+				temp = temp.replaceAll("\\{SEARCH_PLACEHOLDER\\}", query);
+				search.fillValues(query);
+			} else
+				temp = temp.replaceAll("\\{SEARCH_PLACEHOLDER\\}", "");
 
 			// fill stuff
 			temp = WebServer.fillBaseStuff(ex, tokenCookie.value, temp);
 			temp = fillCardsInfo(temp, server, member, search);
 
-			WebServer.setContentType(ex, "http/tradeboard.html");
+			WebServer.setContentType(ex, "http/profiles.html");
 			OutputStream response = ex.getResponseBody();
 			byte[] out = temp.getBytes("UTF-8");
 			ex.sendResponseHeaders(200, out.length);
@@ -142,7 +141,7 @@ public class HttpHandlerProfiles implements HttpHandler {
 					.collectList().block();
 			Role lastHighest = null;
 			for (PlayerProfile post : profiles) {
-				if (search != null && !search.matches(post))
+				if (search != null && !search.matches(server.getDiscordGuild(), post))
 					continue;
 				Member owner = server.getDiscordGuild().getMemberById(Snowflake.of(post.getDiscordId()))
 						.block();
@@ -201,11 +200,56 @@ public class HttpHandlerProfiles implements HttpHandler {
 
 	private class ProfilesSearch {
 
-		public boolean matches(PlayerProfile post) {
-			return true;
+		public final List<String> terms = new LinkedList<>();
+
+		public boolean matches(Guild guild, PlayerProfile post) {
+			if (terms.size() == 0)
+				return true;
+			boolean matches = true;
+			for (String term : terms) {
+				final String termL = term.toLowerCase();
+				EnumTeam team = EnumTeam.getTeam(termL);
+				if (team != null && team != post.getTeam()) {
+					matches = false;
+					break;
+				} else if (team != null && team == post.getTeam())
+					continue;
+				if (termL.matches("\\d\\d?")) {
+					int level = Integer.parseInt(termL);
+					if (post.getLevel() != level) {
+						matches = false;
+						break;
+					} else
+						continue;
+				}
+				Member profileOwner = post.getDiscordMember(guild);
+				Optional<String> nickname = profileOwner.getNickname();
+				Set<String> alts = post.getAlts().keySet();
+				alts.removeIf((alt) -> !alt.toLowerCase().startsWith(termL));
+				// pogo name
+				if (post.getPoGoName().toLowerCase().startsWith(termL)
+						// real name
+						|| post.getRealName() != null
+								&& post.getRealName().toLowerCase().startsWith(termL)
+						// discord nickname
+						|| nickname.isPresent() && nickname.get().toLowerCase().startsWith(termL)
+						// discord username
+						|| profileOwner.getUsername().toLowerCase().startsWith(termL)
+						// alt pogo names
+						|| alts.size() > 0)
+					continue;
+				else {
+					matches = false;
+					break;
+				}
+			}
+			return matches;
 		}
 
-		public void fillValues(String search) {}
+		public void fillValues(String search) {
+			for (String t : search.split(" "))
+				terms.add(t);
+		}
 
 	}
 

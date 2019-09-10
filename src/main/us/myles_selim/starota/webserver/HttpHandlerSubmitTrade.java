@@ -2,7 +2,6 @@ package us.myles_selim.starota.webserver;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -24,13 +23,13 @@ public class HttpHandlerSubmitTrade implements HttpHandler {
 	public void handle(HttpExchange ex) throws IOException {
 		try {
 			if (!WebServer.isLoggedIn(ex)) {
-				WebServer.return404(ex, "Please login");
+				WebServer.return404(ex, "Please " + WebServer.getLoginHTML(ex, "login"));
 				return;
 			}
 			Cookie tokenCookie = WebServer.getCookies(ex).get("token");
 			Cookie serverCookie = WebServer.getCookies(ex).get("current_server");
 			if (serverCookie == null) {
-				WebServer.return404(ex, "Please select a server");
+				WebServer.returnServer404(ex, "Please select a server");
 				return;
 			}
 			Snowflake serverId = Snowflake.of(serverCookie.value);

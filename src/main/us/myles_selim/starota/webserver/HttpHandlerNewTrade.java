@@ -1,8 +1,9 @@
 package us.myles_selim.starota.webserver;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Map;
 
@@ -26,13 +27,13 @@ public class HttpHandlerNewTrade implements HttpHandler {
 	public void handle(HttpExchange ex) throws IOException {
 		try {
 			if (!WebServer.isLoggedIn(ex)) {
-				WebServer.return404(ex, "Please login");
+				WebServer.return404(ex, "Please " + WebServer.getLoginHTML(ex, "login"));
 				return;
 			}
 			Cookie tokenCookie = WebServer.getCookies(ex).get("token");
 			Cookie serverCookie = WebServer.getCookies(ex).get("current_server");
 			if (serverCookie == null) {
-				WebServer.return404(ex, "Please select a server");
+				WebServer.returnServer404(ex, "Please select a server");
 				return;
 			}
 			Map<String, String> get = WebServer.getGET(ex);
@@ -46,7 +47,8 @@ public class HttpHandlerNewTrade implements HttpHandler {
 			} else
 				selected = 1;
 
-			BufferedReader profTempFile = new BufferedReader(new FileReader("http/new_trade.html"));
+			InputStream file = WebServer.getResourceFile("http/new_trade.html");
+			BufferedReader profTempFile = new BufferedReader(new InputStreamReader(file));
 			StringBuilder tempBuilder = new StringBuilder();
 			profTempFile.lines().forEach(tempBuilder::append);
 			profTempFile.close();

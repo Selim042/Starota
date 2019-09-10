@@ -1,18 +1,17 @@
 package us.myles_selim.starota.webserver;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +19,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import com.google.common.io.Files;
+import org.apache.pdfbox.io.IOUtils;
+
 import com.google.gson.Gson;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
@@ -67,7 +67,7 @@ public class WebServer {
 			// HttpHandlerAPIProfiles());
 			// server.createContext("/settings/", new HttpHandlerSettings());
 			server.createContext("/profile", new HttpHandlerProfile());
-			server.createContext("/guilds", new HttpHandler() {
+			server.createContext("/data/guilds", new HttpHandler() {
 
 				@Override
 				public void handle(HttpExchange ex) throws IOException {
@@ -114,6 +114,13 @@ public class WebServer {
 			server.createContext("/new_trade", new HttpHandlerNewTrade());
 			server.createContext("/submit_trade", new HttpHandlerSubmitTrade());
 			server.createContext("/profiles", new HttpHandlerProfiles());
+			server.createContext("/leaderboards", new HttpHandler() {
+
+				@Override
+				public void handle(HttpExchange ex) throws IOException {
+					returnTextFile(ex, "http/leaderboards.html");
+				}
+			});
 			server.createContext("/", new HttpHandler() {
 
 				@Override
@@ -129,6 +136,33 @@ public class WebServer {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
+	protected static String getLoginHTML(HttpExchange ex, String text) {
+		try {
+			return String.format("<a href=\"/login?p=%s\">%s</a>",
+					URLEncoder.encode(ex.getRequestURI().toString(), "UTF-8"), text);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return String.format("<a href=\"/login?p=%s\">%s</a>",
+					URLEncoder.encode(ex.getRequestURI().toString()), text);
+		}
+	}
+
+	protected static InputStream getResourceFile(String path) {
+		return WebServer.class.getClassLoader().getResourceAsStream(path);
+	}
+
+	protected static Snowflake getGuild(HttpExchange ex) {
+		handleBaseGET(ex);
+		Cookie serverCookie = WebServer.getCookies(ex).get("current_server");
+		if (serverCookie == null)
+			return null;
+		Snowflake id = Snowflake.of(serverCookie.value);
+		if (id.asLong() == 314733127027130379L || Starota.IS_DEV)
+			return id;
+		return null;
+	}
+
 	protected static boolean isLoggedIn(HttpExchange ex) {
 		Cookie token = getCookies(ex).get("token");
 		if (token == null || !OAuthUtils.isTokenValid(token.value))
@@ -136,11 +170,11 @@ public class WebServer {
 		return true;
 	}
 
-	protected static void setContentType(HttpExchange ex, String file) {
-		String mimeType = URLConnection.guessContentTypeFromName(file);
-		if (file.contains(".css"))
+	protected static void setContentType(HttpExchange ex, String fileName) {
+		String mimeType = URLConnection.guessContentTypeFromName(fileName);
+		if (fileName.contains(".css"))
 			mimeType = "text/css";
-		else if (file.contains(".js"))
+		else if (fileName.contains(".js"))
 			mimeType = "application/javascript";
 		Headers respHeaders = ex.getResponseHeaders();
 		respHeaders.set("Content-Type", mimeType);
@@ -182,25 +216,26 @@ public class WebServer {
 		}
 	}
 
-	protected static void returnTextFile(HttpExchange ex, String file) {
-		returnTextFile(ex, file, new HashMap<>());
+	protected static void returnTextFile(HttpExchange ex, String fileName) {
+		returnTextFile(ex, fileName, new HashMap<>());
 	}
 
-	protected static void returnTextFile(HttpExchange ex, String file, int code) {
-		returnTextFile(ex, file, code, new HashMap<>());
+	protected static void returnTextFile(HttpExchange ex, String fileName, int code) {
+		returnTextFile(ex, fileName, code, new HashMap<>());
 	}
 
-	protected static void returnTextFile(HttpExchange ex, String file, Map<String, String> replace) {
-		returnTextFile(ex, file, 200, replace);
+	protected static void returnTextFile(HttpExchange ex, String fileName, Map<String, String> replace) {
+		returnTextFile(ex, fileName, 200, replace);
 	}
 
-	protected static void returnTextFile(HttpExchange ex, String file, int code,
+	protected static void returnTextFile(HttpExchange ex, String fileName, int code,
 			Map<String, String> replace) {
 		try {
-			setContentType(ex, file);
+			InputStream file = getResourceFile(fileName);
+			setContentType(ex, fileName);
 
 			OutputStream response = ex.getResponseBody();
-			BufferedReader reader = new BufferedReader(new FileReader(file));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(file));
 			StringBuilder data = new StringBuilder();
 			int c = reader.read();
 			while (c != -1) {
@@ -221,18 +256,18 @@ public class WebServer {
 		}
 	}
 
-	protected static void returnBinaryFile(HttpExchange ex, String file) {
-		returnBinaryFile(ex, file, 200);
+	protected static void returnBinaryFile(HttpExchange ex, String fileName) {
+		returnBinaryFile(ex, fileName, 200);
 	}
 
-	protected static void returnBinaryFile(HttpExchange ex, String file, int code) {
+	protected static void returnBinaryFile(HttpExchange ex, String fileName, int code) {
 		try {
-			setContentType(ex, file);
+			InputStream file = getResourceFile(fileName);
+			setContentType(ex, fileName);
 
-			File f = new File(file);
-			ex.sendResponseHeaders(code, f.length());
+			ex.sendResponseHeaders(code, file.available());
 			OutputStream respBody = ex.getResponseBody();
-			Files.copy(f, respBody);
+			IOUtils.copy(file, respBody);
 			respBody.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -340,22 +375,6 @@ public class WebServer {
 			}
 		}
 		return ret;
-	}
-
-	protected static String getJSObject(Object obj) {
-		StringBuilder out = new StringBuilder("{");
-		try {
-			for (Field f : obj.getClass().getDeclaredFields()) {
-				Object val = f.get(obj);
-				if (val == null)
-					out.append(String.format("%s:null,", f.getName()));
-				if (val instanceof String)
-					out.append(String.format("%s:\"%s\",", f.getName(), val));
-				if (val instanceof Number)
-					out.append(String.format("%s:%s,", f.getName(), val.toString()));
-			}
-		} catch (IllegalArgumentException | IllegalAccessException e) {}
-		return out.toString() + "}";
 	}
 
 	public static boolean isRunning() {

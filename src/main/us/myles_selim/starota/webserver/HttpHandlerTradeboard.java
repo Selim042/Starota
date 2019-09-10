@@ -1,8 +1,9 @@
 package us.myles_selim.starota.webserver;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,6 +50,9 @@ public class HttpHandlerTradeboard implements HttpHandler {
 			+ "<h1 style=\"font-size: 16px;\"><strong>Legacy:</strong></h1>"
 			+ "<p>{POKEMON_LEGACY}</p></div></div><div class=\"row\"><div class=\"col\">"
 			+ "<h1 style=\"font-size: 16px;\"><strong>Shiny:</strong></h1>" + "<p>{POKEMON_SHINY}</p>"
+			+ "</div>" + "<div class=\"col\">" + "<form action=\"/tradeboard\" method=\"post\">"
+			+ "<button class=\"btn btn-primary\" type=\"submit\">I'm Interested!</button>"
+			+ "<input type=\"hidden\" class=\"form-control\" name=\"id-int\" value=\"{POST_NUMBER}\" /></form>"
 			+ "</div></div></div></div></div>";
 
 	private static final String TRADE_CARD_DELETE = "<div class=\"col-md-6 col-xl-3 mb-4\">"
@@ -76,27 +80,22 @@ public class HttpHandlerTradeboard implements HttpHandler {
 			+ "<p>{POKEMON_SHINY}</p></div><div class=\"col\">"
 			+ "<form action=\"/tradeboard\" method=\"post\">"
 			+ "<button class=\"btn btn-danger\" type=\"submit\">Delete Trade</button>"
-			+ "<input type=\"hidden\" class=\"form-control\" name=\"id\" value=\"{POST_NUMBER}\" /></form>"
+			+ "<input type=\"hidden\" class=\"form-control\" name=\"id-del\" value=\"{POST_NUMBER}\" /></form>"
 			+ "</div></div></div></div></div>";
 
 	@Override
 	public void handle(HttpExchange ex) throws IOException {
 		try {
 			if (!WebServer.isLoggedIn(ex)) {
-				WebServer.return404(ex, "Please login");
+				WebServer.return404(ex, "Please " + WebServer.getLoginHTML(ex, "login"));
 				return;
 			}
 			Cookie tokenCookie = WebServer.getCookies(ex).get("token");
-			Cookie serverCookie = WebServer.getCookies(ex).get("current_server");
-			if (serverCookie == null) {
-				WebServer.returnServer404(ex, "Please select a server");
-				return;
-			}
-			Snowflake serverId = Snowflake.of(serverCookie.value);
+			Snowflake serverId = WebServer.getGuild(ex);
 			boolean inGuild = Starota.getClient().getGuilds().any((g) -> g.getId().equals(serverId))
 					.block();
 			if (!inGuild) {
-				WebServer.return404(ex, "Tradeboard not found");
+				WebServer.returnServer404(ex, "Please select a server");
 				return;
 			}
 			Guild guild = inGuild ? Starota.getGuild(serverId) : null;
@@ -106,17 +105,41 @@ public class HttpHandlerTradeboard implements HttpHandler {
 			Member member = guild.getMemberById(userId).block();
 
 			Map<String, String> post = WebServer.getPOST(ex);
-			if (post.containsKey("id")) {
-				String idS = post.get("id");
+			if (post.containsKey("id-del")) {
+				String idS = post.get("id-del");
 				if (idS.matches("\\d{4}")) {
 					int id = Integer.parseInt(idS);
 					TradeboardPost tPost = server.getPost(id);
 					if (tPost != null && userId.asLong() == tPost.getOwner())
 						server.removePost(id);
 				}
+			} else if (post.containsKey("id-int")) {
+				String idS = post.get("id-int");
+				if (idS.matches("\\d{4}")) {
+					int id = Integer.parseInt(idS);
+					TradeboardPost tPost = server.getPost(id);
+					if (tPost != null && userId.asLong() != tPost.getOwner()) {
+						Member poster = server.getDiscordGuild()
+								.getMemberById(Snowflake.of(tPost.getOwner())).block();
+						Member interested = server.getDiscordGuild().getMemberById(userId).block();
+						String nickname = interested.asMember(server.getDiscordGuild().getId()).block()
+								.getDisplayName();
+						if (nickname != null)
+							nickname += " (_" + interested.getUsername() + "#"
+									+ interested.getDiscriminator() + "_)";
+						else
+							nickname = interested.getUsername() + "#" + interested.getDiscriminator();
+						final String finalNick = nickname;
+						poster.getPrivateChannel().block().createMessage((e) -> e.setContent(finalNick
+								+ " from " + server.getDiscordGuild().getName()
+								+ " is interested in your trade. Please contact them for more information.")
+								.setEmbed(tPost.getPostEmbed(server, false))).block();
+					}
+				}
 			}
 
-			BufferedReader profTempFile = new BufferedReader(new FileReader("http/tradeboard.html"));
+			InputStream file = WebServer.getResourceFile("http/tradeboard.html");
+			BufferedReader profTempFile = new BufferedReader(new InputStreamReader(file));
 			StringBuilder tempBuilder = new StringBuilder();
 			profTempFile.lines().forEach(tempBuilder::append);
 			profTempFile.close();
@@ -149,6 +172,41 @@ public class HttpHandlerTradeboard implements HttpHandler {
 		}
 	}
 
+	protected static String getCard(Member browseMember, Member postMember, TradeboardPost post) {
+		String card;
+		EnumPokemon pokemon = post.getPokemon();
+		if (postMember.equals(browseMember))
+			card = TRADE_CARD_DELETE.replaceAll("\\{TYPE\\}", pokemon.getType1().name().toLowerCase());
+		else
+			card = TRADE_CARD.replaceAll("\\{TYPE\\}", pokemon.getType1().name().toLowerCase());
+		Form form = post.getForm();
+
+		card = card.replaceAll("\\{POSTER_ID\\}", postMember.getId().asString());
+		card = card.replaceAll("\\{POSTER_AVATAR\\}", postMember.getAvatarUrl());
+		card = card.replaceAll("\\{POSTER_DISPLAY_NAME\\}", postMember.getDisplayName());
+		card = card.replaceAll("\\{POSTER_USERNAME\\}", postMember.getUsername());
+		card = card.replaceAll("\\{POSTER_DISCRIM\\}", postMember.getDiscriminator());
+
+		card = card.replaceAll("\\{TRADE_TYPE\\}", post.isLookingFor() ? "Looking for" : "For trade");
+
+		card = card.replaceAll("\\{POST_NUMBER\\}", post.getIdString());
+		card = card.replaceAll("\\{POKEMON_IMAGE\\}", ImageHelper.getOfficalArtwork(pokemon, form));
+		card = card.replaceAll("\\{POKEMON_NAME\\}", pokemon.getName());
+		card = card.replaceAll("\\{POKEMON_FORM\\}", form == null ? "-" : form.toString());
+		EnumGender gender = post.getGender();
+		card = card.replaceAll("\\{POKEMON_GENDER\\}",
+				gender == null ? pokemon.getGenderPossible().toString() : gender.toString());
+
+		String isLegacyS = Boolean.toString(post.isLegacy());
+		card = card.replaceAll("\\{POKEMON_LEGACY\\}",
+				Character.toUpperCase(isLegacyS.charAt(0)) + isLegacyS.substring(1));
+		String isShinyS = Boolean.toString(post.isShiny());
+		card = card.replaceAll("\\{POKEMON_SHINY\\}",
+				Character.toUpperCase(isShinyS.charAt(0)) + isShinyS.substring(1));
+
+		return card;
+	}
+
 	private String fillCardsInfo(String temp, StarotaServer server, Member member,
 			TradeboardSearch search) {
 		StringBuilder cards = new StringBuilder();
@@ -159,41 +217,7 @@ public class HttpHandlerTradeboard implements HttpHandler {
 					continue;
 				Member owner = server.getDiscordGuild().getMemberById(Snowflake.of(post.getOwner()))
 						.block();
-				EnumPokemon pokemon = post.getPokemon();
-				String card;
-				if (owner.equals(member))
-					card = TRADE_CARD_DELETE.replaceAll("\\{TYPE\\}",
-							pokemon.getType1().name().toLowerCase());
-				else
-					card = TRADE_CARD.replaceAll("\\{TYPE\\}", pokemon.getType1().name().toLowerCase());
-				Form form = post.getForm();
-
-				card = card.replaceAll("\\{POSTER_ID\\}", owner.getId().asString());
-				card = card.replaceAll("\\{POSTER_AVATAR\\}", owner.getAvatarUrl());
-				card = card.replaceAll("\\{POSTER_DISPLAY_NAME\\}", owner.getDisplayName());
-				card = card.replaceAll("\\{POSTER_USERNAME\\}", owner.getUsername());
-				card = card.replaceAll("\\{POSTER_DISCRIM\\}", owner.getDiscriminator());
-
-				card = card.replaceAll("\\{TRADE_TYPE\\}",
-						post.isLookingFor() ? "Looking for" : "For trade");
-
-				card = card.replaceAll("\\{POST_NUMBER\\}", post.getIdString());
-				card = card.replaceAll("\\{POKEMON_IMAGE\\}",
-						ImageHelper.getOfficalArtwork(pokemon, form));
-				card = card.replaceAll("\\{POKEMON_NAME\\}", pokemon.getName());
-				card = card.replaceAll("\\{POKEMON_FORM\\}", form == null ? "-" : form.toString());
-				EnumGender gender = post.getGender();
-				card = card.replaceAll("\\{POKEMON_GENDER\\}",
-						gender == null ? pokemon.getGenderPossible().toString() : gender.toString());
-
-				String isLegacyS = Boolean.toString(post.isLegacy());
-				card = card.replaceAll("\\{POKEMON_LEGACY\\}",
-						Character.toUpperCase(isLegacyS.charAt(0)) + isLegacyS.substring(1));
-				String isShinyS = Boolean.toString(post.isShiny());
-				card = card.replaceAll("\\{POKEMON_SHINY\\}",
-						Character.toUpperCase(isShinyS.charAt(0)) + isShinyS.substring(1));
-
-				cards.append(card);
+				cards.append(getCard(member, owner, post));
 			}
 		}
 

@@ -56,16 +56,31 @@ public class HttpHandlerLogin implements HttpHandler {
 				}).block();
 
 				OutputStream responseB = ex.getResponseBody();
-				ex.getResponseHeaders().set("Location", "/");
+				Map<String, WebServer.Cookie> cookies = WebServer.getCookies(ex);
+				boolean redirected = false;
+				if (cookies.containsKey("p")) {
+					String p = cookies.get("p").value;
+					if (!p.equals("-1")) {
+						ex.getResponseHeaders().set("Location", cookies.get("p").value);
+						response.add("Set-Cookie", "p=-1; expires=Thu, 01 Jan 1970 00:00:00 GMT");
+						redirected = true;
+					}
+				}
+				if (!redirected)
+					ex.getResponseHeaders().set("Location", "/");
 				ex.sendResponseHeaders(302, 0);
 				responseB.close();
 			} else if (!WebServer.isLoggedIn(ex)) {
+				if (get.containsKey("p")) {
+					Headers response = ex.getResponseHeaders();
+					response.add("Set-Cookie", "p=" + get.get("p"));
+				}
 				Map<String, String> replace = new HashMap<>();
 				replace.put("\\{REDIRECT_URL\\}", getRedirectURI(ex));
 				WebServer.returnTextFile(ex, "http/login.html", replace);
 				return;
 			} else
-				WebServer.redirect(ex, "/login");
+				WebServer.redirect(ex, "/");
 		} catch (Exception e) {
 			e.printStackTrace();
 			WebServer.returnError(ex, e);
@@ -73,6 +88,16 @@ public class HttpHandlerLogin implements HttpHandler {
 	}
 
 	private static String getRedirectURI(HttpExchange ex) {
+		// TODO: remove
+		System.out.println("HttpHandlerLogin#getRedirectURI");
+		for (String s : ex.getRequestHeaders().get("Host"))
+			System.out.println(s);
+		try {
+			if (!Starota.IS_DEV)
+				return URLEncoder.encode("http://starota.myles-selim.us/login", "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 		try {
 			String path = ex.getRequestURI().toString();
 			int index = path.indexOf("?");

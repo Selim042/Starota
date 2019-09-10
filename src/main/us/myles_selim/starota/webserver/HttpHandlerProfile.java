@@ -1,9 +1,11 @@
 package us.myles_selim.starota.webserver;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Map.Entry;
 
 import com.sun.net.httpserver.HttpExchange;
@@ -21,6 +23,7 @@ import us.myles_selim.starota.silph_road.SilphCard;
 import us.myles_selim.starota.silph_road.SilphCard.SilphBadgeData;
 import us.myles_selim.starota.silph_road.SilphCard.SilphSocial;
 import us.myles_selim.starota.silph_road.SilphRoadCardUtils;
+import us.myles_selim.starota.trading.TradeboardPost;
 import us.myles_selim.starota.webserver.OAuthUtils.OAuthUser;
 import us.myles_selim.starota.webserver.WebServer.Cookie;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -33,53 +36,51 @@ public class HttpHandlerProfile implements HttpHandler {
 		try {
 			WebServer.handleBaseGET(ex);
 			if (!WebServer.isLoggedIn(ex)) {
-				WebServer.return404(ex, "Please login");
+				WebServer.return404(ex, "Please " + WebServer.getLoginHTML(ex, "login"));
 				return;
 			}
 			String path = ex.getRequestURI().toString();
 			Cookie tokenCookie = WebServer.getCookies(ex).get("token");
-			Snowflake userId;
+			OAuthUser loggedIn = OAuthUtils.getUser(tokenCookie.value);
+			Snowflake profileId;
 			if (path.matches("/profile/\\d{18}/?.*?"))
-				userId = Snowflake.of(path.substring(9, 9 + 18));
-			else if (tokenCookie != null && path.matches("/profile/?.*?")) {
-				OAuthUser loggedIn = OAuthUtils.getUser(tokenCookie.value);
-				userId = Snowflake.of(loggedIn.id);
-			} else {
+				profileId = Snowflake.of(path.substring(9, 9 + 18));
+			else if (tokenCookie != null && path.matches("/profile/?.*?"))
+				profileId = Snowflake.of(loggedIn.id);
+			else {
 				WebServer.return404(ex, "Profile not found");
 				return;
 			}
-			Cookie serverCookie = WebServer.getCookies(ex).get("current_server");
-			if (serverCookie == null) {
-				WebServer.returnServer404(ex, "Please select a server");
-				return;
-			}
-			Snowflake serverId = Snowflake.of(serverCookie.value);
+			Snowflake serverId = WebServer.getGuild(ex);
 			boolean inGuild = Starota.getClient().getGuilds().any((g) -> g.getId().equals(serverId))
 					.block();
 			if (!inGuild) {
-				WebServer.return404(ex, "Profile not found");
+				WebServer.returnServer404(ex, "Please select a server");
 				return;
 			}
 			Guild guild = Starota.getGuild(serverId);
-			boolean findUser = guild.getMembers().any((m) -> m.getId().equals(userId)).block();
+			boolean findUser = guild.getMembers().any((m) -> m.getId().equals(profileId)).block();
 			if (!findUser) {
 				WebServer.return404(ex, "Profile not found");
 				return;
 			}
+			Member browsingMember = guild.getMemberById(Snowflake.of(loggedIn.id)).block();
 			StarotaServer server = StarotaServer.getServer(guild);
-			Member member = guild.getMemberById(userId).block();
-			PlayerProfile profile = server.getProfile(member);
+			Member profileMember = guild.getMemberById(profileId).block();
+			PlayerProfile profile = server.getProfile(profileMember);
 			if (profile == null) {
 				WebServer.return404(ex, "Profile not found");
 				return;
 			}
 
+			InputStream file;
 			BufferedReader profTempFile;
 			boolean hasSilphCard = profile.getSilphRoadCard() != null;
 			if (hasSilphCard)
-				profTempFile = new BufferedReader(new FileReader("http/profile_silph.html"));
+				file = WebServer.getResourceFile("http/profile_silph.html");
 			else
-				profTempFile = new BufferedReader(new FileReader("http/profile.html"));
+				file = WebServer.getResourceFile("http/profile.html");
+			profTempFile = new BufferedReader(new InputStreamReader(file));
 			StringBuilder profileTempBuilder = new StringBuilder();
 			profTempFile.lines().forEach(profileTempBuilder::append);
 			profTempFile.close();
@@ -87,10 +88,11 @@ public class HttpHandlerProfile implements HttpHandler {
 
 			// fill stuff
 			profileTemp = WebServer.fillBaseStuff(ex, tokenCookie.value, profileTemp);
-			profileTemp = fillProfileInfo(profileTemp, profile, member);
+			profileTemp = fillProfileInfo(profileTemp, profile, profileMember);
 			if (hasSilphCard)
 				profileTemp = fillSilphCard(profileTemp,
 						SilphRoadCardUtils.getCard(profile.getPoGoName()));
+			profileTemp = fillTrades(profileTemp, server, profileMember, browsingMember);
 
 			WebServer.setContentType(ex, "http/profile.html");
 			OutputStream response = ex.getResponseBody();
@@ -185,6 +187,19 @@ public class HttpHandlerProfile implements HttpHandler {
 		profileTemp = profileTemp.replaceAll("\\{SILPH_BADGES\\}", badges.toString());
 
 		return profileTemp;
+	}
+
+	private String fillTrades(String profileTemp, StarotaServer server, Member postMember,
+			Member browseMember) {
+		StringBuilder cards = new StringBuilder();
+		List<TradeboardPost> posts = server.getPosts(postMember);
+		for (TradeboardPost p : posts)
+			cards.append(HttpHandlerTradeboard.getCard(browseMember,
+					server.getDiscordGuild().getMemberById(Snowflake.of(p.getOwner())).block(), p));
+		if (posts.size() > 0)
+			return profileTemp.replaceAll("\\{CARDS\\}", cards.toString());
+		else
+			return profileTemp.replaceAll("\\{CARDS\\}", "No posts found.");
 	}
 
 }

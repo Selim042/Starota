@@ -110,6 +110,12 @@ public class OAuthUtils {
 			}
 			BufferedReader out = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			out.lines().forEach((s) -> output.append(s + "\n"));
+			if (conn.getResponseCode() != 200) {
+				System.out
+						.println(conn.getResponseCode() + " error encountered when authenticating user");
+				System.out.println(output.toString());
+				return null;
+			}
 		} catch (IOException e) {
 			return null;
 		}
