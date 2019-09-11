@@ -37,6 +37,7 @@ import us.myles_selim.starota.trading.forms.FormSetSquirtleSquad;
 import us.myles_selim.starota.trading.forms.FormSetUnown;
 
 public enum EnumPokemon {
+
 	// GEN 1
 	BULBASAUR(EnumPokemonStage.BASE, EnumPokemonType.GRASS, EnumPokemonType.POISON),
 	IVYSAUR(EnumPokemonStage.MIDDLE, EnumPokemonType.GRASS, EnumPokemonType.POISON),
@@ -1282,6 +1283,9 @@ public enum EnumPokemon {
 			int id = Integer.parseInt(name);
 			return getPokemon(id);
 		} catch (NumberFormatException e) { /* */ }
+		name = name.replaceAll(" ", "_").replaceAll("[^a-zA-Z0-9]", "");
+		if (name.toLowerCase().matches("farfetch.d"))
+			return EnumPokemon.FARFETCHD;
 		for (EnumPokemon p : values()) {
 			List<String> names = new ArrayList<>();
 			names.add(p.name.toLowerCase());

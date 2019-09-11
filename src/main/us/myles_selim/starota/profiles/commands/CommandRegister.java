@@ -61,12 +61,7 @@ public class CommandRegister extends BotCommand<StarotaServer> {
 			return;
 		}
 
-		EnumTeam team;
-		try {
-			team = EnumTeam.valueOf(args[3].toUpperCase());
-		} catch (IllegalArgumentException e) {
-			team = null;
-		}
+		EnumTeam team = EnumTeam.getTeam(new String[] { args[3], args[4] });
 		if (team == null) {
 			channel.createMessage("Team \"" + args[3] + "\" not found").block();
 			return;
@@ -76,7 +71,11 @@ public class CommandRegister extends BotCommand<StarotaServer> {
 		try {
 			level = Integer.parseInt(args[4]);
 		} catch (NumberFormatException e) {
-			level = -1;
+			try {
+				level = Integer.parseInt(args[3]);
+			} catch (NumberFormatException e2) {
+				level = -1;
+			}
 		}
 		if (level == -1) {
 			channel.createMessage("Invalid level \"" + args[4] + "\"").block();

@@ -86,7 +86,14 @@ public class CommandSelfRegister extends BotCommand<StarotaServer> {
 		try {
 			level = Integer.parseInt(args[2]);
 		} catch (NumberFormatException e) {
-			level = -1;
+			if (args.length > 3) {
+				try {
+					level = Integer.parseInt(args[3]);
+				} catch (NumberFormatException e2) {
+					level = -1;
+				}
+			} else
+				level = -1;
 		}
 		if (level == -1) {
 			channel.createMessage("Invalid level \"" + args[2] + "\"").block();

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum EnumTeam {
+
 	// TODO: Replace NO_TEAM URL with a representative image
 	NO_TEAM("No team", 0x777777, "http://assets.myles-selim.us/starota/teams/instinct.png", 0),
 	INSTINCT("Instinct", 0xF1C40F, "http://assets.myles-selim.us/starota/teams/instinct.png", 3),
@@ -21,6 +22,15 @@ public enum EnumTeam {
 		if (!NAME_MAP.containsKey(name.toLowerCase()))
 			return null;
 		return NAME_MAP.get(name.toLowerCase());
+	}
+
+	public static EnumTeam getTeam(String[] names) {
+		for (String n : names) {
+			EnumTeam ret = getTeam(n);
+			if (ret != null)
+				return ret;
+		}
+		return null;
 	}
 
 	private String name;

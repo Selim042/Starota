@@ -223,11 +223,13 @@ public class SilphRoadData {
 						if (!nameMatcher.find())
 							continue;
 						String nameMatch = nameMatcher.group();
-						String[] pokemonName = splitName(
-								nameMatch.substring(47, nameMatch.length() - 26));
+						String fullName = nameMatch.substring(47, nameMatch.length() - 26);
+						EnumPokemon pokemon = EnumPokemon.getPokemon(fullName);
+						String[] pokemonName = splitName(fullName);
 						// System.out.println(pokemonName[0] + " " +
 						// pokemonName[1]);
-						EnumPokemon pokemon = EnumPokemon.getPokemon(pokemonName[0]);
+						if (pokemon == null)
+							pokemon = EnumPokemon.getPokemon(pokemonName[0]);
 						if (pokemon == null) {
 							Starota.submitError("Cannot find egg hatch named " + pokemonName[0],
 									new IllegalArgumentException(

@@ -576,7 +576,7 @@ public class Starota {
 			body += line + "\n";
 		}
 		builder.appendDesc(body);
-		reportChannel.createEmbed(builder.build());
+		reportChannel.createEmbed(builder.build()).block();
 	}
 
 	public static void submitStats() {

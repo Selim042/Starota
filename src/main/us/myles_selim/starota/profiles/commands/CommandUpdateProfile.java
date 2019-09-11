@@ -45,7 +45,7 @@ public class CommandUpdateProfile extends BotCommand<StarotaServer> {
 			}
 		}
 		if (!server.hasProfile(target)) {
-			if (target.equals(message.getAuthor()))
+			if (target.equals(message.getAuthor().orElse(null)))
 				channel.createMessage("You do not yet have a profile.  Please contact an admin of \""
 						+ server.getDiscordGuild().getName() + "\".").block();
 			else
@@ -104,9 +104,12 @@ public class CommandUpdateProfile extends BotCommand<StarotaServer> {
 			executed = true;
 			break;
 		case "alt":
+		case "alts":
 			profile.getAlts().clear();
-			if (args[2].equalsIgnoreCase("null"))
+			if (args[2].equalsIgnoreCase("null")) {
+				executed = true;
 				break;
+			}
 			String[] altParts = args[2].split(":");
 			for (int i = 0; i < altParts.length; i += 2) {
 				String altName = altParts[i];
