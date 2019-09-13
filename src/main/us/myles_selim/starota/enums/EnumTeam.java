@@ -3,6 +3,9 @@ package us.myles_selim.starota.enums;
 import java.util.HashMap;
 import java.util.Map;
 
+import discord4j.core.object.reaction.ReactionEmoji;
+import us.myles_selim.starota.misc.utils.EmojiServerHelper;
+
 public enum EnumTeam {
 
 	// TODO: Replace NO_TEAM URL with a representative image
@@ -59,6 +62,10 @@ public enum EnumTeam {
 
 	public int getRDMIndex() {
 		return this.rdmIndex;
+	}
+
+	public ReactionEmoji.Custom getEmoji() {
+		return EmojiServerHelper.getEmoji(this.name().toLowerCase(), icon);
 	}
 
 	public static EnumTeam valueOf(int ordinal) {

@@ -11,6 +11,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.reaction.ReactionEmoji;
+import discord4j.core.object.reaction.ReactionEmoji.Custom;
 import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumWeather;
@@ -141,14 +142,13 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 			entry = GoHubDatabase.getEntry(pokemon, form == null ? null : form.toString());
 		if (pokemon != null) {
 			String titleString = (form == null ? "" : form + " ") + pokemon + " Raid ";
-			// if (boss.getTier() == 6)
-			// titleString += EmojiServerHelper.getEmoji(EX_RAID_EMOJI);
-			// else {
-			// GuildEmoji raidEmoji =
-			// EmojiServerHelper.getEmoji(RAID_EMOJI);
-			// for (int i = 0; i < boss.getTier(); i++)
-			// titleString += raidEmoji;
-			// }
+			if (boss.getTier() == 6)
+				titleString += EmojiServerHelper.getEmoji(EX_RAID_EMOJI);
+			else {
+				Custom raidEmoji = EmojiServerHelper.getEmoji(RAID_EMOJI);
+				for (int i = 0; i < boss.getTier(); i++)
+					titleString += MiscUtils.getEmojiDisplay(raidEmoji);
+			}
 			builder.withTitle(titleString);
 			builder.withColor(boss.getColor());
 			builder.withThumbnail(ImageHelper.getOfficalArtwork(pokemon, form));
@@ -163,16 +163,30 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 		builder.appendField("Location:", location, true);
 
 		String attendingString = "";
-		for (Entry<Member, ReactionEmoji> e : attending.entrySet())
-			attendingString += MiscUtils.getEmojiName(e.getValue()) + " " + e.getKey().getDisplayName()
-					+ "\n";
+		for (Entry<Member, ReactionEmoji> e : attending.entrySet()) {
+			if (server.hasProfile(e.getKey()))
+				attendingString += MiscUtils.getEmojiName(e.getValue()) + " "
+						+ e.getKey().getDisplayName() + " "
+						+ MiscUtils.getEmojiDisplay(server.getProfile(e.getKey()).getTeam().getEmoji())
+						+ "\n";
+			else
+				attendingString += MiscUtils.getEmojiName(e.getValue()) + " "
+						+ e.getKey().getDisplayName() + "\n";
+		}
 		if (!attendingString.isEmpty())
 			builder.appendField("Attending:", attendingString, false);
 
 		String hereString = "";
-		for (Entry<Member, ReactionEmoji> e : here.entrySet())
-			hereString += MiscUtils.getEmojiName(e.getValue()) + " " + e.getKey().getDisplayName()
-					+ "\n";
+		for (Entry<Member, ReactionEmoji> e : here.entrySet()) {
+			if (server.hasProfile(e.getKey()))
+				hereString += MiscUtils.getEmojiName(e.getValue()) + " " + e.getKey().getDisplayName()
+						+ " "
+						+ MiscUtils.getEmojiDisplay(server.getProfile(e.getKey()).getTeam().getEmoji())
+						+ "\n";
+			else
+				hereString += MiscUtils.getEmojiName(e.getValue()) + " " + e.getKey().getDisplayName()
+						+ "\n";
+		}
 		if (!hereString.isEmpty())
 			builder.appendField("Here:", hereString, false);
 
@@ -207,13 +221,12 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 		}
 		List<RaidBoss> bosses = SilphRoadData.getBosses(tier);
 		for (RaidBoss b : bosses) {
+			if (boss != null)
+				break;
 			String postfix = b.getForm() == null ? ""
 					: "_" + b.getForm().getSpritePostfix(b.getPokemon());
 			msg.addReaction(EmojiServerHelper.getEmoji(b.getPokemon() + postfix,
 					ImageHelper.getOfficalArtwork(b.getPokemon(), b.getForm()))).block();
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) { /* */ }
 		}
 	}
 
