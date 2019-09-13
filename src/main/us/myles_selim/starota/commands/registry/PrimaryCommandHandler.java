@@ -99,7 +99,13 @@ public class PrimaryCommandHandler implements EventListener {
 			return;
 		String[] args = getArgs(message, guild);
 
-		PermissionSet authorPerms = message.getAuthorAsMember().block().getBasePermissions().block();
+		PermissionSet authorServerPerms;
+		if (guild == null)
+			authorServerPerms = PermissionSet.of(Permission.ADD_REACTIONS, Permission.ATTACH_FILES,
+					Permission.EMBED_LINKS, Permission.MENTION_EVERYONE, Permission.SEND_MESSAGES,
+					Permission.USE_EXTERNAL_EMOJIS, Permission.VIEW_CHANNEL);
+		else
+			authorServerPerms = message.getAuthorAsMember().block().getBasePermissions().block();
 		StarotaServer server = StarotaServer.getServer(guild);
 		boolean cmdFound = false;
 
@@ -133,7 +139,8 @@ public class PrimaryCommandHandler implements EventListener {
 				if (cmd == null
 						|| !ChannelCommandManager.isAllowedHere(server, cmd.getCategory(), channel)
 						|| (cmd.requiredUsePermission() != null && guild != null
-								&& !authorPerms.contains(cmd.requiredUsePermission())))
+								&& authorServerPerms != null
+								&& !authorServerPerms.contains(cmd.requiredUsePermission())))
 					continue;
 
 				// if Starota doesn't have necessary perms, create error msg
@@ -176,7 +183,7 @@ public class PrimaryCommandHandler implements EventListener {
 				if (cmd == null
 						|| !ChannelCommandManager.isAllowedHere(server, cmd.getCategory(), channel)
 						|| (cmd.requiredUsePermission() != null && guild != null
-								&& !authorPerms.contains(cmd.requiredUsePermission())))
+								&& !authorServerPerms.contains(cmd.requiredUsePermission())))
 					continue;
 				String desciption = cmd.getDescription();
 				builder.appendDesc("- " + prefix + cmd.getName()

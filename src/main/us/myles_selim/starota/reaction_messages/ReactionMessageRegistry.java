@@ -116,7 +116,7 @@ public class ReactionMessageRegistry implements EventListener {
 
 	@EventSubscriber
 	public void onEdit(MessageUpdateEvent event) {
-		if (!messages.containsKey(event.getMessage().block().getId().asString()))
+		if (!messages.containsKey(event.getMessageId().asString()))
 			return;
 		ReactionMessage rMessage = messages.get(event.getMessage().block().getId().asString());
 		if (!(rMessage instanceof PersistReactionMessage))

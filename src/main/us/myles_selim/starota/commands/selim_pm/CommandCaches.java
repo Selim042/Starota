@@ -61,7 +61,7 @@ public class CommandCaches extends JavaCommand {
 			String out = "";
 			for (String key : CACHES.keySet())
 				out += key + ", ";
-			channel.createMessage(out);
+			channel.createMessage(out).block();
 			return;
 		case "dumpcache":
 			if (args.length < 2) {
@@ -69,11 +69,11 @@ public class CommandCaches extends JavaCommand {
 				return;
 			}
 			if (!CACHES.containsKey(args[1])) {
-				channel.createMessage("Cache not found");
+				channel.createMessage("Cache not found").block();
 				return;
 			}
 			CACHES.get(args[1]).accept(args[1]);
-			channel.createMessage("Dumped");
+			channel.createMessage("Dumped").block();
 			return;
 		}
 	}

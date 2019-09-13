@@ -57,7 +57,7 @@ public class StarotaEvent {
 	public long getAdjustedStart(TimeZone timezone) {
 		if (startTime == 0)
 			return 0;
-		if (localized)
+		if (localized && timezone != null)
 			return startTime + timezone.getOffset(startTime) + timezone.getDSTSavings();
 		return startTime;
 	}

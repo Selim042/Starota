@@ -22,6 +22,7 @@ import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.profiles.PlayerProfile;
+import us.myles_selim.starota.silph_road.SilphRoadCardUtils;
 import us.myles_selim.starota.trading.TradeboardPost;
 import us.myles_selim.starota.webserver.OAuthUtils.OAuthUser;
 import us.myles_selim.starota.webserver.WebServer.Cookie;
@@ -208,6 +209,16 @@ public class HttpHandlerProfiles implements HttpHandler {
 			boolean matches = true;
 			for (String term : terms) {
 				final String termL = term.toLowerCase();
+				if (MiscUtils.arrContains(new String[] { "code", "tc", "trainercode" }, termL)) {
+					if (post.getTrainerCode() == -1)
+						matches = false;
+					break;
+				}
+				if (MiscUtils.arrContains(new String[] { "silph", "silphcard", "card" }, termL)) {
+					if (!SilphRoadCardUtils.hasCard(post.getPoGoName()))
+						matches = false;
+					break;
+				}
 				EnumTeam team = EnumTeam.getTeam(termL);
 				if (team != null && team != post.getTeam()) {
 					matches = false;

@@ -39,7 +39,7 @@ public class HttpHandlerLogin implements HttpHandler {
 						e.setTitle("New Dev Web Login");
 					} else {
 						e.setColor(Color.GREEN);
-						e.setTitle("New Dev Web Login");
+						e.setTitle("New Web Login");
 					}
 					e.addField("User", String.format("%s#%s", user.username, user.discriminator), true);
 					e.addField("ID", user.id, true);

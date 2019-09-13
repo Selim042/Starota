@@ -125,9 +125,12 @@ public class SilphRoadData {
 	}
 
 	public static boolean areBossesLoaded(int tier) {
-		if (BOSSES != null && TIERED_EGGS != null && !BOSSES.hasPassed(86400000L)) // 1
-																					// day
-			return TIERED_EGGS[tier - 1] != null;
+		// 1 day
+		if (BOSSES != null && TIERED_EGGS != null && !BOSSES.hasPassed(86400000L))
+			if (tier < 0 || tier > 6)
+				return true;
+			else
+				return TIERED_EGGS[tier - 1] != null;
 		return false;
 	}
 

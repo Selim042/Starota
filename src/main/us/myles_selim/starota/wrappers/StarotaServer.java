@@ -540,10 +540,11 @@ public class StarotaServer extends BotServer {
 
 	public List<EnumDonorPerm> getVoteRewards() {
 		List<EnumDonorPerm> donorPerms = new ArrayList<>();
-		Member owner = Starota.getGuild(StarotaConstants.SUPPORT_SERVER.asLong())
-				.getMemberById(getDiscordGuild().getOwnerId()).block();
-		if (owner == null)
+		Guild supportServer = Starota.getGuild(StarotaConstants.SUPPORT_SERVER.asLong());
+		if (!supportServer.getMembers().any((m) -> m.getId().equals(getDiscordGuild().getOwnerId()))
+				.block())
 			return Collections.emptyList();
+		Member owner = supportServer.getMemberById(getDiscordGuild().getOwnerId()).block();
 		for (Role role : owner.getRoles().collectList().block()) {
 			EnumDonorPerm perm = EnumDonorPerm.getPermForRole(role);
 			if (perm != null)
