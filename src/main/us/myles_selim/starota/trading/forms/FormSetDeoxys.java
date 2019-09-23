@@ -15,6 +15,11 @@ public class FormSetDeoxys extends FormSet {
 			public String getSpritePostfix(EnumPokemon pokemon) {
 				return "attack";
 			}
+
+			@Override
+			public String getGoHubFormName(EnumPokemon pokemon) {
+				return "Attack";
+			}
 		});
 		this.addForm(new FormString(2, "Defense") {
 
@@ -22,12 +27,22 @@ public class FormSetDeoxys extends FormSet {
 			public String getSpritePostfix(EnumPokemon pokemon) {
 				return "defense";
 			}
+
+			@Override
+			public String getGoHubFormName(EnumPokemon pokemon) {
+				return "Defense";
+			}
 		});
 		this.addForm(new FormString(3, "Speed") {
 
 			@Override
 			public String getSpritePostfix(EnumPokemon pokemon) {
 				return "speed";
+			}
+
+			@Override
+			public String getGoHubFormName(EnumPokemon pokemon) {
+				return "Speed";
 			}
 		});
 	}

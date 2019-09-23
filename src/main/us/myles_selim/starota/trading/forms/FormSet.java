@@ -33,9 +33,10 @@ public abstract class FormSet {
 			String formName = f.toString().replaceAll("\\.", "").replaceAll(" ", "_");
 			String postfix = f.getSpritePostfix(null);
 			if ((formName.equalsIgnoreCase(form) || formName.split("_")[0].equalsIgnoreCase(form)
-					|| formName.replaceAll("_", "").equalsIgnoreCase(form))
-					|| (postfix != null && (postfix.equalsIgnoreCase(form)
-							|| postfix.split("_")[0].equalsIgnoreCase(form)
+					|| formName.replaceAll("_", "").equalsIgnoreCase(form)))
+				return f;
+			if ((postfix != null
+					&& (postfix.equalsIgnoreCase(form) || postfix.split("_")[0].equalsIgnoreCase(form)
 							|| postfix.replaceAll("_", "").equalsIgnoreCase(form))))
 				return f;
 		}
@@ -75,6 +76,10 @@ public abstract class FormSet {
 
 		public String getSpritePostfix(EnumPokemon pokemon) {
 			return null;
+		}
+
+		public String getGoHubFormName(EnumPokemon pokemon) {
+			return getSpritePostfix(pokemon);
 		}
 
 		/**

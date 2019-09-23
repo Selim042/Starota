@@ -99,10 +99,7 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 			msg.addReaction(ReactionEmoji.unicode(EMOJI_NAMES[6])).block();
 			if (!GoHubDatabase.isEntryLoaded(pokemon)) {
 				msg.edit((m) -> m.setEmbed(GoHubDatabase.LOADING_EMBED)).block();
-				GoHubDatabase.getEntry(pokemon,
-						form == null ? null
-								: (form.getSpritePostfix(pokemon) == null ? form.toString()
-										: form.getSpritePostfix(pokemon)));
+				GoHubDatabase.getEntry(pokemon, form == null ? null : (form.getGoHubFormName(pokemon)));
 			}
 		} else {
 			// here emoji
@@ -166,7 +163,8 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 		EmbedBuilder builder = new EmbedBuilder();
 		PokedexEntry entry = null;
 		if (pokemon != null && StarotaModule.isModuleEnabled(server, BaseModules.POKEDEX))
-			entry = GoHubDatabase.getEntry(pokemon, form == null ? null : form.toString());
+			entry = GoHubDatabase.getEntry(pokemon,
+					form == null ? null : (form.getGoHubFormName(pokemon)));
 		if (pokemon != null) {
 			String titleString = (form == null ? "" : form + " ") + pokemon + " Raid ";
 			if (boss.getTier() == 6)
@@ -190,14 +188,26 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 
 		// forecasted weather boosts
 		if (server.isWeatherSetup()) {
+			// current boosts
+			StringBuilder forecastedWeather = new StringBuilder();
 			EnumWeather[] forecastedBoosts = server.getCurrentPossibleBoosts();
 			if (forecastedBoosts.length > 0) {
-				StringBuilder forecastedWeather = new StringBuilder();
+				forecastedWeather.append("**Now**: ");
 				for (EnumWeather weather : forecastedBoosts)
 					forecastedWeather.append(MiscUtils.getEmojiDisplay(weather.getEmoji()));
-				builder.appendField("Forecasted Boosts:", forecastedWeather.toString(), true);
 			} else
-				builder.appendField("Forecasted Boosts:", "No weather forecast found", true);
+				forecastedWeather.append("**Now**: No weather forecast found");
+
+			// boosts for the next hour
+			EnumWeather[] nextForecastedBoosts = server.getPossibleBoosts(1);
+			if (nextForecastedBoosts.length > 0) {
+				forecastedWeather.append("\n**+1 hr**: ");
+				for (EnumWeather weather : nextForecastedBoosts)
+					forecastedWeather.append(MiscUtils.getEmojiDisplay(weather.getEmoji()));
+			} else
+				forecastedWeather.append("**+1 hr**: No weather forecast found");
+
+			builder.appendField("Weather Forecasts:", forecastedWeather.toString(), false);
 		}
 
 		builder.appendField("Time:", time, true);
