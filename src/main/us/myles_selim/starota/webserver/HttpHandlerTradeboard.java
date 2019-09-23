@@ -153,8 +153,17 @@ public class HttpHandlerTradeboard implements HttpHandler {
 				search.fillValues(query);
 			} else
 				temp = temp.replaceAll("\\{SEARCH_PLACEHOLDER\\}", "");
-			if (get.containsKey("t") && get.get("t").matches("(01)"))
+			if (get.containsKey("t"))
 				search.lookingFor = get.get("t").equals("0");
+
+			if (search.lookingFor != null) {
+				if (search.lookingFor)
+					temp = temp.replaceAll("\\{LOOKING_FOR_SELECTED\\}", "selected")
+							.replaceAll("\\{FOR_TRADE_SELECTED\\}", "");
+				else
+					temp = temp.replaceAll("\\{LOOKING_FOR_SELECTED\\}", "")
+							.replaceAll("\\{FOR_TRADE_SELECTED\\}", "selected");
+			}
 
 			// fill stuff
 			temp = WebServer.fillBaseStuff(ex, tokenCookie.value, temp);
@@ -232,8 +241,7 @@ public class HttpHandlerTradeboard implements HttpHandler {
 	private class TradeboardSearch {
 
 		public final List<Integer> ids = new LinkedList<>();
-		public final List<EnumPokemon> pokemon = new LinkedList<>();
-		public final List<String> forms = new LinkedList<>();
+		public final List<String> otherTerms = new LinkedList<>();
 		public EnumGender gender;
 		public Boolean legacy;
 		public Boolean shiny;
@@ -247,18 +255,6 @@ public class HttpHandlerTradeboard implements HttpHandler {
 				return false;
 			if (ids.size() != 0 && !ids.contains(post.getId()))
 				return false;
-			if (pokemon.size() != 0 && !pokemon.contains(post.getPokemon()))
-				return false;
-			if (post.getForm() != null) {
-				boolean foundForm = forms.size() != 1;
-				for (String f : forms)
-					if (post.getForm().toString().toLowerCase().contains(f.toLowerCase())) {
-						foundForm = true;
-						break;
-					}
-				if (!foundForm)
-					return false;
-			}
 			if (gender != null) {
 				EnumGender postGender = post.getGender();
 				if (postGender == null)
@@ -280,6 +276,14 @@ public class HttpHandlerTradeboard implements HttpHandler {
 				return false;
 			if (regional != null && regional != post.getPokemon().isRegional())
 				return false;
+			for (String t : otherTerms) {
+				boolean matched = (post.getForm() != null
+						&& post.getForm().toString().toLowerCase().startsWith(t.toLowerCase()));
+				matched = matched
+						|| post.getPokemon().getName().toLowerCase().startsWith(t.toLowerCase());
+				if (!matched)
+					return false;
+			}
 			return true;
 		}
 
@@ -289,11 +293,6 @@ public class HttpHandlerTradeboard implements HttpHandler {
 					continue;
 				if (t.matches("\\d{4}")) {
 					ids.add(Integer.parseInt(t));
-					continue;
-				}
-				EnumPokemon pokemonS = EnumPokemon.getPokemon(t);
-				if (pokemonS != null) {
-					pokemon.add(pokemonS);
 					continue;
 				}
 				if (t.equalsIgnoreCase("legacy")) {
@@ -330,7 +329,7 @@ public class HttpHandlerTradeboard implements HttpHandler {
 					gender = genderS;
 					continue;
 				}
-				forms.add(t);
+				otherTerms.add(t);
 			}
 
 		}

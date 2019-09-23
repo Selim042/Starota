@@ -31,6 +31,7 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.util.Snowflake;
 import reactor.core.publisher.Flux;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.misc.utils.EmojiServerHelper;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.webserver.OAuthUtils.OAuthGuildPart;
 import us.myles_selim.starota.webserver.OAuthUtils.OAuthUser;
@@ -77,12 +78,17 @@ public class WebServer {
 							Map<String, Cookie> cookies = getCookies(ex);
 							OAuthGuildPart[] userGuilds = OAuthUtils
 									.getUserGuilds(cookies.get("token").value);
-							List<OAuthGuildPart> botGuilds = new ArrayList<>();
-							Flux<Guild> guilds = Starota.getClient().getGuilds();
-							for (OAuthGuildPart gp : userGuilds)
-								if (guilds.any((g) -> g.getId().asString().equals(gp.id)).block())
-									botGuilds.add(gp);
-							ret = GSON.toJson(botGuilds);
+							if (userGuilds != null) {
+								List<OAuthGuildPart> botGuilds = new ArrayList<>();
+								Flux<Guild> guilds = Starota.getClient().getGuilds();
+								for (OAuthGuildPart gp : userGuilds) {
+									if (EmojiServerHelper.isEmojiServer(Snowflake.of(gp.id)))
+										continue;
+									if (guilds.any((g) -> g.getId().asString().equals(gp.id)).block())
+										botGuilds.add(gp);
+								}
+								ret = GSON.toJson(botGuilds);
+							}
 						}
 
 						byte[] dat = ret.getBytes("UTF-8");
