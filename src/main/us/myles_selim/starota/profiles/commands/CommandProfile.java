@@ -51,7 +51,7 @@ public class CommandProfile extends BotCommand<StarotaServer> {
 			}
 		}
 		if (server.hasProfile(target)) {
-			channel.createEmbed(server.getProfile(target).toEmbed(server)).block();
+			new ProfileReactionMessage(server.getProfile(target)).createMessage(channel);
 			return;
 		}
 		channel.createMessage("User " + target.getUsername() + " does not have a profile").block();
