@@ -37,7 +37,7 @@ public class CommandWeather extends BotCommand<StarotaServer> {
 				out.append("**+" + i + " hr**: ");
 			EnumWeather[] boosts = server.getPossibleBoosts(i);
 			if (boosts == null || boosts.length == 0)
-				break;
+				line.append("No weather forecast found  ");
 			for (EnumWeather weather : boosts)
 				line.append(weather
 						+ (weather == null ? "" : MiscUtils.getEmojiDisplay(weather.getEmoji())) + ", ");
