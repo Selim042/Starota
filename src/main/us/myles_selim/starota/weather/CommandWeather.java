@@ -20,7 +20,7 @@ public class CommandWeather extends BotCommand<StarotaServer> {
 	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
 			throws CommandException {
 		if (!server.isWeatherSetup()) {
-			channel.createMessage("Weather is not configured for this server.");
+			channel.createMessage("Weather is not configured for this server.").block();
 			return;
 		}
 		WeatherLocation loc = server.getLocation();
