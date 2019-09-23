@@ -9,8 +9,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Timer;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -46,7 +49,8 @@ import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 import us.myles_selim.starota.commands.selim_pm.SelimPMCommandHandler;
 import us.myles_selim.starota.commands.settings.CommandSettings;
 import us.myles_selim.starota.commands.settings.types.SettingBoolean;
-import us.myles_selim.starota.commands.settings.types.SettingChannel;
+import us.myles_selim.starota.commands.settings.types.SettingChannelStarota;
+import us.myles_selim.starota.commands.settings.types.SettingString;
 import us.myles_selim.starota.commands.settings.types.SettingTimeZone;
 import us.myles_selim.starota.commands.tutorial.commands.CommandTutorial;
 import us.myles_selim.starota.debug_server.DebugServer;
@@ -99,6 +103,7 @@ import us.myles_selim.starota.trading.commands.CommandRemoveTrade;
 import us.myles_selim.starota.trading.commands.CommandTradeboardHelp;
 import us.myles_selim.starota.vote_rewards.CommandVotePerks;
 import us.myles_selim.starota.vote_rewards.VoteReminderThread;
+import us.myles_selim.starota.weather.CommandWeather;
 import us.myles_selim.starota.webserver.WebServer;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -111,6 +116,7 @@ public class Starota {
 
 	public final static boolean DEBUG = false;
 	public static boolean IS_DEV;
+	public static boolean ENABLE_AUTO_REBOOT;
 	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
 	public final static String CHANGELOG = "Changelog for v" + StarotaConstants.VERSION + "\n"
@@ -121,7 +127,25 @@ public class Starota {
 
 	public static PrimaryCommandHandler COMMAND_HANDLER;
 	public static ReactionMessageRegistry REACTION_MESSAGES_REGISTRY;
-	public static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
+	public static final ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(5);
+
+	private static ScheduledFuture<Void> RESTART_TIMER;
+	private static final Callable<Void> RESTART = new Callable<Void>() {
+
+		@Override
+		public Void call() throws Exception {
+			CLIENT.getUserById(StarotaConstants.SELIM_USER_ID).block().getPrivateChannel().block()
+					.createMessage("Restarting due to inactivity").block();
+			if (!IS_DEV)
+				Runtime.getRuntime().exec("start cmd /k java -jar botManager/bots/Starota.jar", null,
+						new File(System.getProperty("user.dir")));
+			else
+				Runtime.getRuntime().exec("start cmd /k java -jar Starota.jar", null,
+						new File(System.getProperty("user.dir")));
+			Runtime.getRuntime().exit(1);
+			return null;
+		}
+	};
 
 	@SuppressWarnings("deprecation")
 	public static void main(String[] args) {
@@ -131,6 +155,8 @@ public class Starota {
 			@Override
 			public void run() {
 				System.out.println("running shutdown thread");
+				if (CLIENT.isConnected())
+					CLIENT.logout().block();
 				EXECUTOR.shutdown();
 			}
 		});
@@ -144,6 +170,7 @@ public class Starota {
 			DiscordClientBuilder clientBuilder = new DiscordClientBuilder(
 					PROPERTIES.getProperty("token"));
 			IS_DEV = Boolean.parseBoolean(PROPERTIES.getProperty("is_dev"));
+			ENABLE_AUTO_REBOOT = Boolean.parseBoolean(PROPERTIES.getProperty("enable_auto_reboot"));
 			CLIENT = clientBuilder.build();
 			Thread botRun = new Thread() {
 
@@ -163,15 +190,21 @@ public class Starota {
 
 			// default settings, do this before anything else with StarotaServer
 			StarotaServer
-					.setDefaultValue(new SettingChannel(null, StarotaConstants.Settings.CHANGES_CHANNEL,
+					.setDefaultValue(new SettingChannelStarota(null, StarotaConstants.Settings.CHANGES_CHANNEL,
 							"Channel where " + BOT_NAME + " prints out changelogs each update."));
-			StarotaServer.setDefaultValue(new SettingChannel(null,
+			StarotaServer.setDefaultValue(new SettingChannelStarota(null,
 					StarotaConstants.Settings.NEWS_CHANNEL,
 					"Channel where " + BOT_NAME + " prints out news articles when they are published."));
 			StarotaServer.setDefaultValue(new SettingBoolean(StarotaConstants.Settings.PROFILE_NICKNAME,
 					"Sets nickname to PoGo username when profile is made.", true));
 			StarotaServer.setDefaultValue(new SettingTimeZone(StarotaConstants.Settings.TIMEZONE,
-					"Sets the server timezone.  For options, use `getTimezones`.", null));
+					"Sets the server timezone.  For options, use `getTimezones`.  "
+							+ "Used if weather is not setup.",
+					null));
+			StarotaServer.setDefaultValue(new SettingString(StarotaConstants.Settings.WEATHER_API_TOKEN,
+					"Sets the server's weather API token.", null));
+			StarotaServer.setDefaultValue(new SettingString(StarotaConstants.Settings.COORDS,
+					"Sets the community's coordinates.", null));
 
 			// default leaderboards
 			StarotaServer.registerDefaultLeaderboards();
@@ -202,7 +235,8 @@ public class Starota {
 			new EventHandler().setup(dispatcher);
 			// ReactionMessageRegistry.init();
 			WebServer.init();
-			RegistrationBot.start();
+			if (!IS_DEV)
+				RegistrationBot.start();
 			// PointBot.start();
 			submitStats();
 
@@ -224,21 +258,20 @@ public class Starota {
 
 					@Override
 					public void run() {
-						boolean sentToAll = true;
-						List<Guild> guilds = new ArrayList<>(CLIENT.getGuilds().collectList().block());
-						for (Guild g : guilds) {
+						boolean sentToAll = !CLIENT.getGuilds().map((g) -> {
 							StarotaServer server = StarotaServer.getServer(g);
 							TextChannel changesChannel = server
 									.getSetting(StarotaConstants.Settings.CHANGES_CHANNEL);
 							if (changesChannel == null)
-								continue;
+								return true;
 							String latestChangelog = (String) server.getDataValue("changesVersion");
 							if (!StarotaConstants.VERSION.equalsIgnoreCase(latestChangelog)) {
 								changesChannel.createMessage("```" + CHANGELOG + "```").block();
 								server.setDataValue("changesVersion", StarotaConstants.VERSION);
+								return true;
 							} else
-								sentToAll = false;
-						}
+								return false;
+						}).collectList().block().contains(Boolean.FALSE);
 						if (!IS_DEV && sentToAll)
 							TwitterHelper.sendTweet(CHANGELOG);
 					}
@@ -298,6 +331,21 @@ public class Starota {
 				return false;
 			};
 			f.test(null);
+			EXECUTOR.scheduleAtFixedRate(() -> {
+				try {
+					CLIENT.getGuilds().doOnEach((g) -> {
+						StarotaServer server = StarotaServer.getServer(g.get());
+						if (server == null)
+							return;
+						server.updateWeather();
+						System.out.println("Updated weather forecasts for " + g.get().getName());
+					}).collectList().block();
+					CLIENT.getUserById(StarotaConstants.SELIM_USER_ID).block().getPrivateChannel()
+							.block().createMessage("Updated weather").block();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}, 0, 1, TimeUnit.HOURS);
 		} catch (Exception e) {
 			System.err.println("+-------------------------------------------------------------------+");
 			System.err.println("| Starota failed to start properly. Printing exception then exiting |");
@@ -305,6 +353,7 @@ public class Starota {
 			e.printStackTrace();
 			Runtime.getRuntime().exit(0);
 		}
+		restartRestartTimer();
 	}
 
 	private static void registerCommands(JavaCommandHandler jCmdHandler) {
@@ -323,9 +372,7 @@ public class Starota {
 		jCmdHandler.registerCommand("Administrative", new CommandVotePerks());
 		jCmdHandler.registerCommand("Administrative", new CommandSettings());
 		jCmdHandler.registerCommand("Administrative", new CommandGetTimezones());
-		if (IS_DEV) {
-			jCmdHandler.registerCommand("Debug", new CommandTest());
-		}
+		if (IS_DEV) { jCmdHandler.registerCommand("Debug", new CommandTest()); }
 
 		jCmdHandler.registerCommand("Profiles", new CommandRegister());
 		jCmdHandler.registerCommand("Profiles", new CommandUpdateProfile());
@@ -370,6 +417,8 @@ public class Starota {
 		jCmdHandler.registerCommand("Search", new CommandSearchPoke());
 		jCmdHandler.registerCommand("Search", new CommandSearchEvents());
 
+		jCmdHandler.registerCommand("Weather", new CommandWeather());
+
 		jCmdHandler.registerCommand("Misc", new CommandSilphCard());
 		jCmdHandler.registerCommand("Misc", new CommandEvents());
 		jCmdHandler.registerCommand("Misc", new CommandEggHatches());
@@ -378,6 +427,14 @@ public class Starota {
 		jCmdHandler.registerCommand("Misc", new CommandBots());
 
 		jCmdHandler.registerCommand("Tutorial", new CommandTutorial());
+	}
+
+	public static void restartRestartTimer() {
+		if (!ENABLE_AUTO_REBOOT)
+			return;
+		if (RESTART_TIMER != null)
+			RESTART_TIMER.cancel(false);
+		RESTART_TIMER = EXECUTOR.schedule(RESTART, 1, TimeUnit.HOURS);
 	}
 
 	public static DiscordClient getClient() {

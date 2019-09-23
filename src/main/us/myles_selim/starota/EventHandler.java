@@ -2,6 +2,7 @@ package us.myles_selim.starota;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -31,9 +32,10 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class EventHandler implements EventListener {
 
-	private Set<ReadyEvent.Guild> guildsWereIn;
+	private Set<ReadyEvent.Guild> guildsWereIn = Collections.emptySet();
 
 	private boolean isInGuildAtStart(Snowflake guildId) {
+		guildsWereIn = Collections.emptySet();
 		for (ReadyEvent.Guild g : guildsWereIn)
 			if (g.getId().asLong() == guildId.asLong()) {
 				System.out.println("was in guild at start");
@@ -53,7 +55,7 @@ public class EventHandler implements EventListener {
 			System.out.println("skipped stats submission");
 			return;
 		}
-		if (!Starota.FULLY_STARTED || Starota.FULLY_STARTED)
+		if (!Starota.FULLY_STARTED)
 			return;
 		Guild server = event.getGuild();
 		if (!server.getMembers().collectList().block().contains(Starota.getOurUser()))

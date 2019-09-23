@@ -150,23 +150,35 @@ public class CommandEggHatches extends BotCommand<StarotaServer> {
 		}
 		builder.appendField(
 				"**2k Eggs**: " + MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("2kEgg")),
-				"**Non-Shinies**: " + nonShinies2k.substring(0, nonShinies2k.length() - 2) + "\n\n"
-						+ "**Shinies**: " + shinies2k.substring(0, shinies2k.length() - 2),
+				"**Non-Shinies**: "
+						+ nonShinies2k.substring(0,
+								nonShinies2k.length() > 2 ? nonShinies2k.length() - 2 : 0)
+						+ "\n\n" + "**Shinies**: "
+						+ shinies2k.substring(0, shinies2k.length() > 2 ? shinies2k.length() - 2 : 0),
 				false);
 		builder.appendField(
 				"**5k Eggs**: " + MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("5kEgg")),
-				"**Non-Shinies**: " + nonShinies5k.substring(0, nonShinies5k.length() - 2) + "\n\n"
-						+ "**Shinies**: " + shinies5k.substring(0, shinies5k.length() - 2),
+				"**Non-Shinies**: "
+						+ nonShinies5k.substring(0,
+								nonShinies5k.length() > 2 ? nonShinies5k.length() - 2 : 0)
+						+ "\n\n" + "**Shinies**: "
+						+ shinies5k.substring(0, shinies5k.length() > 2 ? shinies5k.length() - 2 : 0),
 				false);
 		builder.appendField(
 				"**7k Eggs**: " + MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("7kEgg")),
-				"**Non-Shinies**: " + nonShinies7k.substring(0, nonShinies7k.length() - 2) + "\n\n"
-						+ "**Shinies**: " + shinies7k.substring(0, shinies7k.length() - 2),
+				"**Non-Shinies**: "
+						+ nonShinies7k.substring(0,
+								nonShinies7k.length() > 2 ? nonShinies7k.length() - 2 : 0)
+						+ "\n\n" + "**Shinies**: "
+						+ shinies7k.substring(0, shinies7k.length() > 2 ? shinies7k.length() - 2 : 0),
 				false);
 		builder.appendField(
 				"**10k Eggs**: " + MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("10kEgg")),
-				"**Non-Shinies**: " + nonShinies10k.substring(0, nonShinies10k.length() - 2) + "\n\n"
-						+ "**Shinies**: " + shinies10k.substring(0, shinies10k.length() - 2),
+				"**Non-Shinies**: "
+						+ nonShinies10k.substring(0,
+								nonShinies10k.length() > 2 ? nonShinies10k.length() - 2 : 0)
+						+ "\n\n" + "**Shinies**: "
+						+ shinies10k.substring(0, shinies10k.length() > 2 ? shinies10k.length() - 2 : 0),
 				false);
 
 		builder.withFooterText("Last updated").withTimestamp(SilphRoadData.getEggCacheTime());

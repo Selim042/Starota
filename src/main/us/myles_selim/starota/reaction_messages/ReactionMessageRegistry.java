@@ -49,9 +49,11 @@ public class ReactionMessageRegistry implements EventListener {
 	public void onReactAdd(ReactionAddEvent event) {
 		if (event.getUser().block().isBot())
 			return;
-		Message msg = event.getMessage().block();
-		if (!messages.containsKey(msg.getId().asString()))
+		if (!messages.containsKey(event.getMessageId().asString()))
 			return;
+		// restart restart timer
+		Starota.restartRestartTimer();
+		Message msg = event.getMessage().block();
 		// Starota.EXECUTOR.execute(new Runnable() {
 		//
 		// @Override

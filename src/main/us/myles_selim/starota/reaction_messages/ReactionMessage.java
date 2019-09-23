@@ -2,6 +2,7 @@ package us.myles_selim.starota.reaction_messages;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Consumer;
 
 import discord4j.core.object.entity.Guild;
@@ -14,6 +15,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.EmojiConstants;
 import us.myles_selim.starota.misc.utils.IndexHolder;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 /**
@@ -73,7 +75,17 @@ public class ReactionMessage {
 	}
 
 	public boolean isButton(ReactionEmoji emoji) {
+		for (ReactionEmoji e : buttons.keySet())
+			if (MiscUtils.getEmojiName(e).equals(MiscUtils.getEmojiName(emoji)))
+				return true;
 		return buttons.containsKey(emoji);
+	}
+
+	public ReactionButton getButton(ReactionEmoji emoji) {
+		for (Entry<ReactionEmoji, ReactionButton> e : buttons.entrySet())
+			if (MiscUtils.getEmojiName(e.getKey()).equals(MiscUtils.getEmojiName(emoji)))
+				return e.getValue();
+		return null;
 	}
 
 	public boolean removeButton(ReactionEmoji emoji) {
@@ -127,14 +139,14 @@ public class ReactionMessage {
 
 	public void onReactionAdded(StarotaServer server, MessageChannel channel, Message msg, User user,
 			ReactionEmoji react) {
-		ReactionButton button = this.buttons.get(react);
+		ReactionButton button = getButton(react);
 		if (button != null)
 			button.execute(msg, user, true);
 	}
 
 	public void onReactionRemoved(StarotaServer server, MessageChannel channel, Message msg, User user,
 			ReactionEmoji react) {
-		ReactionButton button = this.buttons.get(react);
+		ReactionButton button = getButton(react);
 		if (button != null)
 			button.execute(msg, user, false);
 	}

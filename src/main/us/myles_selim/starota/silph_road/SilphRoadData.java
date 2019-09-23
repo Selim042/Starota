@@ -50,7 +50,7 @@ public class SilphRoadData {
 	private static List<RaidBoss>[] TIERED_BOSSES;
 
 	public static List<RaidBoss> getBosses() {
-		if (BOSSES != null && !BOSSES.hasPassed(86400000L)) // 1 day
+		if (BOSSES != null && !BOSSES.hasPassed(43200000L)) // 12 hrs
 			return Collections.unmodifiableList(BOSSES.getValue());
 		List<RaidBoss> newBosses = new LinkedList<>();
 		try {
@@ -124,9 +124,8 @@ public class SilphRoadData {
 		}
 	}
 
-	public static boolean areBossesLoaded(int tier) {
-		// 1 day
-		if (BOSSES != null && TIERED_EGGS != null && !BOSSES.hasPassed(86400000L))
+	public static boolean areBossesLoaded(int tier) { // 12 hrs
+		if (BOSSES != null && TIERED_EGGS != null && !BOSSES.hasPassed(43200000L))
 			if (tier < 0 || tier > 6)
 				return true;
 			else
@@ -136,6 +135,8 @@ public class SilphRoadData {
 
 	public static List<RaidBoss> getBosses(int tier) {
 		getBosses();
+		if (TIERED_BOSSES[tier - 1] == null)
+			return Collections.emptyList();
 		return TIERED_BOSSES[tier - 1];
 	}
 
@@ -264,6 +265,8 @@ public class SilphRoadData {
 
 	public static List<EggEntry> getEggs(int dist) {
 		getEggs();
+		if (TIERED_EGGS[getDistanceIndex(dist)] == null)
+			return Collections.emptyList();
 		return TIERED_EGGS[getDistanceIndex(dist)];
 	}
 

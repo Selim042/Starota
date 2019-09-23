@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
@@ -27,15 +28,15 @@ import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.settings.Setting;
 import us.myles_selim.starota.commands.settings.SettingSet;
 import us.myles_selim.starota.commands.settings.SettingSet.DataTypeSettingSet;
-import us.myles_selim.starota.commands.settings.types.SettingBoolean;
-import us.myles_selim.starota.commands.settings.types.SettingString;
 import us.myles_selim.starota.enums.EnumDonorPerm;
 import us.myles_selim.starota.enums.EnumGender;
 import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.enums.EnumWeather;
 import us.myles_selim.starota.leaderboards.DefaultLeaderboard;
 import us.myles_selim.starota.leaderboards.DefaultLeaderboard.EnumBadgeLeaderboard;
 import us.myles_selim.starota.leaderboards.Leaderboard;
 import us.myles_selim.starota.misc.data_types.BotServer;
+import us.myles_selim.starota.misc.data_types.MaxQueue;
 import us.myles_selim.starota.misc.data_types.Pair;
 import us.myles_selim.starota.misc.data_types.cache.CachedData;
 import us.myles_selim.starota.misc.utils.MiscUtils;
@@ -50,6 +51,8 @@ import us.myles_selim.starota.silph_road.SilphRoadCardUtils;
 import us.myles_selim.starota.trading.TradeboardPost;
 import us.myles_selim.starota.trading.forms.FormSet;
 import us.myles_selim.starota.trading.forms.FormSet.Form;
+import us.myles_selim.starota.weather.api.AccuWeatherAPI;
+import us.myles_selim.starota.weather.api.WeatherForecast;
 
 public class StarotaServer extends BotServer {
 
@@ -71,9 +74,8 @@ public class StarotaServer extends BotServer {
 	// private Map<EnumUsageType, int[]> avgUsage;
 	// private Map<EnumUsageType, int[]> todayUsage;
 
-	private StarotaServer(Guild server) {
-		super(Starota.getClient(), server);
-		// setupServer(this);
+	private StarotaServer(Snowflake id) {
+		super(Starota.getClient(), id);
 	}
 
 	public String getPrefix() {
@@ -92,7 +94,7 @@ public class StarotaServer extends BotServer {
 	}
 
 	public BotServer copy() {
-		return new StarotaServer(getDiscordGuild());
+		return new StarotaServer(getDiscordGuild().getId());
 	}
 
 	// start profile stuffs
@@ -492,11 +494,13 @@ public class StarotaServer extends BotServer {
 			voters = votes.getValue();
 			int numVoters = 0;
 			List<Snowflake> members = getDiscordGuild().getMembers().map((m) -> m.getId()).collectList()
-					.block();
+					.onErrorReturn(Collections.emptyList()).block();
 			for (SimpleUser su : voters) {
 				if (members.contains(Snowflake.of(su.getId())))
 					numVoters++;
 			}
+			if (members.isEmpty())
+				return 0;
 			return numVoters * 100.0f / (members.size() * today.get(Calendar.DATE));
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
@@ -658,32 +662,73 @@ public class StarotaServer extends BotServer {
 	}
 
 	public static SettingSet getDefaultSettings(StarotaServer server) {
+		return new SettingSet(server.getDiscordGuild().getId(), DEFAULT_SETTINGS);
+	}
+
+	public static SettingSet getDefaultSettings(Snowflake server) {
 		return new SettingSet(server, DEFAULT_SETTINGS);
 	}
 	// end settings stuff
 
-	// start other stuff
-	public static final String WEBHOOK_SECRET_KEY = "webhook_secret";
+	// start weatger stuff
+	private final Queue<WeatherForecast[]> forecasts = new MaxQueue<>(8);
 
-	public String getWebhookSecret() {
-		EBStorage data = getData();
-		if (!data.containsKey(WEBHOOK_SECRET_KEY))
-			return null;
-		return data.get(WEBHOOK_SECRET_KEY, String.class);
+	/**
+	 * Only to be called by the loop in {@link us.myles_selim.starota.Starota}
+	 */
+	@Deprecated
+	public void updateWeather() {
+		WeatherForecast[] forecasts = AccuWeatherAPI.getForecast(this);
+		if (forecasts.length > 0)
+			this.forecasts.add(forecasts);
 	}
-	// end other stuff
 
-	private static final Map<Snowflake, StarotaServer> SERVERS = new ConcurrentHashMap<>();
+	public boolean isWeatherSetup() {
+		return !getSetting(StarotaConstants.Settings.WEATHER_API_TOKEN).equals("null")
+				&& !getSetting(StarotaConstants.Settings.COORDS).equals("null");
+	}
+
+	public Queue<WeatherForecast[]> getForecasts() {
+		return this.forecasts;
+	}
+
+	public EnumWeather[] getCurrentPossibleBoosts() {
+		return getPossibleBoosts(0);
+	}
+
+	public EnumWeather[] getPossibleBoosts(int hourOffset) {
+		if (!isWeatherSetup())
+			return new EnumWeather[0];
+		List<EnumWeather> boosts = new ArrayList<>();
+		// rounding to previous hour
+		long currentHour = ((System.currentTimeMillis() / 1000) / 3600) * 3600 + (hourOffset * 3600);
+		for (WeatherForecast[] forecasts : this.forecasts) {
+			for (WeatherForecast f : forecasts) {
+				if (f.getEpochDateTime() == currentHour) {
+					EnumWeather pogoWeather = f.getPoGoWeather();
+					if (!boosts.contains(pogoWeather))
+						boosts.add(pogoWeather);
+				}
+			}
+		}
+		return boosts.toArray(new EnumWeather[0]);
+	}
+	// end weather stuff
+
+	// private static final Map<Snowflake, StarotaServer> SERVERS = new
+	// ConcurrentHashMap<>();
 	private static final Map<Snowflake, StarotaUser> USERS = new ConcurrentHashMap<>();
+
+	public static StarotaServer getServer(Snowflake id) {
+		if (id == null)
+			return null;
+		return BotServer.getServer(Starota.getClient(), id);
+	}
 
 	public static StarotaServer getServer(Guild guild) {
 		if (guild == null)
 			return null;
-		if (SERVERS.containsKey(guild.getId()))
-			return SERVERS.get(guild.getId());
-		StarotaServer server = new StarotaServer(guild);
-		SERVERS.put(guild.getId(), server);
-		return server;
+		return BotServer.getServer(Starota.getClient(), guild);
 	}
 
 	public StarotaUser getUser(Member user) {
@@ -694,34 +739,6 @@ public class StarotaServer extends BotServer {
 		StarotaUser sUser = new StarotaUser(this, user);
 
 		return sUser;
-	}
-
-	public static void main(String... args) {
-		System.out.println("\ndefaults before adding defaults");
-		for (Setting<?> s : StarotaServer.DEFAULT_SETTINGS) {
-			System.out.println(s.getName() + ": " + s.getValue());
-		}
-		StarotaServer.setDefaultValue(new SettingString("testString", "value1"));
-		StarotaServer.setDefaultValue(new SettingBoolean("testBoolean", false));
-		System.out.println("\ndefaults after adding defaults");
-		for (Setting<?> s : StarotaServer.DEFAULT_SETTINGS) {
-			System.out.println(s.getName() + ": " + s.getValue());
-		}
-		SettingSet set1 = StarotaServer.getDefaultSettings();
-		set1.setSetting("testBoolean", true);
-		System.out.println("\nset1 after changing testBoolean");
-		for (Setting<?> s : set1) {
-			System.out.println(s.getName() + ": " + s.getValue());
-		}
-
-		EBStorage ebs1 = new EBStorage().registerType(new DataTypeServerSettings());
-		ebs1.set(SETTINGS_KEY, set1);
-		byte[] serEbs1 = ebs1.serialize();
-		EBStorage ebs2 = EBStorage.deserialize(serEbs1);
-		System.out.println("\nebs2 after deserialize");
-		for (Setting<?> s : ebs2.get(SETTINGS_KEY, SettingSet.class)) {
-			System.out.println(s.getName() + ": " + s.getValue());
-		}
 	}
 
 	public static class DataTypeServerSettings extends DataTypeSettingSet {

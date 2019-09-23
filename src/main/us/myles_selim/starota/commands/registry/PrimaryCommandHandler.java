@@ -81,6 +81,9 @@ public class PrimaryCommandHandler implements EventListener {
 			return;
 		MessageChannel channel = event.getMessage().getChannel().block();
 
+		// restart restart timer
+		Starota.restartRestartTimer();
+
 		// check if the handler should even execute
 		if (!shouldExecute.shouldExecute(channel))
 			return;

@@ -76,7 +76,7 @@ public class CommandSelfRegister extends BotCommand<StarotaServer> {
 		}
 		if (team == null) {
 			if (args.length > 3)
-				channel.createMessage("Team \"" + args[2] + "\" not found").block();
+				channel.createMessage("Team \"" + args[3] + "\" not found").block();
 			else
 				this.sendUsage(server.getPrefix(), channel);
 			return;

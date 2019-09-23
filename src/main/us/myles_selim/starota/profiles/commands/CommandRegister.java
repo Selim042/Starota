@@ -88,7 +88,9 @@ public class CommandRegister extends BotCommand<StarotaServer> {
 
 		Role teamRole = MiscUtils.getTeamRole(server.getDiscordGuild(), team);
 		if (teamRole != null)
-			target.addRole(teamRole.getId()).block();
+			try {
+				target.addRole(teamRole.getId()).block();
+			} catch (Exception e) { /* */ }
 
 		channel.createMessage((m) -> m.setContent("Successfully registered " + target.getUsername())
 				.setEmbed(profile.toEmbed(server))).block();

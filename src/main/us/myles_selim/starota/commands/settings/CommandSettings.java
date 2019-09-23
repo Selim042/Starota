@@ -8,6 +8,7 @@ import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.commands.settings.SettingSet.EnumReturnSetStatus;
+import us.myles_selim.starota.commands.settings.types.ServerSetting;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -60,8 +61,12 @@ public class CommandSettings extends BotCommand<StarotaServer> {
 
 		builder.withTitle(server.getDiscordGuild().getName() + " Options:");
 		server.forEachSetting((setting) -> {
-			builder.appendDesc(
-					String.format(" - %s: %s\n", setting.getName(), setting.getValueString()));
+			if (setting instanceof ServerSetting)
+				builder.appendDesc(String.format(" - %s: %s\n", setting.getName(),
+						((ServerSetting<?>) setting).getValueString(server)));
+			else
+				builder.appendDesc(
+						String.format(" - %s: %s\n", setting.getName(), setting.getValueString()));
 			if (setting.getDescription() != null)
 				builder.appendDesc(String.format("%s\n\n", setting.getDescription()));
 			else
