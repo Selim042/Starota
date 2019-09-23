@@ -37,7 +37,7 @@ public class CommandCredits extends JavaCommand {
 		builder.appendDesc(
 				"**Raid Boss, Field Research, and Egg Information**: [The Silph Road](https://thesilphroad.com/)\n");
 		builder.appendDesc("**Ditto Information**: [Leek Duck](https://leekduck.com)\n");
-		builder.appendDesc("**Maps**: [MapBox](https://www.mapbox.com/)\n");
+		builder.appendDesc("**Weather**: [AccuWeather](https://accuweather.com/)\n");
 
 		StringBuilder editors = new StringBuilder();
 		editors.append("**Article Editors**:\n");

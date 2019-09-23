@@ -11,7 +11,6 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.reaction.ReactionEmoji;
-import discord4j.core.object.reaction.ReactionEmoji.Custom;
 import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumWeather;
@@ -47,6 +46,7 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 	private Form form;
 	private final Map<Member, ReactionEmoji> attending = new HashMap<>();
 	private final Map<Member, ReactionEmoji> here = new HashMap<>();
+	private boolean sentHereMessage = false;
 
 	public RaidReactionMessage(EnumPokemon pokemon, Form form, int tier, String time, String location) {
 		this.boss = new RaidBoss(pokemon, form, tier);
@@ -105,6 +105,7 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 										: form.getSpritePostfix(pokemon)));
 			}
 		} else {
+			// here emoji
 			if (emojiName.equals(EMOJI_NAMES[5])) {
 				ReactionEmoji emoji;
 				if (attending.containsKey(user))
@@ -114,15 +115,41 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 				here.put(user.asMember(server.getDiscordGuild().getId()).block(), emoji);
 				if (attending.containsKey(user))
 					attending.remove(user);
+
+				// if everyone is here, send message
+				if (!sentHereMessage && attending.isEmpty()) {
+					StringBuilder mentionsMessage = new StringBuilder();
+					for (Entry<Member, ReactionEmoji> entry : here.entrySet())
+						mentionsMessage.append(entry.getKey().getMention() + ", ");
+					if (mentionsMessage.length() > 2) {
+						mentionsMessage.append("everyone appears to be here");
+						sentHereMessage = true;
+						channel.createMessage(mentionsMessage.toString()).block();
+					}
+				}
+				// not attending emoji
 			} else if (emojiName.equals(EMOJI_NAMES[6])) {
 				if (here.containsKey(user))
 					here.remove(user);
 				if (attending.containsKey(user))
 					attending.remove(user);
+				// should be one of the numbered emoji
 			} else {
 				if (here.containsKey(user))
 					here.remove(user);
 				attending.put(user.asMember(server.getDiscordGuild().getId()).block(), react);
+				// someone is no longer marked as here (both new people and
+				// changed status)
+				if (sentHereMessage) {
+					StringBuilder mentionsMessage = new StringBuilder();
+					for (Entry<Member, ReactionEmoji> entry : here.entrySet())
+						mentionsMessage.append(entry.getKey().getMention() + ", ");
+					if (mentionsMessage.length() > 2) {
+						mentionsMessage.append(user.getMention() + " is no longer marked as here");
+						sentHereMessage = false;
+						channel.createMessage(mentionsMessage.toString()).block();
+					}
+				}
 			}
 		}
 		msg.edit((m) -> m.setEmbed(getEmbed(server))).block();
@@ -143,11 +170,12 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 		if (pokemon != null) {
 			String titleString = (form == null ? "" : form + " ") + pokemon + " Raid ";
 			if (boss.getTier() == 6)
-				titleString += EmojiServerHelper.getEmoji(EX_RAID_EMOJI);
+				titleString += MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji(EX_RAID_EMOJI));
 			else {
-				Custom raidEmoji = EmojiServerHelper.getEmoji(RAID_EMOJI);
+				String raidEmojiDisplay = MiscUtils
+						.getEmojiDisplay(EmojiServerHelper.getEmoji(RAID_EMOJI));
 				for (int i = 0; i < boss.getTier(); i++)
-					titleString += MiscUtils.getEmojiDisplay(raidEmoji);
+					titleString += raidEmojiDisplay;
 			}
 			builder.withTitle(titleString);
 			builder.withColor(boss.getColor());
@@ -156,9 +184,22 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 				String boostedString = "";
 				for (EnumWeather w : entry.weatherInfluences)
 					boostedString += w.getEmoji().asFormat();
-				builder.appendField("Weather Boosts:", boostedString, true);
+				builder.appendField("Boss Weather Boosts:", boostedString, true);
 			}
 		}
+
+		// forecasted weather boosts
+		if (server.isWeatherSetup()) {
+			EnumWeather[] forecastedBoosts = server.getCurrentPossibleBoosts();
+			if (forecastedBoosts.length > 0) {
+				StringBuilder forecastedWeather = new StringBuilder();
+				for (EnumWeather weather : forecastedBoosts)
+					forecastedWeather.append(MiscUtils.getEmojiDisplay(weather.getEmoji()));
+				builder.appendField("Forecasted Boosts:", forecastedWeather.toString(), true);
+			} else
+				builder.appendField("Forecasted Boosts:", "No weather forecast found", true);
+		}
+
 		builder.appendField("Time:", time, true);
 		builder.appendField("Location:", location, true);
 
@@ -173,8 +214,11 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 				attendingString += MiscUtils.getEmojiName(e.getValue()) + " "
 						+ e.getKey().getDisplayName() + "\n";
 		}
+		int numAttending = 0;
+		for (Entry<Member, ReactionEmoji> e : attending.entrySet())
+			numAttending += getNumberFromEmoji(e.getValue());
 		if (!attendingString.isEmpty())
-			builder.appendField("Attending:", attendingString, false);
+			builder.appendField(String.format("Attending: (%d)", numAttending), attendingString, false);
 
 		String hereString = "";
 		for (Entry<Member, ReactionEmoji> e : here.entrySet()) {
@@ -187,8 +231,12 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 				hereString += MiscUtils.getEmojiName(e.getValue()) + " " + e.getKey().getDisplayName()
 						+ "\n";
 		}
+		int numHere = 0;
+		for (Entry<Member, ReactionEmoji> e : here.entrySet())
+			numHere += getNumberFromEmoji(e.getValue());
 		if (!hereString.isEmpty())
-			builder.appendField("Here:", hereString, false);
+			builder.appendField(String.format("Here: (%d/%d)", numHere, numHere + numAttending),
+					hereString, false);
 
 		if (entry != null) {
 			String cpsString = "";
@@ -244,6 +292,14 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 					+ "React with " + ReactionEmoji.unicode(EMOJI_NAMES[6]).getRaw()
 					+ " if you are no longer able to attend.");
 		return builder.build();
+	}
+
+	private int getNumberFromEmoji(ReactionEmoji emoji) {
+		String emojiName = MiscUtils.getEmojiName(emoji);
+		for (int i = 0; i < 5; i++)
+			if (emojiName != null && emojiName.equals(EMOJI_NAMES[i]))
+				return i + 1;
+		return 0;
 	}
 
 }

@@ -31,12 +31,16 @@ import us.myles_selim.starota.enums.EnumTeam;
 public class MiscUtils {
 
 	public static String getEmojiName(ReactionEmoji emoji) {
+		if (emoji == null)
+			return null;
 		if (emoji.asCustomEmoji().isPresent())
 			return emoji.asCustomEmoji().get().getName();
 		return emoji.asUnicodeEmoji().get().getRaw();
 	}
 
 	public static String getEmojiDisplay(ReactionEmoji emoji) {
+		if (emoji == null)
+			return "null";
 		if (emoji.asUnicodeEmoji().isPresent())
 			return emoji.asUnicodeEmoji().get().getRaw();
 		ReactionEmoji.Custom custom = emoji.asCustomEmoji().get();

@@ -86,9 +86,9 @@ public class GoHubDatabase {
 					JsonDeserializationContext context) throws JsonParseException {
 				String asString = json.getAsString().toUpperCase();
 				if (asString.equals("SUNNY"))
-					return EnumWeather.CLEAR_SUNNY;
+					return EnumWeather.CLEAR;
 				if (asString.equals("PARTLYCLOUDY"))
-					return EnumWeather.PARTY_CLOUDY;
+					return EnumWeather.PARTLY_CLOUDY;
 				return EnumWeather.valueOf(asString);
 			}
 		});

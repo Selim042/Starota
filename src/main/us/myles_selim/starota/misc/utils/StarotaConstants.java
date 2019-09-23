@@ -38,6 +38,10 @@ public class StarotaConstants {
 		public static final String PROFILE_NICKNAME = "profileNickname";
 		/** Server timezone */
 		public static final String TIMEZONE = "timezone";
+		/** Server weather API token */
+		public static final String WEATHER_API_TOKEN = "weatherToken";
+		/** Community coords */
+		public static final String COORDS = "coords";
 
 	}
 
