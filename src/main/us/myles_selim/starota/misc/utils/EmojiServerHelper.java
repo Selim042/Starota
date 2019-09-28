@@ -84,8 +84,10 @@ public class EmojiServerHelper {
 			}
 		}
 		Starota.getClient().getUserById(StarotaConstants.SELIM_USER_ID).block().getPrivateChannel()
-				.block().createMessage(
-						"Emoji servers are full, trying to upload " + namef + " with image " + fallback);
+				.block()
+				.createMessage(
+						"Emoji servers are full, trying to upload " + namef + " with image " + fallback)
+				.block();
 		return null;
 	}
 

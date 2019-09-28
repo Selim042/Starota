@@ -6,12 +6,13 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -22,8 +23,8 @@ import com.google.gson.JsonParser;
 import us.myles_selim.starota.misc.data_types.cache.CachedData;
 import us.myles_selim.starota.misc.data_types.cache.ClearCache;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
+import us.myles_selim.starota.silph_road.SilphCard.SilphBadgeData;
 import us.myles_selim.starota.silph_road.SilphCard.SilphCheckin;
-import us.myles_selim.starota.silph_road.SilphCard.SilphCheckinTime;
 
 public class SilphRoadCardUtils {
 
@@ -40,34 +41,32 @@ public class SilphRoadCardUtils {
 
 			@Override
 			public SilphCheckin[] deserialize(JsonElement json, Type typeOfT,
-					JsonDeserializationContext context) throws JsonParseException {
-				if (!json.isJsonArray())
-					return new SilphCheckin[0];
-				JsonArray arr = json.getAsJsonArray();
-				SilphCheckin[] ret = new SilphCheckin[arr.size()];
-				for (int i = 0; i < arr.size(); i++) {
-					SilphCheckin checkin = new SilphCheckin();
-					JsonObject jObj = arr.get(i).getAsJsonObject();
-					if (!jObj.get("name").isJsonNull())
-						checkin.name = jObj.get("name").getAsString();
-					if (!jObj.get("description").isJsonNull())
-						checkin.description = jObj.get("description").getAsString();
-					if (!jObj.get("image").isJsonNull())
-						checkin.image = jObj.get("image").getAsString();
-					if (!jObj.get("is_global").isJsonNull())
-						checkin.is_global = jObj.get("is_global").getAsString();
-					if (!jObj.get("start").isJsonNull())
-						checkin.start = jObj.get("start").getAsString();
-					if (!jObj.get("end").isJsonNull())
-						checkin.end = jObj.get("end").getAsString();
-					if (!jObj.get("EventCheckin").isJsonNull()) {
-						checkin.EventCheckin = new SilphCheckinTime();
-						checkin.EventCheckin.created = jObj.get("EventCheckin").getAsJsonObject()
-								.get("created").getAsString();
+					JsonDeserializationContext ctx) throws JsonParseException {
+				List<SilphCheckin> vals = new ArrayList<SilphCheckin>();
+				if (json.isJsonArray()) {
+					for (JsonElement e : json.getAsJsonArray()) {
+						vals.add((SilphCheckin) ctx.deserialize(e, SilphCheckin.class));
 					}
-					ret[i] = checkin;
+				} else if (json.isJsonObject()) { /* */ } else {
+					throw new RuntimeException("Unexpected JSON type: " + json.getClass());
 				}
-				return ret;
+				return vals.toArray(new SilphCheckin[0]);
+			}
+		});
+		builder.registerTypeAdapter(SilphBadgeData[].class, new JsonDeserializer<SilphBadgeData[]>() {
+
+			@Override
+			public SilphBadgeData[] deserialize(JsonElement json, Type typeOfT,
+					JsonDeserializationContext ctx) throws JsonParseException {
+				List<SilphBadgeData> vals = new ArrayList<SilphBadgeData>();
+				if (json.isJsonArray()) {
+					for (JsonElement e : json.getAsJsonArray()) {
+						vals.add((SilphBadgeData) ctx.deserialize(e, SilphBadgeData.class));
+					}
+				} else if (json.isJsonObject()) { /* */ } else {
+					throw new RuntimeException("Unexpected JSON type: " + json.getClass());
+				}
+				return vals.toArray(new SilphBadgeData[0]);
 			}
 		});
 		GSON = builder.create();
@@ -129,6 +128,7 @@ public class SilphRoadCardUtils {
 	}
 
 	public static SilphCard getCard(String pogoName) {
+		CARD_CACHE.remove(pogoName);
 		if (!hasCard(pogoName) && HAS_CARD_CACHE.get(pogoName) != null
 				&& HAS_CARD_CACHE.get(pogoName).getValue() == false)
 			return null;

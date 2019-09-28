@@ -189,8 +189,8 @@ public class Starota {
 			BotServer.registerServerType(CLIENT, StarotaServer.class);
 
 			// default settings, do this before anything else with StarotaServer
-			StarotaServer
-					.setDefaultValue(new SettingChannelStarota(null, StarotaConstants.Settings.CHANGES_CHANNEL,
+			StarotaServer.setDefaultValue(
+					new SettingChannelStarota(null, StarotaConstants.Settings.CHANGES_CHANNEL,
 							"Channel where " + BOT_NAME + " prints out changelogs each update."));
 			StarotaServer.setDefaultValue(new SettingChannelStarota(null,
 					StarotaConstants.Settings.NEWS_CHANNEL,
@@ -331,6 +331,8 @@ public class Starota {
 				return false;
 			};
 			f.test(null);
+
+			// start pulling weather
 			EXECUTOR.scheduleAtFixedRate(() -> {
 				try {
 					CLIENT.getGuilds().doOnEach((g) -> {
@@ -338,7 +340,6 @@ public class Starota {
 						if (server == null)
 							return;
 						server.updateWeather();
-						System.out.println("Updated weather forecasts for " + g.get().getName());
 					}).collectList().block();
 					CLIENT.getUserById(StarotaConstants.SELIM_USER_ID).block().getPrivateChannel()
 							.block().createMessage("Updated weather").block();

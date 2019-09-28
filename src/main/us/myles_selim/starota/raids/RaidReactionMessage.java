@@ -205,7 +205,7 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 				for (EnumWeather weather : nextForecastedBoosts)
 					forecastedWeather.append(MiscUtils.getEmojiDisplay(weather.getEmoji()));
 			} else
-				forecastedWeather.append("**+1 hr**: No weather forecast found");
+				forecastedWeather.append("\n**+1 hr**: No weather forecast found");
 
 			builder.appendField("Weather Forecasts:", forecastedWeather.toString(), false);
 		}

@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.enums.EnumPokemonNew;
 import us.myles_selim.starota.misc.data_types.EggEntry;
 import us.myles_selim.starota.misc.data_types.RaidBoss;
 import us.myles_selim.starota.misc.data_types.ResearchTask;
@@ -443,6 +444,90 @@ public class SilphRoadData {
 		BOSSES = null;
 		EGGS = null;
 		TASKS = null;
+	}
+
+	private static CachedData<List<EnumPokemonNew>> AVAILABLE;
+	private static CachedData<List<EnumPokemonNew>> SHINYABLE;
+	private static CachedData<List<EnumPokemonNew>> SHADOWABLE;
+	private static CachedData<List<EnumPokemonNew>> NESTING;
+
+	private static final String SILPH_DEX = "https://thesilphroad.com/catalog";
+	private static final Pattern POKEMON_GENERAL_PATTERN = Pattern
+			.compile("<div class=\"pokemonOption (sighted|notSighted).*?</div>");
+	private static final Pattern DEX_NUM_PATTERN = Pattern.compile("<span>#[0-9]{0,3}</span>");
+
+	private static void checkCaches() {
+		if (AVAILABLE == null || AVAILABLE.hasPassed(86400000L) || SHINYABLE == null
+				|| SHINYABLE.hasPassed(86400000L) || SHADOWABLE == null
+				|| SHADOWABLE.hasPassed(86400000L) || NESTING == null || NESTING.hasPassed(86400000L)) { // 1
+																											// day
+			AVAILABLE = new CachedData<>(new LinkedList<>());
+			SHINYABLE = new CachedData<>(new LinkedList<>());
+			SHADOWABLE = new CachedData<>(new LinkedList<>());
+			NESTING = new CachedData<>(new LinkedList<>());
+
+			try {
+				URL url = new URL(SILPH_DEX);
+				URLConnection conn = url.openConnection();
+				conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
+				BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+				String html = "";
+				String line = null;
+				while ((line = in.readLine()) != null)
+					html += line;
+				Matcher generalMatcher = POKEMON_GENERAL_PATTERN.matcher(html);
+				while (generalMatcher.find()) {
+					String match = generalMatcher.group();
+					if (match.contains("data-released=\"1\"")) {
+						Matcher dexNumMatcher = DEX_NUM_PATTERN.matcher(match);
+						if (dexNumMatcher.find()) {
+							String dexMatch = dexNumMatcher.group();
+							EnumPokemonNew pokemon = EnumPokemonNew.getPokemon(
+									Integer.parseInt(dexMatch.substring(7, dexMatch.length() - 7)));
+							if (pokemon == null)
+								continue;
+							AVAILABLE.getValue().add(pokemon);
+							if (match.contains("data-shiny-released=\"1\""))
+								SHINYABLE.getValue().add(pokemon);
+							if (match.contains("data-shadow-released=\"1\""))
+								SHADOWABLE.getValue().add(pokemon);
+							if (match.contains("data-nests=\"1\""))
+								NESTING.getValue().add(pokemon);
+						}
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	@ClearCache("pokemon")
+	public static void dumpCache() {
+		AVAILABLE = null;
+		SHINYABLE = null;
+		SHADOWABLE = null;
+		NESTING = null;
+	}
+
+	public static boolean isAvailable(EnumPokemonNew pokemon) {
+		checkCaches();
+		return AVAILABLE.getValue().contains(pokemon);
+	}
+
+	public static boolean isShinyable(EnumPokemonNew pokemon) {
+		checkCaches();
+		return SHINYABLE.getValue().contains(pokemon);
+	}
+
+	public static boolean isShadowable(EnumPokemonNew pokemon) {
+		checkCaches();
+		return SHADOWABLE.getValue().contains(pokemon);
+	}
+
+	public static boolean isNesting(EnumPokemonNew pokemon) {
+		checkCaches();
+		return NESTING.getValue().contains(pokemon);
 	}
 
 	private static String[] splitName(String name) {
