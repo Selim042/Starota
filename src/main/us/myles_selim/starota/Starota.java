@@ -120,9 +120,18 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
 	public final static String CHANGELOG = "Changelog for v" + StarotaConstants.VERSION + "\n"
-			+ "Public changes:\n" + " * Fix battleReady (again)\n"
-			+ " * Fix typo in register and sRegister\n" + " * Fix characters in dex and events\n"
-			+ " * Re-implement the \"Starota is typing\" status\n" + " * Fix Deoxys form raids";
+			+ "Public changes:\nNOTE: A few of these were released early\n"
+			+ " + Improve raid embed title and add team emoji to attending and here lists\n"
+			+ " + Add reaction to profile embeds, sends PM with trainer code in QR and text form\n"
+			+ " + New Feature: Weather Predictions\n"
+			+ "   - After adding a AccuWeather API token and community coordinates in the .settings command, "
+			+ "the .weather command is enabled to view weather predictions for your community\n"
+			+ "   - This also shows the current and next hour predictions in raid embeds\n"
+			+ "   - This can be disabled at any time by removing either your community coordinates or API token, or both\n"
+			+ " + Add fields in the \"details\" section of the dex embed to show if the Pokemon has legacy or exclusive moves\n"
+			+ " * Fix error in register command where it gives wrong argument when reporting bad team\n"
+			+ " * Fix some paged embeds not wrapping around when paging to the left from page 1\n"
+			+ " * Misc fixes\n";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static PrimaryCommandHandler COMMAND_HANDLER;
