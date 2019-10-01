@@ -1219,6 +1219,12 @@ public enum EnumPokemon {
 		case SNORUNT:
 		case MAMOSWINE:
 			return true;
+		// gen 5
+		case PANSAGE:
+		case PANPOUR:
+		case PANSEAR:
+		case LAMPENT:
+			return true;
 		default:
 			return false;
 		}
