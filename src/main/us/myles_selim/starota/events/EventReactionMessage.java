@@ -26,8 +26,6 @@ public class EventReactionMessage extends ReactionMessage {
 				new ReactionButton(ReactionEmoji.unicode(REFRESH_EMOJI), (message, user, added) -> {
 					if (!added)
 						return false;
-					this.editMessage(channel, msg);
-					msg.removeReaction(ReactionEmoji.unicode(REFRESH_EMOJI), user.getId()).block();
 					return true;
 				}));
 		msg.addReaction(ReactionEmoji.unicode(REFRESH_EMOJI)).block();
