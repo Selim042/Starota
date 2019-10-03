@@ -1,6 +1,6 @@
 package us.myles_selim.starota.search.events;
 
-import us.myles_selim.starota.leek_duck.events.StarotaEvent;
+import us.myles_selim.starota.events.StarotaEvent;
 import us.myles_selim.starota.search.SearchOperator;
 import us.myles_selim.starota.search.SearchOperator.LlambadaSearchOperator;
 

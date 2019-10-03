@@ -1,4 +1,4 @@
-package us.myles_selim.starota.leek_duck.events;
+package us.myles_selim.starota.events;
 
 import java.util.Collections;
 import java.util.Enumeration;
@@ -17,7 +17,7 @@ import us.myles_selim.starota.misc.utils.ImageHelper;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class StarotaEvent {
+public class StarotaEvent implements Comparable<StarotaEvent> {
 
 	public String name;
 	public String description;
@@ -173,9 +173,7 @@ public class StarotaEvent {
 		StringBuilder research = new StringBuilder();
 		for (EventFieldResearch fr : this.fieldResearch) {
 			research.append("**" + fr.name + "**:\n");
-			for (ResearchReward b : fr.rewards) {
-				research.append(" - " + b + "\n");
-			}
+			for (ResearchReward b : fr.rewards) { research.append(" - " + b + "\n"); }
 		}
 		if (research.length() != 0)
 			builder.appendField("Field Research:", MiscUtils.fixCharacters(research.toString()), false);
@@ -184,6 +182,13 @@ public class StarotaEvent {
 			builder.withFooterText("Event " + index + "/" + max + " | Last updated")
 					.withTimestamp(EventData.getEventsCacheTime());
 		return builder.build();
+	}
+
+	@Override
+	public int compareTo(StarotaEvent event) {
+		if (this.hasStarted() && event.hasStarted())
+			return Long.compare(this.endTime, event.endTime);
+		return Long.compare(this.startTime, event.startTime);
 	}
 
 	public static class EventFieldResearch {

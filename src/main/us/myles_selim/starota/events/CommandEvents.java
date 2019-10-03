@@ -1,4 +1,4 @@
-package us.myles_selim.starota.leek_duck.events;
+package us.myles_selim.starota.events;
 
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;

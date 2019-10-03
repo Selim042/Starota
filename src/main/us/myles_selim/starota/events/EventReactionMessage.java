@@ -1,4 +1,4 @@
-package us.myles_selim.starota.leek_duck.events;
+package us.myles_selim.starota.events;
 
 import java.util.function.Consumer;
 
