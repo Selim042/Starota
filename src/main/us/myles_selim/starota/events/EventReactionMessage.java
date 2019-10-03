@@ -22,12 +22,8 @@ public class EventReactionMessage extends ReactionMessage {
 	@Override
 	public void onSend(StarotaServer server, MessageChannel channel, Message msg) {
 		this.addPageButtons(eventIndex, EventData.getRunningUpcomingEvents().length);
-		this.addButton(
-				new ReactionButton(ReactionEmoji.unicode(REFRESH_EMOJI), (message, user, added) -> {
-					if (!added)
-						return false;
-					return true;
-				}));
+		this.addButton(new ReactionButton(ReactionEmoji.unicode(REFRESH_EMOJI),
+				(message, user, added) -> added));
 		msg.addReaction(ReactionEmoji.unicode(REFRESH_EMOJI)).block();
 	}
 
