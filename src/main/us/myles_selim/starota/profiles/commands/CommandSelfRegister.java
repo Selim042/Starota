@@ -76,7 +76,7 @@ public class CommandSelfRegister extends BotCommand<StarotaServer> {
 		}
 		if (team == null) {
 			if (args.length > 3)
-				channel.createMessage("Team \"" + args[2] + "\" not found").block();
+				channel.createMessage("Team \"" + args[3] + "\" not found").block();
 			else
 				this.sendUsage(server.getPrefix(), channel);
 			return;
@@ -86,7 +86,14 @@ public class CommandSelfRegister extends BotCommand<StarotaServer> {
 		try {
 			level = Integer.parseInt(args[2]);
 		} catch (NumberFormatException e) {
-			level = -1;
+			if (args.length > 3) {
+				try {
+					level = Integer.parseInt(args[3]);
+				} catch (NumberFormatException e2) {
+					level = -1;
+				}
+			} else
+				level = -1;
 		}
 		if (level == -1) {
 			channel.createMessage("Invalid level \"" + args[2] + "\"").block();
@@ -99,9 +106,13 @@ public class CommandSelfRegister extends BotCommand<StarotaServer> {
 
 		Role teamRole = MiscUtils.getTeamRole(server.getDiscordGuild(), team);
 		if (teamRole != null)
-			target.addRole(teamRole.getId()).block();
+			try {
+				target.addRole(teamRole.getId()).block();
+			} catch (Exception e) {
+				/* catch in case role cannot be applied */
+			}
 
-		channel.createMessage((m) -> m.setContent("Sucessfully registered " + target.getUsername())
+		channel.createMessage((m) -> m.setContent("Successfully registered " + target.getUsername())
 				.setEmbed(profile.toEmbed(server))).block();
 	}
 

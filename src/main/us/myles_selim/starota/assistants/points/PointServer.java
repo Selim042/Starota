@@ -2,7 +2,7 @@ package us.myles_selim.starota.assistants.points;
 
 import java.io.File;
 
-import discord4j.core.object.entity.Guild;
+import discord4j.core.object.util.Snowflake;
 import us.myles_selim.starota.commands.settings.SettingSet;
 import us.myles_selim.starota.misc.data_types.BotServer;
 
@@ -11,8 +11,8 @@ public class PointServer extends BotServer {
 	private PointQuest<?, ?> fastQuest;
 	private PointQuest<?, ?> slowQuest;
 
-	private PointServer(Guild server) {
-		super(PointBot.CLIENT, server);
+	private PointServer(Snowflake id) {
+		super(PointBot.CLIENT, id);
 	}
 
 	public void setFastQuest(PointQuest<?, ?> quest) {

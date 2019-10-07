@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import javax.annotation.Nonnull;
 
 import us.myles_selim.ebs.Storage;
+import us.myles_selim.starota.commands.settings.types.ServerSetting;
 import us.myles_selim.starota.misc.utils.IValueSetCallback;
 
 public abstract class Setting<V> {
@@ -26,14 +27,14 @@ public abstract class Setting<V> {
 	public Setting(String name, V value) {
 		this.name = name;
 		this.desc = null;
-		if (!this.setValue(value))
+		if (!(this instanceof ServerSetting) && !this.setValue(value))
 			throw new IllegalArgumentException("value " + value + "not accepted");
 	}
 
 	public Setting(String name, String desc, V value) {
 		this.name = name;
 		this.desc = desc;
-		if (!this.setValue(value))
+		if (!(this instanceof ServerSetting) && !this.setValue(value))
 			throw new IllegalArgumentException("value " + value + "not accepted");
 	}
 
@@ -68,8 +69,12 @@ public abstract class Setting<V> {
 		return val.toString();
 	}
 
-	@SuppressWarnings("unchecked")
 	public boolean setValue(Object newVal) {
+		return setValueInternal(newVal);
+	}
+
+	@SuppressWarnings("unchecked")
+	protected boolean setValueInternal(Object newVal) {
 		if (newVal == null) {
 			this.value = getEmptyValue();
 			if (setCallback != null)
@@ -102,9 +107,11 @@ public abstract class Setting<V> {
 		try {
 			return (Setting<V>) clazz.getConstructor(clazz).newInstance(this);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException | NoSuchMethodException | SecurityException e) {}
-		throw new IllegalArgumentException(
-				"Setting classes must have a public copy constructor, missing in " + clazz.getName());
+				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			throw new IllegalArgumentException(
+					"Setting classes must have a public copy constructor, missing in "
+							+ clazz.getName());
+		}
 	}
 
 }

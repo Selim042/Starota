@@ -9,8 +9,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Timer;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -30,7 +33,6 @@ import discord4j.core.object.presence.Presence;
 import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.assistants.CommandBots;
-import us.myles_selim.starota.assistants.pokedex.PokedexBot;
 import us.myles_selim.starota.assistants.registration.RegistrationBot;
 import us.myles_selim.starota.commands.CommandArticleMessage;
 import us.myles_selim.starota.commands.CommandChangelog;
@@ -47,7 +49,8 @@ import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 import us.myles_selim.starota.commands.selim_pm.SelimPMCommandHandler;
 import us.myles_selim.starota.commands.settings.CommandSettings;
 import us.myles_selim.starota.commands.settings.types.SettingBoolean;
-import us.myles_selim.starota.commands.settings.types.SettingChannel;
+import us.myles_selim.starota.commands.settings.types.SettingChannelStarota;
+import us.myles_selim.starota.commands.settings.types.SettingString;
 import us.myles_selim.starota.commands.settings.types.SettingTimeZone;
 import us.myles_selim.starota.commands.tutorial.commands.CommandTutorial;
 import us.myles_selim.starota.debug_server.DebugServer;
@@ -100,6 +103,7 @@ import us.myles_selim.starota.trading.commands.CommandRemoveTrade;
 import us.myles_selim.starota.trading.commands.CommandTradeboardHelp;
 import us.myles_selim.starota.vote_rewards.CommandVotePerks;
 import us.myles_selim.starota.vote_rewards.VoteReminderThread;
+import us.myles_selim.starota.weather.CommandWeather;
 import us.myles_selim.starota.webserver.WebServer;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -112,15 +116,45 @@ public class Starota {
 
 	public final static boolean DEBUG = false;
 	public static boolean IS_DEV;
+	public static boolean ENABLE_AUTO_REBOOT;
 	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
 	public final static String CHANGELOG = "Changelog for v" + StarotaConstants.VERSION + "\n"
-			+ "Public changes:\n" + " * Fix server count on DiscordBots.org\n * Fix Pokedex bot";
+			+ "Public changes:\nNOTE: A few of these were released early\n"
+			+ " + Improve raid embed title and add team emoji to attending and here lists\n"
+			+ " + Add reaction to profile embeds, sends PM with trainer code in QR and text form\n"
+			+ " + New Feature: Weather Predictions\n"
+			+ "   - After adding a AccuWeather API token and community coordinates in the .settings command, "
+			+ "the .weather command is enabled to view weather predictions for your community\n"
+			+ "   - This also shows the current and next hour predictions in raid embeds\n"
+			+ "   - This can be disabled at any time by removing either your community coordinates or API token, or both\n"
+			+ " + Add fields in the \"details\" section of the dex embed to show if the Pokemon has legacy or exclusive moves\n"
+			+ " * Fix error in register command where it gives wrong argument when reporting bad team\n"
+			+ " * Fix some paged embeds not wrapping around when paging to the left from page 1\n"
+			+ " * Misc fixes\n";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static PrimaryCommandHandler COMMAND_HANDLER;
 	public static ReactionMessageRegistry REACTION_MESSAGES_REGISTRY;
-	public static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
+	public static final ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(5);
+
+	private static ScheduledFuture<Void> RESTART_TIMER;
+	private static final Callable<Void> RESTART = new Callable<Void>() {
+
+		@Override
+		public Void call() throws Exception {
+			CLIENT.getUserById(StarotaConstants.SELIM_USER_ID).block().getPrivateChannel().block()
+					.createMessage("Restarting due to inactivity").block();
+			if (!IS_DEV)
+				Runtime.getRuntime().exec("start cmd /k java -jar botManager/bots/Starota.jar", null,
+						new File(System.getProperty("user.dir")));
+			else
+				Runtime.getRuntime().exec("start cmd /k java -jar Starota.jar", null,
+						new File(System.getProperty("user.dir")));
+			Runtime.getRuntime().exit(1);
+			return null;
+		}
+	};
 
 	@SuppressWarnings("deprecation")
 	public static void main(String[] args) {
@@ -130,6 +164,8 @@ public class Starota {
 			@Override
 			public void run() {
 				System.out.println("running shutdown thread");
+				if (CLIENT.isConnected())
+					CLIENT.logout().block();
 				EXECUTOR.shutdown();
 			}
 		});
@@ -143,6 +179,7 @@ public class Starota {
 			DiscordClientBuilder clientBuilder = new DiscordClientBuilder(
 					PROPERTIES.getProperty("token"));
 			IS_DEV = Boolean.parseBoolean(PROPERTIES.getProperty("is_dev"));
+			ENABLE_AUTO_REBOOT = Boolean.parseBoolean(PROPERTIES.getProperty("enable_auto_reboot"));
 			CLIENT = clientBuilder.build();
 			Thread botRun = new Thread() {
 
@@ -161,16 +198,22 @@ public class Starota {
 			BotServer.registerServerType(CLIENT, StarotaServer.class);
 
 			// default settings, do this before anything else with StarotaServer
-			StarotaServer
-					.setDefaultValue(new SettingChannel(null, StarotaConstants.Settings.CHANGES_CHANNEL,
+			StarotaServer.setDefaultValue(
+					new SettingChannelStarota(null, StarotaConstants.Settings.CHANGES_CHANNEL,
 							"Channel where " + BOT_NAME + " prints out changelogs each update."));
-			StarotaServer.setDefaultValue(new SettingChannel(null,
+			StarotaServer.setDefaultValue(new SettingChannelStarota(null,
 					StarotaConstants.Settings.NEWS_CHANNEL,
 					"Channel where " + BOT_NAME + " prints out news articles when they are published."));
 			StarotaServer.setDefaultValue(new SettingBoolean(StarotaConstants.Settings.PROFILE_NICKNAME,
 					"Sets nickname to PoGo username when profile is made.", true));
 			StarotaServer.setDefaultValue(new SettingTimeZone(StarotaConstants.Settings.TIMEZONE,
-					"Sets the server timezone.  For options, use `getTimezones`.", null));
+					"Sets the server timezone.  For options, use `getTimezones`.  "
+							+ "Used if weather is not setup.",
+					null));
+			StarotaServer.setDefaultValue(new SettingString(StarotaConstants.Settings.WEATHER_API_TOKEN,
+					"Sets the server's weather API token.", null));
+			StarotaServer.setDefaultValue(new SettingString(StarotaConstants.Settings.COORDS,
+					"Sets the community's coordinates.", null));
 
 			// default leaderboards
 			StarotaServer.registerDefaultLeaderboards();
@@ -201,8 +244,8 @@ public class Starota {
 			new EventHandler().setup(dispatcher);
 			// ReactionMessageRegistry.init();
 			WebServer.init();
-			PokedexBot.start();
-			RegistrationBot.start();
+			if (!IS_DEV)
+				RegistrationBot.start();
 			// PointBot.start();
 			submitStats();
 
@@ -210,39 +253,39 @@ public class Starota {
 			StatusUpdater statusUpdater = new StatusUpdater(CLIENT);
 			statusUpdater.addPresence(Presence.online(
 					Activity.playing("v" + StarotaConstants.VERSION + (DEBUG || IS_DEV ? "d" : ""))));
-			statusUpdater.addPresence(
-					Presence.online(Activity.watching("people organize raids with `raid`")));
+			statusUpdater
+					.addPresence(Presence.online(Activity.watching("people organize raids with .raid")));
 			statusUpdater.addPresence(
 					Presence.online(Activity.listening("to people search for events and Pokemon")));
-			statusUpdater.addPresence(Presence.online(Activity.playing("with the new event system")));
 			statusUpdater.addPresence(Presence.online(Activity.watching(".bots for new bots")));
+			statusUpdater.addPresence(
+					Presence.online(Activity.watching("people research counters with .dex")));
 			statusUpdater.start();
 
-			EXECUTOR.execute(new Runnable() {
+			if (!IS_DEV) {
+				EXECUTOR.execute(new Runnable() {
 
-				@Override
-				public void run() {
-					boolean sentToAll = true;
-					List<Guild> guilds = new ArrayList<>(CLIENT.getGuilds().collectList().block());
-					if (!IS_DEV)
-						guilds.addAll(PokedexBot.CLIENT.getGuilds().collectList().block());
-					for (Guild g : guilds) {
-						StarotaServer server = StarotaServer.getServer(g);
-						TextChannel changesChannel = server
-								.getSetting(StarotaConstants.Settings.CHANGES_CHANNEL);
-						if (changesChannel == null)
-							continue;
-						String latestChangelog = (String) server.getDataValue("changesVersion");
-						if (!StarotaConstants.VERSION.equalsIgnoreCase(latestChangelog)) {
-							changesChannel.createMessage("```" + CHANGELOG + "```").block();
-							server.setDataValue("changesVersion", StarotaConstants.VERSION);
-						} else
-							sentToAll = false;
+					@Override
+					public void run() {
+						boolean sentToAll = !CLIENT.getGuilds().map((g) -> {
+							StarotaServer server = StarotaServer.getServer(g);
+							TextChannel changesChannel = server
+									.getSetting(StarotaConstants.Settings.CHANGES_CHANNEL);
+							if (changesChannel == null)
+								return true;
+							String latestChangelog = (String) server.getDataValue("changesVersion");
+							if (!StarotaConstants.VERSION.equalsIgnoreCase(latestChangelog)) {
+								changesChannel.createMessage("```" + CHANGELOG + "```").block();
+								server.setDataValue("changesVersion", StarotaConstants.VERSION);
+								return true;
+							} else
+								return false;
+						}).collectList().block().contains(Boolean.FALSE);
+						if (!IS_DEV && sentToAll)
+							TwitterHelper.sendTweet(CHANGELOG);
 					}
-					if (!IS_DEV && sentToAll)
-						TwitterHelper.sendTweet(CHANGELOG);
-				}
-			});
+				});
+			}
 
 			// LuaUtils.registerConverters();
 			// new LuaEventHandler().setup(dispatcher);
@@ -279,7 +322,7 @@ public class Starota {
 						isReady = inReady;
 						try {
 							Thread.sleep(60000); // 1 min
-						} catch (InterruptedException e) {}
+						} catch (InterruptedException e) { /* */ }
 					}
 				}
 			};
@@ -297,6 +340,22 @@ public class Starota {
 				return false;
 			};
 			f.test(null);
+
+			// start pulling weather
+			EXECUTOR.scheduleAtFixedRate(() -> {
+				try {
+					CLIENT.getGuilds().doOnEach((g) -> {
+						StarotaServer server = StarotaServer.getServer(g.get());
+						if (server == null)
+							return;
+						server.updateWeather();
+					}).collectList().block();
+					CLIENT.getUserById(StarotaConstants.SELIM_USER_ID).block().getPrivateChannel()
+							.block().createMessage("Updated weather").block();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}, 0, 1, TimeUnit.HOURS);
 		} catch (Exception e) {
 			System.err.println("+-------------------------------------------------------------------+");
 			System.err.println("| Starota failed to start properly. Printing exception then exiting |");
@@ -304,6 +363,7 @@ public class Starota {
 			e.printStackTrace();
 			Runtime.getRuntime().exit(0);
 		}
+		restartRestartTimer();
 	}
 
 	private static void registerCommands(JavaCommandHandler jCmdHandler) {
@@ -322,9 +382,7 @@ public class Starota {
 		jCmdHandler.registerCommand("Administrative", new CommandVotePerks());
 		jCmdHandler.registerCommand("Administrative", new CommandSettings());
 		jCmdHandler.registerCommand("Administrative", new CommandGetTimezones());
-		if (IS_DEV) {
-			jCmdHandler.registerCommand("Debug", new CommandTest());
-		}
+		if (IS_DEV) { jCmdHandler.registerCommand("Debug", new CommandTest()); }
 
 		jCmdHandler.registerCommand("Profiles", new CommandRegister());
 		jCmdHandler.registerCommand("Profiles", new CommandUpdateProfile());
@@ -369,6 +427,8 @@ public class Starota {
 		jCmdHandler.registerCommand("Search", new CommandSearchPoke());
 		jCmdHandler.registerCommand("Search", new CommandSearchEvents());
 
+		jCmdHandler.registerCommand("Weather", new CommandWeather());
+
 		jCmdHandler.registerCommand("Misc", new CommandSilphCard());
 		jCmdHandler.registerCommand("Misc", new CommandEvents());
 		jCmdHandler.registerCommand("Misc", new CommandEggHatches());
@@ -377,6 +437,14 @@ public class Starota {
 		jCmdHandler.registerCommand("Misc", new CommandBots());
 
 		jCmdHandler.registerCommand("Tutorial", new CommandTutorial());
+	}
+
+	public static void restartRestartTimer() {
+		if (!ENABLE_AUTO_REBOOT)
+			return;
+		if (RESTART_TIMER != null)
+			RESTART_TIMER.cancel(false);
+		RESTART_TIMER = EXECUTOR.schedule(RESTART, 1, TimeUnit.HOURS);
 	}
 
 	public static DiscordClient getClient() {
@@ -453,7 +521,7 @@ public class Starota {
 			User user = getUser(userId);
 			if (user != null)
 				return user;
-		} catch (NumberFormatException e) {}
+		} catch (NumberFormatException e) { /* */ }
 		String user = name.replaceAll("@", "").replaceAll("#\\d{4}", "");
 		if (user.matches("<\\d{18}>")) {
 			long userId = Long.parseLong(user.substring(1, 19));
@@ -472,10 +540,9 @@ public class Starota {
 			try {
 				long id = Long.parseLong(name.substring(3, name.length() - 1));
 				User idUser = getUser(id);
-				if (idUser != null) {
+				if (idUser != null)
 					return idUser;
-				}
-			} catch (NumberFormatException e) {}
+			} catch (NumberFormatException e) { /* */ }
 		}
 		DiscordClient client = Starota.getClient();
 		List<User> users;
@@ -514,7 +581,7 @@ public class Starota {
 				TextChannel idChannel = getChannel(id);
 				if (idChannel != null)
 					return idChannel;
-			} catch (NumberFormatException e) {}
+			} catch (NumberFormatException e) { /* */ }
 		}
 		name = name.substring(1);
 		DiscordClient client = Starota.getClient();
@@ -576,7 +643,7 @@ public class Starota {
 			body += line + "\n";
 		}
 		builder.appendDesc(body);
-		reportChannel.createEmbed(builder.build());
+		reportChannel.createEmbed(builder.build()).block();
 	}
 
 	public static void submitStats() {
@@ -595,16 +662,6 @@ public class Starota {
 							else
 								System.out.println("Starota Submitted");
 						});
-				if (PokedexBot.CLIENT != null) {
-					PokedexBot.getBotListAPI()
-							.setStats(PokedexBot.CLIENT.getGuilds().collectList().block().size())
-							.whenComplete((v, e) -> {
-								if (e != null)
-									e.printStackTrace();
-								else
-									System.out.println("Pokedex Submitted");
-							});
-				}
 				// if (RegistrationBot.CLIENT != null) {
 				// RegistrationBot.getBotListAPI()
 				// .setStats(RegistrationBot.CLIENT.getGuilds().collectList().block().size())
@@ -644,12 +701,12 @@ public class Starota {
 			if (owner == null)
 				continue;
 			if (!owner.getRoleIds().contains(ownerRole))
-				owner.addRole(ownerRole);
+				owner.addRole(ownerRole).block();
 			currentOwners.add(owner);
 		}
 		for (Member u : MiscUtils.getMembersByRole(supportServer, ownerRole))
 			if (!currentOwners.contains(u))
-				u.removeRole(ownerRole);
+				u.removeRole(ownerRole).block();
 	}
 
 	private static final Long[] SKIPPED_SERVERS = new Long[] { //
@@ -677,8 +734,7 @@ public class Starota {
 					if (MiscUtils.arrContains(SKIPPED_SERVERS, g.getId().asLong()))
 						continue;
 					Member owner = g.getOwner().block();
-					if (author.getId().asLong() == owner.getId().asLong()
-							|| alreadySent.contains(owner.getId().asLong()))
+					if (alreadySent.contains(owner.getId().asLong()))
 						continue;
 					alreadySent.add(owner.getId().asLong());
 					if ((msg == null || msg.isEmpty()) && fEmbed != null)

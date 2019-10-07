@@ -27,15 +27,16 @@ public abstract class FormSet {
 	}
 
 	public Form getForm(String form) {
-		if (form == null || form.equalsIgnoreCase("Normal"))
+		if (form == null || form.equalsIgnoreCase("Normal") || form.equalsIgnoreCase("null"))
 			return getDefaultForm();
 		for (Form f : forms) {
 			String formName = f.toString().replaceAll("\\.", "").replaceAll(" ", "_");
 			String postfix = f.getSpritePostfix(null);
 			if ((formName.equalsIgnoreCase(form) || formName.split("_")[0].equalsIgnoreCase(form)
-					|| formName.replaceAll("_", "").equalsIgnoreCase(form))
-					|| (postfix != null && (postfix.equalsIgnoreCase(form)
-							|| postfix.split("_")[0].equalsIgnoreCase(form)
+					|| formName.replaceAll("_", "").equalsIgnoreCase(form)))
+				return f;
+			if ((postfix != null
+					&& (postfix.equalsIgnoreCase(form) || postfix.split("_")[0].equalsIgnoreCase(form)
 							|| postfix.replaceAll("_", "").equalsIgnoreCase(form))))
 				return f;
 		}
@@ -77,6 +78,13 @@ public abstract class FormSet {
 			return null;
 		}
 
+		public String getGoHubFormName(EnumPokemon pokemon) {
+			return getSpritePostfix(pokemon);
+		}
+
+		/**
+		 * Returns the form name, should be the same as GoHub's name
+		 */
 		@Override
 		public abstract String toString();
 

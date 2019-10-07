@@ -1,4 +1,4 @@
-package us.myles_selim.starota.leek_duck.events;
+package us.myles_selim.starota.events;
 
 import java.util.function.Consumer;
 
@@ -22,12 +22,8 @@ public class EventReactionMessage extends ReactionMessage {
 	@Override
 	public void onSend(StarotaServer server, MessageChannel channel, Message msg) {
 		this.addPageButtons(eventIndex, EventData.getRunningUpcomingEvents().length);
-		this.addButton(
-				new ReactionButton(ReactionEmoji.unicode(REFRESH_EMOJI), (message, user, added) -> {
-					this.editMessage(channel, msg);
-					msg.removeReaction(ReactionEmoji.unicode(REFRESH_EMOJI), user.getId()).block();
-					return true;
-				}));
+		this.addButton(new ReactionButton(ReactionEmoji.unicode(REFRESH_EMOJI),
+				(message, user, added) -> added));
 		msg.addReaction(ReactionEmoji.unicode(REFRESH_EMOJI)).block();
 	}
 

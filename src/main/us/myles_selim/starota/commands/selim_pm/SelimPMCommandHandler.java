@@ -137,7 +137,7 @@ public class SelimPMCommandHandler {
 				throws CommandException;
 
 		@Override
-		public final void setCommandHandler(ICommandHandler handler) {}
+		public final void setCommandHandler(ICommandHandler handler) { /* do nothing */ }
 
 		@Override
 		public final ICommandHandler getCommandHandler() {

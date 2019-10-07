@@ -80,7 +80,7 @@ public class JavaCommand implements ICommand {
 
 	@Override
 	public void execute(String[] args, Message message, Guild guild, MessageChannel channel)
-			throws CommandException {}
+			throws CommandException { /* */ }
 
 	@Override
 	public int compareTo(ICommand o) {

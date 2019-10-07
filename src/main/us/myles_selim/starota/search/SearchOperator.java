@@ -205,9 +205,6 @@ public abstract class SearchOperator<T> {
 			super(type);
 		}
 
-		@Override
-		public final void filter(Collection<T> vals, Collection<T> filtered) {}
-
 		public abstract void filter(String term, Collection<T> vals, Collection<T> filtered);
 
 		@Override

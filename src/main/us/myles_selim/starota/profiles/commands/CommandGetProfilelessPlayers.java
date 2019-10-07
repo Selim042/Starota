@@ -1,6 +1,5 @@
 package us.myles_selim.starota.profiles.commands;
 
-import java.awt.Color;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -63,11 +62,8 @@ public class CommandGetProfilelessPlayers extends BotCommand<StarotaServer> {
 		groups.add(line);
 		for (String g : groups) {
 			EmbedBuilder builder = new EmbedBuilder();
-			builder.appendDesc(g).withColor(Color.getHSBColor(g.length() / 2048f, 0.5f, 1.0f));
+			builder.appendDesc(g);
 			channel.createEmbed(builder.build()).block();
-			try {
-				Thread.sleep(2500);
-			} catch (InterruptedException e) {}
 		}
 	}
 

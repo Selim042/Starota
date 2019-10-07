@@ -7,7 +7,7 @@ public class SimpleQuestUpdateTask extends TimerTask {
 
 	@Override
 	public void run() {
-		
+		 /* point bot is WIP */ 
 	}
 
 }

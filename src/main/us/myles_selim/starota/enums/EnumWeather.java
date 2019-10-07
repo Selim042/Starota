@@ -5,9 +5,10 @@ import discord4j.core.object.entity.GuildEmoji;
 import us.myles_selim.starota.Starota;
 
 public enum EnumWeather {
+
 	EXTREME,
-	CLEAR_SUNNY("clear", EnumPokemonType.FIRE, EnumPokemonType.GRASS, EnumPokemonType.GROUND),
-	PARTY_CLOUDY("partlycloudy", EnumPokemonType.NORMAL, EnumPokemonType.ROCK),
+	CLEAR("clear", EnumPokemonType.FIRE, EnumPokemonType.GRASS, EnumPokemonType.GROUND),
+	PARTLY_CLOUDY("partlycloudy", EnumPokemonType.NORMAL, EnumPokemonType.ROCK),
 	CLOUDY(EnumPokemonType.FAIRY, EnumPokemonType.FIGHTING, EnumPokemonType.POISON),
 	RAIN(EnumPokemonType.WATER, EnumPokemonType.ELECTRIC, EnumPokemonType.BUG),
 	SNOW(EnumPokemonType.ICE, EnumPokemonType.STEEL),
@@ -45,7 +46,7 @@ public enum EnumWeather {
 
 	@Override
 	public String toString() {
-		return this.name;
+		return this.name.replaceAll("_", " ");
 	}
 
 	private static final long EMOJI_SERVER_ID = 408997776672948224L;

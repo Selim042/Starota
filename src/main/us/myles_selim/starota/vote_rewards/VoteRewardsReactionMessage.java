@@ -48,7 +48,7 @@ public class VoteRewardsReactionMessage extends ReactionMessage {
 			public void run() {
 				try {
 					Thread.sleep(1000);
-				} catch (InterruptedException e) {}
+				} catch (InterruptedException e) { /* */ }
 				editMessage(channel, msg);
 			}
 		}.start();

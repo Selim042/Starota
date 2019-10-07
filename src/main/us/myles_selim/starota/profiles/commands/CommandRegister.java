@@ -61,12 +61,7 @@ public class CommandRegister extends BotCommand<StarotaServer> {
 			return;
 		}
 
-		EnumTeam team;
-		try {
-			team = EnumTeam.valueOf(args[3].toUpperCase());
-		} catch (IllegalArgumentException e) {
-			team = null;
-		}
+		EnumTeam team = EnumTeam.getTeam(new String[] { args[3], args[4] });
 		if (team == null) {
 			channel.createMessage("Team \"" + args[3] + "\" not found").block();
 			return;
@@ -76,7 +71,11 @@ public class CommandRegister extends BotCommand<StarotaServer> {
 		try {
 			level = Integer.parseInt(args[4]);
 		} catch (NumberFormatException e) {
-			level = -1;
+			try {
+				level = Integer.parseInt(args[3]);
+			} catch (NumberFormatException e2) {
+				level = -1;
+			}
 		}
 		if (level == -1) {
 			channel.createMessage("Invalid level \"" + args[4] + "\"").block();
@@ -89,9 +88,11 @@ public class CommandRegister extends BotCommand<StarotaServer> {
 
 		Role teamRole = MiscUtils.getTeamRole(server.getDiscordGuild(), team);
 		if (teamRole != null)
-			target.addRole(teamRole.getId()).block();
+			try {
+				target.addRole(teamRole.getId()).block();
+			} catch (Exception e) { /* */ }
 
-		channel.createMessage((m) -> m.setContent("Sucessfully registered " + target.getUsername())
+		channel.createMessage((m) -> m.setContent("Successfully registered " + target.getUsername())
 				.setEmbed(profile.toEmbed(server))).block();
 		PrivateChannel targetPm = target.getPrivateChannel().block();
 		targetPm.createMessage(String.format(REGISTERED_PM, server.getDiscordGuild().getName())).block();

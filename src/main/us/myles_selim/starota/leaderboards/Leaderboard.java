@@ -58,6 +58,8 @@ public class Leaderboard extends DataType<Leaderboard> {
 		else
 			eEntry.setValue(entry.getValue());
 		this.sort();
+		if (this.getParent() != null)
+			this.getParent().flush();
 		return this;
 	}
 
@@ -149,7 +151,7 @@ public class Leaderboard extends DataType<Leaderboard> {
 			if (userDisplay == null)
 				userDisplay = user.getUsername() + "#" + user.getDiscriminator();
 			else
-				userDisplay += "(__" + user.getUsername() + "#" + user.getDiscriminator() + "__)";
+				userDisplay += " (_" + user.getUsername() + "#" + user.getDiscriminator() + "_)";
 			builder.appendDesc("**" + (i + 1) + "**) " + userDisplay + ": "
 					+ NumberFormat.getNumberInstance(Locale.US).format(entry.getValue()) + "\n");
 		}
@@ -243,7 +245,10 @@ public class Leaderboard extends DataType<Leaderboard> {
 		else
 			stor.writeInt(this.type.ordinal());
 		stor.writeByte((byte) (isEnabled ? 1 : 2));
-		stor.writeLong(this.guild.getId().asLong());
+		if (this.guild == null)
+			stor.writeInt(0);
+		else
+			stor.writeLong(this.guild.getId().asLong());
 	}
 
 	@Override

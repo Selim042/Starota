@@ -2,6 +2,7 @@ package us.myles_selim.starota.reaction_messages;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Consumer;
 
 import discord4j.core.object.entity.Guild;
@@ -14,6 +15,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.EmojiConstants;
 import us.myles_selim.starota.misc.utils.IndexHolder;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 /**
@@ -26,7 +28,15 @@ public class ReactionMessage {
 	private Map<ReactionEmoji, ReactionButton> buttons = new HashMap<>();
 
 	public final ReactionMessage addButton(ReactionButton button) {
-		if (buttons.containsKey(button.emoji))
+		if (buttons.keySet().stream().anyMatch((r) -> {
+			if (!r.getClass().equals(button.emoji.getClass()))
+				return false;
+			if (r instanceof ReactionEmoji.Custom)
+				return ((ReactionEmoji.Custom) r).getId()
+						.equals(((ReactionEmoji.Custom) button.emoji).getId());
+			return ((ReactionEmoji.Unicode) r).getRaw()
+					.equals(((ReactionEmoji.Unicode) button.emoji).getRaw());
+		}))
 			return this;
 		this.buttons.put(button.getEmoji(), button);
 		this.msg.addReaction(button.emoji).block();
@@ -38,7 +48,7 @@ public class ReactionMessage {
 				(Message message, User user, boolean added) -> {
 					if (!added)
 						return false;
-					if (index.value >= 0)
+					if (index.value > 0)
 						index.value--;
 					else
 						index.value = max - 1;
@@ -48,10 +58,10 @@ public class ReactionMessage {
 				(Message message, User user, boolean added) -> {
 					if (!added)
 						return false;
-					if (index.value >= max)
-						index.value = 0;
-					else
+					if (index.value < max - 1)
 						index.value++;
+					else
+						index.value = 0;
 					return true;
 				}));
 		return this;
@@ -65,7 +75,17 @@ public class ReactionMessage {
 	}
 
 	public boolean isButton(ReactionEmoji emoji) {
+		for (ReactionEmoji e : buttons.keySet())
+			if (MiscUtils.getEmojiName(e).equals(MiscUtils.getEmojiName(emoji)))
+				return true;
 		return buttons.containsKey(emoji);
+	}
+
+	public ReactionButton getButton(ReactionEmoji emoji) {
+		for (Entry<ReactionEmoji, ReactionButton> e : buttons.entrySet())
+			if (MiscUtils.getEmojiName(e.getKey()).equals(MiscUtils.getEmojiName(emoji)))
+				return e.getValue();
+		return null;
 	}
 
 	public boolean removeButton(ReactionEmoji emoji) {
@@ -113,20 +133,20 @@ public class ReactionMessage {
 		return this.msg;
 	}
 
-	public void onSend(StarotaServer server, MessageChannel channel, Message msg) {}
+	public void onSend(StarotaServer server, MessageChannel channel, Message msg) { /* */ }
 
-	public void onEdit(StarotaServer server, MessageChannel channel, Message msg) {}
+	public void onEdit(StarotaServer server, MessageChannel channel, Message msg) { /* */ }
 
 	public void onReactionAdded(StarotaServer server, MessageChannel channel, Message msg, User user,
 			ReactionEmoji react) {
-		ReactionButton button = this.buttons.get(react);
+		ReactionButton button = getButton(react);
 		if (button != null)
 			button.execute(msg, user, true);
 	}
 
 	public void onReactionRemoved(StarotaServer server, MessageChannel channel, Message msg, User user,
 			ReactionEmoji react) {
-		ReactionButton button = this.buttons.get(react);
+		ReactionButton button = getButton(react);
 		if (button != null)
 			button.execute(msg, user, false);
 	}

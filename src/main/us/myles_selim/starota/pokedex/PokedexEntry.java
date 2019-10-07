@@ -138,10 +138,10 @@ public class PokedexEntry extends ReactionMessage {
 	private DexMove[] fast;
 	private DexMove[] charged;
 
-	public DexMove[] getMoves(String form) {
+	public DexMove[] getMoves() {
 		if (moves != null)
 			return moves;
-		moves = GoHubDatabase.getMoves(getPokemon(), form);
+		moves = GoHubDatabase.getMoves(getPokemon(), this.form);
 		return moves;
 	}
 
@@ -149,7 +149,7 @@ public class PokedexEntry extends ReactionMessage {
 		if (fast != null)
 			return fast;
 		List<DexMove> temp = new ArrayList<>();
-		for (DexMove m : getMoves(form))
+		for (DexMove m : getMoves())
 			if (m.isQuickMove == 1)
 				temp.add(m);
 		fast = temp.toArray(new DexMove[0]);
@@ -160,7 +160,7 @@ public class PokedexEntry extends ReactionMessage {
 		if (charged != null)
 			return charged;
 		List<DexMove> temp = new ArrayList<>();
-		for (DexMove m : getMoves(form))
+		for (DexMove m : getMoves())
 			if (m.isQuickMove != 1)
 				temp.add(m);
 		charged = temp.toArray(new DexMove[0]);
@@ -198,6 +198,64 @@ public class PokedexEntry extends ReactionMessage {
 			max = setsL.size();
 		topMovesets = setsL.subList(0, max).toArray(new DexMoveset[0]);
 		return topMovesets;
+	}
+
+	// legacy move
+	/**
+	 * @deprecated Do not use directly, for internal use only
+	 */
+	@Deprecated
+	private Boolean hasLegacyMove;
+
+	public boolean hasLegacyMove() {
+		if (hasLegacyMove != null)
+			return hasLegacyMove;
+		for (DexMove move : getFastMoves()) {
+			if (move.isLegacy == 1) {
+				hasLegacyMove = true;
+				break;
+			}
+		}
+		if (hasLegacyMove == null) {
+			for (DexMove move : getChargedMoves()) {
+				if (move.isLegacy == 1) {
+					hasLegacyMove = true;
+					break;
+				}
+			}
+		}
+		if (hasLegacyMove == null)
+			hasLegacyMove = false;
+		return hasLegacyMove;
+	}
+
+	// exclusive move
+	/**
+	 * @deprecated Do not use directly, for internal use only
+	 */
+	@Deprecated
+	private Boolean hasExclusiveMove;
+
+	public boolean hasExclusiveMove() {
+		if (hasExclusiveMove != null)
+			return hasExclusiveMove;
+		for (DexMove move : getFastMoves()) {
+			if (move.isExclusive == 1) {
+				hasExclusiveMove = true;
+				break;
+			}
+		}
+		if (hasExclusiveMove == null) {
+			for (DexMove move : getChargedMoves()) {
+				if (move.isExclusive == 1) {
+					hasExclusiveMove = true;
+					break;
+				}
+			}
+		}
+		if (hasExclusiveMove == null)
+			hasExclusiveMove = false;
+		return hasExclusiveMove;
 	}
 
 	// counters
@@ -279,7 +337,7 @@ public class PokedexEntry extends ReactionMessage {
 		builder.withTitle(String.format("%s #%d", pokeName, entry.id))
 				.withUrl(String.format("https://db.pokemongohub.net/pokemon/%d", entry.id));
 		builder.withThumbnail(entry.getPokemon().getArtwork(formId));
-		builder.appendDesc(entry.getDescription());
+		builder.appendDesc(MiscUtils.fixCharacters(entry.getDescription()));
 
 		// stats
 		builder.appendField("Type:",
@@ -301,6 +359,10 @@ public class PokedexEntry extends ReactionMessage {
 			builder.appendField("Forms:", formString.substring(0, formString.length() - 2), false);
 		}
 		String detailsString = "Generation: %d\nCatch Rate: %d%%\nFlee Rate: %d%%\nBuddy Distance: %dkm";
+		if (entry.hasLegacyMove())
+			detailsString += "\nHas legacy move(s): True";
+		if (entry.hasExclusiveMove())
+			detailsString += "\nHas exclusive move(s): True";
 		if (formS != null) {
 			if (formS.canBeShiny(entry.getPokemon()))
 				detailsString += "\nShinyable: True";

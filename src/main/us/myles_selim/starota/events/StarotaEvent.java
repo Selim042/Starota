@@ -1,4 +1,4 @@
-package us.myles_selim.starota.leek_duck.events;
+package us.myles_selim.starota.events;
 
 import java.util.Collections;
 import java.util.Enumeration;
@@ -17,7 +17,7 @@ import us.myles_selim.starota.misc.utils.ImageHelper;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class StarotaEvent {
+public class StarotaEvent implements Comparable<StarotaEvent> {
 
 	public String name;
 	public String description;
@@ -57,7 +57,7 @@ public class StarotaEvent {
 	public long getAdjustedStart(TimeZone timezone) {
 		if (startTime == 0)
 			return 0;
-		if (localized)
+		if (localized && timezone != null)
 			return startTime + timezone.getOffset(startTime) + timezone.getDSTSavings();
 		return startTime;
 	}
@@ -113,7 +113,7 @@ public class StarotaEvent {
 		builder.withTitle(
 				this.location != null && !this.location.isEmpty() ? this.name + ": " + this.location
 						: this.name)
-				.withDesc(this.description);
+				.withDesc(MiscUtils.fixCharacters(this.description));
 		String timeLeft = this.getTimeLeft(server.getTimezone());
 		if (timeLeft != null)
 			builder.appendDesc("\n\n**" + timeLeft + "**");
@@ -156,7 +156,8 @@ public class StarotaEvent {
 		for (String b : this.bonuses)
 			bonuses.append(String.format(" - %s\n", b));
 		if (bonuses.length() != 0)
-			builder.appendField("Bonuses:", bonuses.toString().substring(0, bonuses.length() - 1),
+			builder.appendField("Bonuses:",
+					MiscUtils.fixCharacters(bonuses.toString().substring(0, bonuses.length() - 1)),
 					false);
 
 		StringBuilder tieredBonuses = new StringBuilder();
@@ -166,22 +167,28 @@ public class StarotaEvent {
 				tieredBonuses.append(" - " + b + "\n");
 		}
 		if (tieredBonuses.length() != 0)
-			builder.appendField("Tiered Bonuses:", tieredBonuses.toString(), false);
+			builder.appendField("Tiered Bonuses:", MiscUtils.fixCharacters(tieredBonuses.toString()),
+					false);
 
 		StringBuilder research = new StringBuilder();
 		for (EventFieldResearch fr : this.fieldResearch) {
 			research.append("**" + fr.name + "**:\n");
-			for (ResearchReward b : fr.rewards) {
-				research.append(" - " + b + "\n");
-			}
+			for (ResearchReward b : fr.rewards) { research.append(" - " + b + "\n"); }
 		}
 		if (research.length() != 0)
-			builder.appendField("Field Research:", research.toString(), false);
+			builder.appendField("Field Research:", MiscUtils.fixCharacters(research.toString()), false);
 
 		if (index != -1)
 			builder.withFooterText("Event " + index + "/" + max + " | Last updated")
 					.withTimestamp(EventData.getEventsCacheTime());
 		return builder.build();
+	}
+
+	@Override
+	public int compareTo(StarotaEvent event) {
+		if (this.hasStarted() && event.hasStarted())
+			return Long.compare(this.endTime, event.endTime);
+		return Long.compare(this.startTime, event.startTime);
 	}
 
 	public static class EventFieldResearch {

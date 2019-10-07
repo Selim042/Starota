@@ -26,11 +26,11 @@ public class RegistrationEventHandler implements EventListener {
 	private Set<ReadyEvent.Guild> guildsWereIn;
 
 	private boolean isInGuildAtStart(Snowflake guildId) {
+		if (guildsWereIn == null)
+			return true;
 		for (ReadyEvent.Guild g : guildsWereIn)
-			if (g.getId().asLong() == guildId.asLong()) {
-				System.out.println("was in guild at start");
+			if (g.getId().asLong() == guildId.asLong())
 				return true;
-			}
 		return false;
 	}
 
@@ -56,7 +56,8 @@ public class RegistrationEventHandler implements EventListener {
 		Starota.submitStats();
 		RegistrationBot.updateOwners();
 		Guild server = event.getGuild();
-		if (!server.getMembers().collectList().block().contains(RegistrationBot.CLIENT.getSelf()))
+		if (!server.getMembers().collectList().block()
+				.contains(RegistrationBot.CLIENT.getSelf().block()))
 			return;
 		User selimUser = RegistrationBot.CLIENT.getUserById(StarotaConstants.SELIM_USER_ID).block();
 		PrivateChannel selimPm = selimUser.getPrivateChannel().block();

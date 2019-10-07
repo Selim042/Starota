@@ -91,8 +91,14 @@ public class CommandSilphCard extends BotCommand<StarotaServer> {
 		builder.appendField("Travelers Met:", Integer.toString(card.data.handshakes), true);
 		builder.appendField("Meetup Checkins:", Integer.toString(card.data.checkins.length), true);
 		builder.appendField("Nest Reports:", Integer.toString(card.data.nest_migrations), true);
-		builder.appendField("Playstyle:", card.data.playstyle + "\n" + card.data.goal
-				+ "\nTypically raids " + card.data.raid_average + "x/week", false);
+		StringBuilder playstyle = new StringBuilder();
+		if (card.data.playstyle != null)
+			playstyle.append(card.data.playstyle + "\n");
+		if (card.data.goal != null)
+			playstyle.append(card.data.goal + "\n");
+		if (card.data.raid_average != null)
+			playstyle.append("Typically raids " + card.data.raid_average + "x/week");
+		builder.appendField("Playstyle:", playstyle.toString(), false);
 
 		String socialString = "";
 		for (SilphSocial s : card.data.socials)

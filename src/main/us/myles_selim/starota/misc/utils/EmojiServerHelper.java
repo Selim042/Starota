@@ -8,6 +8,7 @@ import discord4j.core.object.entity.GuildEmoji;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Image;
 import discord4j.core.object.util.Image.Format;
+import discord4j.core.object.util.Snowflake;
 import reactor.netty.http.client.HttpClient;
 import us.myles_selim.starota.Starota;
 
@@ -24,10 +25,20 @@ public class EmojiServerHelper {
 			542428050134925314L, // Emoji Server #4
 			561385227977752578L, // Emoji Server #5
 			602545528630411264L, // Emoji Server #6
+			625149217186381850L, // Emoji Server #7
+			625149512360525846L, // Emoji Server #8
+			629422842462601216L, // Emoji Server #9
+			629422895424339978L, // Emoji Server #10
+			629422934951460885L, // Emoji Server #11
+			629423110914834476L, // Emoji Server #12
 	};
 
 	public static boolean isEmojiServer(Guild guild) {
-		return arrCont(EMOJI_SERVERS, guild.getId().asLong());
+		return isEmojiServer(guild.getId());
+	}
+
+	public static boolean isEmojiServer(Snowflake id) {
+		return arrCont(EMOJI_SERVERS, id.asLong());
 	}
 
 	public static int getNumberServers() {
@@ -77,8 +88,10 @@ public class EmojiServerHelper {
 			}
 		}
 		Starota.getClient().getUserById(StarotaConstants.SELIM_USER_ID).block().getPrivateChannel()
-				.block().createMessage(
-						"Emoji servers are full, trying to upload " + namef + " with image " + fallback);
+				.block()
+				.createMessage(
+						"Emoji servers are full, trying to upload " + namef + " with image " + fallback)
+				.block();
 		return null;
 	}
 

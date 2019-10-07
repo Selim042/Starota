@@ -20,6 +20,7 @@ public class TutorialChapter {
 		return description;
 	}
 
-	public void execute(User user, ChapterProgress progress) throws Exception {}
+	public void execute(User user, ChapterProgress progress)
+			throws Exception { /* WIP */ }
 
 }

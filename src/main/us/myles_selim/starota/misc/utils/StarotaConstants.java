@@ -5,7 +5,7 @@ import discord4j.core.object.util.Snowflake;
 public class StarotaConstants {
 
 	/** Starota version */
-	public final static String VERSION = "3.0.2";
+	public final static String VERSION = "3.1.0";
 
 	/** Starota user ID */
 	public static final Snowflake STAROTA_ID = Snowflake.of(489245655710040099L);
@@ -38,6 +38,10 @@ public class StarotaConstants {
 		public static final String PROFILE_NICKNAME = "profileNickname";
 		/** Server timezone */
 		public static final String TIMEZONE = "timezone";
+		/** Server weather API token */
+		public static final String WEATHER_API_TOKEN = "weatherToken";
+		/** Community coords */
+		public static final String COORDS = "coords";
 
 	}
 

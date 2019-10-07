@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.enums.EnumPokemonNew;
 import us.myles_selim.starota.misc.data_types.EggEntry;
 import us.myles_selim.starota.misc.data_types.RaidBoss;
 import us.myles_selim.starota.misc.data_types.ResearchTask;
@@ -50,7 +51,7 @@ public class SilphRoadData {
 	private static List<RaidBoss>[] TIERED_BOSSES;
 
 	public static List<RaidBoss> getBosses() {
-		if (BOSSES != null && !BOSSES.hasPassed(86400000L)) // 1 day
+		if (BOSSES != null && !BOSSES.hasPassed(43200000L)) // 12 hrs
 			return Collections.unmodifiableList(BOSSES.getValue());
 		List<RaidBoss> newBosses = new LinkedList<>();
 		try {
@@ -124,15 +125,19 @@ public class SilphRoadData {
 		}
 	}
 
-	public static boolean areBossesLoaded(int tier) {
-		if (BOSSES != null && TIERED_EGGS != null && !BOSSES.hasPassed(86400000L)) // 1
-																					// day
-			return TIERED_EGGS[tier - 1] != null;
+	public static boolean areBossesLoaded(int tier) { // 12 hrs
+		if (BOSSES != null && TIERED_EGGS != null && !BOSSES.hasPassed(43200000L))
+			if (tier < 0 || tier > 6)
+				return true;
+			else
+				return TIERED_EGGS[tier - 1] != null;
 		return false;
 	}
 
 	public static List<RaidBoss> getBosses(int tier) {
 		getBosses();
+		if (TIERED_BOSSES[tier - 1] == null)
+			return Collections.emptyList();
 		return TIERED_BOSSES[tier - 1];
 	}
 
@@ -223,11 +228,13 @@ public class SilphRoadData {
 						if (!nameMatcher.find())
 							continue;
 						String nameMatch = nameMatcher.group();
-						String[] pokemonName = splitName(
-								nameMatch.substring(47, nameMatch.length() - 26));
+						String fullName = nameMatch.substring(47, nameMatch.length() - 26);
+						EnumPokemon pokemon = EnumPokemon.getPokemon(fullName);
+						String[] pokemonName = splitName(fullName);
 						// System.out.println(pokemonName[0] + " " +
 						// pokemonName[1]);
-						EnumPokemon pokemon = EnumPokemon.getPokemon(pokemonName[0]);
+						if (pokemon == null)
+							pokemon = EnumPokemon.getPokemon(pokemonName[0]);
 						if (pokemon == null) {
 							Starota.submitError("Cannot find egg hatch named " + pokemonName[0],
 									new IllegalArgumentException(
@@ -259,6 +266,8 @@ public class SilphRoadData {
 
 	public static List<EggEntry> getEggs(int dist) {
 		getEggs();
+		if (TIERED_EGGS[getDistanceIndex(dist)] == null)
+			return Collections.emptyList();
 		return TIERED_EGGS[getDistanceIndex(dist)];
 	}
 
@@ -437,6 +446,90 @@ public class SilphRoadData {
 		TASKS = null;
 	}
 
+	private static CachedData<List<EnumPokemonNew>> AVAILABLE;
+	private static CachedData<List<EnumPokemonNew>> SHINYABLE;
+	private static CachedData<List<EnumPokemonNew>> SHADOWABLE;
+	private static CachedData<List<EnumPokemonNew>> NESTING;
+
+	private static final String SILPH_DEX = "https://thesilphroad.com/catalog";
+	private static final Pattern POKEMON_GENERAL_PATTERN = Pattern
+			.compile("<div class=\"pokemonOption (sighted|notSighted).*?</div>");
+	private static final Pattern DEX_NUM_PATTERN = Pattern.compile("<span>#[0-9]{0,3}</span>");
+
+	private static void checkCaches() {
+		if (AVAILABLE == null || AVAILABLE.hasPassed(86400000L) || SHINYABLE == null
+				|| SHINYABLE.hasPassed(86400000L) || SHADOWABLE == null
+				|| SHADOWABLE.hasPassed(86400000L) || NESTING == null || NESTING.hasPassed(86400000L)) { // 1
+																											// day
+			AVAILABLE = new CachedData<>(new LinkedList<>());
+			SHINYABLE = new CachedData<>(new LinkedList<>());
+			SHADOWABLE = new CachedData<>(new LinkedList<>());
+			NESTING = new CachedData<>(new LinkedList<>());
+
+			try {
+				URL url = new URL(SILPH_DEX);
+				URLConnection conn = url.openConnection();
+				conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
+				BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+				String html = "";
+				String line = null;
+				while ((line = in.readLine()) != null)
+					html += line;
+				Matcher generalMatcher = POKEMON_GENERAL_PATTERN.matcher(html);
+				while (generalMatcher.find()) {
+					String match = generalMatcher.group();
+					if (match.contains("data-released=\"1\"")) {
+						Matcher dexNumMatcher = DEX_NUM_PATTERN.matcher(match);
+						if (dexNumMatcher.find()) {
+							String dexMatch = dexNumMatcher.group();
+							EnumPokemonNew pokemon = EnumPokemonNew.getPokemon(
+									Integer.parseInt(dexMatch.substring(7, dexMatch.length() - 7)));
+							if (pokemon == null)
+								continue;
+							AVAILABLE.getValue().add(pokemon);
+							if (match.contains("data-shiny-released=\"1\""))
+								SHINYABLE.getValue().add(pokemon);
+							if (match.contains("data-shadow-released=\"1\""))
+								SHADOWABLE.getValue().add(pokemon);
+							if (match.contains("data-nests=\"1\""))
+								NESTING.getValue().add(pokemon);
+						}
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	@ClearCache("pokemon")
+	public static void dumpCache() {
+		AVAILABLE = null;
+		SHINYABLE = null;
+		SHADOWABLE = null;
+		NESTING = null;
+	}
+
+	public static boolean isAvailable(EnumPokemonNew pokemon) {
+		checkCaches();
+		return AVAILABLE.getValue().contains(pokemon);
+	}
+
+	public static boolean isShinyable(EnumPokemonNew pokemon) {
+		checkCaches();
+		return SHINYABLE.getValue().contains(pokemon);
+	}
+
+	public static boolean isShadowable(EnumPokemonNew pokemon) {
+		checkCaches();
+		return SHADOWABLE.getValue().contains(pokemon);
+	}
+
+	public static boolean isNesting(EnumPokemonNew pokemon) {
+		checkCaches();
+		return NESTING.getValue().contains(pokemon);
+	}
+
 	private static String[] splitName(String name) {
 		String[] parts = new String[2];
 		if (name.matches(".*? \\(.*?\\)")) {
@@ -446,8 +539,13 @@ public class SilphRoadData {
 			return parts;
 		} else if (name.matches(".*? .*?")) {
 			String[] iParts = name.split(" ");
-			parts[0] = iParts[1];
-			parts[1] = iParts[0];
+			if (iParts[0].equals("Unown")) {
+				parts[0] = iParts[0];
+				parts[1] = iParts[1];
+			} else {
+				parts[0] = iParts[1];
+				parts[1] = iParts[0];
+			}
 			return parts;
 		} else
 			parts[0] = name;

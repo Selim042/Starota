@@ -103,7 +103,7 @@ public class CommandHelp extends JavaCommand {
 				if (args.length > 2)
 					try {
 						page = Integer.parseInt(args[2]) - 1;
-					} catch (NumberFormatException e1) {}
+					} catch (NumberFormatException e1) { /* */ }
 			}
 		}
 

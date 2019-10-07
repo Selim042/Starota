@@ -43,7 +43,7 @@ public class PokedexReactionMessage extends ReactionMessage {
 			msg.addReaction(emoji).block();
 			try {
 				Thread.sleep(100);
-			} catch (InterruptedException e) {}
+			} catch (InterruptedException e) { /* */ }
 		}
 	}
 
@@ -89,10 +89,6 @@ public class PokedexReactionMessage extends ReactionMessage {
 			msg.edit((m) -> m.setEmbed(newEmbed)).block();
 		}
 	}
-
-	@Override
-	public void onReactionRemoved(StarotaServer server, MessageChannel channel, Message msg, User user,
-			ReactionEmoji react) {}
 
 	@Override
 	protected Consumer<? super EmbedCreateSpec> getEmbed(StarotaServer server) {

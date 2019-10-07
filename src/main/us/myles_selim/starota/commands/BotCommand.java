@@ -9,7 +9,7 @@ import us.myles_selim.starota.commands.registry.java.JavaCommand;
 import us.myles_selim.starota.misc.data_types.BotServer;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
-public class BotCommand<S extends BotServer> extends JavaCommand {
+public abstract class BotCommand<S extends BotServer> extends JavaCommand {
 
 	public BotCommand(String name) {
 		super(name);
@@ -28,8 +28,8 @@ public class BotCommand<S extends BotServer> extends JavaCommand {
 				channel);
 	}
 
-	public void execute(String[] args, Message message, S server, MessageChannel channel)
-			throws CommandException {}
+	public abstract void execute(String[] args, Message message, S server, MessageChannel channel)
+			throws CommandException;
 
 	@Override
 	public final Role requiredRole(Guild guild) {

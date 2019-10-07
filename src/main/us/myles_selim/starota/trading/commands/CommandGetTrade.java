@@ -36,10 +36,12 @@ public class CommandGetTrade extends BotCommand<StarotaServer> {
 					.block();
 			return;
 		}
-		int tradeId = -1;
+		int tradeId;
 		try {
 			tradeId = Integer.parseInt(args[1]);
-		} catch (NumberFormatException e) {}
+		} catch (NumberFormatException e) {
+			tradeId = -1;
+		}
 		TradeboardPost post = server.getPost(tradeId);
 		if (post == null) {
 			channel.createMessage("Trade \"" + args[1] + "\" not found.").block();

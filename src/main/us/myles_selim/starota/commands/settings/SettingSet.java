@@ -7,13 +7,12 @@ import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 
+import discord4j.core.object.util.Snowflake;
 import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.commands.settings.types.ServerSetting;
-import us.myles_selim.starota.misc.data_types.BotServer;
 import us.myles_selim.starota.misc.utils.IValueSetCallback;
 import us.myles_selim.starota.misc.utils.MiscUtils;
-import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class SettingSet implements Iterable<Setting<?>> {
 
@@ -31,7 +30,7 @@ public class SettingSet implements Iterable<Setting<?>> {
 			this.settings.put(setting.getName(), (Setting<?>) setting.clone());
 	}
 
-	public SettingSet(StarotaServer server, SettingSet settings) {
+	public SettingSet(Snowflake server, SettingSet settings) {
 		this.settings = new HashMap<>();
 		for (Setting<?> setting : settings)
 			if (setting instanceof ServerSetting)
@@ -59,30 +58,48 @@ public class SettingSet implements Iterable<Setting<?>> {
 		return EnumReturnSetStatus.SUCCESS;
 	}
 
-	public <V> EnumReturnSetStatus setSetting(String name, String value) {
+	public <V> EnumReturnSetStatus setSetting(Snowflake server, String name, String value) {
 		Setting<?> setting = MiscUtils.getValueIgnoreCase(settings, name);
 		if (setting == null)
 			return EnumReturnSetStatus.NOT_FOUND;
-		if (setting.setValue(value)) {
-			if (setCallback != null)
-				setCallback.onSet();
-			return EnumReturnSetStatus.SUCCESS;
-		} else
-			return EnumReturnSetStatus.NOT_SET;
+		if (setting instanceof ServerSetting) {
+			if (((ServerSetting<?>) setting).setValue(server, value)) {
+				if (setCallback != null)
+					setCallback.onSet();
+				return EnumReturnSetStatus.SUCCESS;
+			} else
+				return EnumReturnSetStatus.NOT_SET;
+		} else {
+			if (setting.setValue(value)) {
+				if (setCallback != null)
+					setCallback.onSet();
+				return EnumReturnSetStatus.SUCCESS;
+			} else
+				return EnumReturnSetStatus.NOT_SET;
+		}
 	}
 
-	public <V> EnumReturnSetStatus setSetting(String name, V value) {
+	public <V> EnumReturnSetStatus setSetting(Snowflake server, String name, V value) {
 		Setting<?> setting = MiscUtils.getValueIgnoreCase(settings, name);
 		if (setting == null)
 			return EnumReturnSetStatus.NOT_FOUND;
 		if (!setting.getType().isInstance(value))
 			return EnumReturnSetStatus.NOT_SET;
-		if (setting.setValue(value)) {
-			if (setCallback != null)
-				setCallback.onSet();
-			return EnumReturnSetStatus.SUCCESS;
-		} else
-			return EnumReturnSetStatus.NOT_SET;
+		if (setting instanceof ServerSetting) {
+			if (((ServerSetting<?>) setting).setValue(server, value)) {
+				if (setCallback != null)
+					setCallback.onSet();
+				return EnumReturnSetStatus.SUCCESS;
+			} else
+				return EnumReturnSetStatus.NOT_SET;
+		} else {
+			if (setting.setValue(value)) {
+				if (setCallback != null)
+					setCallback.onSet();
+				return EnumReturnSetStatus.SUCCESS;
+			} else
+				return EnumReturnSetStatus.NOT_SET;
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -104,7 +121,7 @@ public class SettingSet implements Iterable<Setting<?>> {
 		return setting.getValue().equals(setting.getEmptyValue());
 	}
 
-	public SettingSet setServer(BotServer server) {
+	public SettingSet setServer(Snowflake server) {
 		iterator().forEachRemaining((Setting<?> setting) -> {
 			if (setting instanceof ServerSetting)
 				this.settings.put(setting.getName(), ((ServerSetting<?>) setting).clone(server));
@@ -168,7 +185,9 @@ public class SettingSet implements Iterable<Setting<?>> {
 			this.value.settings.clear();
 			this.value.setWriteCallback(() -> setValue(getValue()));
 			for (Setting<?> setting : value)
-				this.value.setSetting(setting.getName(), setting.getValue());
+				if (setting instanceof ServerSetting)
+					this.value.setSetting(((ServerSetting<?>) setting).getServer(), setting.getName(),
+							setting.getValue());
 		}
 
 		@Override

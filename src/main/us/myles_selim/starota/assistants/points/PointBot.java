@@ -52,7 +52,7 @@ public class PointBot {
 	@SuppressWarnings("deprecation")
 	public static void start() {
 		// if (started || Starota.IS_DEV)
-		if (started)
+		if (started || !started)
 			return;
 		started = true;
 

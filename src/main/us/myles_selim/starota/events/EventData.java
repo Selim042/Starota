@@ -1,4 +1,4 @@
-package us.myles_selim.starota.leek_duck.events;
+package us.myles_selim.starota.events;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -6,7 +6,6 @@ import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -67,7 +66,6 @@ public class EventData {
 	private static final String EVENTS_URL = "https://raw.githubusercontent.com/Selim042/Misc-PoGo-Stuffs/master/events.json";
 
 	private static CachedData<StarotaEvent[]> EVENT_CACHE;
-	private static StarotaEvent[] RUN_UP_EVENTS;
 
 	public static StarotaEvent[] getEvents() {
 		if (EVENT_CACHE != null && !EVENT_CACHE.hasPassed(3600000)) // 1 hour
@@ -88,22 +86,22 @@ public class EventData {
 	}
 
 	public static StarotaEvent[] getRunningUpcomingEvents() {
-		if (EVENT_CACHE != null && !EVENT_CACHE.hasPassed(3600000) // 1 hour
-				&& RUN_UP_EVENTS != null)
-			return RUN_UP_EVENTS;
-		List<StarotaEvent> runUps = new ArrayList<>();
+		if (EVENT_CACHE != null && !EVENT_CACHE.hasPassed(3600000)) // 1 hour
+			return EVENT_CACHE.getValue();
+		List<StarotaEvent> shortEvents = new ArrayList<>();
+		List<StarotaEvent> longEvents = new ArrayList<>();
 		for (StarotaEvent e : getEvents())
 			if (!e.isOver())
-				runUps.add(e);
-		runUps.sort(new Comparator<StarotaEvent>() {
+				if (e.longTerm)
+					longEvents.add(e);
+				else
+					shortEvents.add(e);
+		shortEvents.sort(null);
+		longEvents.sort(null);
 
-			@Override
-			public int compare(StarotaEvent arg0, StarotaEvent arg1) {
-				return Long.compare(arg0.startTime, arg1.startTime);
-			}
-		});
-		RUN_UP_EVENTS = runUps.toArray(new StarotaEvent[0]);
-		return RUN_UP_EVENTS;
+		shortEvents.addAll(longEvents);
+		EVENT_CACHE = new CachedData<>(shortEvents.toArray(new StarotaEvent[0]));
+		return EVENT_CACHE.getValue();
 	}
 
 	public static boolean areEventsLoaded() {
