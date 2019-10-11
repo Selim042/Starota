@@ -1,10 +1,12 @@
 package us.myles_selim.starota.silph_road.eggs;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.PermissionSet;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -18,6 +20,11 @@ import us.myles_selim.starota.silph_road.SilphRoadData;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandEggHatches extends BotCommand<StarotaServer> {
+
+	private static final String REGIONAL_DISCLAIMER = //
+			"Regional exclusive Pokemon can only be hatched from eggs piced up in their respective regions.\n"
+					+ "There is no way to obtain regional 5km eggs in any other way outside of picking them "
+					+ "up from a Pokestop in their respective regions.";
 
 	public CommandEggHatches() {
 		super("eggHatches", "Gets information on what can currently hatch from eggs.");
@@ -69,12 +76,27 @@ public class CommandEggHatches extends BotCommand<StarotaServer> {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withTitle(String.format("%dk Eggs: %s", dist,
 				MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji(dist + "kEgg"))));
-		for (EggEntry b : SilphRoadData.getEggs(dist))
-			builder.appendDescription(b.getPokemon()
-					+ (b.getForm() == null ? "" : " (" + b.getForm() + ") ")
-					+ (b.isShinyable()
-							? MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("shiny")) + "\n"
-							: "\n"));
+
+		boolean foundRegional = false;
+		StringBuilder regionalHatches = new StringBuilder();
+		regionalHatches.append(REGIONAL_DISCLAIMER + "\n\n");
+		for (EggEntry b : SilphRoadData.getEggs(dist)) {
+			if (b.getPokemon().isRegional()) {
+				foundRegional = true;
+				regionalHatches.append(b.getPokemon()
+						+ (b.getForm() == null ? "" : " (" + b.getForm() + ") ")
+						+ (b.isShinyable()
+								? MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("shiny")) + "\n"
+								: "\n"));
+			} else
+				builder.appendDescription(b.getPokemon()
+						+ (b.getForm() == null ? "" : " (" + b.getForm() + ") ")
+						+ (b.isShinyable()
+								? MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("shiny")) + "\n"
+								: "\n"));
+		}
+		if (foundRegional)
+			builder.appendField("Regional Hatches:", regionalHatches.toString(), false);
 
 		builder.withUrl("https://thesilphroad.com/raid-bosses");
 		builder.withAuthorName("The Silph Road");
@@ -96,93 +118,104 @@ public class CommandEggHatches extends BotCommand<StarotaServer> {
 		builder.withAuthorIcon("https://thesilphroad.com/favicon.ico?1476895361");
 		builder.withAuthorUrl("https://thesilphroad.com/");
 
-		String nonShinies2k = "";
-		String shinies2k = "";
-		String nonShinies5k = "";
-		String shinies5k = "";
-		String nonShinies7k = "";
-		String shinies7k = "";
-		String nonShinies10k = "";
-		String shinies10k = "";
-		for (EggEntry e : SilphRoadData.getEggs()) {
-			switch (e.getDistance()) {
-			case 2:
-				if (e.isShinyable())
-					shinies2k += (e.getForm() == null ? e.getPokemon().getName()
-							: String.format("%s (%s)", e.getPokemon().getName(), e.getForm().toString()))
-							+ ", ";
-				else
-					nonShinies2k += (e.getForm() == null ? e.getPokemon().getName()
-							: String.format("%s (%s)", e.getPokemon().getName(), e.getForm().toString()))
-							+ ", ";
-				break;
-			case 5:
-				if (e.isShinyable())
-					shinies5k += (e.getForm() == null ? e.getPokemon().getName()
-							: String.format("%s (%s)", e.getPokemon().getName(), e.getForm().toString()))
-							+ ", ";
-				else
-					nonShinies5k += (e.getForm() == null ? e.getPokemon().getName()
-							: String.format("%s (%s)", e.getPokemon().getName(), e.getForm().toString()))
-							+ ", ";
-				break;
-			case 7:
-				if (e.isShinyable())
-					shinies7k += (e.getForm() == null ? e.getPokemon().getName()
-							: String.format("%s (%s)", e.getPokemon().getName(), e.getForm().toString()))
-							+ ", ";
-				else
-					nonShinies7k += (e.getForm() == null ? e.getPokemon().getName()
-							: String.format("%s (%s)", e.getPokemon().getName(), e.getForm().toString()))
-							+ ", ";
-				break;
-			case 10:
-				if (e.isShinyable())
-					shinies10k += (e.getForm() == null ? e.getPokemon().getName()
-							: String.format("%s (%s)", e.getPokemon().getName(), e.getForm().toString()))
-							+ ", ";
-				else
-					nonShinies10k += (e.getForm() == null ? e.getPokemon().getName()
-							: String.format("%s (%s)", e.getPokemon().getName(), e.getForm().toString()))
-							+ ", ";
-				break;
-			}
+		List<EggData> sortedEggs = getSortedEggs();
+		for (EggData data : sortedEggs) {
+			StringBuilder titleBuilder = new StringBuilder(
+					data.distance + "k Eggs" + (data.regional ? " (Regionals): " : ": "));
+			titleBuilder.append(
+					MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji(data.distance + "kEgg")));
+			if (data.regional)
+				titleBuilder.append(MiscUtils.getEmojiDisplay(ReactionEmoji.unicode("🗺")));
+
+			StringBuilder bodyBuilder = new StringBuilder();
+			if (data.regional)
+				bodyBuilder.append(REGIONAL_DISCLAIMER + "\n\n");
+			bodyBuilder.append("**Non-Shinies**:\n");
+			if (data.builder.length() > 2)
+				bodyBuilder.append(data.builder.substring(0, data.builder.length() - 2));
+			else
+				bodyBuilder.append("No hatches found");
+			bodyBuilder.append("\n\n**Shinies**:\n");
+			if (data.shinyBuilder.length() > 2)
+				bodyBuilder.append(data.shinyBuilder.substring(0, data.shinyBuilder.length() - 2));
+			else
+				bodyBuilder.append("No hatches found");
+
+			builder.appendField(titleBuilder.toString(), bodyBuilder.toString(), false);
 		}
-		builder.appendField(
-				"**2k Eggs**: " + MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("2kEgg")),
-				"**Non-Shinies**: "
-						+ nonShinies2k.substring(0,
-								nonShinies2k.length() > 2 ? nonShinies2k.length() - 2 : 0)
-						+ "\n\n" + "**Shinies**: "
-						+ shinies2k.substring(0, shinies2k.length() > 2 ? shinies2k.length() - 2 : 0),
-				false);
-		builder.appendField(
-				"**5k Eggs**: " + MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("5kEgg")),
-				"**Non-Shinies**: "
-						+ nonShinies5k.substring(0,
-								nonShinies5k.length() > 2 ? nonShinies5k.length() - 2 : 0)
-						+ "\n\n" + "**Shinies**: "
-						+ shinies5k.substring(0, shinies5k.length() > 2 ? shinies5k.length() - 2 : 0),
-				false);
-		builder.appendField(
-				"**7k Eggs**: " + MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("7kEgg")),
-				"**Non-Shinies**: "
-						+ nonShinies7k.substring(0,
-								nonShinies7k.length() > 2 ? nonShinies7k.length() - 2 : 0)
-						+ "\n\n" + "**Shinies**: "
-						+ shinies7k.substring(0, shinies7k.length() > 2 ? shinies7k.length() - 2 : 0),
-				false);
-		builder.appendField(
-				"**10k Eggs**: " + MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("10kEgg")),
-				"**Non-Shinies**: "
-						+ nonShinies10k.substring(0,
-								nonShinies10k.length() > 2 ? nonShinies10k.length() - 2 : 0)
-						+ "\n\n" + "**Shinies**: "
-						+ shinies10k.substring(0, shinies10k.length() > 2 ? shinies10k.length() - 2 : 0),
-				false);
 
 		builder.withFooterText("Last updated").withTimestamp(SilphRoadData.getEggCacheTime());
 		return builder.build();
+	}
+
+	private static List<EggData> getSortedEggs() {
+		List<EggData> sortedEggs = new ArrayList<>();
+		for (EggEntry e : SilphRoadData.getEggs()) {
+			EggData data = null;
+			for (EggData eData : sortedEggs) {
+				if (eData.matches(e.getDistance(), e.getPokemon().isRegional()))
+					data = eData;
+			}
+			if (data == null) {
+				data = new EggData(e.getDistance(), e.getPokemon().isRegional());
+				sortedEggs.add(data);
+			}
+			if (e.isShinyable())
+				data.shinyBuilder.append((e.getForm() == null ? e.getPokemon().getName()
+						: String.format("%s (%s)", e.getPokemon().getName(), e.getForm().toString()))
+						+ ", ");
+			else
+				data.builder.append((e.getForm() == null ? e.getPokemon().getName()
+						: String.format("%s (%s)", e.getPokemon().getName(), e.getForm().toString()))
+						+ ", ");
+		}
+		sortedEggs.sort(null);
+		return sortedEggs;
+	}
+
+	private static class EggData implements Comparable<EggData> {
+
+		public int distance;
+		public boolean regional;
+		public final StringBuilder builder = new StringBuilder();
+		public final StringBuilder shinyBuilder = new StringBuilder();
+
+		public EggData(int distance, boolean regional) {
+			this.distance = distance;
+			this.regional = regional;
+		}
+
+		public boolean matches(int distance, boolean regional) {
+			return this.distance == distance && this.regional == regional;
+		}
+
+		@Override
+		public int compareTo(EggData data) {
+			if (this.distance == data.distance)
+				return Boolean.compare(this.regional, data.regional);
+			return Integer.compare(this.distance, data.distance);
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + distance;
+			result = prime * result + (regional ? 1231 : 1237);
+			return result;
+		}
+
+		@Override
+		public String toString() {
+			StringBuilder builder = new StringBuilder();
+			builder.append("EggData [distance=");
+			builder.append(distance);
+			builder.append(", regional=");
+			builder.append(regional);
+			builder.append("]");
+			return builder.toString() + "=" + this.builder.toString();
+		}
+
 	}
 
 }
