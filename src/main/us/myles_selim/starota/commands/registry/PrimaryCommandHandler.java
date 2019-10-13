@@ -25,11 +25,11 @@ import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.PermissionSet;
 import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.commands.registry.channel_management.ChannelCommandManager;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.EventListener;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.modules.StarotaModule;
+import us.myles_selim.starota.permissions.holders.PermissionHolder;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class PrimaryCommandHandler implements EventListener {
@@ -137,13 +137,20 @@ public class PrimaryCommandHandler implements EventListener {
 			// try to find valid command
 			for (ICommandHandler h : COMMAND_HANDLERS) {
 				ICommand cmd = h.findCommand(guild, message, args[0]);
-				// check if cmd not found, or if cmd isn't allowed here, or if
+				// check if cmd not found, or if
 				// the user doesn't have perms for the found cmd
-				if (cmd == null
-						|| !ChannelCommandManager.isAllowedHere(server, cmd.getCategory(), channel)
-						|| (cmd.requiredUsePermission() != null && guild != null
-								&& authorServerPerms != null
-								&& !authorServerPerms.contains(cmd.requiredUsePermission())))
+				if (cmd == null || (cmd.requiredUsePermission() != null && guild != null
+						&& authorServerPerms != null
+						&& !authorServerPerms.contains(cmd.requiredUsePermission())))
+					continue;
+
+				// check if user has permission via Starota permission system
+				boolean hasStarotaPerms = true;
+				if (guild != null)
+					hasStarotaPerms = PermissionHolder
+							.getNewHolderMember(guild, message.getAuthorAsMember().block())
+							.hasPermission(channel, cmd.getStarotaPermission());
+				if (!hasStarotaPerms)
 					continue;
 
 				// if Starota doesn't have necessary perms, create error msg
@@ -183,11 +190,18 @@ public class PrimaryCommandHandler implements EventListener {
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.withTitle("Did you mean...?");
 			for (ICommand cmd : getSuggestions(guild, message, args[0], 5)) {
-				if (cmd == null
-						|| !ChannelCommandManager.isAllowedHere(server, cmd.getCategory(), channel)
-						|| (cmd.requiredUsePermission() != null && guild != null
-								&& !authorServerPerms.contains(cmd.requiredUsePermission())))
+				if (cmd == null || (cmd.requiredUsePermission() != null && guild != null
+						&& !authorServerPerms.contains(cmd.requiredUsePermission())))
 					continue;
+
+				boolean hasStarotaPerms = true;
+				if (guild != null)
+					hasStarotaPerms = PermissionHolder
+							.getNewHolderMember(guild, message.getAuthorAsMember().block())
+							.hasPermission(channel, cmd.getStarotaPermission());
+				if (!hasStarotaPerms)
+					continue;
+
 				String desciption = cmd.getDescription();
 				builder.appendDesc("- " + prefix + cmd.getName()
 						+ (desciption == null ? "" : ", _" + cmd.getDescription() + "_") + "\n");
@@ -214,7 +228,7 @@ public class PrimaryCommandHandler implements EventListener {
 		channel.createMessage(message.getAuthor().get().getMention()
 				+ ", There was an error encountered while executing your command: "
 				+ th.getClass().getName() + ": " + th.getLocalizedMessage() + "\n"
-				+ th.getStackTrace()[0]);
+				+ th.getStackTrace()[0]).block();
 		// });
 		System.err.println("executed command: " + message.getContent());
 		th.printStackTrace();
@@ -275,9 +289,14 @@ public class PrimaryCommandHandler implements EventListener {
 		MessageChannel channel = message.getChannel().block();
 		for (ICommandHandler ch : COMMAND_HANDLERS) {
 			for (ICommand cmd : ch.getAllCommands(guild)) {
-				if (channel != null && !ChannelCommandManager
-						.isAllowedHere(StarotaServer.getServer(guild), cmd.getCategory(), channel))
+				boolean hasStarotaPerms = true;
+				if (guild != null)
+					hasStarotaPerms = PermissionHolder
+							.getNewHolderMember(guild, message.getAuthorAsMember().block())
+							.hasPermission(channel, cmd.getStarotaPermission());
+				if (!hasStarotaPerms)
 					continue;
+
 				if (!cmd.hasRequiredRole(guild, message.getAuthorAsMember().block())
 						|| !cmd.isRequiredChannel(guild, message.getChannel().block()))
 					continue;

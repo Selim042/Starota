@@ -27,6 +27,7 @@ import us.myles_selim.starota.misc.data_types.cache.CachedData;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.ServerDataHelper;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
+import us.myles_selim.starota.permissions.holders.PermissionHolder;
 import us.myles_selim.starota.weather.api.AccuWeatherAPI;
 import us.myles_selim.starota.weather.api.WeatherLocation;
 import us.myles_selim.starota.weather.api.WeatherTimezone;
@@ -233,6 +234,12 @@ public abstract class BotServer {
 		return location.getValue();
 	}
 	// end weather stuffs
+
+	// start misc stuffs
+	public void clearPermissions() {
+		PermissionHolder.dumpPerms(getDiscordGuild());
+	}
+	// end misc stuffs
 
 	public Guild getDiscordGuild() {
 		return guild;

@@ -11,7 +11,6 @@ import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
-import us.myles_selim.starota.commands.registry.channel_management.ChannelCommandManager;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
 import us.myles_selim.starota.debug_server.DebugServer;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
@@ -68,15 +67,6 @@ public class CommandChannelInfo extends JavaCommand {
 			builder.appendField("Missing Perms:", permsString, false);
 		else
 			builder.appendField("Missing Perms:", "None", false);
-
-		String disallowedCats = "";
-		for (String c : Starota.COMMAND_HANDLER.getAllCategories(targetGuild))
-			if (!ChannelCommandManager.isAllowedHere(server, c, targetChannel))
-				disallowedCats += " - " + c + "\n";
-		if (!disallowedCats.isEmpty())
-			builder.appendField("Disallowed Categories:", disallowedCats, false);
-		else
-			builder.appendField("Disallowed Categories:", "None", false);
 
 		channel.createEmbed(builder.build());
 	}

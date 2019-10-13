@@ -16,12 +16,9 @@ import us.myles_selim.starota.commands.registry.CommandSetPrefix;
 import us.myles_selim.starota.commands.registry.ICommand;
 import us.myles_selim.starota.commands.registry.ICommandHandler;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
-import us.myles_selim.starota.commands.registry.channel_management.ChannelCommandManager;
-import us.myles_selim.starota.commands.registry.channel_management.CommandAddChannelWhitelist;
-import us.myles_selim.starota.commands.registry.channel_management.CommandGetWhitelist;
-import us.myles_selim.starota.commands.registry.channel_management.CommandRemoveChannelWhitelist;
 import us.myles_selim.starota.debug_server.DebugServer;
 import us.myles_selim.starota.modules.StarotaModule;
+import us.myles_selim.starota.permissions.holders.PermissionHolder;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class JavaCommandHandler implements ICommandHandler {
@@ -39,10 +36,10 @@ public class JavaCommandHandler implements ICommandHandler {
 
 		registerCommand("Help", new CommandHelp());
 
-		registerCommand("Commands", new CommandAddChannelWhitelist());
-		registerCommand("Commands", new CommandGetWhitelist());
+		// registerCommand("Commands", new CommandAddChannelWhitelist());
+		// registerCommand("Commands", new CommandGetWhitelist());
 		registerCommand("Commands", new CommandSetPrefix());
-		registerCommand("Commands", new CommandRemoveChannelWhitelist());
+		// registerCommand("Commands", new CommandRemoveChannelWhitelist());
 	}
 
 	public void registerCommand(JavaCommand cmd) {
@@ -67,9 +64,15 @@ public class JavaCommandHandler implements ICommandHandler {
 		ICommand cmd = findCommand(guild, message, args[0]);
 		if (cmd == null)
 			return false;
-		if (!ChannelCommandManager.isAllowedHere(StarotaServer.getServer(guild), cmd.getCategory(),
-				channel))
+
+		boolean hasStarotaPerms = true;
+		if (guild != null)
+			hasStarotaPerms = PermissionHolder
+					.getNewHolderMember(guild, message.getAuthorAsMember().block())
+					.hasPermission(channel, cmd.getStarotaPermission());
+		if (!hasStarotaPerms)
 			return false;
+
 		Member author = message.getAuthorAsMember().block();
 		if (cmd.requiredUsePermission() == null || guild == null
 				|| (!author.getBasePermissions().block().contains(cmd.requiredUsePermission())

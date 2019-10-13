@@ -14,6 +14,14 @@ import discord4j.core.object.util.PermissionSet;
 
 public interface ICommand extends Comparable<ICommand> {
 
+	public default String getStarotaPermission() {
+		StringBuilder builder = new StringBuilder("command.");
+		if (getCategory() != null)
+			builder.append(getCategory() + ".");
+		builder.append(getName());
+		return builder.toString();
+	}
+
 	void setCategory(String category);
 
 	public String getCategory();
