@@ -25,10 +25,7 @@ public class CommandBots extends JavaCommand {
 				" - Player profiles\n - Role management\n - Custom scripting\n - Tradeboards\n - Leaderboards\n");
 		builder.appendDesc("[DiscordBots.org](https://discordbots.org/bot/489245655710040099)\n");
 
-		builder.appendDesc("\n**Pokedex**: Just the Pokedex command from Starota.\n");
-		builder.appendDesc("[DiscordBots.org](https://discordbots.org/bot/541079916234407967)\n");
-
-		builder.appendDesc("\n**Registration Bot**: Registers Starota players profiles using OCR.\n");
+		builder.appendDesc("\n**Registration Bot (WIP)**: Registers Starota players profiles using OCR.\n");
 		builder.appendDesc("[DiscordBots.org](https://discordbots.org/bot/578326030603780126)\n");
 
 		builder.appendDesc("\n**Point Bot (WIP)**: Quest-based bot for some friendly competition.\n");
