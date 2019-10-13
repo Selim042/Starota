@@ -87,7 +87,9 @@ public class HttpHandlerTradeboard implements HttpHandler {
 	public void handle(HttpExchange ex) throws IOException {
 		try {
 			if (!WebServer.isLoggedIn(ex)) {
-				WebServer.return404(ex, "Please " + WebServer.getLoginHTML(ex, "login"));
+				// WebServer.return404(ex, "Please " +
+				// WebServer.getLoginHTML(ex, "login"));
+				WebServer.redirect(ex, "/login");
 				return;
 			}
 			Cookie tokenCookie = WebServer.getCookies(ex).get("token");
@@ -104,14 +106,26 @@ public class HttpHandlerTradeboard implements HttpHandler {
 			Snowflake userId = Snowflake.of(loggedIn.id);
 			Member member = guild.getMemberById(userId).block();
 
+			InputStream file = WebServer.getResourceFile("http/tradeboard.html");
+			BufferedReader profTempFile = new BufferedReader(new InputStreamReader(file));
+			StringBuilder tempBuilder = new StringBuilder();
+			profTempFile.lines().forEach(tempBuilder::append);
+			profTempFile.close();
+			String temp = tempBuilder.toString();
+
 			Map<String, String> post = WebServer.getPOST(ex);
 			if (post.containsKey("id-del")) {
 				String idS = post.get("id-del");
 				if (idS.matches("\\d{4}")) {
 					int id = Integer.parseInt(idS);
 					TradeboardPost tPost = server.getPost(id);
-					if (tPost != null && userId.asLong() == tPost.getOwner())
+					if (tPost != null && userId.asLong() == tPost.getOwner()) {
 						server.removePost(id);
+						temp = temp.replaceAll("\\{ALERT_COLOR\\}", "danger");
+						temp = temp.replaceAll("\\{ALERT_TEXT\\}",
+								String.format("Tradeboard post #%s was deleted", id));
+						temp = temp.replaceAll("\\{ALERT_HIDDEN\\}", "");
+					}
 				}
 			} else if (post.containsKey("id-int")) {
 				String idS = post.get("id-int");
@@ -134,16 +148,13 @@ public class HttpHandlerTradeboard implements HttpHandler {
 								+ " from " + server.getDiscordGuild().getName()
 								+ " is interested in your trade. Please contact them for more information.")
 								.setEmbed(tPost.getPostEmbed(server, false))).block();
+						temp = temp.replaceAll("\\{ALERT_COLOR\\}", "success");
+						temp = temp.replaceAll("\\{ALERT_TEXT\\}",
+								String.format("Contacted %s", poster.getDisplayName()));
+						temp = temp.replaceAll("\\{ALERT_HIDDEN\\}", "");
 					}
 				}
 			}
-
-			InputStream file = WebServer.getResourceFile("http/tradeboard.html");
-			BufferedReader profTempFile = new BufferedReader(new InputStreamReader(file));
-			StringBuilder tempBuilder = new StringBuilder();
-			profTempFile.lines().forEach(tempBuilder::append);
-			profTempFile.close();
-			String temp = tempBuilder.toString();
 
 			Map<String, String> get = WebServer.getGET(ex);
 			TradeboardSearch search = new TradeboardSearch();
@@ -164,6 +175,7 @@ public class HttpHandlerTradeboard implements HttpHandler {
 					temp = temp.replaceAll("\\{LOOKING_FOR_SELECTED\\}", "")
 							.replaceAll("\\{FOR_TRADE_SELECTED\\}", "selected");
 			}
+			temp = temp.replaceAll("\\{ALERT_HIDDEN\\}", "d-none");
 
 			// fill stuff
 			temp = WebServer.fillBaseStuff(ex, tokenCookie.value, temp);
@@ -224,9 +236,12 @@ public class HttpHandlerTradeboard implements HttpHandler {
 			for (TradeboardPost post : server.getPosts()) {
 				if (search != null && !search.matches(post))
 					continue;
-				Member owner = server.getDiscordGuild().getMemberById(Snowflake.of(post.getOwner()))
-						.block();
-				cards.append(getCard(member, owner, post));
+				if (server.getDiscordGuild().getMembers()
+						.any((m) -> m.getId().equals(Snowflake.of(post.getOwner()))).block()) {
+					Member owner = server.getDiscordGuild().getMemberById(Snowflake.of(post.getOwner()))
+							.block();
+					cards.append(getCard(member, owner, post));
+				}
 			}
 		}
 

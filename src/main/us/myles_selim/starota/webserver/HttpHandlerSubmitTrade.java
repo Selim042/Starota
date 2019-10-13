@@ -23,7 +23,9 @@ public class HttpHandlerSubmitTrade implements HttpHandler {
 	public void handle(HttpExchange ex) throws IOException {
 		try {
 			if (!WebServer.isLoggedIn(ex)) {
-				WebServer.return404(ex, "Please " + WebServer.getLoginHTML(ex, "login"));
+				// WebServer.return404(ex, "Please " +
+				// WebServer.getLoginHTML(ex, "login"));
+				WebServer.redirect(ex, "/login");
 				return;
 			}
 			Cookie tokenCookie = WebServer.getCookies(ex).get("token");

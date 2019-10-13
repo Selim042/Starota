@@ -36,7 +36,9 @@ public class HttpHandlerProfile implements HttpHandler {
 		try {
 			WebServer.handleBaseGET(ex);
 			if (!WebServer.isLoggedIn(ex)) {
-				WebServer.return404(ex, "Please " + WebServer.getLoginHTML(ex, "login"));
+				// WebServer.return404(ex, "Please " +
+				// WebServer.getLoginHTML(ex, "login"));
+				WebServer.redirect(ex, "/login");
 				return;
 			}
 			String path = ex.getRequestURI().toString();

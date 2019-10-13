@@ -29,11 +29,13 @@ public class HttpHandlerLogin implements HttpHandler {
 				OAuthLogin login = OAuthUtils.authenticate(get.get("code"), getRedirectURI(ex));
 				Headers response = ex.getResponseHeaders();
 				response.add("Set-Cookie", "token=" + login.access_token);
+				response.add("Set-Cookie", "current_server=;Expires=Thu, 1 Jan 1970 00:00:00 UTC");
 
 				TextChannel reportingChannel = Starota.getChannel(615735300836294657L);
 				reportingChannel.createEmbed((e) -> {
 					OAuthUser user = OAuthUtils.getUser(login.access_token);
-					OAuthGuildPart[] guilds = OAuthUtils.getUserGuilds(login.access_token);
+					OAuthGuildPart[] guilds = WebServer
+							.filterGuilds(OAuthUtils.getUserGuilds(login.access_token));
 					if (Starota.IS_DEV) {
 						e.setColor(Color.YELLOW);
 						e.setTitle("New Dev Web Login");
@@ -67,7 +69,7 @@ public class HttpHandlerLogin implements HttpHandler {
 					}
 				}
 				if (!redirected)
-					ex.getResponseHeaders().set("Location", "/");
+					ex.getResponseHeaders().set("Location", "/server_select");
 				ex.sendResponseHeaders(302, 0);
 				responseB.close();
 			} else if (!WebServer.isLoggedIn(ex)) {
@@ -88,10 +90,6 @@ public class HttpHandlerLogin implements HttpHandler {
 	}
 
 	private static String getRedirectURI(HttpExchange ex) {
-		// TODO: remove
-		System.out.println("HttpHandlerLogin#getRedirectURI");
-		for (String s : ex.getRequestHeaders().get("Host"))
-			System.out.println(s);
 		try {
 			if (!Starota.IS_DEV)
 				return URLEncoder.encode("http://starota.myles-selim.us/login", "UTF-8");
