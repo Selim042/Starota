@@ -14,7 +14,19 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css">
+    <link rel="stylesheet" href="/assets/css/permissions.css">
     <link rel="stylesheet" href="/assets/css/stuff.css">
+<!-- Hotjar Tracking Code for http://starota.myles-selim.us -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:1506050,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
 </head>
 
 <body id="page-top">
@@ -42,7 +54,7 @@
                         <ul class="nav navbar-nav flex-nowrap ml-auto">
                             <li class="nav-item" role="presentation"></li>
                             <li class="nav-item dropdown no-arrow" role="presentation" id="profile_display">
-                                <div class="nav-item dropdown no-arrow"><button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false" type="button" style="background-color: rgba(78,115,223,0);"><span class="d-lg-inline mr-2 text-gray-600 small" id="profile_name">Login</span><img class="border rounded-circle invisible img-profile" id="profile_avatar" src="/assets/img/default_server.png"></button>
+                                <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" href="#"><span class="d-lg-inline mr-2 text-gray-600 small" id="profile_name">Login</span><img class="border rounded-circle invisible img-profile" id="profile_avatar" src="/assets/img/default_server.png" style="width: 32px;height: 32px;margin-right: 8px;"></a>
                                     <div
                                         class="dropdown-menu shadow dropdown-menu-right animated--grow-in" role="menu"><a class="dropdown-item" role="presentation" href="/profile"><i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Profile</a><a class="dropdown-item disabled" role="presentation" href="#"><i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Settings</a>
                                         <div
@@ -50,7 +62,7 @@
             </div>
             </li>
             </ul>
-            <div class="dropdown d-flex d-lg-flex justify-content-lg-end align-items-lg-center no-arrow" id="server_select"><button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false" type="button"><span id="server_count" class="badge badge-servers badge-counter">0</span><img class="rounded-circle" id="current_server" style="width: 32px;height: 32px;" src="/assets/img/default_server.png"></button>
+            <div class="dropdown d-flex d-lg-flex justify-content-lg-end align-items-lg-center no-arrow" id="server_select"><a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" href="#"><span id="server_count" class="badge badge-servers badge-counter" style="margin-top: 0px;margin-right: -6px;">0</span><img class="rounded-circle" id="current_server" style="width: 32px;height: 32px;" src="/assets/img/default_server.png"></a>
                 <div
                     class="dropdown-menu dropdown-menu-right dropdown-list dropdown-menu-right animated--grow-in" role="menu" id="server_list">
                     <h6 class="dropdown-header">Server Selector</h6>
@@ -66,7 +78,7 @@
             <p class="text-dark mb-5 lead">{ERROR}</p>
             <p class="text-black-50 mb-0">It looks like you found a glitch in the matrix...</p><a href="/">← Back to Dashboard</a></div>
         <div class="row">
-            <div class="col" id="404_server_select"></div>
+            <div class="col" id="other_server_select"></div>
         </div>
     </div>
     </div>
@@ -82,6 +94,7 @@
     <script src="/assets/js/bs-charts.js"></script>
     <script src="/assets/js/discord.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
+    <script src="/assets/js/permissions.js"></script>
     <script src="/assets/js/smart_navbar.js"></script>
     <script src="/assets/js/theme.js"></script>
 </body>

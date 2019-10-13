@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Profiles - Starota</title>
+    <title>Blank Page - Starota</title>
     <link rel="icon" type="image/png" sizes="64x64" href="/assets/img/starota.png">
     <link rel="icon" type="image/png" sizes="64x64" href="/assets/img/starota.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/assets/img/starota_med.png">
@@ -29,7 +29,7 @@
 </script>
 </head>
 
-<body id="page-top">
+<body id="page-top-permissions-page">
     <div id="wrapper">
         <nav class="navbar navbar-dark navbar-expand-md align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0">
             <div class="container-fluid d-flex flex-column p-0">
@@ -71,21 +71,21 @@
     </div>
     </nav>
     <div class="container-fluid">
-        <div class="d-sm-flex justify-content-between align-items-center mb-4">
-            <h3 class="text-dark mb-0">Profiles</h3>
-        </div>
-        <div class="row" style="padding-bottom: 6px;">
-            <div class="col">
-                <form action="/profiles" method="get">
-                    <div class="form-row">
-                        <div class="col-auto"><input class="form-control" type="search" name="q" value="{SEARCH_PLACEHOLDER}"></div>
-                        <div class="col-auto"><button class="btn btn-primary" type="submit">Search</button></div>
-                        <div class="col"><a class="btn btn-primary" role="button" href="/profiles">Clear Search</a></div>
-                    </div>
-                </form>
+        <div class="row">
+            <div class="col" style="padding-right: 0px;padding-left: 0px;">
+                <h3 class="text-dark mb-1">Permission Settings</h3>
             </div>
+            <div class="col-auto" style="padding-right: 0px;padding-left: 0px;"><button class="btn btn-primary" type="button">Button</button></div>
         </div>
-        <div class="row">{CARDS}</div>
+        <div class="row">
+            <div class="col-auto">
+                <h5>Permission Holders</h5>
+                <p class="text-dark border rounded permission-selected permission-holder" style="padding-left: 4px;"><img class="rounded-circle" src="https://cdn.discordapp.com/avatars/134855940938661889/a_77d3f965cac8d3526d91472ae242a0fe.gif" style="width: 20px;">Selim#0042</p>
+                <p class="permission-holder" style="margin-bottom: 0px;">Dummy Role</p>
+                <p class="permission-holder" style="padding-left: 4px;">@everyone</p>
+            </div>
+            <div class="col"></div>
+        </div>
     </div>
     </div>
     <footer class="bg-white sticky-footer">

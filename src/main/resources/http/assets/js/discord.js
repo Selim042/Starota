@@ -87,24 +87,29 @@ function addGuild(guild) {
                 <div class="text-truncate">{SERVER_NAME}</div>
             </div>`;
     var list = document.getElementById("server_list");
-    var a = document.createElement("a");
-    a.onclick = function() {
-        document.cookie = "current_server = " + guild["id"] + "; path=/;";
-        location.reload();
-        return false;
-    };
-    a.className = "d-flex align-items-center dropdown-item";
-    a.href = "#";
-    a.innerHTML = serverFormat.replace("{SERVER_ICON}", 
-        getServerIcon(guild)).replace("{SERVER_NAME}", guild["name"]);
-    list.appendChild(a);
+    if (list != null) {
+      var a = document.createElement("a");
+      a.onclick = function() {
+          document.cookie = "current_server = " + guild["id"] + "; path=/;";
+          location.reload();
+          return false;
+      };
+      a.className = "d-flex align-items-center dropdown-item";
+      a.href = "#";
+      a.innerHTML = serverFormat.replace("{SERVER_ICON}", 
+          getServerIcon(guild)).replace("{SERVER_NAME}", guild["name"]);
+      list.appendChild(a);
+    }
     
-    var list404 = document.getElementById("404_server_select");
+    var list404 = document.getElementById("other_server_select");
     if (list404 != null) {
         var a404 = document.createElement("a");
         a404.onclick = function() {
             document.cookie = "current_server = " + guild["id"] + "; path=/;";
-            location.reload();
+            if (list404.getAttribute("url") != null)
+              window.location.href = list404.getAttribute("url");
+            else
+              location.reload();
             return false;
         };
         a404.className = "d-flex align-items-center dropdown-item";
@@ -211,39 +216,48 @@ $( document ).ready(function() {
         };
         return;
     }
-    document.getElementById
-        ("logout_dropdown_option").onclick
-        = function() {
-        document.cookie =
-            "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        location.reload();
-    };
+    var logoutButton = document.getElementById
+        ("logout_dropdown_option");
+    if (logoutButton != null) {
+        logoutButton.onclick
+          = function() {
+          document.cookie =
+              "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+          location.reload();
+      };
+    }
     if (profile == null) {
         document.getElementById("profile_name")
             .textContent = "Login";
     } else {
-        document.getElementById("profile_name")
-            .textContent = profile.username;
-        var avatar = document
-            .getElementById("profile_avatar");
+      var profileName = document.getElementById("profile_name");
+      if (profileName != null)
+        profileName.textContent = profile.username;
+      var avatar = document
+          .getElementById("profile_avatar");
+      if (avatar != null) {
         avatar.classList.remove("invisible");
         avatar.src = getUserAvatar(profile);
-        document.getElementById("server_select")
-            .classList.remove("invisible");
+      }
+      var serverSelect = document.getElementById("server_select");
+      if (serverSelect != null)
+        serverSelect.classList.remove("invisible");
 
-        var guilds = getGuilds(token, profile);
-        if (guilds.length > 0) {
-            guilds.forEach(function (g) {
-                addGuild(g);
-            });
-        } else {
-            addNoGuildsToSelector();
-        }
-        document.getElementById("server_count")
-            .textContent = guilds.length;
+      var guilds = getGuilds(token, profile);
+      if (guilds.length > 0) {
+        guilds.forEach(function (g) {
+          addGuild(g);
+        });
+      } else {
+        addNoGuildsToSelector();
+      }
+      var serverCount = document.getElementById("server_count");
+      if (serverCount != null)
+        serverCount.textContent = guilds.length;
 
-        document.getElementById("current_server")
-            .src = getServerIconFromID(guilds,
-            cookies["current_server"]);
+      var currentServer = document.getElementById("current_server");
+      if (currentServer != null)
+        currentServer.src = getServerIconFromID(guilds,
+          cookies["current_server"]);
     }
 });
