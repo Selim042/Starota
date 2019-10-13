@@ -28,6 +28,7 @@ import us.myles_selim.starota.misc.data_types.cache.ClearCache;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.EventListener;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
+import us.myles_selim.starota.trading.TradeboardPost;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class EventHandler implements EventListener {
@@ -96,11 +97,13 @@ public class EventHandler implements EventListener {
 	}
 
 	@EventSubscriber
-	public void onUserJoin(MemberLeaveEvent event) {
+	public void onUserLeave(MemberLeaveEvent event) {
 		StarotaServer server = event.getGuild().map((g) -> StarotaServer.getServer(g)).block();
 		Snowflake user = event.getUser().getId();
 		if (server.hasProfile(user))
 			server.deleteProfile(user);
+		for (TradeboardPost post : server.getPosts(user))
+			server.removePost(post.getId());
 	}
 
 	private static final Map<String, Consumer<String>> CACHES = new HashMap<>();

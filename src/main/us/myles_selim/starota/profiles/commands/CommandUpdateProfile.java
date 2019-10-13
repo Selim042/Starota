@@ -49,10 +49,9 @@ public class CommandUpdateProfile extends BotCommand<StarotaServer> {
 				channel.createMessage("You do not yet have a profile.  Please contact an admin of \""
 						+ server.getDiscordGuild().getName() + "\".").block();
 			else
-				channel.createMessage(
-						target + " does not yet have a profile.  Please contact an admin of \""
-								+ server.getDiscordGuild().getName() + "\".")
-						.block();
+				channel.createMessage(target.getMention()
+						+ " does not yet have a profile.  Please contact an admin of \""
+						+ server.getDiscordGuild().getName() + "\".").block();
 			return;
 		}
 		if (args.length < 3) {

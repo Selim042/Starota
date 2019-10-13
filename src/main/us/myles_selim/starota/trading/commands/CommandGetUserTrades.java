@@ -42,7 +42,7 @@ public class CommandGetUserTrades extends BotCommand<StarotaServer> {
 						.block();
 				return;
 			}
-			target = Starota.findUser(args[1]).asMember(server.getDiscordGuild().getId()).block();
+			target = Starota.findUser(args[1]).asMember(server.getDiscordGuildId()).block();
 			if (target == null) {
 				PlayerProfile profile = server.getProfile(args[1]);
 				if (profile == null) {
@@ -57,7 +57,8 @@ public class CommandGetUserTrades extends BotCommand<StarotaServer> {
 			return;
 		}
 		List<TradeboardPost> posts = server.getPosts(target);
-		channel.createMessage(target.getUsername() + " has " + posts.size() + " active trade posts");
+		channel.createMessage(target.getUsername() + " has " + posts.size() + " active trade posts")
+				.block();
 		for (TradeboardPost p : posts)
 			channel.createEmbed(p.getPostEmbed(server)).block();
 	}

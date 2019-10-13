@@ -4,6 +4,7 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.entity.PrivateChannel;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.PermissionSet;
@@ -114,6 +115,10 @@ public class CommandSelfRegister extends BotCommand<StarotaServer> {
 
 		channel.createMessage((m) -> m.setContent("Successfully registered " + target.getUsername())
 				.setEmbed(profile.toEmbed(server))).block();
+		PrivateChannel targetPm = target.getPrivateChannel().block();
+		targetPm.createMessage(
+				String.format(CommandRegister.REGISTERED_PM, server.getDiscordGuild().getName()))
+				.block();
 	}
 
 	private static boolean hasTeamRoles(Member user, Guild guild) {
