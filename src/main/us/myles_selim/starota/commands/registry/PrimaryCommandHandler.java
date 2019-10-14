@@ -100,6 +100,11 @@ public class PrimaryCommandHandler implements EventListener {
 		if (!cmdS.startsWith(prefix)
 				&& !cmdS.startsWith(client.getSelf().block().getMention().replaceAll("@!", "@") + " "))
 			return;
+
+		// skip any msgs that start with "..", or less than 2 chars long
+		if (cmdS.length() < 2 || cmdS.charAt(1) == '.')
+			return;
+
 		String[] args = getArgs(message, guild);
 
 		PermissionSet authorServerPerms;
