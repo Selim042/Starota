@@ -1255,6 +1255,8 @@ public enum EnumPokemon {
 			return true;
 		// gen 4
 		case PACHIRISU:
+		case SHELLOS:
+		case GASTRODON:
 		case CHATOT:
 		case CARNIVINE:
 		case UXIE:
