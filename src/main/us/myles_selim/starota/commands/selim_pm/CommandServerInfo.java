@@ -91,7 +91,7 @@ public class CommandServerInfo extends JavaCommand {
 		else
 			builder.appendField("Disabled Modules:", "None", false);
 
-		channel.createEmbed(builder.build());
+		channel.createEmbed(builder.build()).block();
 	}
 
 }

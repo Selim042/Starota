@@ -41,7 +41,7 @@ public class CommandChannelInfo extends JavaCommand {
 			targetChannel = null;
 		}
 		if (targetChannel == null) {
-			channel.createMessage("Channel with id \"" + args[1] + "\" not found.");
+			channel.createMessage("Channel with id \"" + args[1] + "\" not found.").block();
 			return;
 		}
 
@@ -68,7 +68,7 @@ public class CommandChannelInfo extends JavaCommand {
 		else
 			builder.appendField("Missing Perms:", "None", false);
 
-		channel.createEmbed(builder.build());
+		channel.createEmbed(builder.build()).block();
 	}
 
 }
