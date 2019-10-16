@@ -46,6 +46,8 @@ public class EmojiServerHelper {
 	}
 
 	public static GuildEmoji getGuildEmoji(String name) {
+		if (!Starota.FULLY_STARTED)
+			return null;
 		final String name2 = name.replaceAll("-", "_");
 		for (long id : EMOJI_SERVERS) {
 			Guild guild = Starota.getGuild(id);
@@ -61,10 +63,14 @@ public class EmojiServerHelper {
 	}
 
 	public static ReactionEmoji.Custom getEmoji(String name) {
+		if (!Starota.FULLY_STARTED)
+			return null;
 		return ReactionEmoji.custom(getGuildEmoji(name));
 	}
 
 	public static GuildEmoji getGuildEmoji(String name, String fallback) {
+		if (!Starota.FULLY_STARTED)
+			return null;
 		String namef = name.replaceAll("-", "_").replaceAll("♂", "M").replaceAll("♀", "F");
 		GuildEmoji emoji = getGuildEmoji(namef);
 		if (emoji != null)

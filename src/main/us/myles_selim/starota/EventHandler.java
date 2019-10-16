@@ -16,11 +16,14 @@ import discord4j.core.event.domain.guild.GuildDeleteEvent;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
 import discord4j.core.event.domain.guild.MemberLeaveEvent;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
+import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.event.domain.role.RoleUpdateEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.PrivateChannel;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.Snowflake;
 import us.myles_selim.starota.debug_server.DebugServer;
@@ -48,6 +51,18 @@ public class EventHandler implements EventListener {
 	@EventSubscriber
 	public void onReady(ReadyEvent event) {
 		guildsWereIn = event.getGuilds();
+	}
+
+	@EventSubscriber
+	public void onMessageEvent(MessageCreateEvent event) {
+		Message message = event.getMessage();
+		if (message.getAuthor().isPresent())
+			if (message.getAuthor().get().getId().equals(StarotaConstants.SELIM_USER_ID)
+					&& message.getUserMentions().any((u) -> u.equals(Starota.getOurUser())).block())
+				message.addReaction(ReactionEmoji.unicode("❤")).block();
+
+		if (message.getUserMentions().any((u) -> u.equals(Starota.getOurUser())).block())
+			message.addReaction(ReactionEmoji.unicode("👋")).block();
 	}
 
 	@EventSubscriber

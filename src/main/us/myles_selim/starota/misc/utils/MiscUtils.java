@@ -72,6 +72,13 @@ public class MiscUtils {
 		return false;
 	}
 
+	public static boolean arrContains(long[] tt, long tv) {
+		for (long t : tt)
+			if (t == tv)
+				return true;
+		return false;
+	}
+
 	public static <T> boolean arrContains(T[] tt, T tv) {
 		for (T t : tt)
 			if (t != null && t.equals(tv))

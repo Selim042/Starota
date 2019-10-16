@@ -114,7 +114,7 @@ public class StarotaEvent implements Comparable<StarotaEvent> {
 				this.location != null && !this.location.isEmpty() ? this.name + ": " + this.location
 						: this.name)
 				.withDesc(MiscUtils.fixCharacters(this.description));
-		String timeLeft = this.getTimeLeft(server.getTimezone());
+		String timeLeft = this.getTimeLeft(server == null ? null : server.getTimezone());
 		if (timeLeft != null)
 			builder.appendDesc("\n\n**" + timeLeft + "**");
 		if (this.link != null)

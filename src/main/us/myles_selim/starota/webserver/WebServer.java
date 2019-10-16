@@ -31,10 +31,13 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.util.Snowflake;
 import reactor.core.publisher.Flux;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.enums.EnumDonorPerm;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.webserver.OAuthUtils.OAuthGuildPart;
 import us.myles_selim.starota.webserver.OAuthUtils.OAuthUser;
+import us.myles_selim.starota.wrappers.StarotaServer;
 
 // https://www.reddit.com/r/discordapp/comments/82p8i6/a_basic_tutorial_on_how_to_get_the_most_out_of/
 @SuppressWarnings("restriction")
@@ -42,6 +45,12 @@ public class WebServer {
 
 	public static int PORT = 7366;
 	public static final String USER_AGENT = "Starota HTTP Access/" + StarotaConstants.VERSION;
+
+	private static final long[] OTHER_IGNORED_SERVERS = new long[] { //
+			481646364716040202L, // Bot Test
+			517546213520965662L, // Bot Debug
+			264445053596991498L, // Discord Bot List
+	};
 
 	private static boolean inited = false;
 	private static final Properties PROPERTIES = new Properties();
@@ -76,19 +85,9 @@ public class WebServer {
 						String ret = "{}";
 						if (isLoggedIn(ex)) {
 							Map<String, Cookie> cookies = getCookies(ex);
-							OAuthGuildPart[] userGuilds = OAuthUtils
-									.getUserGuilds(cookies.get("token").value);
-							if (userGuilds != null) {
-								List<OAuthGuildPart> botGuilds = new ArrayList<>();
-								Flux<Guild> guilds = Starota.getClient().getGuilds();
-								for (OAuthGuildPart gp : userGuilds) {
-									if (EmojiServerHelper.isEmojiServer(Snowflake.of(gp.id)))
-										continue;
-									if (guilds.any((g) -> g.getId().asString().equals(gp.id)).block())
-										botGuilds.add(gp);
-								}
-								ret = GSON.toJson(botGuilds);
-							}
+							OAuthGuildPart[] userGuilds = filterGuilds(
+									OAuthUtils.getUserGuilds(cookies.get("token").value));
+							ret = GSON.toJson(userGuilds);
 						}
 
 						byte[] dat = ret.getBytes("UTF-8");
@@ -167,6 +166,26 @@ public class WebServer {
 		if (id.asLong() == 314733127027130379L || Starota.IS_DEV)
 			return id;
 		return null;
+	}
+
+	protected static OAuthGuildPart[] filterGuilds(OAuthGuildPart[] userGuilds) {
+		List<OAuthGuildPart> botGuilds = new ArrayList<>();
+		if (userGuilds != null) {
+			Flux<Guild> guilds = Starota.getClient().getGuilds();
+			for (OAuthGuildPart gp : userGuilds) {
+				if (MiscUtils.arrContains(OTHER_IGNORED_SERVERS, Long.parseLong(gp.id))
+						|| EmojiServerHelper.isEmojiServer(Snowflake.of(gp.id)))
+					continue;
+				if (guilds.any((g) -> {
+					if (!Starota.IS_DEV
+							&& !StarotaServer.getServer(g).getVoteRewards().contains(EnumDonorPerm.HTTP))
+						return false;
+					return g.getId().asString().equals(gp.id);
+				}).block())
+					botGuilds.add(gp);
+			}
+		}
+		return botGuilds.toArray(new OAuthGuildPart[0]);
 	}
 
 	protected static boolean isLoggedIn(HttpExchange ex) {
