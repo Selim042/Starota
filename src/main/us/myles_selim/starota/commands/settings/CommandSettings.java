@@ -36,7 +36,7 @@ public class CommandSettings extends BotCommand<StarotaServer> {
 	@Override
 	public void execute(String[] args, Message message, StarotaServer server, MessageChannel channel)
 			throws CommandException {
-		if (args.length == 1) {
+		if (args.length < 3) {
 			sendSettingsEmbed(server, (TextChannel) channel);
 			return;
 		}
