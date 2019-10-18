@@ -191,19 +191,22 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 			// current boosts
 			StringBuilder forecastedWeather = new StringBuilder();
 			EnumWeather[] forecastedBoosts = server.getCurrentPossibleBoosts();
+			boolean isDaylight = server.isDaylight();
 			if (forecastedBoosts.length > 0) {
 				forecastedWeather.append("**Now**: ");
 				for (EnumWeather weather : forecastedBoosts)
-					forecastedWeather.append(MiscUtils.getEmojiDisplay(weather.getEmoji()));
+					forecastedWeather.append(MiscUtils.getEmojiDisplay(weather.getEmoji(isDaylight)));
 			} else
 				forecastedWeather.append("**Now**: No weather forecast found");
 
 			// boosts for the next hour
 			EnumWeather[] nextForecastedBoosts = server.getPossibleBoosts(1);
+			boolean isDaylightNext = server.isDaylight(1);
 			if (nextForecastedBoosts.length > 0) {
 				forecastedWeather.append("\n**+1 hr**: ");
 				for (EnumWeather weather : nextForecastedBoosts)
-					forecastedWeather.append(MiscUtils.getEmojiDisplay(weather.getEmoji()));
+					forecastedWeather
+							.append(MiscUtils.getEmojiDisplay(weather.getEmoji(isDaylightNext)));
 			} else
 				forecastedWeather.append("\n**+1 hr**: No weather forecast found");
 

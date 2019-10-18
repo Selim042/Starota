@@ -713,6 +713,29 @@ public class StarotaServer extends BotServer {
 		}
 		return boosts.toArray(new EnumWeather[0]);
 	}
+
+	public boolean isDaylight() {
+		return isDaylight(0);
+	}
+
+	public boolean isDaylight(int hourOffset) {
+		if (!isWeatherSetup())
+			return true;
+		int daylightCount = 0;
+		// rounding to previous hour
+		long currentHour = ((System.currentTimeMillis() / 1000) / 3600) * 3600 + (hourOffset * 3600);
+		for (WeatherForecast[] forecasts : this.forecasts) {
+			for (WeatherForecast f : forecasts) {
+				if (f.getEpochDateTime() == currentHour) {
+					if (f.isIsDaylight())
+						daylightCount++;
+					else
+						daylightCount--;
+				}
+			}
+		}
+		return daylightCount >= 0;
+	}
 	// end weather stuff
 
 	// private static final Map<Snowflake, StarotaServer> SERVERS = new

@@ -7,23 +7,33 @@ import us.myles_selim.starota.Starota;
 public enum EnumWeather {
 
 	EXTREME,
-	CLEAR("clear", EnumPokemonType.FIRE, EnumPokemonType.GRASS, EnumPokemonType.GROUND),
-	PARTLY_CLOUDY("partlycloudy", EnumPokemonType.NORMAL, EnumPokemonType.ROCK),
+	CLEAR(true, EnumPokemonType.FIRE, EnumPokemonType.GRASS, EnumPokemonType.GROUND),
+	PARTLY_CLOUDY(true, EnumPokemonType.NORMAL, EnumPokemonType.ROCK),
 	CLOUDY(EnumPokemonType.FAIRY, EnumPokemonType.FIGHTING, EnumPokemonType.POISON),
 	RAIN(EnumPokemonType.WATER, EnumPokemonType.ELECTRIC, EnumPokemonType.BUG),
 	SNOW(EnumPokemonType.ICE, EnumPokemonType.STEEL),
-	FOG("fogweather", EnumPokemonType.DARK, EnumPokemonType.GHOST),
+	FOG(EnumPokemonType.DARK, EnumPokemonType.GHOST),
 	WINDY(EnumPokemonType.DRAGON, EnumPokemonType.FLYING, EnumPokemonType.PSYCHIC);
 
+	private boolean hasNightEmoji;
 	private String name;
 	private String emojiName;
 	private EnumPokemonType[] types;
 
 	EnumWeather(EnumPokemonType... types) {
-		this(null, types);
+		this(false, null, types);
+	}
+
+	EnumWeather(boolean hasNightEmoji, EnumPokemonType... types) {
+		this(hasNightEmoji, null, types);
 	}
 
 	EnumWeather(String emojiName, EnumPokemonType... types) {
+		this(false, emojiName, types);
+	}
+
+	EnumWeather(boolean hasNightEmoji, String emojiName, EnumPokemonType... types) {
+		this.hasNightEmoji = hasNightEmoji;
 		this.name = this.name();
 		this.name = name.substring(0, 1).toUpperCase() + name.substring(1, name.length()).toLowerCase();
 		if (emojiName == null)
@@ -49,13 +59,20 @@ public enum EnumWeather {
 		return this.name.replaceAll("_", " ");
 	}
 
-	private static final long EMOJI_SERVER_ID = 408997776672948224L;
+	private static final long WEATHER_EMOJI_SERVER_ID = 629423110914834476L;
 	private static Guild EMOJI_SERVER;
 
 	public GuildEmoji getEmoji() {
+		return getEmoji(true);
+	}
+
+	public GuildEmoji getEmoji(boolean daytime) {
 		if (EMOJI_SERVER == null)
-			EMOJI_SERVER = Starota.getGuild(EMOJI_SERVER_ID);
-		return EMOJI_SERVER.getEmojis().filter((e) -> e.getName().equals(emojiName)).blockFirst();
+			EMOJI_SERVER = Starota.getGuild(WEATHER_EMOJI_SERVER_ID);
+		return EMOJI_SERVER.getEmojis()
+				.filter((e) -> e.getName()
+						.equals((!daytime && hasNightEmoji) ? emojiName + "_night" : emojiName))
+				.blockFirst();
 	}
 
 }

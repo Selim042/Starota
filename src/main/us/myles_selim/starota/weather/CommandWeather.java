@@ -36,11 +36,12 @@ public class CommandWeather extends BotCommand<StarotaServer> {
 			else
 				out.append("**+" + i + " hr**: ");
 			EnumWeather[] boosts = server.getPossibleBoosts(i);
+			boolean isDaylight = server.isDaylight(i);
 			if (boosts == null || boosts.length == 0)
 				line.append("No weather forecast found  ");
 			for (EnumWeather weather : boosts)
-				line.append(weather
-						+ (weather == null ? "" : MiscUtils.getEmojiDisplay(weather.getEmoji())) + ", ");
+				line.append(weather + (weather == null ? ""
+						: MiscUtils.getEmojiDisplay(weather.getEmoji(isDaylight))) + ", ");
 			out.append(line.subSequence(0, line.length() - 2) + "\n");
 			line.setLength(0);
 		}
