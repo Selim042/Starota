@@ -647,7 +647,7 @@ public enum EnumPokemon {
 	SCRAGGY(EnumPokemonStage.BASE, EnumPokemonType.DARK, EnumPokemonType.FIGHTING),
 	SCRAFTY(EnumPokemonStage.FINAL, EnumPokemonType.DARK, EnumPokemonType.FIGHTING),
 	SIGILYPH(EnumPokemonStage.BASE, EnumPokemonType.PSYCHIC, EnumPokemonType.FLYING),
-	YANMASK(EnumPokemonStage.BASE, EnumPokemonType.GHOST),
+	YAMASK(EnumPokemonStage.BASE, EnumPokemonType.GHOST),
 	COFAGRIGUS(EnumPokemonStage.FINAL, EnumPokemonType.GHOST),
 	TIRTOUGA(EnumPokemonStage.BASE, EnumPokemonType.WATER, EnumPokemonType.ROCK),
 	CARRACOSTA(EnumPokemonStage.FINAL, EnumPokemonType.WATER, EnumPokemonType.ROCK),
