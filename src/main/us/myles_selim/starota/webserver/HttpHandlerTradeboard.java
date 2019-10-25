@@ -18,9 +18,9 @@ import discord4j.core.object.util.Snowflake;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumGender;
 import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.forms.Form;
 import us.myles_selim.starota.misc.utils.ImageHelper;
 import us.myles_selim.starota.trading.TradeboardPost;
-import us.myles_selim.starota.trading.forms.FormSet.Form;
 import us.myles_selim.starota.webserver.OAuthUtils.OAuthUser;
 import us.myles_selim.starota.webserver.WebServer.Cookie;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -197,9 +197,11 @@ public class HttpHandlerTradeboard implements HttpHandler {
 		String card;
 		EnumPokemon pokemon = post.getPokemon();
 		if (postMember.equals(browseMember))
-			card = TRADE_CARD_DELETE.replaceAll("\\{TYPE\\}", pokemon.getType1().name().toLowerCase());
+			card = TRADE_CARD_DELETE.replaceAll("\\{TYPE\\}",
+					pokemon.getData().getType1().name().toLowerCase());
 		else
-			card = TRADE_CARD.replaceAll("\\{TYPE\\}", pokemon.getType1().name().toLowerCase());
+			card = TRADE_CARD.replaceAll("\\{TYPE\\}",
+					pokemon.getData().getType1().name().toLowerCase());
 		Form form = post.getForm();
 
 		card = card.replaceAll("\\{POSTER_ID\\}", postMember.getId().asString());
@@ -212,11 +214,11 @@ public class HttpHandlerTradeboard implements HttpHandler {
 
 		card = card.replaceAll("\\{POST_NUMBER\\}", post.getIdString());
 		card = card.replaceAll("\\{POKEMON_IMAGE\\}", ImageHelper.getOfficalArtwork(pokemon, form));
-		card = card.replaceAll("\\{POKEMON_NAME\\}", pokemon.getName());
-		card = card.replaceAll("\\{POKEMON_FORM\\}", form == null ? "-" : form.toString());
+		card = card.replaceAll("\\{POKEMON_NAME\\}", pokemon.getData().getName());
+		card = card.replaceAll("\\{POKEMON_FORM\\}", form == null ? "-" : form.getName());
 		EnumGender gender = post.getGender();
 		card = card.replaceAll("\\{POKEMON_GENDER\\}",
-				gender == null ? pokemon.getGenderPossible().toString() : gender.toString());
+				gender == null ? pokemon.getData().getGenderPossible().toString() : gender.toString());
 
 		String isLegacyS = Boolean.toString(post.isLegacy());
 		card = card.replaceAll("\\{POKEMON_LEGACY\\}",
@@ -273,7 +275,7 @@ public class HttpHandlerTradeboard implements HttpHandler {
 			if (gender != null) {
 				EnumGender postGender = post.getGender();
 				if (postGender == null)
-					postGender = post.getPokemon().getGenderPossible();
+					postGender = post.getPokemon().getData().getGenderPossible();
 				switch (postGender) {
 				case EITHER:
 					if (gender == EnumGender.UNKNOWN)
@@ -289,13 +291,13 @@ public class HttpHandlerTradeboard implements HttpHandler {
 				return false;
 			if (shiny != null && shiny != post.isShiny())
 				return false;
-			if (regional != null && regional != post.getPokemon().isRegional())
+			if (regional != null && regional != post.getPokemon().getData().isRegional())
 				return false;
 			for (String t : otherTerms) {
 				boolean matched = (post.getForm() != null
 						&& post.getForm().toString().toLowerCase().startsWith(t.toLowerCase()));
-				matched = matched
-						|| post.getPokemon().getName().toLowerCase().startsWith(t.toLowerCase());
+				matched = matched || post.getPokemon().getData().getName().toLowerCase()
+						.startsWith(t.toLowerCase());
 				if (!matched)
 					return false;
 			}

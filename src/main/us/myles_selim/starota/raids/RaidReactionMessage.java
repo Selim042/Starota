@@ -1,5 +1,6 @@
 package us.myles_selim.starota.raids;
 
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,7 @@ import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumWeather;
-import us.myles_selim.starota.misc.data_types.BotServer;
+import us.myles_selim.starota.forms.Form;
 import us.myles_selim.starota.misc.data_types.RaidBoss;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
@@ -28,7 +29,7 @@ import us.myles_selim.starota.pokedex.PokedexEntry.DexCounter;
 import us.myles_selim.starota.reaction_messages.IHelpReactionMessage;
 import us.myles_selim.starota.reaction_messages.ReactionMessage;
 import us.myles_selim.starota.silph_road.SilphRoadData;
-import us.myles_selim.starota.trading.forms.FormSet.Form;
+import us.myles_selim.starota.wrappers.BotServer;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class RaidReactionMessage extends ReactionMessage implements IHelpReactionMessage {
@@ -99,7 +100,7 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 			msg.addReaction(ReactionEmoji.unicode(EMOJI_NAMES[6])).block();
 			if (!GoHubDatabase.isEntryLoaded(pokemon)) {
 				msg.edit((m) -> m.setEmbed(GoHubDatabase.LOADING_EMBED)).block();
-				GoHubDatabase.getEntry(pokemon, form == null ? null : (form.getGoHubFormName(pokemon)));
+				GoHubDatabase.getEntry(pokemon, form == null ? null : (form.getGoHubFormName()));
 			}
 		} else {
 			// here emoji
@@ -153,9 +154,9 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 	}
 
 	private Form getForm(String[] parts) {
-		if (parts.length < 2 || pokemon.getFormSet() == null)
+		if (parts.length < 2 || pokemon.getData().getFormSet() == null)
 			return null;
-		return pokemon.getFormSet().getForm(parts[1]);
+		return pokemon.getData().getFormSet().getForm(parts[1]);
 	}
 
 	@Override
@@ -163,8 +164,7 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 		EmbedBuilder builder = new EmbedBuilder();
 		PokedexEntry entry = null;
 		if (pokemon != null && StarotaModule.isModuleEnabled(server, BaseModules.POKEDEX))
-			entry = GoHubDatabase.getEntry(pokemon,
-					form == null ? null : (form.getGoHubFormName(pokemon)));
+			entry = GoHubDatabase.getEntry(pokemon, form == null ? null : (form.getGoHubFormName()));
 		if (pokemon != null) {
 			String titleString = (form == null ? "" : form + " ") + pokemon + " Raid ";
 			if (boss.getTier() == 6)
@@ -192,23 +192,28 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 			StringBuilder forecastedWeather = new StringBuilder();
 			EnumWeather[] forecastedBoosts = server.getCurrentPossibleBoosts();
 			boolean isDaylight = server.isDaylight();
+			SimpleDateFormat hourFormat = server.getHourFormat();
+			long time = System.currentTimeMillis();
 			if (forecastedBoosts.length > 0) {
-				forecastedWeather.append("**Now**: ");
+				forecastedWeather.append(String.format("**%s**:", hourFormat.format(time)));
 				for (EnumWeather weather : forecastedBoosts)
 					forecastedWeather.append(MiscUtils.getEmojiDisplay(weather.getEmoji(isDaylight)));
 			} else
-				forecastedWeather.append("**Now**: No weather forecast found");
+				forecastedWeather.append(
+						(String.format("**%s**: No weather forecast found", hourFormat.format(time))));
 
 			// boosts for the next hour
 			EnumWeather[] nextForecastedBoosts = server.getPossibleBoosts(1);
 			boolean isDaylightNext = server.isDaylight(1);
+			time += 3600000;
 			if (nextForecastedBoosts.length > 0) {
-				forecastedWeather.append("\n**+1 hr**: ");
+				forecastedWeather.append(String.format("\n**%s**:", hourFormat.format(time)));
 				for (EnumWeather weather : nextForecastedBoosts)
 					forecastedWeather
 							.append(MiscUtils.getEmojiDisplay(weather.getEmoji(isDaylightNext)));
 			} else
-				forecastedWeather.append("\n**+1 hr**: No weather forecast found");
+				forecastedWeather.append(
+						(String.format("**%s**: No weather forecast found", hourFormat.format(time))));
 
 			builder.appendField("Weather Forecasts:", forecastedWeather.toString(), false);
 		}
@@ -284,8 +289,7 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 		for (RaidBoss b : bosses) {
 			if (boss != null)
 				break;
-			String postfix = b.getForm() == null ? ""
-					: "_" + b.getForm().getSpritePostfix(b.getPokemon());
+			String postfix = b.getForm() == null ? "" : "_" + b.getForm().getEmojiPostfix();
 			msg.addReaction(EmojiServerHelper.getEmoji(b.getPokemon() + postfix,
 					ImageHelper.getOfficalArtwork(b.getPokemon(), b.getForm()))).block();
 		}

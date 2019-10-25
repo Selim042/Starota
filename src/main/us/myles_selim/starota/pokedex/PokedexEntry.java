@@ -13,6 +13,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
 import us.myles_selim.starota.enums.EnumWeather;
+import us.myles_selim.starota.forms.Form;
 import us.myles_selim.starota.misc.data_types.EggEntry;
 import us.myles_selim.starota.misc.data_types.RaidBoss;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
@@ -21,7 +22,6 @@ import us.myles_selim.starota.misc.utils.ImageHelper;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.reaction_messages.ReactionMessage;
 import us.myles_selim.starota.silph_road.SilphRoadData;
-import us.myles_selim.starota.trading.forms.FormSet;
 
 public class PokedexEntry extends ReactionMessage {
 
@@ -287,7 +287,7 @@ public class PokedexEntry extends ReactionMessage {
 		for (DexCounter c : allCounters) {
 			if (index >= length)
 				break;
-			if (!EnumPokemon.getPokemon(c.pokemonId).isAvailable())
+			if (!SilphRoadData.isAvailable(EnumPokemon.getPokemon(c.pokemonId)))
 				continue;
 			topCounters[index++] = c;
 		}
@@ -329,14 +329,14 @@ public class PokedexEntry extends ReactionMessage {
 		String embForm = entry.form;
 		if (entry.form == null)
 			embForm = "Normal";
-		FormSet.Form formS = null;
-		if (entry.getPokemon().getFormSet() != null)
-			formS = entry.getPokemon().getFormSet().getForm(embForm);
+		Form formS = null;
+		if (entry.getPokemon().getData().getFormSet() != null)
+			formS = entry.getPokemon().getData().getFormSet().getForm(embForm);
 		if (entry.forms.length > 1)
 			pokeName += String.format(" (%s)", embForm);
 		builder.withTitle(String.format("%s #%d", pokeName, entry.id))
 				.withUrl(String.format("https://db.pokemongohub.net/pokemon/%d", entry.id));
-		builder.withThumbnail(entry.getPokemon().getArtwork(formId));
+		builder.withThumbnail(ImageHelper.getOfficalArtwork(entry.getPokemon(), formId));
 		builder.appendDesc(MiscUtils.fixCharacters(entry.getDescription()));
 
 		// stats
@@ -364,13 +364,13 @@ public class PokedexEntry extends ReactionMessage {
 		if (entry.hasExclusiveMove())
 			detailsString += "\nHas exclusive move(s): True";
 		if (formS != null) {
-			if (formS.canBeShiny(entry.getPokemon()))
+			if (formS.isShinyable())
 				detailsString += "\nShinyable: True";
-		} else if (entry.getPokemon().isShinyable())
+		} else if (SilphRoadData.isShinyable(entry.getPokemon()))
 			detailsString += "\nShinyable: True";
-		if (entry.getPokemon().isNesting())
+		if (SilphRoadData.isNesting(entry.getPokemon()))
 			detailsString += "\nNesting: True";
-		if (entry.getPokemon().isShadowable())
+		if (SilphRoadData.isShadowable(entry.getPokemon()))
 			detailsString += "\nShadowable: True";
 		builder.appendField("Details:",
 				String.format(detailsString, entry.generation, (int) (entry.baseCaptureRate * 100),

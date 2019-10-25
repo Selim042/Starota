@@ -2,8 +2,8 @@ package us.myles_selim.starota.trading;
 
 import us.myles_selim.starota.enums.EnumGender;
 import us.myles_selim.starota.enums.EnumPokemon;
-import us.myles_selim.starota.trading.forms.FormSet;
-import us.myles_selim.starota.trading.forms.FormSet.Form;
+import us.myles_selim.starota.forms.Form;
+import us.myles_selim.starota.forms.FormSet;
 
 public class PokemonInstance {
 
@@ -30,7 +30,7 @@ public class PokemonInstance {
 		if (this.pokemon == null)
 			return null;
 		if (this.form == null)
-			return this.pokemon.getDefaultForm();
+			return this.pokemon.getData().getDefaultForm();
 		return this.form;
 	}
 
@@ -59,7 +59,7 @@ public class PokemonInstance {
 		pokemon = EnumPokemon.getPokemon(args[1]);
 		if (pokemon == null)
 			return new PokemonInstance(pokemon, form, shiny, EnumGender.EITHER, legacy);
-		gender = pokemon.getGenderPossible();
+		gender = pokemon.getData().getGenderPossible();
 
 		for (int i = 2; i < args.length; i++) {
 			String arg = args[i];
@@ -101,7 +101,7 @@ public class PokemonInstance {
 					continue;
 			}
 			if (form == null) {
-				FormSet forms = pokemon.getFormSet();
+				FormSet forms = pokemon.getData().getFormSet();
 				if (forms != null)
 					form = forms.getForm(arg);
 				if (form != null)

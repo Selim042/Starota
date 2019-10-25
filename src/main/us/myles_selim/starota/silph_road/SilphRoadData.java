@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumPokemon;
-import us.myles_selim.starota.enums.EnumPokemonNew;
+import us.myles_selim.starota.forms.Form;
 import us.myles_selim.starota.misc.data_types.EggEntry;
 import us.myles_selim.starota.misc.data_types.RaidBoss;
 import us.myles_selim.starota.misc.data_types.ResearchTask;
@@ -26,7 +26,6 @@ import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
-import us.myles_selim.starota.trading.forms.FormSet.Form;
 
 public class SilphRoadData {
 
@@ -110,8 +109,8 @@ public class SilphRoadData {
 						}
 						boolean shinyable = match2.contains("shiny");
 						Form form = null;
-						if (pokemon.getFormSet() != null)
-							form = pokemon.getFormSet().getForm(pokemonName[1]);
+						if (pokemon.getData().getFormSet() != null)
+							form = pokemon.getData().getFormSet().getForm(pokemonName[1]);
 						newBosses.add(new RaidBoss(pokemon, form, tier, shinyable));
 					}
 				}
@@ -242,8 +241,8 @@ public class SilphRoadData {
 							continue;
 						}
 						Form form = null;
-						if (pokemon.getFormSet() != null)
-							form = pokemon.getFormSet().getForm(pokemonName[1]);
+						if (pokemon.getData().getFormSet() != null)
+							form = pokemon.getData().getFormSet().getForm(pokemonName[1]);
 						newEggs.add(
 								new EggEntry(pokemon, form, tier, wrapperMatch.contains("shinyIcon")));
 					}
@@ -446,10 +445,10 @@ public class SilphRoadData {
 		TASKS = null;
 	}
 
-	private static CachedData<List<EnumPokemonNew>> AVAILABLE;
-	private static CachedData<List<EnumPokemonNew>> SHINYABLE;
-	private static CachedData<List<EnumPokemonNew>> SHADOWABLE;
-	private static CachedData<List<EnumPokemonNew>> NESTING;
+	private static CachedData<List<EnumPokemon>> AVAILABLE;
+	private static CachedData<List<EnumPokemon>> SHINYABLE;
+	private static CachedData<List<EnumPokemon>> SHADOWABLE;
+	private static CachedData<List<EnumPokemon>> NESTING;
 
 	private static final String SILPH_DEX = "https://thesilphroad.com/catalog";
 	private static final Pattern POKEMON_GENERAL_PATTERN = Pattern
@@ -482,7 +481,7 @@ public class SilphRoadData {
 						Matcher dexNumMatcher = DEX_NUM_PATTERN.matcher(match);
 						if (dexNumMatcher.find()) {
 							String dexMatch = dexNumMatcher.group();
-							EnumPokemonNew pokemon = EnumPokemonNew.getPokemon(
+							EnumPokemon pokemon = EnumPokemon.getPokemon(
 									Integer.parseInt(dexMatch.substring(7, dexMatch.length() - 7)));
 							if (pokemon == null)
 								continue;
@@ -510,22 +509,22 @@ public class SilphRoadData {
 		NESTING = null;
 	}
 
-	public static boolean isAvailable(EnumPokemonNew pokemon) {
+	public static boolean isAvailable(EnumPokemon pokemon) {
 		checkCaches();
 		return AVAILABLE.getValue().contains(pokemon);
 	}
 
-	public static boolean isShinyable(EnumPokemonNew pokemon) {
+	public static boolean isShinyable(EnumPokemon pokemon) {
 		checkCaches();
 		return SHINYABLE.getValue().contains(pokemon);
 	}
 
-	public static boolean isShadowable(EnumPokemonNew pokemon) {
+	public static boolean isShadowable(EnumPokemon pokemon) {
 		checkCaches();
 		return SHADOWABLE.getValue().contains(pokemon);
 	}
 
-	public static boolean isNesting(EnumPokemonNew pokemon) {
+	public static boolean isNesting(EnumPokemon pokemon) {
 		checkCaches();
 		return NESTING.getValue().contains(pokemon);
 	}

@@ -49,7 +49,7 @@ public enum EnumWeather {
 
 	public boolean isBoosted(EnumPokemon pokemon) {
 		for (EnumPokemonType t : this.types)
-			if (t.equals(pokemon.getType1()) || t.equals(pokemon.getType2()))
+			if (t.equals(pokemon.getData().getType1()) || t.equals(pokemon.getData().getType2()))
 				return true;
 		return false;
 	}

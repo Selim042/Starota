@@ -99,10 +99,10 @@ public class CommandSearchPoke extends BotCommand<StarotaServer> {
 				if (i >= maxVal)
 					break;
 				if (i >= pageIndex.value * RESULTS_PER_PAGE) {
-					String typeString = MiscUtils.getEmojiDisplay(p.getType1().getEmoji());
-					if (p.getType2() != null)
-						typeString += MiscUtils.getEmojiDisplay(p.getType2().getEmoji());
-					builder.appendDesc(String.format(" - %s %s\n", p.getName(), typeString));
+					String typeString = MiscUtils.getEmojiDisplay(p.getData().getType1().getEmoji());
+					if (p.getData().getType2() != null)
+						typeString += MiscUtils.getEmojiDisplay(p.getData().getType2().getEmoji());
+					builder.appendDesc(String.format(" - %s %s\n", p.getData().getName(), typeString));
 				}
 				i++;
 			}

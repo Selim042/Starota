@@ -9,16 +9,24 @@ import java.net.URLConnection;
 import javax.imageio.ImageIO;
 
 import us.myles_selim.starota.enums.EnumPokemon;
-import us.myles_selim.starota.trading.forms.FormSet.Form;
+import us.myles_selim.starota.forms.Form;
 
 public class ImageHelper {
 
 	public static String getOfficalArtwork(EnumPokemon pokemon) {
-		return getOfficalArtwork(pokemon, null);
+		return getOfficalArtwork(pokemon, (Form) null);
 	}
 
+	// public static String getOfficalArtwork(EnumPokemon pokemon,
+	// FormSetOld.Form form) {
+	// return getOfficalArtwork(pokemon, form == null ? -1 :
+	// form.getGoHubId(pokemon));
+	// }
+
 	public static String getOfficalArtwork(EnumPokemon pokemon, Form form) {
-		return getOfficalArtwork(pokemon, form == null ? -1 : form.getGoHubId(pokemon));
+		if (form != null && form.getImage() != null)
+			return form.getImage();
+		return getOfficalArtwork(pokemon, form == null ? -1 : form.getGoHubFormId());
 	}
 
 	public static String getOfficalArtwork(EnumPokemon pokemon, int goHubFormId) {
@@ -28,16 +36,16 @@ public class ImageHelper {
 		case MEWTWO:
 			return String.format("https://db.pokemongohub.net/images/official/full/%03d"
 					+ (goHubFormId != -1 && (goHubFormId < 0 || goHubFormId > 0) ? "_f" + 4 : "")
-					+ ".png", pokemon.getId());
+					+ ".png", pokemon.getData().getId());
 		case WORMADAM:
 		case ROTOM:
 		case ARCEUS:
 			return String.format("https://db.pokemongohub.net/images/official/full/%03d" + ".png",
-					pokemon.getId());
+					pokemon.getData().getId());
 		default:
 			return String.format("https://db.pokemongohub.net/images/official/full/%03d"
 					+ (goHubFormId != 0 && goHubFormId != -1 ? "_f" + (goHubFormId + 1) : "") + ".png",
-					pokemon.getId());
+					pokemon.getData().getId());
 		}
 	}
 

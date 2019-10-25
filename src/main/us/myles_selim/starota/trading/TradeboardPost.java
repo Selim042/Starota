@@ -10,10 +10,11 @@ import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.enums.EnumGender;
 import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.forms.Form;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.ImageHelper;
 import us.myles_selim.starota.profiles.PlayerProfile;
-import us.myles_selim.starota.trading.forms.FormSet.Form;
+import us.myles_selim.starota.silph_road.SilphRoadData;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class TradeboardPost extends DataType<TradeboardPost> {
@@ -101,8 +102,8 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 	}
 
 	public boolean isShiny() {
-		return this.shiny && ((this.form != null && this.form.canBeShiny(pokemon)))
-				|| (this.shiny && this.pokemon.isShinyable());
+		return this.shiny && ((this.form != null && this.form.isShinyable()))
+				|| (this.shiny && SilphRoadData.isShinyable(pokemon));
 	}
 
 	public Instant getTimePosted() {
@@ -145,8 +146,8 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 
 		EnumPokemon pokemon = this.getPokemon();
 		Form form = this.getForm();
-		if (form == null && pokemon.getFormSet() != null)
-			form = pokemon.getDefaultForm();
+		if (form == null && pokemon.getData().getFormSet() != null)
+			form = pokemon.getData().getDefaultForm();
 		// builder.withThumbnail(ImageHelper.getPokeAPISprite(pokemon, form,
 		// isShiny()));
 		builder.withThumbnail(ImageHelper.getOfficalArtwork(pokemon, form));
@@ -154,21 +155,21 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 		builder.withAuthorIcon(user.getAvatarUrl());
 		builder.withAuthorName(user.getDisplayName());
 		if (form != null)
-			builder.withColor(form.getType1(pokemon).getColor());
+			builder.withColor(form.getType1().getColor());
 		else
-			builder.withColor(pokemon.getType1().getColor());
+			builder.withColor(pokemon.getData().getType1().getColor());
 
-		builder.appendField("Pokemon:", pokemon.getName(), false);
-		if (form != null)
-			builder.appendField("Form:", form.toString(), true);
-		if (pokemon.isShinyable() || (form != null && form.canBeShiny(pokemon))) {
+		builder.appendField("Pokemon:", pokemon.getData().getName(), false);
+		if (!pokemon.getData().getFormSet().isDefaultOnly())
+			builder.appendField("Form:", form.getName(), true);
+		if (SilphRoadData.isShinyable(pokemon) || (form != null && form.isShinyable())) {
 			String isShinyS = Boolean.toString(this.isShiny());
 			builder.appendField("Shiny:",
 					Character.toUpperCase(isShinyS.charAt(0)) + isShinyS.substring(1), true);
 		}
 		EnumGender gender = this.getGender();
 		if (gender == null)
-			gender = this.pokemon.getGenderPossible();
+			gender = this.pokemon.getData().getGenderPossible();
 		builder.appendField("Gender:", gender.toString(), true);
 		String isLegacyS = Boolean.toString(this.isLegacy());
 		builder.appendField("Legacy:",
@@ -220,9 +221,9 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 		stor.writeInt(this.id);
 		stor.writeBoolean(this.lookingFor);
 		stor.writeLong(this.owner);
-		stor.writeInt(this.pokemon.getId());
-		if (this.pokemon.getFormSet() != null)
-			stor.writeInt(this.pokemon.getFormSet().getForms().indexOf(this.form));
+		stor.writeInt(this.pokemon.getData().getId());
+		if (this.pokemon.getData().getFormSet() != null)
+			stor.writeInt(this.pokemon.getData().getFormSet().getFormId(this.form));
 		else
 			stor.writeInt(-1);
 		stor.writeBoolean(this.shiny);
@@ -242,8 +243,8 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 		int pokemonId = stor.readInt();
 		this.pokemon = EnumPokemon.getPokemon(pokemonId);
 		int form = stor.readInt();
-		if (form != -1 && this.pokemon.getFormSet() != null)
-			this.form = this.pokemon.getFormSet().getForms().get(form);
+		if (form != -1 && this.pokemon.getData().getFormSet() != null)
+			this.form = this.pokemon.getData().getFormSet().getFormById(form);
 		this.shiny = stor.readBoolean();
 		this.timePosted = stor.readLong();
 		if (this.timePosted <= 0 || this.timePosted >= System.currentTimeMillis() / 1000)

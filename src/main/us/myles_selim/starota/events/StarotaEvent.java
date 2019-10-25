@@ -127,10 +127,10 @@ public class StarotaEvent implements Comparable<StarotaEvent> {
 		for (int id : this.featuredPokemon) {
 			EnumPokemon poke = EnumPokemon.getPokemon(id);
 			if (MiscUtils.arrContains(this.newShinies, id))
-				featPoke.append(poke.getName() + " "
+				featPoke.append(poke.getData().getName() + " "
 						+ MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("shiny")) + ", ");
 			else
-				featPoke.append(poke.getName() + ", ");
+				featPoke.append(poke.getData().getName() + ", ");
 		}
 		if (featPoke.length() != 0)
 			builder.appendField("Featured Pokemon:", featPoke.substring(0, featPoke.length() - 2),

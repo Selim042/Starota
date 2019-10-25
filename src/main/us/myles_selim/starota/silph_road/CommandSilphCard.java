@@ -82,7 +82,7 @@ public class CommandSilphCard extends BotCommand<StarotaServer> {
 		String favPokemonString = "";
 		for (int id : card.data.top_6_pokemon)
 			if (id != 0)
-				favPokemonString += EnumPokemon.getPokemon(id).getName() + ", ";
+				favPokemonString += EnumPokemon.getPokemon(id).getData().getName() + ", ";
 		if (!favPokemonString.isEmpty())
 			builder.appendField("Top 6 Pokemon:",
 					favPokemonString.substring(0, favPokemonString.length() - 2), false);

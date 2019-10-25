@@ -1,26 +1,20 @@
 package us.myles_selim.starota.misc.data_types;
 
 import us.myles_selim.starota.enums.EnumPokemon;
-import us.myles_selim.starota.trading.forms.FormSet.Form;
+import us.myles_selim.starota.forms.Form;
 
 public class EggEntry {
 
 	private final EnumPokemon pokemon;
 	private final Form form;
 	private final int distance;
-	// private final int maxCP;
-	// private final int minCP;
 	private final boolean shinyable;
 
 	// private final int totalHatches;
 	// private final int numHatched;
 
-	public EggEntry(EnumPokemon pokemon, Form form, int distance
-	/*
-	 * , int maxCP, int minCP
-	 */, boolean shinyable/*
-							 * , int totalHatches, int numHatched
-							 */) {
+	public EggEntry(EnumPokemon pokemon, Form form, int distance,
+			boolean shinyable/* , int totalHatches, int numHatched */) {
 		this.pokemon = pokemon;
 		this.form = form;
 		this.distance = distance;
@@ -43,14 +37,6 @@ public class EggEntry {
 	public int getDistance() {
 		return distance;
 	}
-
-	// public int getMaxCP() {
-	// return maxCP;
-	// }
-	//
-	// public int getMinCP() {
-	// return minCP;
-	// }
 
 	public boolean isShinyable() {
 		return shinyable;

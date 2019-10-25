@@ -10,10 +10,11 @@ import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.enums.EnumGender;
 import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.forms.Form;
+import us.myles_selim.starota.silph_road.SilphRoadData;
 import us.myles_selim.starota.trading.PokemonInstance;
-import us.myles_selim.starota.trading.TradeboardPost;
 import us.myles_selim.starota.trading.PokemonInstance.ErrorPokemonInstance;
-import us.myles_selim.starota.trading.forms.FormSet.Form;
+import us.myles_selim.starota.trading.TradeboardPost;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandLookingFor extends BotCommand<StarotaServer> {
@@ -55,25 +56,26 @@ public class CommandLookingFor extends BotCommand<StarotaServer> {
 			channel.createMessage("Pokemon \"" + args[1] + "\" not found").block();
 			return;
 		}
-		if (!pokemon.isAvailable()) {
+		if (!SilphRoadData.isAvailable(pokemon)) {
 			channel.createMessage("Pokemon **" + pokemon + "** is not available").block();
 			return;
 		}
-		if (pokemonInst.getShiny() && !pokemon.isShinyable()) {
+		if (pokemonInst.getShiny() && !SilphRoadData.isShinyable(pokemon)) {
 			channel.createMessage("Pokemon **" + pokemon + "** is not shinyable").block();
 			return;
 		}
-		if (!pokemon.isTradable()) {
+		if (!pokemon.getData().isTradable()) {
 			channel.createMessage("Pokemon **" + pokemon + "** is not tradable").block();
 			return;
 		}
-		if (shiny && ((form == null && !pokemon.isShinyable())
-				|| (form != null && !form.canBeShiny(pokemon)))) {
+		if (shiny && ((form == null && !SilphRoadData.isShinyable(pokemon))
+				|| (form != null && !form.isShinyable()))) {
 			channel.createMessage("Pokemon **" + pokemon + "** cannot be shiny"
 					+ (form == null ? "" : " in form \"" + form + "\"")).block();
 			return;
 		}
-		if (pokemon.getGenderPossible() != gender && pokemon.getGenderPossible() != EnumGender.EITHER) {
+		if (pokemon.getData().getGenderPossible() != gender
+				&& pokemon.getData().getGenderPossible() != EnumGender.EITHER) {
 			channel.createMessage("Pokemon **" + pokemon + "** cannot be " + gender).block();
 			return;
 		}

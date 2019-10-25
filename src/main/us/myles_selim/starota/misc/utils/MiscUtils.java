@@ -27,6 +27,7 @@ import reactor.core.publisher.Flux;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumTeam;
+import us.myles_selim.starota.silph_road.SilphRoadData;
 
 public class MiscUtils {
 
@@ -299,7 +300,7 @@ public class MiscUtils {
 			if (index >= count)
 				break;
 			EnumPokemon sug = e.en;
-			if (!MiscUtils.arrContains(out, sug) && !sug.isAvailable())
+			if (!MiscUtils.arrContains(out, sug) && !SilphRoadData.isAvailable(sug))
 				out[index++] = sug;
 		}
 		return out;

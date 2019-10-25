@@ -81,7 +81,7 @@ public class CommandEggHatches extends BotCommand<StarotaServer> {
 		StringBuilder regionalHatches = new StringBuilder();
 		regionalHatches.append(REGIONAL_DISCLAIMER + "\n\n");
 		for (EggEntry b : SilphRoadData.getEggs(dist)) {
-			if (b.getPokemon().isRegional()) {
+			if (b.getPokemon().getData().isRegional()) {
 				foundRegional = true;
 				regionalHatches.append(b.getPokemon()
 						+ (b.getForm() == null ? "" : " (" + b.getForm() + ") ")
@@ -153,20 +153,22 @@ public class CommandEggHatches extends BotCommand<StarotaServer> {
 		for (EggEntry e : SilphRoadData.getEggs()) {
 			EggData data = null;
 			for (EggData eData : sortedEggs) {
-				if (eData.matches(e.getDistance(), e.getPokemon().isRegional()))
+				if (eData.matches(e.getDistance(), e.getPokemon().getData().isRegional()))
 					data = eData;
 			}
 			if (data == null) {
-				data = new EggData(e.getDistance(), e.getPokemon().isRegional());
+				data = new EggData(e.getDistance(), e.getPokemon().getData().isRegional());
 				sortedEggs.add(data);
 			}
 			if (e.isShinyable())
-				data.shinyBuilder.append((e.getForm() == null ? e.getPokemon().getName()
-						: String.format("%s (%s)", e.getPokemon().getName(), e.getForm().toString()))
+				data.shinyBuilder.append((e.getForm() == null ? e.getPokemon().getData().getName()
+						: String.format("%s (%s)", e.getPokemon().getData().getName(),
+								e.getForm().toString()))
 						+ ", ");
 			else
-				data.builder.append((e.getForm() == null ? e.getPokemon().getName()
-						: String.format("%s (%s)", e.getPokemon().getName(), e.getForm().toString()))
+				data.builder.append((e.getForm() == null ? e.getPokemon().getData().getName()
+						: String.format("%s (%s)", e.getPokemon().getData().getName(),
+								e.getForm().toString()))
 						+ ", ");
 		}
 		sortedEggs.sort(null);

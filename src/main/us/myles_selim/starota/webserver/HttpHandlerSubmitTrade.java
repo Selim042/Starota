@@ -11,8 +11,9 @@ import discord4j.core.object.util.Snowflake;
 import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.enums.EnumGender;
 import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.forms.Form;
+import us.myles_selim.starota.forms.FormSet;
 import us.myles_selim.starota.trading.TradeboardPost;
-import us.myles_selim.starota.trading.forms.FormSet;
 import us.myles_selim.starota.webserver.WebServer.Cookie;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
@@ -50,12 +51,12 @@ public class HttpHandlerSubmitTrade implements HttpHandler {
 				WebServer.returnError(ex, 400);
 				return;
 			}
-			FormSet.Form form = null;
+			Form form = null;
 			if (!post.get("pokemon_form").equals("-1")) {
-				FormSet formSet = pokemon.getFormSet();
+				FormSet formSet = pokemon.getData().getFormSet();
 				if (formSet != null) {
 					String formName = post.get("pokemon_form");
-					for (FormSet.Form f : formSet.getForms()) {
+					for (Form f : formSet) {
 						if (f.toString().equals(formName)) {
 							form = f;
 							continue;

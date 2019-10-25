@@ -9,6 +9,7 @@ import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.leek_duck.LeekDuckData;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
+import us.myles_selim.starota.misc.utils.ImageHelper;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandDitto extends BotCommand<StarotaServer> {
@@ -31,13 +32,13 @@ public class CommandDitto extends BotCommand<StarotaServer> {
 		builder.withAuthorUrl("https://leekduck.com");
 
 		builder.withTitle("Dittoable Pokemon:").withUrl("https://leekduck.com/FindDitto/");
-		builder.withThumbnail(EnumPokemon.DITTO.getArtwork(0));
+		builder.withThumbnail(ImageHelper.getOfficalArtwork(EnumPokemon.DITTO, 0));
 
 		Message oldMessage = null;
 		if (!LeekDuckData.areDittoablesLoaded())
 			oldMessage = channel.createEmbed(LeekDuckData.LOADING_EMBED).block();
 		for (EnumPokemon p : LeekDuckData.getDittoablePokemon())
-			builder.appendDesc(" - " + p.getName() + "\n");
+			builder.appendDesc(" - " + p.getData().getName() + "\n");
 
 		builder.withFooterText("Last updated");
 		builder.withTimestamp(LeekDuckData.getDittoableCacheTime());
