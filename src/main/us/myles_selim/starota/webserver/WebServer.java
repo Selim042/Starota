@@ -37,6 +37,7 @@ import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.webserver.OAuthUtils.OAuthGuildPart;
 import us.myles_selim.starota.webserver.OAuthUtils.OAuthUser;
+import us.myles_selim.starota.webserver.webhook_data.TopGGVote;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 // https://www.reddit.com/r/discordapp/comments/82p8i6/a_basic_tutorial_on_how_to_get_the_most_out_of/
@@ -57,6 +58,7 @@ public class WebServer {
 	private static final Gson GSON = new Gson();
 
 	protected static String CLIENT_SECRET;
+	protected static String TOP_GG_AUTH;
 
 	public static void init() {
 		if (inited)
@@ -65,6 +67,7 @@ public class WebServer {
 		try {
 			PROPERTIES.load(new FileInputStream("starota.properties"));
 			CLIENT_SECRET = PROPERTIES.getProperty("oauth_client_secret");
+			TOP_GG_AUTH = PROPERTIES.getProperty("top_gg_auth");
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -126,10 +129,44 @@ public class WebServer {
 					returnTextFile(ex, "http/leaderboards.html");
 				}
 			});
+			server.createContext("/server_select", new HttpHandler() {
+
+				@Override
+				public void handle(HttpExchange ex) throws IOException {
+					returnTextFile(ex, "http/server_select.html", 200);
+				}
+			});
+			server.createContext("/webhooks/top-gg", new HttpHandler() {
+
+				@Override
+				public void handle(HttpExchange ex) throws IOException {
+					Headers reqHeaders = ex.getRequestHeaders();
+					if (reqHeaders.containsKey("Authorization")) {
+						if (reqHeaders.get("Authorization").contains(TOP_GG_AUTH)) {
+							TopGGVote vote = GSON.fromJson(new InputStreamReader(ex.getRequestBody()),
+									TopGGVote.class);
+							if (Starota.FULLY_STARTED) {
+								Starota.getClient().getUserById(StarotaConstants.SELIM_USER_ID).block()
+										.getPrivateChannel().block().createMessage(vote.toString())
+										.block();
+							}
+						}
+					}
+					ex.sendResponseHeaders(200, 1);
+					OutputStream response = ex.getResponseBody();
+					response.write('1');
+					response.close();
+				}
+			});
 			server.createContext("/", new HttpHandler() {
 
 				@Override
 				public void handle(HttpExchange ex) throws IOException {
+					WebServer.handleBaseGET(ex);
+					if (!WebServer.isLoggedIn(ex)) {
+						WebServer.redirect(ex, "/login");
+						return;
+					}
 					returnTextFile(ex, "http/index.html");
 				}
 			});
