@@ -35,6 +35,8 @@ import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.assistants.CommandBots;
 import us.myles_selim.starota.assistants.registration.RegistrationBot;
 import us.myles_selim.starota.commands.CommandArticleMessage;
+import us.myles_selim.starota.commands.CommandCatcherCup;
+import us.myles_selim.starota.commands.CommandCatcherCupAddPoints;
 import us.myles_selim.starota.commands.CommandChangelog;
 import us.myles_selim.starota.commands.CommandCredits;
 import us.myles_selim.starota.commands.CommandGetTimezones;
@@ -214,6 +216,11 @@ public class Starota {
 					"Sets the server's weather API token.", null));
 			StarotaServer.setDefaultValue(new SettingString(StarotaConstants.Settings.COORDS,
 					"Sets the community's coordinates.", null));
+			StarotaServer
+					.setDefaultValue(new SettingBoolean(StarotaConstants.Settings.EASY_HOUSE_CUP_ENTRY,
+							"Allows users with the necessary permissions to distribute House Cup "
+									+ "points by saying things like \"10 points for instinct!\".",
+							true));
 
 			// default leaderboards
 			StarotaServer.registerDefaultLeaderboards();
@@ -366,6 +373,7 @@ public class Starota {
 		restartRestartTimer();
 	}
 
+	@SuppressWarnings("deprecation")
 	private static void registerCommands(JavaCommandHandler jCmdHandler) {
 		jCmdHandler.registerDefaultCommands();
 
@@ -428,6 +436,12 @@ public class Starota {
 		jCmdHandler.registerCommand("Search", new CommandSearchEvents());
 
 		jCmdHandler.registerCommand("Weather", new CommandWeather());
+
+		jCmdHandler.registerCommand("Catcher Cup", new CommandCatcherCup());
+		CommandCatcherCupAddPoints addPointsCmd = new CommandCatcherCupAddPoints();
+		jCmdHandler.registerCommand("Catcher Cup", addPointsCmd);
+		EventDispatcher dispatcher = CLIENT.getEventDispatcher();
+		addPointsCmd.new EasyEntryHandler().setup(dispatcher);
 
 		jCmdHandler.registerCommand("Misc", new CommandSilphCard());
 		jCmdHandler.registerCommand("Misc", new CommandEvents());

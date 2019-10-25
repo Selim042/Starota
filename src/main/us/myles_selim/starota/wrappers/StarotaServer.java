@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,10 @@ import us.myles_selim.starota.commands.settings.SettingSet.DataTypeSettingSet;
 import us.myles_selim.starota.enums.EnumDonorPerm;
 import us.myles_selim.starota.enums.EnumGender;
 import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.enums.EnumWeather;
+import us.myles_selim.starota.forms.Form;
+import us.myles_selim.starota.forms.FormSet;
 import us.myles_selim.starota.leaderboards.DefaultLeaderboard;
 import us.myles_selim.starota.leaderboards.DefaultLeaderboard.EnumBadgeLeaderboard;
 import us.myles_selim.starota.leaderboards.Leaderboard;
@@ -49,8 +53,6 @@ import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.silph_road.SilphCard;
 import us.myles_selim.starota.silph_road.SilphRoadCardUtils;
 import us.myles_selim.starota.trading.TradeboardPost;
-import us.myles_selim.starota.trading.forms.FormSet;
-import us.myles_selim.starota.trading.forms.FormSet.Form;
 import us.myles_selim.starota.weather.api.AccuWeatherAPI;
 import us.myles_selim.starota.weather.api.WeatherForecast;
 
@@ -217,7 +219,7 @@ public class StarotaServer extends BotServer {
 	}
 
 	public List<TradeboardPost> findPosts(boolean lookingFor, EnumPokemon pokemon, boolean shiny) {
-		FormSet fSet = pokemon.getFormSet();
+		FormSet fSet = pokemon.getData().getFormSet();
 		return findPosts(lookingFor, pokemon, fSet == null ? null : fSet.getDefaultForm(), shiny,
 				EnumGender.EITHER, false);
 	}
@@ -230,7 +232,7 @@ public class StarotaServer extends BotServer {
 		if (tradeboard == null)
 			return Collections.emptyList();
 		List<TradeboardPost> matching = new LinkedList<>();
-		FormSet fSet = pokemon.getFormSet();
+		FormSet fSet = pokemon.getData().getFormSet();
 		for (TradeboardPost p : tradeboard.values())
 			if (p.isLookingFor() != lookingFor && p.getPokemon().equals(pokemon)
 					&& (fSet == null || p.getForm() == form || form.equals(p.getForm()))
@@ -250,7 +252,7 @@ public class StarotaServer extends BotServer {
 	}
 
 	public List<TradeboardPost> findPosts(EnumPokemon pokemon, boolean shiny) {
-		FormSet fSet = pokemon.getFormSet();
+		FormSet fSet = pokemon.getData().getFormSet();
 		return findPosts(pokemon, fSet == null ? null : fSet.getDefaultForm(), shiny, EnumGender.EITHER,
 				false);
 	}
@@ -314,11 +316,15 @@ public class StarotaServer extends BotServer {
 	}
 
 	public List<TradeboardPost> getPosts(Member user) {
+		return getPosts(user.getId());
+	}
+
+	public List<TradeboardPost> getPosts(Snowflake user) {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.TRADEBOARD))
 			return null;
 		List<TradeboardPost> posts = new LinkedList<>();
 		for (TradeboardPost t : getTradeboardInternal().values())
-			if (t != null && t.getOwner() == user.getId().asLong())
+			if (t != null && t.getOwner() == user.asLong())
 				posts.add(t);
 		return Collections.unmodifiableList(posts);
 	}
@@ -554,6 +560,13 @@ public class StarotaServer extends BotServer {
 			if (perm != null)
 				donorPerms.add(perm);
 		}
+		// add HTTP for "home" server
+		if (this.getDiscordGuildId().asLong() == 314733127027130379L)
+			donorPerms.add(EnumDonorPerm.HTTP);
+		// perms for support server
+		if (this.getDiscordGuildId().equals(StarotaConstants.SUPPORT_SERVER))
+			for (EnumDonorPerm perm : EnumDonorPerm.values())
+				donorPerms.add(perm);
 		return Collections.unmodifiableList(donorPerms);
 	}
 
@@ -738,9 +751,105 @@ public class StarotaServer extends BotServer {
 	}
 	// end weather stuff
 
-	// private static final Map<Snowflake, StarotaServer> SERVERS = new
-	// ConcurrentHashMap<>();
-	private static final Map<Snowflake, StarotaUser> USERS = new ConcurrentHashMap<>();
+	// start house cup stuff
+	private static final String INSTINCT_HOUSE_CUP_KEY = "house_cup_instinct";
+	private static final String MYSTIC_HOUSE_CUP_KEY = "house_cup_mystic";
+	private static final String VALOR_HOUSE_CUP_KEY = "house_cup_valor";
+
+	/** House cup stuff */
+	public List<Pair<EnumTeam, Integer>> getRankings() {
+		List<Pair<EnumTeam, Integer>> ret = new ArrayList<>();
+		ret.add(new Pair<>(EnumTeam.INSTINCT, getTeamPoints(EnumTeam.INSTINCT)));
+		ret.add(new Pair<>(EnumTeam.MYSTIC, getTeamPoints(EnumTeam.MYSTIC)));
+		ret.add(new Pair<>(EnumTeam.VALOR, getTeamPoints(EnumTeam.VALOR)));
+		ret.sort(new Comparator<Pair<EnumTeam, Integer>>() {
+
+			@Override
+			public int compare(Pair<EnumTeam, Integer> o1, Pair<EnumTeam, Integer> o2) {
+				return Integer.compare(o2.right, o1.right);
+			}
+		});
+		return Collections.unmodifiableList(ret);
+	}
+
+	/** House cup stuff */
+	public int getTeamPoints(EnumTeam team) {
+		switch (team) {
+		case INSTINCT:
+			if (!hasDataKey(INSTINCT_HOUSE_CUP_KEY))
+				return 0;
+			return getDataValue(INSTINCT_HOUSE_CUP_KEY, Integer.class);
+		case MYSTIC:
+			if (!hasDataKey(MYSTIC_HOUSE_CUP_KEY))
+				return 0;
+			return getDataValue(MYSTIC_HOUSE_CUP_KEY, Integer.class);
+		case VALOR:
+			if (!hasDataKey(VALOR_HOUSE_CUP_KEY))
+				return 0;
+			return getDataValue(VALOR_HOUSE_CUP_KEY, Integer.class);
+		case NO_TEAM:
+		default:
+			throw new IllegalArgumentException("team " + team + " doesn't get points");
+		}
+	}
+
+	/** House cup stuff */
+	public void addTeamPoints(EnumTeam team, int points) {
+		switch (team) {
+		case INSTINCT:
+			setDataValue(INSTINCT_HOUSE_CUP_KEY, getTeamPoints(team) + points);
+			break;
+		case MYSTIC:
+			setDataValue(MYSTIC_HOUSE_CUP_KEY, getTeamPoints(team) + points);
+			break;
+		case VALOR:
+			setDataValue(VALOR_HOUSE_CUP_KEY, getTeamPoints(team) + points);
+			break;
+		case NO_TEAM:
+		default:
+			throw new IllegalArgumentException("team " + team + " doesn't get points");
+		}
+	}
+
+	/** House cup stuff */
+	public void setTeamPoints(EnumTeam team, int points) {
+		switch (team) {
+		case INSTINCT:
+			setDataValue(INSTINCT_HOUSE_CUP_KEY, points);
+			break;
+		case MYSTIC:
+			setDataValue(MYSTIC_HOUSE_CUP_KEY, points);
+			break;
+		case VALOR:
+			setDataValue(VALOR_HOUSE_CUP_KEY, points);
+			break;
+		case NO_TEAM:
+		default:
+			throw new IllegalArgumentException("team " + team + " doesn't get points");
+		}
+	}
+
+	/** House cup stuff */
+	public void clearTeamPoints() {
+		setDataValue(INSTINCT_HOUSE_CUP_KEY, 0);
+		setDataValue(MYSTIC_HOUSE_CUP_KEY, 0);
+		setDataValue(VALOR_HOUSE_CUP_KEY, 0);
+	}
+
+	/** House cup stuff */
+	public EnumTeam getHighestTeam() {
+		int instinctPoints = getTeamPoints(EnumTeam.INSTINCT);
+		int mysticPoints = getTeamPoints(EnumTeam.MYSTIC);
+		int valorPoints = getTeamPoints(EnumTeam.VALOR);
+		if (instinctPoints > mysticPoints && instinctPoints > valorPoints)
+			return EnumTeam.INSTINCT;
+		if (mysticPoints > valorPoints && mysticPoints > instinctPoints)
+			return EnumTeam.MYSTIC;
+		if (valorPoints > instinctPoints && valorPoints > mysticPoints)
+			return EnumTeam.VALOR;
+		return EnumTeam.NO_TEAM;
+	}
+	// end house cup stuff
 
 	public static StarotaServer getServer(Snowflake id) {
 		if (id == null)
@@ -752,16 +861,6 @@ public class StarotaServer extends BotServer {
 		if (guild == null)
 			return null;
 		return BotServer.getServer(Starota.getClient(), guild);
-	}
-
-	public StarotaUser getUser(Member user) {
-		if (user == null)
-			return null;
-		if (USERS.containsKey(user.getId()))
-			return USERS.get(user.getId());
-		StarotaUser sUser = new StarotaUser(this, user);
-
-		return sUser;
 	}
 
 	public static class DataTypeServerSettings extends DataTypeSettingSet {

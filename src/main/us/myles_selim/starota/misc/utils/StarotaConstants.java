@@ -42,6 +42,8 @@ public class StarotaConstants {
 		public static final String WEATHER_API_TOKEN = "weatherToken";
 		/** Community coords */
 		public static final String COORDS = "coords";
+		/** "10 points for instinct!" */
+		public static final String EASY_HOUSE_CUP_ENTRY = "easyHouseCupEntry";
 
 	}
 

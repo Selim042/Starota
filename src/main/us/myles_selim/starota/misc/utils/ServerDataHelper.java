@@ -7,6 +7,7 @@ import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.EBList;
 import us.myles_selim.ebs.EBStorage;
 import us.myles_selim.ebs.IOHelper;
+import us.myles_selim.ebs.callbacks.ClassNotFoundCallback;
 import us.myles_selim.ebs.callbacks.OnWriteCallback;
 import us.myles_selim.ebs.data_types.DataTypeEBStorage;
 
@@ -33,7 +34,13 @@ public class ServerDataHelper {
 		if (!ebsFile.exists() || !folder.exists() || !folder.isDirectory())
 			return new EBStorage().registerPrimitives()
 					.setOnWriteCallback(new FileWriteCallback(ebsFile));
-		return IOHelper.readEBStorage(ebsFile).setOnWriteCallback(new FileWriteCallback(ebsFile));
+		return IOHelper.readEBStorage(ebsFile, new ClassNotFoundCallback() {
+
+			@Override
+			public boolean shouldJustDelete(String oldPath) {
+				return oldPath.equals("us.myles_selim.starota.commands.CommandHouseCup$HouseCupData");
+			}
+		}).setOnWriteCallback(new FileWriteCallback(ebsFile));
 	}
 
 	@SuppressWarnings("unchecked")

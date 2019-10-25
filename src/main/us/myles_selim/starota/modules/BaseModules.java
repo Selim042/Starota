@@ -54,6 +54,8 @@ public class BaseModules {
 					+ "to display raid, task, and Pokemon spawn information.");
 	public static final StarotaModule SEARCH = new StarotaModule("Search", "Search").setDescription(
 			"The search module enables searching of data in the Pokedex and other information.");
+	public static final StarotaModule CATCHER_CUP = new StarotaModule("CatcherCup", "Catcher Cup")
+			.setDescription("Catcher Cup, similar to Harry Potter House Cup.");
 
 	public static void registerModules() {
 		if (registered)
@@ -71,6 +73,7 @@ public class BaseModules {
 		StarotaModule.registerModule(HTTP);
 		StarotaModule.registerModule(WEBHOOKS);
 		StarotaModule.registerModule(SEARCH);
+		StarotaModule.registerModule(CATCHER_CUP);
 	}
 
 }
