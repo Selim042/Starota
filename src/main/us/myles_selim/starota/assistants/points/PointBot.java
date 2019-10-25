@@ -30,10 +30,10 @@ import us.myles_selim.starota.commands.CommandGetTimezones;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 import us.myles_selim.starota.commands.settings.CommandSettings;
-import us.myles_selim.starota.misc.data_types.BotServer;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.misc.utils.StatusUpdater;
+import us.myles_selim.starota.wrappers.BotServer;
 
 public class PointBot {
 

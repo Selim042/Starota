@@ -39,7 +39,6 @@ import us.myles_selim.starota.forms.FormSet;
 import us.myles_selim.starota.leaderboards.DefaultLeaderboard;
 import us.myles_selim.starota.leaderboards.DefaultLeaderboard.EnumBadgeLeaderboard;
 import us.myles_selim.starota.leaderboards.Leaderboard;
-import us.myles_selim.starota.misc.data_types.BotServer;
 import us.myles_selim.starota.misc.data_types.MaxQueue;
 import us.myles_selim.starota.misc.data_types.Pair;
 import us.myles_selim.starota.misc.data_types.cache.CachedData;

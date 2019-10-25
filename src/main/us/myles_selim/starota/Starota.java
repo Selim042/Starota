@@ -54,16 +54,14 @@ import us.myles_selim.starota.commands.settings.types.SettingBoolean;
 import us.myles_selim.starota.commands.settings.types.SettingChannelStarota;
 import us.myles_selim.starota.commands.settings.types.SettingString;
 import us.myles_selim.starota.commands.settings.types.SettingTimeZone;
-import us.myles_selim.starota.commands.tutorial.commands.CommandTutorial;
 import us.myles_selim.starota.debug_server.DebugServer;
+import us.myles_selim.starota.events.CommandEvents;
 import us.myles_selim.starota.leaderboards.commands.CommandEditLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandGetLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandListLeaderboards;
 import us.myles_selim.starota.leaderboards.commands.CommandNewLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandUpdateLeaderboard;
 import us.myles_selim.starota.leek_duck.ditto.CommandDitto;
-import us.myles_selim.starota.leek_duck.events.CommandEvents;
-import us.myles_selim.starota.misc.data_types.BotServer;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
@@ -79,9 +77,9 @@ import us.myles_selim.starota.profiles.commands.CommandProfileHelp;
 import us.myles_selim.starota.profiles.commands.CommandRegister;
 import us.myles_selim.starota.profiles.commands.CommandSelfRegister;
 import us.myles_selim.starota.profiles.commands.CommandUpdateProfile;
-import us.myles_selim.starota.pvp.CommandBattleReady;
-import us.myles_selim.starota.pvp.CommandFindBattles;
-import us.myles_selim.starota.pvp.CommandNotReady;
+import us.myles_selim.starota.pvp.battle_discovery.CommandBattleReady;
+import us.myles_selim.starota.pvp.battle_discovery.CommandFindBattles;
+import us.myles_selim.starota.pvp.battle_discovery.CommandNotReady;
 import us.myles_selim.starota.raids.CommandRaid;
 import us.myles_selim.starota.raids.CommandRaidBosses;
 import us.myles_selim.starota.raids.CommandSetRaidEChannel;
@@ -107,6 +105,7 @@ import us.myles_selim.starota.vote_rewards.CommandVotePerks;
 import us.myles_selim.starota.vote_rewards.VoteReminderThread;
 import us.myles_selim.starota.weather.CommandWeather;
 import us.myles_selim.starota.webserver.WebServer;
+import us.myles_selim.starota.wrappers.BotServer;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class Starota {
@@ -166,8 +165,11 @@ public class Starota {
 			@Override
 			public void run() {
 				System.out.println("running shutdown thread");
-				if (CLIENT.isConnected())
+				if (CLIENT.isConnected()) {
+					CLIENT.getUserById(StarotaConstants.SELIM_USER_ID).block().getPrivateChannel()
+							.block().createMessage("Shutting down").block();
 					CLIENT.logout().block();
+				}
 				EXECUTOR.shutdown();
 			}
 		});
@@ -221,6 +223,8 @@ public class Starota {
 							"Allows users with the necessary permissions to distribute House Cup "
 									+ "points by saying things like \"10 points for instinct!\".",
 							true));
+			StarotaServer.setDefaultValue(new SettingBoolean(StarotaConstants.Settings.CLOCK_24H,
+					"If true, uses 24 hour clock (1-24) rather than 12 hour clock.", false));
 
 			// default leaderboards
 			StarotaServer.registerDefaultLeaderboards();
@@ -263,8 +267,9 @@ public class Starota {
 			statusUpdater
 					.addPresence(Presence.online(Activity.watching("people organize raids with .raid")));
 			statusUpdater.addPresence(
-					Presence.online(Activity.listening("to people search for events and Pokemon")));
-			statusUpdater.addPresence(Presence.online(Activity.watching(".bots for new bots")));
+					Presence.online(Activity.listening("people search for events and Pokemon")));
+			// statusUpdater.addPresence(Presence.online(Activity.watching(".bots
+			// for new bots")));
 			statusUpdater.addPresence(
 					Presence.online(Activity.watching("people research counters with .dex")));
 			statusUpdater.start();
@@ -357,12 +362,17 @@ public class Starota {
 							return;
 						server.updateWeather();
 					}).collectList().block();
-					CLIENT.getUserById(StarotaConstants.SELIM_USER_ID).block().getPrivateChannel()
-							.block().createMessage("Updated weather").block();
+					// CLIENT.getUserById(StarotaConstants.SELIM_USER_ID).block().getPrivateChannel()
+					// .block().createMessage("Updated weather").block();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}, 0, 1, TimeUnit.HOURS);
+
+			// auto restart
+			boolean restartEnabled = restartRestartTimer();
+			CLIENT.getUserById(StarotaConstants.SELIM_USER_ID).block().getPrivateChannel().block()
+					.createMessage("Auto reboot is " + (restartEnabled ? "enabled" : "disabled"));
 		} catch (Exception e) {
 			System.err.println("+-------------------------------------------------------------------+");
 			System.err.println("| Starota failed to start properly. Printing exception then exiting |");
@@ -370,7 +380,6 @@ public class Starota {
 			e.printStackTrace();
 			Runtime.getRuntime().exit(0);
 		}
-		restartRestartTimer();
 	}
 
 	@SuppressWarnings("deprecation")
@@ -450,15 +459,16 @@ public class Starota {
 		jCmdHandler.registerCommand("Misc", new CommandArticleMessage());
 		jCmdHandler.registerCommand("Misc", new CommandBots());
 
-		jCmdHandler.registerCommand("Tutorial", new CommandTutorial());
+		// jCmdHandler.registerCommand("Tutorial", new CommandTutorial());
 	}
 
-	public static void restartRestartTimer() {
+	public static boolean restartRestartTimer() {
 		if (!ENABLE_AUTO_REBOOT)
-			return;
+			return false;
 		if (RESTART_TIMER != null)
 			RESTART_TIMER.cancel(false);
 		RESTART_TIMER = EXECUTOR.schedule(RESTART, 1, TimeUnit.HOURS);
+		return true;
 	}
 
 	public static DiscordClient getClient() {
@@ -539,7 +549,9 @@ public class Starota {
 		String user = name.replaceAll("@", "").replaceAll("#\\d{4}", "");
 		if (user.matches("<\\d{18}>")) {
 			long userId = Long.parseLong(user.substring(1, 19));
-			Guild guild = Starota.getGuild(serverId);
+			Guild guild = null;
+			if (serverId != -1)
+				guild = Starota.getGuild(serverId);
 			if (guild != null) {
 				Member userD = guild.getMemberById(Snowflake.of(userId)).block();
 				if (userD != null)

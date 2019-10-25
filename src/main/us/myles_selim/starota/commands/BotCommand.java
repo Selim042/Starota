@@ -6,7 +6,7 @@ import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.Role;
 import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.commands.registry.java.JavaCommand;
-import us.myles_selim.starota.misc.data_types.BotServer;
+import us.myles_selim.starota.wrappers.BotServer;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public abstract class BotCommand<S extends BotServer> extends JavaCommand {

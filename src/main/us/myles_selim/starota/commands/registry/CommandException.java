@@ -1,6 +1,6 @@
 package us.myles_selim.starota.commands.registry;
 
-import us.myles_selim.starota.misc.data_types.BotServer;
+import us.myles_selim.starota.wrappers.BotServer;
 
 public class CommandException extends RuntimeException {
 

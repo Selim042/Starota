@@ -1,4 +1,4 @@
-package us.myles_selim.starota.misc.data_types;
+package us.myles_selim.starota.wrappers;
 
 import java.io.File;
 import java.lang.reflect.Constructor;

@@ -4,7 +4,7 @@ import java.io.File;
 
 import discord4j.core.object.util.Snowflake;
 import us.myles_selim.starota.commands.settings.SettingSet;
-import us.myles_selim.starota.misc.data_types.BotServer;
+import us.myles_selim.starota.wrappers.BotServer;
 
 public class PointServer extends BotServer {
 

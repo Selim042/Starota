@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import discord4j.core.object.util.Snowflake;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.commands.settings.Setting;
-import us.myles_selim.starota.misc.data_types.BotServer;
+import us.myles_selim.starota.wrappers.BotServer;
 
 public abstract class ServerSetting<V> extends Setting<V> {
 

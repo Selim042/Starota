@@ -16,9 +16,10 @@ public class QuestType<P> {
 	public static final QuestTypeNull DO_RAID = new QuestTypeNull("Complete a raid",
 			"Complete any tier raid and post your journal screenshot to this channel before this quest expires.",
 			false, "http://assets.myles-selim.us/starota/points/raids.png", 5);
+	// TODO: fix random Pokemon picking
 	public static final QuestType<EnumPokemon> CATCH_POKEMON = new QuestType<EnumPokemon>("Catch %s",
 			"Catch a %s from the wild, raids, or research tasks/breakthroughs and post your journal screenshot to this channel before this quest expires.",
-			true, EnumPokemon::getRandomPokemon, ImageHelper::getOfficalArtwork, QuestType::getPoints);
+			true, rand -> EnumPokemon.PIPLUP, ImageHelper::getOfficalArtwork, QuestType::getPoints);
 	public static final QuestTypeNull SPIN_STOP = new QuestTypeNull("Spin a PokeStop",
 			"Spin any PokeStop photo disc and post your journal screenshot to this channel before this quest expires.",
 			true, "http://assets.myles-selim.us/starota/points/pokestop.png", 1);
@@ -45,19 +46,19 @@ public class QuestType<P> {
 			false, "http://assets.myles-selim.us/starota/points/eggs.png", 4);
 
 	private static int getPoints(EnumPokemon poke) {
-		switch (poke.getStage()) {
+		switch (poke.getData().getStage()) {
 		case BASE:
-			return (int) (1 * Math.max(poke.getType1().getPointMult(),
-					poke.getType2() == null ? 0 : poke.getType2().getPointMult()));
+			return (int) (1 * Math.max(poke.getData().getType1().getPointMult(),
+					poke.getData().getType2() == null ? 0 : poke.getData().getType2().getPointMult()));
 		case MIDDLE:
-			return (int) (2 * Math.max(poke.getType1().getPointMult(),
-					poke.getType2() == null ? 0 : poke.getType2().getPointMult()));
+			return (int) (2 * Math.max(poke.getData().getType1().getPointMult(),
+					poke.getData().getType2() == null ? 0 : poke.getData().getType2().getPointMult()));
 		case FINAL:
-			return (int) (3.5f * Math.max(poke.getType1().getPointMult(),
-					poke.getType2() == null ? 0 : poke.getType2().getPointMult()));
+			return (int) (3.5f * Math.max(poke.getData().getType1().getPointMult(),
+					poke.getData().getType2() == null ? 0 : poke.getData().getType2().getPointMult()));
 		case BABY:
-			return (int) (2 * Math.max(poke.getType1().getPointMult(),
-					poke.getType2() == null ? 0 : poke.getType2().getPointMult()));
+			return (int) (2 * Math.max(poke.getData().getType1().getPointMult(),
+					poke.getData().getType2() == null ? 0 : poke.getData().getType2().getPointMult()));
 		case LEGEND:
 			return 5;
 		case MYTHIC:
@@ -134,6 +135,7 @@ public class QuestType<P> {
 	}
 
 	public static enum EnumGiftSendOpen {
+
 		SEND("Send"),
 		OPEN("Open"),
 		EITHER("Send or open");
@@ -151,6 +153,7 @@ public class QuestType<P> {
 	}
 
 	public static enum EnumPVPWinLose {
+
 		WIN("Win"),
 		LOSE("Lose"),
 		EITHER("Win or lose");

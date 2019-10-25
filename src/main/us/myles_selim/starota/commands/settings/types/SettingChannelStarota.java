@@ -4,8 +4,8 @@ import discord4j.core.object.entity.GuildChannel;
 import discord4j.core.object.util.Snowflake;
 import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.Starota;
-import us.myles_selim.starota.misc.data_types.BotServer;
 import us.myles_selim.starota.misc.utils.MiscUtils;
+import us.myles_selim.starota.wrappers.BotServer;
 
 public class SettingChannelStarota extends ServerSetting<Snowflake> {
 

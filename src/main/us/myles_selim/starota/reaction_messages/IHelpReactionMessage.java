@@ -7,7 +7,7 @@ import discord4j.core.object.entity.PrivateChannel;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.spec.EmbedCreateSpec;
-import us.myles_selim.starota.misc.data_types.BotServer;
+import us.myles_selim.starota.wrappers.BotServer;
 
 public interface IHelpReactionMessage {
 
