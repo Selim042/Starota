@@ -682,7 +682,7 @@ public class StarotaServer extends BotServer {
 	}
 	// end settings stuff
 
-	// start weatger stuff
+	// start weather stuff
 	private final Queue<WeatherForecast[]> forecasts = new MaxQueue<>(8);
 
 	/**

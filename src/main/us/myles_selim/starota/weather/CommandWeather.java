@@ -1,5 +1,7 @@
 package us.myles_selim.starota.weather;
 
+import java.text.SimpleDateFormat;
+
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import us.myles_selim.starota.commands.BotCommand;
@@ -28,16 +30,17 @@ public class CommandWeather extends BotCommand<StarotaServer> {
 			channel.createEmbed((e) -> e.setDescription("No weather forecast found")).block();
 			return;
 		}
+		SimpleDateFormat hourFormat = server.getHourFormat();
+		long time = System.currentTimeMillis();
 		StringBuilder out = new StringBuilder();
 		StringBuilder line = new StringBuilder();
 		for (int i = 0; i < 10; i++) {
-			if (i == 0)
-				out.append("**Now**: ");
-			else
-				out.append("**+" + i + " hr**: ");
+			long targetHour = time + (i * 3600000);
+			out.append(String.format("**%s**: ", hourFormat.format(targetHour)));
 			EnumWeather[] boosts = server.getPossibleBoosts(i);
 			boolean isDaylight = server.isDaylight(i);
 			if (boosts == null || boosts.length == 0)
+				// need these two extra spaces
 				line.append("No weather forecast found  ");
 			for (EnumWeather weather : boosts)
 				line.append(weather + (weather == null ? ""

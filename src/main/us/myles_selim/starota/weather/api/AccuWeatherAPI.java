@@ -3,13 +3,13 @@ package us.myles_selim.starota.weather.api;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 
 import com.google.gson.Gson;
 
-import us.myles_selim.starota.misc.data_types.BotServer;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
+import us.myles_selim.starota.wrappers.BotServer;
 
 public class AccuWeatherAPI {
 
@@ -25,8 +25,11 @@ public class AccuWeatherAPI {
 			try {
 				URL url = new URL(FORECAST_12_HOUR
 						+ String.format(location.getKey() + "?apikey=%s&details=true", weatherToken));
-				URLConnection conn = url.openConnection();
+				HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 				conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
+				conn.connect();
+				if (conn.getResponseCode() != 200)
+					return new WeatherForecast[0];
 				BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 				String json = "";
 				String line = null;
@@ -50,8 +53,11 @@ public class AccuWeatherAPI {
 		try {
 			URL url = new URL(
 					GEOPOSITION_SEARCH + String.format("?apikey=%s&q=%s", weatherToken, coords));
-			URLConnection conn = url.openConnection();
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
+			conn.connect();
+			if (conn.getResponseCode() != 200)
+				return null;
 			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 			String json = "";
 			String line = null;

@@ -44,6 +44,8 @@ public class StarotaConstants {
 		public static final String COORDS = "coords";
 		/** "10 points for instinct!" */
 		public static final String EASY_HOUSE_CUP_ENTRY = "easyHouseCupEntry";
+		/** 24 hour clock */
+		public static final String CLOCK_24H = "24hrClock";
 
 	}
 

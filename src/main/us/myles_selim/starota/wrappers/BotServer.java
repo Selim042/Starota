@@ -3,6 +3,7 @@ package us.myles_selim.starota.wrappers;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -219,6 +220,19 @@ public abstract class BotServer {
 		if (settings.isEmpty(StarotaConstants.Settings.TIMEZONE))
 			return MiscUtils.getTimezone(getDiscordGuild().getRegion().block());
 		return null;
+	}
+
+	private static final SimpleDateFormat DATE_FORMAT_12H = new SimpleDateFormat("ha");
+	private static final SimpleDateFormat DATE_FORMAT_24H = new SimpleDateFormat("k");
+
+	public SimpleDateFormat getHourFormat() {
+		SimpleDateFormat ret;
+		if ((boolean) getSetting(StarotaConstants.Settings.CLOCK_24H))
+			ret = ((SimpleDateFormat) DATE_FORMAT_24H.clone());
+		else
+			ret = ((SimpleDateFormat) DATE_FORMAT_12H.clone());
+		ret.setTimeZone(getTimezone());
+		return ret;
 	}
 	// send settings stuffs
 
