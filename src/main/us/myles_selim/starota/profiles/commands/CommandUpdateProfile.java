@@ -1,5 +1,9 @@
 package us.myles_selim.starota.profiles.commands;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
@@ -104,22 +108,30 @@ public class CommandUpdateProfile extends BotCommand<StarotaServer> {
 			break;
 		case "alt":
 		case "alts":
-			profile.getAlts().clear();
 			if (args[2].equalsIgnoreCase("null")) {
+				profile.setAlts(Collections.emptyMap());
 				executed = true;
 				break;
 			}
 			String[] altParts = args[2].split(":");
-			for (int i = 0; i < altParts.length; i += 2) {
+			if (altParts.length % 2 != 0) {
+				channel.createMessage("Invalid value.  "
+						+ "Make sure your values are in trainer name and trainer code pairs, seperated by a colon.\n"
+						+ "Example: TestAccount9000:123412341234:TestAccount9001:432143214321").block();
+				return;
+			}
+			Map<String, Long> alts = new HashMap<>();
+			for (int i = 0; i < altParts.length - 1; i += 2) {
 				String altName = altParts[i];
 				String altCode = altParts[i + 1];
 				if (altCode.length() != 12)
 					continue;
 				try {
-					profile.getAlts().put(altName, Long.valueOf(altCode));
+					alts.put(altName, Long.valueOf(altCode));
+					executed = true;
 				} catch (NumberFormatException e) { /* */ }
 			}
-			executed = true;
+			profile.setAlts(alts);
 			break;
 		}
 		if (!executed && isAdmin) {
