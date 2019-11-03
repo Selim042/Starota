@@ -22,7 +22,7 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 public class CommandEggHatches extends BotCommand<StarotaServer> {
 
 	private static final String REGIONAL_DISCLAIMER = //
-			"Regional exclusive Pokemon can only be hatched from eggs piced up in their respective regions.\n"
+			"Regional exclusive Pokemon can only be hatched from eggs picked up in their respective regions.\n"
 					+ "There is no way to obtain regional 5km eggs in any other way outside of picking them "
 					+ "up from a Pokestop in their respective regions.";
 
@@ -161,14 +161,16 @@ public class CommandEggHatches extends BotCommand<StarotaServer> {
 				sortedEggs.add(data);
 			}
 			if (e.isShinyable())
-				data.shinyBuilder.append((e.getForm() == null ? e.getPokemon().getData().getName()
+				data.shinyBuilder.append((e.getPokemon().getFormSet().isDefaultForm(e.getForm())
+						? e.getPokemon().getData().getName()
 						: String.format("%s (%s)", e.getPokemon().getData().getName(),
-								e.getForm().toString()))
+								e.getForm().getName()))
 						+ ", ");
 			else
-				data.builder.append((e.getForm() == null ? e.getPokemon().getData().getName()
+				data.builder.append((e.getPokemon().getFormSet().isDefaultForm(e.getForm())
+						? e.getPokemon().getData().getName()
 						: String.format("%s (%s)", e.getPokemon().getData().getName(),
-								e.getForm().toString()))
+								e.getForm().getName()))
 						+ ", ");
 		}
 		sortedEggs.sort(null);
