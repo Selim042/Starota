@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -191,6 +192,11 @@ public class StarotaServer extends BotServer {
 		if (!StarotaModule.isModuleEnabled(this, BaseModules.TRADEBOARD))
 			return;
 		getTradeboardInternal().add(post);
+	}
+
+	public int getNumPosts() {
+		List<TradeboardPost> posts = getPosts();
+		return posts == null ? 0 : posts.size();
 	}
 
 	public List<TradeboardPost> getPosts() {
@@ -486,6 +492,15 @@ public class StarotaServer extends BotServer {
 	// end pvp stuffs
 
 	// start vote stuff
+	private static final Map<Snowflake, EnumDonorPerm[]> PERM_OVERRIDES = new HashMap<>();
+
+	static {
+		PERM_OVERRIDES.put(StarotaConstants.SUPPORT_SERVER, EnumDonorPerm.values());
+		// home server
+		PERM_OVERRIDES.put(Snowflake.of(314733127027130379L),
+				new EnumDonorPerm[] { EnumDonorPerm.HTTP, EnumDonorPerm.LUA });
+	}
+
 	private CachedData<List<SimpleUser>> votes;
 
 	@SuppressWarnings("deprecation")
@@ -523,6 +538,10 @@ public class StarotaServer extends BotServer {
 				vals++;
 			}
 		}
+		if (PERM_OVERRIDES.containsKey(this.getDiscordGuildId()))
+			for (EnumDonorPerm p : PERM_OVERRIDES.get(this.getDiscordGuildId()))
+				if (p.getPointsRequired() > 0)
+					sum += p.getPointsRequired();
 		if (vals == 0)
 			return sum;
 		return sum / vals;
@@ -559,13 +578,9 @@ public class StarotaServer extends BotServer {
 			if (perm != null)
 				donorPerms.add(perm);
 		}
-		// add HTTP for "home" server
-		if (this.getDiscordGuildId().asLong() == 314733127027130379L)
-			donorPerms.add(EnumDonorPerm.HTTP);
-		// perms for support server
-		if (this.getDiscordGuildId().equals(StarotaConstants.SUPPORT_SERVER))
-			for (EnumDonorPerm perm : EnumDonorPerm.values())
-				donorPerms.add(perm);
+		if (PERM_OVERRIDES.containsKey(this.getDiscordGuildId()))
+			for (EnumDonorPerm p : PERM_OVERRIDES.get(this.getDiscordGuildId()))
+				donorPerms.add(p);
 		return Collections.unmodifiableList(donorPerms);
 	}
 
