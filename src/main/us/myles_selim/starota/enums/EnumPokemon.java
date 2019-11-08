@@ -86,7 +86,7 @@ public enum EnumPokemon {
 	WEEPINBELL,
 	VICTREEBEL,
 	TENTACOOL,
-	TENACRUEL,
+	TENTACRUEL,
 	GEODUDE,
 	GRAVELER,
 	GOLEM,
@@ -535,9 +535,9 @@ public enum EnumPokemon {
 	PANPOUR,
 	SIMIPOUR,
 	MUNNA,
-	MASHARNA,
+	MUSHARNA,
 	PIDOVE,
-	TRAQUILL,
+	TRANQUILL,
 	UNFEZANT,
 	BLITZLE,
 	ZEBSTRIKA,
@@ -620,10 +620,10 @@ public enum EnumPokemon {
 	KLANG,
 	KLINKLANG,
 	TYNAMO,
-	EELETRIK,
+	EELEKTRIK,
 	EELEKTROSS,
 	ELGYEM,
-	BEHEEYM,
+	BEHEEYEM,
 	LITWICK,
 	LAMPENT,
 	CHANDELURE,
@@ -685,7 +685,7 @@ public enum EnumPokemon {
 	SCATTERBUG,
 	SPEWPA,
 	VIVILLON,
-	LITEO,
+	LITLEO,
 	PYROAR,
 	FLABEBE,
 	FLOETTE,
@@ -698,14 +698,14 @@ public enum EnumPokemon {
 	ESPURR,
 	MEOWSTIC,
 	HONEDGE,
-	DOUBLATE,
+	DOUBLADE,
 	AEGISLASH,
 	SPRITZEE,
 	AROMATISSE,
 	SWIRLIX,
 	SLURPUFF,
 	INKAY,
-	MALMAR,
+	MALAMAR,
 	BINACLE,
 	BARBARACLE,
 	SKRELP,
@@ -719,7 +719,7 @@ public enum EnumPokemon {
 	AMAURA,
 	AURORUS,
 	SYLVEON,
-	HAWLUNCHA,
+	HAWLUCHA,
 	DEDENNE,
 	CARBINK,
 	GOOMY,
@@ -772,7 +772,7 @@ public enum EnumPokemon {
 	MUDSDALE,
 	DEWPIDER,
 	ARAQUANID,
-	FORMANTIS,
+	FOMANTIS,
 	LURANTIS,
 	MORELULL,
 	SHIINOTIC,
@@ -1149,8 +1149,8 @@ public enum EnumPokemon {
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.WATER)
 						.withType2(EnumPokemonType.POISON).withGender(EnumGender.EITHER)
 						.withGeneration(1).build());
-		DATA_LOOKUP.put(EnumPokemon.TENACRUEL,
-				new PokemonDataBuilder().withPokemon(EnumPokemon.TENACRUEL)
+		DATA_LOOKUP.put(EnumPokemon.TENTACRUEL,
+				new PokemonDataBuilder().withPokemon(EnumPokemon.TENTACRUEL)
 						.withStage(EnumPokemonStage.FINAL).withType1(EnumPokemonType.WATER)
 						.withType2(EnumPokemonType.POISON).withGender(EnumGender.EITHER)
 						.withGeneration(1).build());
@@ -3096,16 +3096,16 @@ public enum EnumPokemon {
 				new PokemonDataBuilder().withPokemon(EnumPokemon.MUNNA).withStage(EnumPokemonStage.BASE)
 						.withType1(EnumPokemonType.PSYCHIC).withGender(EnumGender.EITHER)
 						.withGeneration(5).build());
-		DATA_LOOKUP.put(EnumPokemon.MASHARNA,
-				new PokemonDataBuilder().withPokemon(EnumPokemon.MASHARNA)
+		DATA_LOOKUP.put(EnumPokemon.MUSHARNA,
+				new PokemonDataBuilder().withPokemon(EnumPokemon.MUSHARNA)
 						.withStage(EnumPokemonStage.FINAL).withType1(EnumPokemonType.PSYCHIC)
 						.withGender(EnumGender.EITHER).withGeneration(5).build());
 		DATA_LOOKUP.put(EnumPokemon.PIDOVE,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.PIDOVE).withStage(EnumPokemonStage.BASE)
 						.withType1(EnumPokemonType.NORMAL).withType2(EnumPokemonType.FLYING)
 						.withGender(EnumGender.EITHER).withGeneration(5).build());
-		DATA_LOOKUP.put(EnumPokemon.TRAQUILL,
-				new PokemonDataBuilder().withPokemon(EnumPokemon.TRAQUILL)
+		DATA_LOOKUP.put(EnumPokemon.TRANQUILL,
+				new PokemonDataBuilder().withPokemon(EnumPokemon.TRANQUILL)
 						.withStage(EnumPokemonStage.FINAL).withType1(EnumPokemonType.NORMAL)
 						.withType2(EnumPokemonType.FLYING).withGender(EnumGender.EITHER)
 						.withGeneration(5).build());
@@ -3473,8 +3473,8 @@ public enum EnumPokemon {
 				new PokemonDataBuilder().withPokemon(EnumPokemon.TYNAMO).withStage(EnumPokemonStage.BASE)
 						.withType1(EnumPokemonType.ELECTRIC).withGender(EnumGender.EITHER)
 						.withGeneration(5).build());
-		DATA_LOOKUP.put(EnumPokemon.EELETRIK,
-				new PokemonDataBuilder().withPokemon(EnumPokemon.EELETRIK)
+		DATA_LOOKUP.put(EnumPokemon.EELEKTRIK,
+				new PokemonDataBuilder().withPokemon(EnumPokemon.EELEKTRIK)
 						.withStage(EnumPokemonStage.MIDDLE).withType1(EnumPokemonType.ELECTRIC)
 						.withGender(EnumGender.EITHER).withGeneration(5).build());
 		DATA_LOOKUP.put(EnumPokemon.EELEKTROSS,
@@ -3485,8 +3485,8 @@ public enum EnumPokemon {
 				new PokemonDataBuilder().withPokemon(EnumPokemon.ELGYEM).withStage(EnumPokemonStage.BASE)
 						.withType1(EnumPokemonType.PSYCHIC).withGender(EnumGender.EITHER)
 						.withGeneration(5).build());
-		DATA_LOOKUP.put(EnumPokemon.BEHEEYM,
-				new PokemonDataBuilder().withPokemon(EnumPokemon.BEHEEYM)
+		DATA_LOOKUP.put(EnumPokemon.BEHEEYEM,
+				new PokemonDataBuilder().withPokemon(EnumPokemon.BEHEEYEM)
 						.withStage(EnumPokemonStage.FINAL).withType1(EnumPokemonType.PSYCHIC)
 						.withGender(EnumGender.EITHER).withGeneration(5).build());
 		DATA_LOOKUP.put(EnumPokemon.LITWICK,
@@ -3762,8 +3762,8 @@ public enum EnumPokemon {
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.BUG)
 						.withType2(EnumPokemonType.FLYING).withGender(EnumGender.EITHER)
 						.withGeneration(6).build());
-		DATA_LOOKUP.put(EnumPokemon.LITEO,
-				new PokemonDataBuilder().withPokemon(EnumPokemon.LITEO).withStage(EnumPokemonStage.BASE)
+		DATA_LOOKUP.put(EnumPokemon.LITLEO,
+				new PokemonDataBuilder().withPokemon(EnumPokemon.LITLEO).withStage(EnumPokemonStage.BASE)
 						.withType1(EnumPokemonType.FIRE).withType2(EnumPokemonType.NORMAL)
 						.withGender(EnumGender.EITHER).withGeneration(6).build());
 		DATA_LOOKUP.put(EnumPokemon.PYROAR,
@@ -3817,8 +3817,8 @@ public enum EnumPokemon {
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.STEEL)
 						.withType2(EnumPokemonType.GHOST).withGender(EnumGender.EITHER).withGeneration(6)
 						.build());
-		DATA_LOOKUP.put(EnumPokemon.DOUBLATE,
-				new PokemonDataBuilder().withPokemon(EnumPokemon.DOUBLATE)
+		DATA_LOOKUP.put(EnumPokemon.DOUBLADE,
+				new PokemonDataBuilder().withPokemon(EnumPokemon.DOUBLADE)
 						.withStage(EnumPokemonStage.MIDDLE).withType1(EnumPokemonType.STEEL)
 						.withType2(EnumPokemonType.GHOST).withGender(EnumGender.EITHER).withGeneration(6)
 						.build());
@@ -3847,8 +3847,8 @@ public enum EnumPokemon {
 				new PokemonDataBuilder().withPokemon(EnumPokemon.INKAY).withStage(EnumPokemonStage.BASE)
 						.withType1(EnumPokemonType.DARK).withType2(EnumPokemonType.PSYCHIC)
 						.withGender(EnumGender.EITHER).withGeneration(6).build());
-		DATA_LOOKUP.put(EnumPokemon.MALMAR,
-				new PokemonDataBuilder().withPokemon(EnumPokemon.MALMAR)
+		DATA_LOOKUP.put(EnumPokemon.MALAMAR,
+				new PokemonDataBuilder().withPokemon(EnumPokemon.MALAMAR)
 						.withStage(EnumPokemonStage.FINAL).withType1(EnumPokemonType.DARK)
 						.withType2(EnumPokemonType.PSYCHIC).withGender(EnumGender.EITHER)
 						.withGeneration(6).build());
@@ -3909,8 +3909,8 @@ public enum EnumPokemon {
 				new PokemonDataBuilder().withPokemon(EnumPokemon.SYLVEON)
 						.withStage(EnumPokemonStage.FINAL).withType1(EnumPokemonType.FAIRY)
 						.withGender(EnumGender.EITHER).withGeneration(6).build());
-		DATA_LOOKUP.put(EnumPokemon.HAWLUNCHA,
-				new PokemonDataBuilder().withPokemon(EnumPokemon.HAWLUNCHA)
+		DATA_LOOKUP.put(EnumPokemon.HAWLUCHA,
+				new PokemonDataBuilder().withPokemon(EnumPokemon.HAWLUCHA)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.FIGHTING)
 						.withType2(EnumPokemonType.FLYING).withGender(EnumGender.EITHER)
 						.withGeneration(6).build());
@@ -4147,8 +4147,8 @@ public enum EnumPokemon {
 						.withStage(EnumPokemonStage.FINAL).withType1(EnumPokemonType.WATER)
 						.withType2(EnumPokemonType.BUG).withGender(EnumGender.EITHER).withGeneration(7)
 						.build());
-		DATA_LOOKUP.put(EnumPokemon.FORMANTIS,
-				new PokemonDataBuilder().withPokemon(EnumPokemon.FORMANTIS)
+		DATA_LOOKUP.put(EnumPokemon.FOMANTIS,
+				new PokemonDataBuilder().withPokemon(EnumPokemon.FOMANTIS)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.GRASS)
 						.withGender(EnumGender.EITHER).withGeneration(7).build());
 		DATA_LOOKUP.put(EnumPokemon.LURANTIS,
@@ -4423,10 +4423,10 @@ public enum EnumPokemon {
 	public static EnumPokemon getPokemon(String name) {
 		if (name == null)
 			return null;
-		try {
+		if (name.matches("[0-9]+")) {
 			int id = Integer.parseInt(name);
 			return getPokemon(id);
-		} catch (NumberFormatException e) { /* */ }
+		}
 		name = name.replaceAll(" ", "_").replaceAll("[^a-zA-Z0-9]", "");
 		if (name.toLowerCase().matches("farfetch.d"))
 			return EnumPokemon.FARFETCHD;
