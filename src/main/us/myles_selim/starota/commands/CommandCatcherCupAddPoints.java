@@ -9,13 +9,13 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.PermissionSet;
+import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.misc.utils.EventListener;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.modules.BaseModules;
 import us.myles_selim.starota.modules.StarotaModule;
-import us.myles_selim.starota.permissions.holders.PermissionHolder;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandCatcherCupAddPoints extends BotCommand<StarotaServer> {
@@ -78,6 +78,11 @@ public class CommandCatcherCupAddPoints extends BotCommand<StarotaServer> {
 
 		@EventSubscriber
 		public void onMessage(MessageCreateEvent event) {
+
+			// to disable this the cheap & dirty way for now w/out errors
+			if (Starota.IS_DEV || !Starota.IS_DEV)
+				return;
+
 			if (!event.getGuildId().isPresent())
 				return;
 			StarotaServer server = StarotaServer.getServer(event.getGuildId().get());
@@ -90,9 +95,13 @@ public class CommandCatcherCupAddPoints extends BotCommand<StarotaServer> {
 			Member author = message.getAuthorAsMember().block();
 			if (author == null || author.isBot())
 				return;
-			if (!PermissionHolder.getNewHolderMember(server.getDiscordGuild(), author)
-					.hasPermission(channel, CommandCatcherCupAddPoints.this.getStarotaPermission()))
-				return;
+			// TODO: for proper permission system
+			// if
+			// (!PermissionHolder.getNewHolderMember(server.getDiscordGuild(),
+			// author)
+			// .hasPermission(channel,
+			// CommandCatcherCupAddPoints.this.getStarotaPermission()))
+			// return;
 			String messageS = message.getContent().orElse("");
 			messageS = messageS.replaceAll("<([@#:]|(a?:.+?:))\\d{18}>", "");
 			if (isMessageValid(messageS)) {
