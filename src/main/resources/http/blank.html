@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Blank Page - Starota</title>
+    <meta name="google-site-verification" content="T8zXdRmzTn5Zs3pFeMHsWZ_yr0Q37yglqkZs1eCy2zQ">
     <link rel="icon" type="image/png" sizes="64x64" href="/assets/img/starota.png">
     <link rel="icon" type="image/png" sizes="64x64" href="/assets/img/starota.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/assets/img/starota_med.png">
@@ -29,7 +30,7 @@
 </script>
 </head>
 
-<body id="page-top-permissions-page">
+<body id="page-top" class="permissions-page">
     <div id="wrapper">
         <nav class="navbar navbar-dark navbar-expand-md align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0">
             <div class="container-fluid d-flex flex-column p-0">
@@ -49,7 +50,7 @@
         <div class="d-flex flex-column" id="content-wrapper">
             <div id="content">
                 <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top">
-                    <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle mr-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button>
+                    <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle mr-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button><img class="{WEATHER_VISIBILITY}" style="width: 32px;height: 32px;" src="{WEATHER_ICON}">
                         <h3 class="d-none">{SERVER_NAME}</h3>
                         <ul class="nav navbar-nav flex-nowrap ml-auto">
                             <li class="nav-item" role="presentation"></li>
@@ -71,26 +72,124 @@
     </div>
     </nav>
     <div class="container-fluid">
-        <div class="row">
+        <div class="row" style="padding-bottom: 8px;">
             <div class="col" style="padding-right: 0px;padding-left: 0px;">
                 <h3 class="text-dark mb-1">Permission Settings</h3>
             </div>
-            <div class="col-auto" style="padding-right: 0px;padding-left: 0px;"><button class="btn btn-primary" type="button">Button</button></div>
+            <div class="col-auto" style="padding-right: 0px;padding-left: 0px;"><button class="btn btn-primary" type="submit">Save</button></div>
         </div>
-        <div class="row">
-            <div class="col-auto">
+        <div class="row" style="padding-right: 20px;">
+            <div class="col-3">
                 <h5>Permission Holders</h5>
-                <p class="text-dark border rounded permission-selected permission-holder" style="padding-left: 4px;"><img class="rounded-circle" src="https://cdn.discordapp.com/avatars/134855940938661889/a_77d3f965cac8d3526d91472ae242a0fe.gif" style="width: 20px;">Selim#0042</p>
-                <p class="permission-holder" style="margin-bottom: 0px;">Dummy Role</p>
-                <p class="permission-holder" style="padding-left: 4px;">@everyone</p>
+                <p class="text-truncate text-dark permission-holder-selected permission-holder" style="padding-left: 4px;padding-bottom: 0px;margin-bottom: 2px;margin-top: 2px;"><img class="rounded-circle" src="https://cdn.discordapp.com/avatars/134855940938661889/a_77d3f965cac8d3526d91472ae242a0fe.gif" style="width: 20px;">Selim#0042</p>
+                <p class="text-truncate permission-holder" style="margin-bottom: 2px;padding-left: 4px;margin-top: 2px;">Dummy Role</p>
+                <p class="text-truncate permission-holder" style="padding-left: 4px;margin-top: 2px;margin-bottom: 2px;">@everyone</p>
             </div>
-            <div class="col"></div>
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        <div class="row">
+                            <div class="col-7">
+                                <h4>Command Permissions</h4>
+                            </div>
+                            <div class="col-auto">
+                                <p class="border rounded" style="background-color: #d3d3d3;"><i class="fas fa-times permission-selected-times" style="padding: 4px;padding-left: 6px;padding-right: 6px;"></i><i class="fas fa-slash mirror" style="padding: 4px;"></i><i class="fas fa-check" style="padding: 4px;padding-right: 6px;padding-left: 6px;"></i></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <p>Command permissions allow or deny permissions holders from using specific commands.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-5">
+                        <p><strong>Administrative</strong>:</p>
+                    </div>
+                    <div class="col-auto">
+                        <p class="border rounded" style="background-color: #d3d3d3;"><i class="fas fa-times permission-selected-times" style="padding: 4px;padding-right: 6px;padding-left: 6px;"></i><i class="fas fa-slash mirror" style="padding: 4px;"></i><i class="fas fa-check" style="padding: 4px;padding-right: 6px;padding-left: 6px;"></i></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-5">
+                        <p style="margin-left: 16px;">Get Timezones</p>
+                    </div>
+                    <div class="col-auto">
+                        <p class="border rounded" style="background-color: #d3d3d3;"><i class="fas fa-times" style="padding: 4px;padding-left: 6px;padding-right: 6px;"></i><i class="fas fa-slash mirror" style="padding: 4px;"></i><i class="fas fa-check permission-selected-check" style="padding: 4px;padding-right: 6px;padding-left: 6px;"></i></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-5">
+                        <p style="margin-left: 16px;">Settings</p>
+                    </div>
+                    <div class="col-auto">
+                        <p class="border rounded" style="background-color: #d3d3d3;"><i class="fas fa-times" style="padding: 4px;padding-left: 6px;padding-right: 6px;"></i><i class="fas fa-slash mirror permission-selected-slash" style="padding: 4px;"></i><i class="fas fa-check" style="padding: 4px;padding-right: 6px;padding-left: 6px;"></i></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-5">
+                        <p style="margin-left: 16px;">Status</p>
+                    </div>
+                    <div class="col-auto">
+                        <p class="border rounded" style="background-color: #d3d3d3;"><i class="fas fa-times" style="padding: 4px;padding-left: 6px;padding-right: 6px;"></i><i class="fas fa-slash mirror permission-selected-slash" style="padding: 4px;"></i><i class="fas fa-check" style="padding: 4px;padding-right: 6px;padding-left: 6px;"></i></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-5">
+                        <p style="margin-left: 16px;">Vote Perks</p>
+                    </div>
+                    <div class="col-auto">
+                        <p class="border rounded" style="background-color: #d3d3d3;"><i class="fas fa-times" style="padding: 4px;padding-left: 6px;padding-right: 6px;"></i><i class="fas fa-slash mirror" style="padding: 4px;"></i><i class="fas fa-check permission-selected-check" style="padding: 4px;padding-right: 6px;padding-left: 6px;"></i></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-5">
+                        <p><strong>Commands</strong>:</p>
+                    </div>
+                    <div class="col-auto">
+                        <p class="border rounded" style="background-color: #d3d3d3;"><i class="fas fa-times" style="padding: 4px;padding-right: 6px;padding-left: 6px;"></i><i class="fas fa-slash mirror permission-selected-slash" style="padding: 4px;"></i><i class="fas fa-check" style="padding: 4px;padding-right: 6px;padding-left: 6px;"></i></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-5">
+                        <p style="margin-left: 16px;">Add Channel Whitelist</p>
+                    </div>
+                    <div class="col-auto">
+                        <p class="border rounded" style="background-color: #d3d3d3;"><i class="fas fa-times" style="padding: 4px;padding-left: 6px;padding-right: 6px;"></i><i class="fas fa-slash mirror permission-selected-slash" style="padding: 4px;"></i><i class="fas fa-check" style="padding: 4px;padding-right: 6px;padding-left: 6px;"></i></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-5">
+                        <p style="margin-left: 16px;">Get Whitelist</p>
+                    </div>
+                    <div class="col-auto">
+                        <p class="border rounded" style="background-color: #d3d3d3;"><i class="fas fa-times" style="padding: 4px;padding-left: 6px;padding-right: 6px;"></i><i class="fas fa-slash mirror permission-selected-slash" style="padding: 4px;"></i><i class="fas fa-check" style="padding: 4px;padding-right: 6px;padding-left: 6px;"></i></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-5">
+                        <p style="margin-left: 16px;">Remove Channel Whitelist</p>
+                    </div>
+                    <div class="col-auto">
+                        <p class="border rounded" style="background-color: #d3d3d3;"><i class="fas fa-times" style="padding: 4px;padding-left: 6px;padding-right: 6px;"></i><i class="fas fa-slash mirror permission-selected-slash" style="padding: 4px;"></i><i class="fas fa-check" style="padding: 4px;padding-right: 6px;padding-left: 6px;"></i></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-5">
+                        <p style="margin-left: 16px;">Set Prefix</p>
+                    </div>
+                    <div class="col-auto">
+                        <p class="border rounded" style="background-color: #d3d3d3;"><i class="fas fa-times" style="padding: 4px;padding-left: 6px;padding-right: 6px;"></i><i class="fas fa-slash mirror permission-selected-slash" style="padding: 4px;"></i><i class="fas fa-check" style="padding: 4px;padding-right: 6px;padding-left: 6px;"></i></p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     </div>
     <footer class="bg-white sticky-footer">
         <div class="container my-auto">
-            <div class="text-center my-auto copyright"><span>Copyright&nbsp;©&nbsp;Starota 2019</span></div>
+            <div class="text-center my-auto copyright"><a href="/credits">Credits</a><span>&nbsp;|&nbsp;</span><span>Copyright&nbsp;©&nbsp;Starota 2019</span></div>
         </div>
     </footer>
     </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a></div>
