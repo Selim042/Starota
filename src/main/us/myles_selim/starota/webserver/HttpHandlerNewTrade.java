@@ -94,26 +94,24 @@ public class HttpHandlerNewTrade implements HttpHandler {
 			if (!SilphRoadData.isAvailable(pokemon) || !pokemon.getData().isTradable())
 				continue;
 			if (pokemon.getData().getGeneration() != prevGen) {
-				fullPokemonOptions
-						.append(DROPDOWN_GROUP.replaceAll("\\{NAME\\}", "Generation " + prevGen)
-								.replaceAll("\\{OPTIONS\\}", pokemonOptions.toString()));
+				fullPokemonOptions.append(DROPDOWN_GROUP.replace("{NAME}", "Generation " + prevGen)
+						.replace("{OPTIONS}", pokemonOptions.toString()));
 				pokemonOptions = new StringBuilder();
 				prevGen = pokemon.getData().getGeneration();
 			}
 			String pokemonOption;
 			if (selectedPokemon.getData().getId() != pokemon.getData().getId())
-				pokemonOption = DROPDOWN.replaceAll("\\{ID\\}",
-						Integer.toString(pokemon.getData().getId()));
+				pokemonOption = DROPDOWN.replace("{ID}", Integer.toString(pokemon.getData().getId()));
 			else
-				pokemonOption = DROPDOWN_SELECTED.replaceAll("\\{ID\\}",
+				pokemonOption = DROPDOWN_SELECTED.replace("{ID}",
 						Integer.toString(pokemon.getData().getId()));
-			pokemonOption = pokemonOption.replaceAll("\\{NAME\\}", pokemon.getData().getName());
+			pokemonOption = pokemonOption.replace("{NAME}", pokemon.getData().getName());
 
 			pokemonOptions.append(pokemonOption);
 		}
-		fullPokemonOptions.append(DROPDOWN_GROUP.replaceAll("\\{NAME\\}", "Generation " + prevGen)
-				.replaceAll("\\{OPTIONS\\}", pokemonOptions.toString()));
-		temp = temp.replaceAll("\\{POKEMON_OPTIONS\\}", fullPokemonOptions.toString());
+		fullPokemonOptions.append(DROPDOWN_GROUP.replace("{NAME}", "Generation " + prevGen)
+				.replace("{OPTIONS}", pokemonOptions.toString()));
+		temp = temp.replace("{POKEMON_OPTIONS}", fullPokemonOptions.toString());
 
 		// Forms
 		StringBuilder formOptions = new StringBuilder();
@@ -121,16 +119,15 @@ public class HttpHandlerNewTrade implements HttpHandler {
 		if (forms != null) {
 			for (Form f : forms) {
 				if (f.equals(selectedForm))
-					formOptions.append(DROPDOWN_SELECTED.replaceAll("\\{ID\\}", f.toString())
-							.replaceAll("\\{NAME\\}", f.getName()));
+					formOptions.append(DROPDOWN_SELECTED.replace("{ID}", f.getName()).replace("{NAME}",
+							f.getName()));
 				else
-					formOptions.append(DROPDOWN.replaceAll("\\{ID\\}", f.toString())
-							.replaceAll("\\{NAME\\}", f.getName()));
+					formOptions.append(
+							DROPDOWN.replace("{ID}", f.getName()).replace("{NAME}", f.getName()));
 			}
-			temp = temp.replaceAll("\\{FORM_OPTIONS\\}", formOptions.toString());
+			temp = temp.replace("{FORM_OPTIONS}", formOptions.toString());
 		} else {
-			temp = temp.replaceAll("\\{FORM_OPTIONS\\}",
-					DROPDOWN.replaceAll("\\{ID\\}", "-1").replaceAll("\\{NAME\\}", "-"));
+			temp = temp.replace("{FORM_OPTIONS}", DROPDOWN.replace("{ID}", "-1").replace("{NAME}", "-"));
 		}
 
 		// Genders
@@ -138,34 +135,34 @@ public class HttpHandlerNewTrade implements HttpHandler {
 		EnumGender genders = selectedPokemon.getData().getGenderPossible();
 		switch (genders) {
 		case EITHER:
-			genderOptions.append(DROPDOWN.replaceAll("\\{ID\\}", Integer.toString(2))
-					.replaceAll("\\{NAME\\}", "Male"));
-			genderOptions.append(DROPDOWN.replaceAll("\\{ID\\}", Integer.toString(3))
-					.replaceAll("\\{NAME\\}", "Female"));
-			genderOptions.append(DROPDOWN.replaceAll("\\{ID\\}", Integer.toString(1))
-					.replaceAll("\\{NAME\\}", "Male/female"));
+			genderOptions
+					.append(DROPDOWN.replace("{ID}", Integer.toString(2)).replace("{NAME}", "Male"));
+			genderOptions
+					.append(DROPDOWN.replace("{ID}", Integer.toString(3)).replace("{NAME}", "Female"));
+			genderOptions.append(
+					DROPDOWN.replace("{ID}", Integer.toString(1)).replace("{NAME}", "Male/female"));
 			break;
 		case FEMALE:
-			genderOptions.append(DROPDOWN.replaceAll("\\{ID\\}", Integer.toString(3))
-					.replaceAll("\\{NAME\\}", "Female"));
+			genderOptions
+					.append(DROPDOWN.replace("{ID}", Integer.toString(3)).replace("{NAME}", "Female"));
 			break;
 		case MALE:
-			genderOptions.append(DROPDOWN.replaceAll("\\{ID\\}", Integer.toString(2))
-					.replaceAll("\\{NAME\\}", "Male"));
+			genderOptions
+					.append(DROPDOWN.replace("{ID}", Integer.toString(2)).replace("{NAME}", "Male"));
 			break;
 		case UNKNOWN:
-			genderOptions.append(DROPDOWN.replaceAll("\\{ID\\}", Integer.toString(0))
-					.replaceAll("\\{NAME\\}", "Unknown"));
+			genderOptions
+					.append(DROPDOWN.replace("{ID}", Integer.toString(0)).replace("{NAME}", "Unknown"));
 			break;
 		}
-		temp = temp.replaceAll("\\{GENDER_OPTIONS\\}", genderOptions.toString());
+		temp = temp.replace("{GENDER_OPTIONS}", genderOptions.toString());
 
 		// Shiny
 		if (selectedForm == null)
-			temp = temp.replaceAll("\\{SHINY_DISABLE\\}",
+			temp = temp.replace("{SHINY_DISABLE}",
 					SilphRoadData.isShinyable(selectedPokemon) ? "" : "disabled");
 		else
-			temp = temp.replaceAll("\\{SHINY_DISABLE\\}", selectedForm.isShinyable() ? "" : "disabled");
+			temp = temp.replace("{SHINY_DISABLE}", selectedForm.isShinyable() ? "" : "disabled");
 
 		return temp;
 	}

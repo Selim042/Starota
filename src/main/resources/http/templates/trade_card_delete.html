@@ -1,0 +1,70 @@
+<div class="col-md-6 col-xl-3 mb-4">
+	<div class="card shadow border-left-{TYPE} py-2">
+		<div class="card-body">
+			<a href="/profile/{POSTER_ID}">
+				<div class="row">
+					<div class="col-auto" style="width: 40px;">
+						<img class="rounded-circle" src="{POSTER_AVATAR}" style="width: 32px;">
+					</div>
+					<div class="col">
+						<p class="text-secondary" style="margin-top: 6px;margin-bottom: 6px;">{POSTER_DISPLAY_NAME}</p>
+					</div>
+				</div>
+			</a>
+			<div class="row">
+				<div class="col">
+					<h1 style="font-size: 26px;"><strong>Post #{POST_NUMBER}</strong></h1>
+				</div>
+				<div class="col">
+					<img class="float-right" src="{POKEMON_IMAGE}" style="width: 64px;">
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<h1 style="font-size: 16px;"><strong>Trade Type:</strong></h1>
+					<p>{TRADE_TYPE}</p>
+				</div>
+				<div class="col">
+					<h1 style="font-size: 16px;"><strong>Discord User:</strong></h1>
+					<p>{POSTER_USERNAME}#{POSTER_DISCRIM}</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<h1 style="font-size: 16px;"><strong>Pokemon:</strong></h1>
+					<p>{POKEMON_NAME}</p>
+				</div>
+				<div class="col">
+					<h1 style="font-size: 16px;"><strong>Form:</strong></h1>
+					<p>{POKEMON_FORM}</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<h1 style="font-size: 16px;"><strong>Gender:</strong></h1>
+					<p>{POKEMON_GENDER}</p>
+				</div>
+				<div class="col">
+					<h1 style="font-size: 16px;"><strong>Legacy:</strong></h1>
+					<p>{POKEMON_LEGACY}</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<h1 style="font-size: 16px;"><strong>Shiny:</strong></h1><p>{POKEMON_SHINY}</p>
+				</div>
+				<div class="col">
+					<form action="/tradeboard" method="post">
+						<button class="btn btn-danger" type="submit">Delete Trade</button>
+						<input type="hidden" class="form-control" name="id-del" value="{POST_NUMBER}" />
+					</form>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<small><h1 style="font-size: 16px;display: inline;"><strong>Posted: </strong></h1>{DATE_POSTED}</small>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -28,7 +28,6 @@ import us.myles_selim.starota.misc.data_types.cache.CachedData;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.ServerDataHelper;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
-import us.myles_selim.starota.permissions.holders.PermissionHolder;
 import us.myles_selim.starota.weather.api.AccuWeatherAPI;
 import us.myles_selim.starota.weather.api.WeatherLocation;
 import us.myles_selim.starota.weather.api.WeatherTimezone;
@@ -93,7 +92,9 @@ public abstract class BotServer {
 		}
 	}
 
-	public static <S extends BotServer> S getServer(DiscordClient client, Guild guild) {
+	public static BotServer getServer(DiscordClient client, Guild guild) {
+		if (guild == null)
+			return null;
 		return getServer(client, guild.getId());
 	}
 
@@ -251,7 +252,8 @@ public abstract class BotServer {
 
 	// start misc stuffs
 	public void clearPermissions() {
-		PermissionHolder.dumpPerms(getDiscordGuild());
+		// TODO: for proper permission system
+		// PermissionHolder.dumpPerms(getDiscordGuild());
 	}
 	// end misc stuffs
 

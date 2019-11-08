@@ -78,7 +78,7 @@ public class HttpHandlerLogin implements HttpHandler {
 					response.add("Set-Cookie", "p=" + get.get("p"));
 				}
 				Map<String, String> replace = new HashMap<>();
-				replace.put("\\{REDIRECT_URL\\}", getRedirectURI(ex));
+				replace.put("{REDIRECT_URL}", getRedirectURI(ex));
 				WebServer.returnTextFile(ex, "http/login.html", replace);
 				return;
 			} else

@@ -1,0 +1,30 @@
+.permission-holder-selected {
+  margin-bottom: 0px;
+  background-color: #d3d3d3;
+  font-weight: bold;
+  border-radius: .35rem!important;
+}
+
+.mirror {
+  -moz-transform: scale(-1, 1);
+  -webkit-transform: scale(-1, 1);
+  -o-transform: scale(-1, 1);
+  -ms-transform: scale(-1, 1);
+  transform: scale(-1, 1);
+}
+
+.permission-selected-check {
+  background-color: #78c850;
+  border-radius: .35rem!important;
+}
+
+.permission-selected-slash {
+  background-color: #777777;
+  border-radius: .35rem!important;
+}
+
+.permission-selected-times {
+  background-color: #c03028;
+  border-radius: .35rem!important;
+}
+

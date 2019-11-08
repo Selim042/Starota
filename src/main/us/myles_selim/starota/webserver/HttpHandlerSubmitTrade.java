@@ -57,7 +57,7 @@ public class HttpHandlerSubmitTrade implements HttpHandler {
 				if (formSet != null) {
 					String formName = post.get("pokemon_form");
 					for (Form f : formSet) {
-						if (f.toString().equals(formName)) {
+						if (f.getName().equals(formName)) {
 							form = f;
 							continue;
 						}

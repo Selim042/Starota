@@ -31,7 +31,12 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.util.Snowflake;
 import reactor.core.publisher.Flux;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.commands.credits.Credit;
+import us.myles_selim.starota.commands.credits.CreditSet;
+import us.myles_selim.starota.commands.credits.Creditable;
+import us.myles_selim.starota.commands.credits.EnumCreditType;
 import us.myles_selim.starota.enums.EnumDonorPerm;
+import us.myles_selim.starota.enums.EnumWeather;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
@@ -104,6 +109,70 @@ public class WebServer {
 					}
 				}
 			});
+
+			// TODO: for proper permission system
+//			server.createContext("/data/permissions", new HttpHandler() {
+//
+//				@Override
+//				public void handle(HttpExchange ex) throws IOException {
+//					try {
+//						if (!isLoggedIn(ex)) {
+//							notAllowed(ex);
+//							return;
+//						}
+//						OAuthUser oUser = OAuthUtils.getUser(getCookies(ex).get("token").value);
+//						Snowflake guildId = getGuild(ex);
+//						boolean inGuild = Starota.getClient().getGuilds()
+//								.any((g) -> g.getId().equals(guildId)).block();
+//						if (!inGuild) {
+//							notAllowed(ex);
+//							return;
+//						}
+//						Guild guild = Starota.getGuild(guildId);
+//						if (!guild.getMemberById(Snowflake.of(oUser.id)).block().getBasePermissions()
+//								.block().contains(Permission.ADMINISTRATOR)) {
+//							notAllowed(ex);
+//							return;
+//						}
+//
+//						File permFile = new File(PermissionsIO.PERMISSION_FOLDER,
+//								guildId.asString() + ".starota_perms");
+//						String ret;
+//						if (permFile.exists()) {
+//							StringBuilder contents = new StringBuilder();
+//							FileReader in = new FileReader(permFile);
+//							for (char c = (char) in.read(); in.ready(); c = (char) in.read())
+//								contents.append(c);
+//							in.close();
+//							ret = contents.toString();
+//						} else
+//							ret = "";
+//
+//						byte[] dat = ret.toString().getBytes("UTF-8");
+//						ex.sendResponseHeaders(200, dat.length);
+//						OutputStream out = ex.getResponseBody();
+//						out.write(dat);
+//						out.close();
+//					} catch (Exception e) {
+//						e.printStackTrace();
+//						returnError(ex, e);
+//					}
+//				}
+//
+//				private void notAllowed(HttpExchange ex) {
+//					try {
+//						String ret = "{\"error_message\"=\"not allowed\"}";
+//						byte[] dat = ret.getBytes("UTF-8");
+//						ex.sendResponseHeaders(200, dat.length);
+//						OutputStream out = ex.getResponseBody();
+//						out.write(dat);
+//						out.close();
+//					} catch (IOException e) {
+//						e.printStackTrace();
+//					}
+//				}
+//
+//			});
 			server.createContext("/assets", new HttpHandler() {
 
 				@Override
@@ -122,13 +191,7 @@ public class WebServer {
 			server.createContext("/new_trade", new HttpHandlerNewTrade());
 			server.createContext("/submit_trade", new HttpHandlerSubmitTrade());
 			server.createContext("/profiles", new HttpHandlerProfiles());
-			server.createContext("/leaderboards", new HttpHandler() {
-
-				@Override
-				public void handle(HttpExchange ex) throws IOException {
-					returnTextFile(ex, "http/leaderboards.html");
-				}
-			});
+			server.createContext("/leaderboards", new HttpHandlerLeaderboard());
 			server.createContext("/server_select", new HttpHandler() {
 
 				@Override
@@ -158,18 +221,68 @@ public class WebServer {
 					response.close();
 				}
 			});
-			server.createContext("/", new HttpHandler() {
+			server.createContext("/credits", new HttpHandler() {
 
 				@Override
 				public void handle(HttpExchange ex) throws IOException {
-					WebServer.handleBaseGET(ex);
-					if (!WebServer.isLoggedIn(ex)) {
-						WebServer.redirect(ex, "/login");
-						return;
+					try {
+						Map<String, String> replace = new HashMap<>();
+						replace.put("{VERSION}",
+								"v" + StarotaConstants.VERSION + (Starota.IS_DEV ? "d" : ""));
+
+						StringBuilder builder = new StringBuilder();
+						for (Creditable creditable : Starota.getCredits()) {
+							EnumCreditType type = creditable.getType();
+							if (creditable instanceof Credit) {
+								Credit credit = (Credit) creditable;
+								if (credit.getLink() == null)
+									builder.append(String.format("<strong>%1$s</strong>: %2$s<br>",
+											credit.getType() == EnumCreditType.OTHER ? credit.getTitle()
+													: credit.getType().getDisplay(),
+											credit.getName()));
+								else
+									builder.append(String.format(
+											"<strong>%1$s</strong>: <a href=\"%3$s\">%2$s</a><br>",
+											credit.getType() == EnumCreditType.OTHER ? credit.getTitle()
+													: credit.getType().getDisplay(),
+											credit.getName(), credit.getLink()));
+							} else if (creditable instanceof CreditSet) {
+								builder.append(
+										String.format("<strong>%s</strong>:<br>", type.getDisplay()));
+								for (Creditable credit2 : (CreditSet) creditable) {
+									if (!(credit2 instanceof Credit))
+										continue;
+									Credit credit = (Credit) credit2;
+									if (type == EnumCreditType.OTHER) {
+										if (credit.getLink() == null)
+											builder.append(String.format("- %1$s (%2$s)<br>",
+													credit.getName(), credit.getTitle()));
+										else
+											builder.append(String.format(
+													"- <a href=\"%2$s\">%1$s</a> (%3$s)<br>",
+													credit.getName(), credit.getLink(),
+													credit.getTitle()));
+									} else {
+										if (credit.getLink() == null)
+											builder.append(
+													String.format("- %1$s<br>", credit.getName()));
+										else
+											builder.append(
+													String.format("- <a href=\"%2$s\">%1$s</a><br>",
+															credit.getName(), credit.getLink()));
+									}
+								}
+							}
+						}
+						replace.put("{CREDITS}", builder.toString());
+						returnTextFile(ex, "http/credits.html", replace);
+					} catch (Exception e) {
+						returnError(ex, e);
+						e.printStackTrace();
 					}
-					returnTextFile(ex, "http/index.html");
 				}
 			});
+			server.createContext("/", new HttpHandlerDashboard());
 			server.setExecutor(null);
 			server.start();
 		} catch (IOException e) {
@@ -191,7 +304,29 @@ public class WebServer {
 	}
 
 	protected static InputStream getResourceFile(String path) {
-		return WebServer.class.getClassLoader().getResourceAsStream(path);
+		InputStream file = WebServer.class.getClassLoader().getResourceAsStream(path);
+		if (file == null)
+			throw new IllegalArgumentException("file " + path + " not found");
+		return file;
+	}
+
+	protected static String getTemplate(String name) {
+		try {
+			InputStream file = getResourceFile("http/templates/" + name);
+
+			BufferedReader reader = new BufferedReader(new InputStreamReader(file));
+			StringBuilder data = new StringBuilder();
+			int c = reader.read();
+			while (c != -1) {
+				data.append((char) c);
+				c = reader.read();
+			}
+			reader.close();
+			return data.toString();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	protected static Snowflake getGuild(HttpExchange ex) {
@@ -330,7 +465,10 @@ public class WebServer {
 			reader.close();
 			String dataS = data.toString();
 			for (Entry<String, String> e : replace.entrySet())
-				dataS = dataS.replaceAll(e.getKey(), e.getValue());
+				dataS = dataS.replace(e.getKey(), e.getValue());
+			Map<String, Cookie> cookies = getCookies(ex);
+			dataS = fillBaseStuff(ex, cookies.containsKey("token") ? cookies.get("token").value : null,
+					dataS);
 			byte[] dataB = dataS.getBytes();
 			ex.sendResponseHeaders(code, dataB.length);
 			response.write(dataB);
@@ -366,7 +504,7 @@ public class WebServer {
 
 	protected static void return404(HttpExchange ex, String message) {
 		Map<String, String> rep = new HashMap<>();
-		rep.put("\\{ERROR\\}", message);
+		rep.put("{ERROR}", message);
 		returnTextFile(ex, "http/404.html", 404, rep);
 	}
 
@@ -385,7 +523,7 @@ public class WebServer {
 
 	protected static void returnServer404(HttpExchange ex, String message) {
 		Map<String, String> rep = new HashMap<>();
-		rep.put("\\{ERROR\\}", message);
+		rep.put("{ERROR}", message);
 		returnTextFile(ex, "http/404_server.html", 404, rep);
 	}
 

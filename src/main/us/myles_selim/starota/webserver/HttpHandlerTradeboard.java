@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,60 +30,15 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 @SuppressWarnings("restriction")
 public class HttpHandlerTradeboard implements HttpHandler {
 
-	private static final String TRADE_CARD = "<div class=\"col-md-6 col-xl-3 mb-4\">"
-			+ "<div class=\"card shadow border-left-{TYPE} py-2\"><div class=\"card-body\">"
-			+ "<a href=\"/profile/{POSTER_ID}\"><div class=\"row\"><div class=\"col-auto\" style=\"width: 40px;\">"
-			+ "<img class=\"rounded-circle\" src=\"{POSTER_AVATAR}\" style=\"width: 32px;\" /></div>"
-			+ "<div class=\"col\"><p class=\"text-secondary\" style=\"margin-top: 6px;margin-bottom: 6px;\">"
-			+ "{POSTER_DISPLAY_NAME}</p></div></div></a><div class=\"row\"><div class=\"col\">"
-			+ "<h1 style=\"font-size: 26px;\"><strong>Post #{POST_NUMBER}</strong></h1></div><div class=\"col\">"
-			+ "<img class=\"float-right\" src=\"{POKEMON_IMAGE}\" style=\"width: 64px;\" /></div>"
-			+ "</div><div class=\"row\"><div class=\"col\">"
-			+ "<h1 style=\"font-size: 16px;\"><strong>Trade Type:</strong></h1>"
-			+ "<p>{TRADE_TYPE}</p></div><div class=\"col\">"
-			+ "<h1 style=\"font-size: 16px;\"><strong>Discord User:</strong></h1>"
-			+ "<p>{POSTER_USERNAME}#{POSTER_DISCRIM}</p></div></div><div class=\"row\">"
-			+ "<div class=\"col\"><h1 style=\"font-size: 16px;\"><strong>Pokemon:</strong></h1>"
-			+ "<p>{POKEMON_NAME}</p></div><div class=\"col\">"
-			+ "<h1 style=\"font-size: 16px;\"><strong>Form:</strong></h1>"
-			+ "<p>{POKEMON_FORM}</p></div></div><div class=\"row\"><div class=\"col\">"
-			+ "<h1 style=\"font-size: 16px;\"><strong>Gender:</strong></h1>"
-			+ "<p>{POKEMON_GENDER}</p></div><div class=\"col\">"
-			+ "<h1 style=\"font-size: 16px;\"><strong>Legacy:</strong></h1>"
-			+ "<p>{POKEMON_LEGACY}</p></div></div><div class=\"row\"><div class=\"col\">"
-			+ "<h1 style=\"font-size: 16px;\"><strong>Shiny:</strong></h1>" + "<p>{POKEMON_SHINY}</p>"
-			+ "</div>" + "<div class=\"col\">" + "<form action=\"/tradeboard\" method=\"post\">"
-			+ "<button class=\"btn btn-primary\" type=\"submit\">I'm Interested!</button>"
-			+ "<input type=\"hidden\" class=\"form-control\" name=\"id-int\" value=\"{POST_NUMBER}\" /></form>"
-			+ "</div></div></div></div></div>";
+	private static final SimpleDateFormat DATE_POSTED = new SimpleDateFormat("MM/dd/YYYY");
 
-	private static final String TRADE_CARD_DELETE = "<div class=\"col-md-6 col-xl-3 mb-4\">"
-			+ "<div class=\"card shadow border-left-{TYPE} py-2\"><div class=\"card-body\">"
-			+ "<a href=\\\"/profile/{POSTER_ID}\\\"><div class=\"row\"><div class=\"col-auto\" style=\"width: 40px;\">"
-			+ "<img class=\"rounded-circle\" src=\"{POSTER_AVATAR}\" style=\"width: 32px;\" /></div>"
-			+ "<div class=\"col\"><p class=\\\"text-secondary\\\" style=\"margin-top: 6px;margin-bottom: 6px;\">{POSTER_DISPLAY_NAME}</p>"
-			+ "</div></div></a><div class=\"row\"><div class=\"col\">"
-			+ "<h1 style=\"font-size: 26px;\"><strong>Post #{POST_NUMBER}</strong></h1></div><div class=\"col\">"
-			+ "<img class=\"float-right\" src=\"{POKEMON_IMAGE}\" style=\"width: 64px;\" /></div>"
-			+ "</div><div class=\"row\"><div class=\"col\">"
-			+ "<h1 style=\"font-size: 16px;\"><strong>Trade Type:</strong></h1>"
-			+ "<p>{TRADE_TYPE}</p></div><div class=\"col\">"
-			+ "<h1 style=\"font-size: 16px;\"><strong>Discord User:</strong></h1>"
-			+ "<p>{POSTER_USERNAME}#{POSTER_DISCRIM}</p></div></div><div class=\"row\">"
-			+ "<div class=\"col\"><h1 style=\"font-size: 16px;\"><strong>Pokemon:</strong></h1>"
-			+ "<p>{POKEMON_NAME}</p></div><div class=\"col\">"
-			+ "<h1 style=\"font-size: 16px;\"><strong>Form:</strong></h1>"
-			+ "<p>{POKEMON_FORM}</p></div></div><div class=\"row\"><div class=\"col\">"
-			+ "<h1 style=\"font-size: 16px;\"><strong>Gender:</strong></h1>"
-			+ "<p>{POKEMON_GENDER}</p></div><div class=\"col\">"
-			+ "<h1 style=\"font-size: 16px;\"><strong>Legacy:</strong></h1>"
-			+ "<p>{POKEMON_LEGACY}</p></div></div><div class=\"row\"><div class=\"col\">"
-			+ "<h1 style=\"font-size: 16px;\"><strong>Shiny:</strong></h1>"
-			+ "<p>{POKEMON_SHINY}</p></div><div class=\"col\">"
-			+ "<form action=\"/tradeboard\" method=\"post\">"
-			+ "<button class=\"btn btn-danger\" type=\"submit\">Delete Trade</button>"
-			+ "<input type=\"hidden\" class=\"form-control\" name=\"id-del\" value=\"{POST_NUMBER}\" /></form>"
-			+ "</div></div></div></div></div>";
+	private static final String TRADE_CARD;
+	private static final String TRADE_CARD_DELETE;
+
+	static {
+		TRADE_CARD = WebServer.getTemplate("trade_card.html");
+		TRADE_CARD_DELETE = WebServer.getTemplate("trade_card_delete.html");
+	}
 
 	@Override
 	public void handle(HttpExchange ex) throws IOException {
@@ -121,10 +78,10 @@ public class HttpHandlerTradeboard implements HttpHandler {
 					TradeboardPost tPost = server.getPost(id);
 					if (tPost != null && userId.asLong() == tPost.getOwner()) {
 						server.removePost(id);
-						temp = temp.replaceAll("\\{ALERT_COLOR\\}", "danger");
-						temp = temp.replaceAll("\\{ALERT_TEXT\\}",
+						temp = temp.replace("{ALERT_COLOR}", "danger");
+						temp = temp.replace("{ALERT_TEXT}",
 								String.format("Tradeboard post #%s was deleted", id));
-						temp = temp.replaceAll("\\{ALERT_HIDDEN\\}", "");
+						temp = temp.replace("{ALERT_HIDDEN}", "");
 					}
 				}
 			} else if (post.containsKey("id-int")) {
@@ -148,10 +105,10 @@ public class HttpHandlerTradeboard implements HttpHandler {
 								+ " from " + server.getDiscordGuild().getName()
 								+ " is interested in your trade. Please contact them for more information.")
 								.setEmbed(tPost.getPostEmbed(server, false))).block();
-						temp = temp.replaceAll("\\{ALERT_COLOR\\}", "success");
-						temp = temp.replaceAll("\\{ALERT_TEXT\\}",
+						temp = temp.replace("{ALERT_COLOR}", "success");
+						temp = temp.replace("{ALERT_TEXT}",
 								String.format("Contacted %s", poster.getDisplayName()));
-						temp = temp.replaceAll("\\{ALERT_HIDDEN\\}", "");
+						temp = temp.replace("{ALERT_HIDDEN}", "");
 					}
 				}
 			}
@@ -160,22 +117,22 @@ public class HttpHandlerTradeboard implements HttpHandler {
 			TradeboardSearch search = new TradeboardSearch();
 			if (get.containsKey("q")) {
 				String query = get.get("q");
-				temp = temp.replaceAll("\\{SEARCH_PLACEHOLDER\\}", query);
+				temp = temp.replace("{SEARCH_PLACEHOLDER}", query);
 				search.fillValues(query);
 			} else
-				temp = temp.replaceAll("\\{SEARCH_PLACEHOLDER\\}", "");
+				temp = temp.replace("{SEARCH_PLACEHOLDER}", "");
 			if (get.containsKey("t"))
 				search.lookingFor = get.get("t").equals("0");
 
 			if (search.lookingFor != null) {
 				if (search.lookingFor)
-					temp = temp.replaceAll("\\{LOOKING_FOR_SELECTED\\}", "selected")
-							.replaceAll("\\{FOR_TRADE_SELECTED\\}", "");
+					temp = temp.replace("{LOOKING_FOR_SELECTED}", "selected")
+							.replace("{FOR_TRADE_SELECTED}", "");
 				else
-					temp = temp.replaceAll("\\{LOOKING_FOR_SELECTED\\}", "")
-							.replaceAll("\\{FOR_TRADE_SELECTED\\}", "selected");
+					temp = temp.replace("{LOOKING_FOR_SELECTED}", "").replace("{FOR_TRADE_SELECTED}",
+							"selected");
 			}
-			temp = temp.replaceAll("\\{ALERT_HIDDEN\\}", "d-none");
+			temp = temp.replace("{ALERT_HIDDEN}", "d-none");
 
 			// fill stuff
 			temp = WebServer.fillBaseStuff(ex, tokenCookie.value, temp);
@@ -197,35 +154,37 @@ public class HttpHandlerTradeboard implements HttpHandler {
 		String card;
 		EnumPokemon pokemon = post.getPokemon();
 		if (postMember.equals(browseMember))
-			card = TRADE_CARD_DELETE.replaceAll("\\{TYPE\\}",
+			card = TRADE_CARD_DELETE.replace("{TYPE}",
 					pokemon.getData().getType1().name().toLowerCase());
 		else
-			card = TRADE_CARD.replaceAll("\\{TYPE\\}",
-					pokemon.getData().getType1().name().toLowerCase());
+			card = TRADE_CARD.replace("{TYPE}", pokemon.getData().getType1().name().toLowerCase());
 		Form form = post.getForm();
 
-		card = card.replaceAll("\\{POSTER_ID\\}", postMember.getId().asString());
-		card = card.replaceAll("\\{POSTER_AVATAR\\}", postMember.getAvatarUrl());
-		card = card.replaceAll("\\{POSTER_DISPLAY_NAME\\}", postMember.getDisplayName());
-		card = card.replaceAll("\\{POSTER_USERNAME\\}", postMember.getUsername());
-		card = card.replaceAll("\\{POSTER_DISCRIM\\}", postMember.getDiscriminator());
+		card = card.replace("{POSTER_ID}", postMember.getId().asString());
+		card = card.replace("{POSTER_AVATAR}", postMember.getAvatarUrl());
+		card = card.replace("{POSTER_DISPLAY_NAME}", postMember.getDisplayName());
+		card = card.replace("{POSTER_USERNAME}", postMember.getUsername());
+		card = card.replace("{POSTER_DISCRIM}", postMember.getDiscriminator());
 
-		card = card.replaceAll("\\{TRADE_TYPE\\}", post.isLookingFor() ? "Looking for" : "For trade");
+		card = card.replace("{TRADE_TYPE}", post.isLookingFor() ? "Looking for" : "For trade");
 
-		card = card.replaceAll("\\{POST_NUMBER\\}", post.getIdString());
-		card = card.replaceAll("\\{POKEMON_IMAGE\\}", ImageHelper.getOfficalArtwork(pokemon, form));
-		card = card.replaceAll("\\{POKEMON_NAME\\}", pokemon.getData().getName());
-		card = card.replaceAll("\\{POKEMON_FORM\\}", form == null ? "-" : form.getName());
+		card = card.replace("{POST_NUMBER}", post.getIdString());
+		card = card.replace("{POKEMON_IMAGE}", ImageHelper.getOfficalArtwork(pokemon, form));
+		card = card.replace("{POKEMON_NAME}", pokemon.getData().getName());
+		card = card.replace("{POKEMON_FORM}", form == null ? "-" : form.getName());
 		EnumGender gender = post.getGender();
-		card = card.replaceAll("\\{POKEMON_GENDER\\}",
+		card = card.replace("{POKEMON_GENDER}",
 				gender == null ? pokemon.getData().getGenderPossible().toString() : gender.toString());
 
 		String isLegacyS = Boolean.toString(post.isLegacy());
-		card = card.replaceAll("\\{POKEMON_LEGACY\\}",
+		card = card.replace("{POKEMON_LEGACY}",
 				Character.toUpperCase(isLegacyS.charAt(0)) + isLegacyS.substring(1));
 		String isShinyS = Boolean.toString(post.isShiny());
-		card = card.replaceAll("\\{POKEMON_SHINY\\}",
+		card = card.replace("{POKEMON_SHINY}",
 				Character.toUpperCase(isShinyS.charAt(0)) + isShinyS.substring(1));
+
+		card = card.replace("{DATE_POSTED}",
+				DATE_POSTED.format(new Date(post.getTimePosted().toEpochMilli())));
 
 		return card;
 	}
@@ -248,9 +207,9 @@ public class HttpHandlerTradeboard implements HttpHandler {
 		}
 
 		if (cards.length() > 0)
-			temp = temp.replaceAll("\\{CARDS\\}", cards.toString());
+			temp = temp.replace("{CARDS}", cards.toString());
 		else
-			temp = temp.replaceAll("\\{CARDS\\}", "<div class=\"col-md-6 col-xl-3 mb-4\">\r\n"
+			temp = temp.replace("{CARDS}", "<div class=\"col-md-6 col-xl-3 mb-4\">\r\n"
 					+ "    <p class=\"text-center\">No trades found</p>\r\n" + "</div>");
 		return temp;
 	}
@@ -294,8 +253,9 @@ public class HttpHandlerTradeboard implements HttpHandler {
 			if (regional != null && regional != post.getPokemon().getData().isRegional())
 				return false;
 			for (String t : otherTerms) {
-				boolean matched = (post.getForm() != null
-						&& post.getForm().toString().toLowerCase().startsWith(t.toLowerCase()));
+				boolean matched = (post.getForm() != null && (post.getForm().getName().toLowerCase()
+						.startsWith(t.toLowerCase())
+						|| post.getForm().getGoHubFormName().toLowerCase().startsWith(t.toLowerCase())));
 				matched = matched || post.getPokemon().getData().getName().toLowerCase()
 						.startsWith(t.toLowerCase());
 				if (!matched)

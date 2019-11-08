@@ -26,6 +26,8 @@ public class OAuthUtils {
 	}
 
 	public static OAuthUser getUser(String accessToken) {
+		if (accessToken == null)
+			return null;
 		try {
 			URL tokenUrl = new URL(API_URL + "/users/@me");
 			HttpsURLConnection con = (HttpsURLConnection) tokenUrl.openConnection();

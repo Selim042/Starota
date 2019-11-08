@@ -109,61 +109,60 @@ public class HttpHandlerProfile implements HttpHandler {
 	}
 
 	private String fillProfileInfo(String profileTemp, PlayerProfile profile, Member member) {
-		profileTemp = profileTemp.replaceAll("\\{POGO_NAME\\}", profile.getPoGoName())
-				.replaceAll("\\{DISCORD_NAME_DISCRIM\\}",
+		profileTemp = profileTemp.replace("{POGO_NAME}", profile.getPoGoName())
+				.replace("{DISCORD_NAME_DISCRIM}",
 						member.getUsername() + "#" + member.getDiscriminator())
-				.replaceAll("\\{POGO_LEVEL\\}", Integer.toString(profile.getLevel()))
-				.replaceAll("\\{POGO_TEAM\\}", profile.getTeam().getName())
-				.replaceAll("\\{DISCORD_AVATAR\\}", member.getAvatarUrl());
+				.replace("{POGO_LEVEL}", Integer.toString(profile.getLevel()))
+				.replace("{POGO_TEAM}", profile.getTeam().getName())
+				.replace("{DISCORD_AVATAR}", member.getAvatarUrl());
 
 		if (profile.getRealName() != null)
-			profileTemp = profileTemp.replaceAll("\\{REAL_NAME\\}", profile.getRealName());
+			profileTemp = profileTemp.replace("{REAL_NAME}", profile.getRealName());
 		else
-			profileTemp = profileTemp.replaceAll("\\{REAL_NAME\\}", "-");
+			profileTemp = profileTemp.replace("{REAL_NAME}", "-");
 		if (profile.getTrainerCodeString() != null)
-			profileTemp = profileTemp.replaceAll("\\{POGO_TRAINER_CODE\\}",
-					profile.getTrainerCodeString());
+			profileTemp = profileTemp.replace("{POGO_TRAINER_CODE}", profile.getTrainerCodeString());
 		else
-			profileTemp = profileTemp.replaceAll("\\{POGO_TRAINER_CODE\\}", "-");
+			profileTemp = profileTemp.replace("{POGO_TRAINER_CODE}", "-");
 		if (profile.getAlts().size() != 0) {
 			StringBuilder alts = new StringBuilder();
 			for (Entry<String, Long> alt : profile.getAlts().entrySet())
-				alts.append(String.format("%s: %s\n", alt.getKey(),
+				alts.append(String.format("%s: %s<br>", alt.getKey(),
 						MiscUtils.getTrainerCodeString(alt.getValue())));
-			profileTemp = profileTemp.replaceAll("\\{POGO_ALT_ACCOUNTS\\}", alts.toString());
+			profileTemp = profileTemp.replace("{POGO_ALT_ACCOUNTS}", alts.toString());
 		} else
-			profileTemp = profileTemp.replaceAll("\\{POGO_ALT_ACCOUNTS\\}", "-");
+			profileTemp = profileTemp.replace("{POGO_ALT_ACCOUNTS}", "-");
 		if (profile.getSilphRoadCard() != null) {
-			profileTemp = profileTemp.replaceAll("\\{SILPH_CARD_URL\\}", profile.getSilphRoadCard());
-			profileTemp = profileTemp.replaceAll("\\{SILPH_CARD_DISPLAY_URL\\}",
-					profile.getSilphRoadCard().replaceAll("https?://", ""));
+			profileTemp = profileTemp.replace("{SILPH_CARD_URL}", profile.getSilphRoadCard());
+			profileTemp = profileTemp.replace("{SILPH_CARD_DISPLAY_URL}",
+					profile.getSilphRoadCard().replace("https?://", ""));
 		} else {
-			profileTemp = profileTemp.replaceAll("\\{SILPH_CARD_URL\\}", "#");
-			profileTemp = profileTemp.replaceAll("\\{SILPH_CARD_DISPLAY_URL\\}", "-");
+			profileTemp = profileTemp.replace("{SILPH_CARD_URL}", "#");
+			profileTemp = profileTemp.replace("{SILPH_CARD_DISPLAY_URL}", "-");
 		}
 		if (profile.getDonorRoleName() != null)
-			profileTemp = profileTemp.replaceAll("\\{DONOR_LEVEL\\}", profile.getDonorRoleName());
+			profileTemp = profileTemp.replace("{DONOR_LEVEL}", profile.getDonorRoleName());
 		else
-			profileTemp = profileTemp.replaceAll("\\{DONOR_LEVEL\\}", "-");
+			profileTemp = profileTemp.replace("{DONOR_LEVEL}", "-");
 		return profileTemp;
 	}
 
 	private String fillSilphCard(String profileTemp, SilphCard card) {
-		profileTemp = profileTemp.replaceAll("\\{SILPH_CARD_ID\\}", card.data.card_id.toUpperCase());
-		profileTemp = profileTemp.replaceAll("\\{SILPH_JOINED_DATE\\}", card.data.joined);
-		profileTemp = profileTemp.replaceAll("\\{SILPH_TRAVELERS_MET\\}",
+		profileTemp = profileTemp.replace("{SILPH_CARD_ID}", card.data.card_id.toUpperCase());
+		profileTemp = profileTemp.replace("{SILPH_JOINED_DATE}", card.data.joined);
+		profileTemp = profileTemp.replace("{SILPH_TRAVELERS_MET}",
 				Integer.toString(card.data.handshakes));
-		profileTemp = profileTemp.replaceAll("\\{SILPH_MEETUP_CHECKINS\\}",
+		profileTemp = profileTemp.replace("{SILPH_MEETUP_CHECKINS}",
 				Integer.toString(card.data.checkins.length));
-		profileTemp = profileTemp.replaceAll("\\{SILPH_NEST_REPORTS\\}",
+		profileTemp = profileTemp.replace("{SILPH_NEST_REPORTS}",
 				Integer.toString(card.data.nest_migrations));
 
 		StringBuilder social = new StringBuilder();
 		for (SilphSocial s : card.data.socials)
 			social.append(String.format("%s: %s<br>", s.vendor, s.username));
-		profileTemp = profileTemp.replaceAll("\\{SILPH_SOCIAL\\}", social.toString());
+		profileTemp = profileTemp.replace("{SILPH_SOCIAL}", social.toString());
 
-		profileTemp = profileTemp.replaceAll("\\{SILPH_PLAYSTYLE\\}",
+		profileTemp = profileTemp.replace("{SILPH_PLAYSTYLE}",
 				String.format("%s<br>%s<br>%s", card.data.playstyle, card.data.goal,
 						String.format("Typically raids %sx/week", card.data.raid_average)));
 
@@ -177,7 +176,7 @@ public class HttpHandlerProfile implements HttpHandler {
 				if (pp != null)
 					top6.append(String.format(topHtml, ImageHelper.getOfficalArtwork(pp)));
 			}
-		profileTemp = profileTemp.replaceAll("\\{SILPH_TOP_6\\}", top6.toString());
+		profileTemp = profileTemp.replace("{SILPH_TOP_6}", top6.toString());
 
 		String badgeHtml = "<img style=\"width: 32px;height: 38px;margin: 2px;\" src=\"%s\" />";
 		StringBuilder badges = new StringBuilder();
@@ -186,7 +185,7 @@ public class HttpHandlerProfile implements HttpHandler {
 		else
 			for (SilphBadgeData b : card.data.badges)
 				badges.append(String.format(badgeHtml, b.Badge.image));
-		profileTemp = profileTemp.replaceAll("\\{SILPH_BADGES\\}", badges.toString());
+		profileTemp = profileTemp.replace("{SILPH_BADGES}", badges.toString());
 
 		return profileTemp;
 	}
@@ -199,9 +198,9 @@ public class HttpHandlerProfile implements HttpHandler {
 			cards.append(HttpHandlerTradeboard.getCard(browseMember,
 					server.getDiscordGuild().getMemberById(Snowflake.of(p.getOwner())).block(), p));
 		if (posts.size() > 0)
-			return profileTemp.replaceAll("\\{CARDS\\}", cards.toString());
+			return profileTemp.replace("{CARDS}", cards.toString());
 		else
-			return profileTemp.replaceAll("\\{CARDS\\}", "No posts found.");
+			return profileTemp.replace("{CARDS}", "No posts found.");
 	}
 
 }

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Starota</title>
+    <link rel="icon" type="image/png" sizes="64x64" href="/assets/img/starota.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="/assets/img/starota.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/img/starota_med.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/img/starota_med.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/img/starota_med.png">
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css">
+    <link rel="stylesheet" href="/assets/css/stuff.css">
+</head>
+
+<body>
+    <div class="container">
+        <form>
+            <div class="form-row">
+                <div class="col-auto"><button class="btn btn-primary" id="generate_button" type="button">Generate</button></div>
+                <div class="col-auto"><button class="btn btn-primary" type="reset">Reset</button></div>
+            </div>
+            <div style="padding-top: 8px;padding-bottom: 8px;">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item"><a class="nav-link" role="tab" data-toggle="tab" href="#tab-1">General</a></li>
+                    <li class="nav-item"><a class="nav-link" role="tab" data-toggle="tab" href="#tab-2">Times</a></li>
+                    <li class="nav-item"><a class="nav-link active" role="tab" data-toggle="tab" href="#tab-3">Pokemon</a></li>
+                    <li class="nav-item"><a class="nav-link" role="tab" data-toggle="tab" href="#tab-4">Bonuses</a></li>
+                    <li class="nav-item"><a class="nav-link" role="tab" data-toggle="tab" href="#tab-5">Research</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane" role="tabpanel" id="tab-1">
+                        <section style="padding-top: 8px;padding-bottom: 8px;">
+                            <div class="form-row">
+                                <div class="col">
+                                    <h1>General</h1>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <div class="col-auto"><label class="col-form-label" for="name">Name</label></div>
+                                    <div class="col"><input class="form-control" type="text" name="name" required=""></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <div class="col-auto"><label class="col-form-label" for="link">Link</label></div>
+                                    <div class="col"><input class="form-control" type="text" name="link" required="" inputmode="url"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <div class="col-auto"><label class="col-form-label" for="link_title">Link Title</label></div>
+                                    <div class="col"><input class="form-control" type="text" name="link_title" required=""></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <div class="col-auto"><label class="col-form-label" for="color">Color</label></div>
+                                    <div class="col"><input type="color" name="color"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <div class="col-auto"><label class="col-form-label" for="image">Image</label></div>
+                                    <div class="col"><input class="form-control" type="text" name="image" required="" inputmode="url"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <div class="col-auto"><label class="col-form-label" for="description">Description</label></div>
+                                    <div class="col"><textarea class="form-control" name="description"></textarea></div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-auto">
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-1" name="raids_changed"><label class="form-check-label" for="raids_changed">Raids Changed</label></div>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-2" name="raid_oriented"><label class="form-check-label" for="raid_oriented">Raid Oriented</label></div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="tab-pane" role="tabpanel" id="tab-2">
+                        <section style="padding-top: 8px;padding-bottom: 8px;">
+                            <div class="form-row">
+                                <div class="col">
+                                    <h1>Times</h1>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <div class="col-auto"><label class="col-form-label" for="start_time">Start Time</label></div>
+                                    <div class="col-auto"><input class="form-control" type="date" name="start_time"></div>
+                                    <div class="col-auto"><input class="form-control" type="time" name="start_time"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <div class="col-auto"><label class="col-form-label" for="start_time">End Time</label></div>
+                                    <div class="col-auto"><input class="form-control" type="date" name="end_time"></div>
+                                    <div class="col-auto"><input class="form-control" type="time" name="end_time"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <div class="col-auto"><label class="col-form-label" for="location">Location</label></div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-auto">
+                                        <div class="form-check"><input class="form-check-input" type="radio" id="formCheck-3" name="location" checked=""><label class="form-check-label" for="location">Global</label></div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="form-check"><input class="form-check-input" type="radio" id="formCheck-3" name="location"><label class="form-check-label" for="location">Localized</label></div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="form-check"><input class="form-check-input" type="radio" id="formCheck-3" name="location"><label class="form-check-label" for="location">Regional</label></div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="form-check"><input class="form-check-input" type="radio" id="formCheck-3" name="location"><label class="form-check-label" for="location">Specific</label></div>
+                                    </div>
+                                    <div class="col"><input class="form-control" type="text" name="specific_location"></div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col">
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-4" name="long_term"><label class="form-check-label" for="long_term">Long term event</label></div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="tab-pane active" role="tabpanel" id="tab-3">
+                        <section style="padding-top: 8px;padding-bottom: 8px;">
+                            <div class="form-row">
+                                <div class="col">
+                                    <h1>Pokemon</h1>
+                                </div>
+                            </div>
+                            <p>Not yet functional</p>
+                        </section>
+                    </div>
+                    <div class="tab-pane" role="tabpanel" id="tab-4">
+                        <section style="padding-top: 8px;padding-bottom: 8px;">
+                            <div class="form-row">
+                                <div class="col">
+                                    <h1>Bonuses</h1>
+                                </div>
+                            </div>
+                            <p>Not yet functional</p>
+                        </section>
+                    </div>
+                    <div class="tab-pane" role="tabpanel" id="tab-5">
+                        <section style="padding-top: 8px;padding-bottom: 8px;">
+                            <div class="form-row">
+                                <div class="col">
+                                    <h1>Research</h1>
+                                </div>
+                            </div>
+                            <p>Not yet functional</p>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+    <script src="/assets/js/bs-charts.js"></script>
+    <script src="/assets/js/discord.js"></script>
+    <script src="/assets/js/event_gen.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
+    <script src="/assets/js/smart_navbar.js"></script>
+    <script src="/assets/js/theme.js"></script>
+</body>
+
+</html>

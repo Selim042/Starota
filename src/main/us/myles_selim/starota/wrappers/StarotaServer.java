@@ -802,6 +802,7 @@ public class StarotaServer extends BotServer {
 				return 0;
 			return getDataValue(VALOR_HOUSE_CUP_KEY, Integer.class);
 		case NO_TEAM:
+			return 0;
 		default:
 			throw new IllegalArgumentException("team " + team + " doesn't get points");
 		}
@@ -874,7 +875,7 @@ public class StarotaServer extends BotServer {
 	public static StarotaServer getServer(Guild guild) {
 		if (guild == null)
 			return null;
-		return BotServer.getServer(Starota.getClient(), guild);
+		return (StarotaServer) BotServer.getServer(Starota.getClient(), guild);
 	}
 
 	public static class DataTypeServerSettings extends DataTypeSettingSet {

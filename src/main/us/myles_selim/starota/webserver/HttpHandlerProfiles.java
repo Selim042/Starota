@@ -31,28 +31,15 @@ import us.myles_selim.starota.wrappers.StarotaServer;
 @SuppressWarnings("restriction")
 public class HttpHandlerProfiles implements HttpHandler {
 
-	private static final String PROFILE_CARD = "<div class=\"col-md-6 col-xl-3 mb-4\">"
-			+ "<div class=\"card shadow border-left-{POGO_TEAM} py-2\">"
-			+ "<a href=\"/profile/{DISCORD_ID}\" class=\"text-secondary\" style=\"text-decoration:none\">"
-			+ "<div class=\"card-body\"><div class=\"row align-items-center no-gutters\">"
-			+ "<div class=\"col\"><img class=\"rounded-circle\" src=\"{DISCORD_AVATAR}\" "
-			+ "width=\"32px\" height=\"32px\" style=\"margin-bottom: 4px;margin-right: 4px;\" />"
-			+ "<span style=\"padding: 2px;\">{DISCORD_USERNAME}</span></div></div>"
-			+ "<div class=\"row\"><div class=\"col\" style=\"margin: 0px;margin-top: 4px;margin-bottom: 4px;\">"
-			+ "<h1 style=\"font-size: 16px;\"><strong>Trainer Username:</strong></h1><span>{POGO_NAME}</span></div>"
-			+ "</div><div class=\"row\"><div class=\"col\" "
-			+ "style=\"margin: 0px;margin-top: 4px;margin-bottom: 4px;\"><h1 style=\"font-size: 16px;\">"
-			+ "<strong>Trainer Level:</strong></h1><span>{POGO_LEVEL}</span></div>"
-			+ "<div class=\"col\" style=\"margin: 4px;margin-right: 0px;margin-left: 0px;\">"
-			+ "<h1 style=\"font-size: 16px;\"><strong>Real Name:</strong></h1><span>{REAL_NAME}</span></div>"
-			+ "</div><div class=\"row\">"
-			+ "<div class=\"col\" style=\"margin: 4px;margin-right: 0px;margin-left: 0px;\">"
-			+ "<h1 style=\"font-size: 16px;\"><strong>Trainer Code:</strong></h1>"
-			+ "<span>{POGO_TRAINER_CODE}</span></div></div></div></a></div></div>";
-
 	private static final String ROLE_HEADER = "<div class=\"row\" style=\"width: 100%;\">"
 			+ "<div class=\"col\" style=\"margin-left: 10px;\"><h4 class=\"text-secondary\">"
 			+ "{HEADER}</h4></div></div>";
+
+	private static final String PROFILE_CARD;
+
+	static {
+		PROFILE_CARD = WebServer.getTemplate("profile_card.html");
+	}
 
 	@Override
 	public void handle(HttpExchange ex) throws IOException {
@@ -99,10 +86,10 @@ public class HttpHandlerProfiles implements HttpHandler {
 			ProfilesSearch search = new ProfilesSearch();
 			if (get.containsKey("q")) {
 				String query = get.get("q");
-				temp = temp.replaceAll("\\{SEARCH_PLACEHOLDER\\}", query);
+				temp = temp.replace("{SEARCH_PLACEHOLDER}", query);
 				search.fillValues(query);
 			} else
-				temp = temp.replaceAll("\\{SEARCH_PLACEHOLDER\\}", "");
+				temp = temp.replace("{SEARCH_PLACEHOLDER}", "");
 
 			// fill stuff
 			temp = WebServer.fillBaseStuff(ex, tokenCookie.value, temp);
@@ -151,37 +138,36 @@ public class HttpHandlerProfiles implements HttpHandler {
 				Role ownerRole = highestRoles.get(owner);
 				if (lastHighest == null || !lastHighest.equals(ownerRole)) {
 					if (ownerRole.isEveryone())
-						cards.append(ROLE_HEADER.replaceAll("\\{HEADER\\}", "@EVERYONE ELSE"));
+						cards.append(ROLE_HEADER.replace("{HEADER}", "@EVERYONE ELSE"));
 					else
-						cards.append(ROLE_HEADER.replaceAll("\\{HEADER\\}",
-								ownerRole.getName().toUpperCase()));
+						cards.append(ROLE_HEADER.replace("{HEADER}", ownerRole.getName().toUpperCase()));
 					lastHighest = ownerRole;
 				}
-				String card = PROFILE_CARD.replaceAll("\\{DISCORD_AVATAR\\}", owner.getAvatarUrl());
-				card = card.replaceAll("\\{DISCORD_ID\\}", Long.toString(post.getDiscordId()));
+				String card = PROFILE_CARD.replace("{DISCORD_AVATAR}", owner.getAvatarUrl());
+				card = card.replace("{DISCORD_ID}", Long.toString(post.getDiscordId()));
 
-				card = card.replaceAll("\\{POGO_TEAM\\}", post.getTeam().toString().toLowerCase());
-				card = card.replaceAll("\\{DISCORD_USERNAME\\}", owner.getUsername());
-				card = card.replaceAll("\\{POGO_NAME\\}", post.getPoGoName());
-				card = card.replaceAll("\\{POGO_LEVEL\\}", Integer.toString(post.getLevel()));
+				card = card.replace("{POGO_TEAM}", post.getTeam().toString().toLowerCase());
+				card = card.replace("{DISCORD_USERNAME}", owner.getUsername());
+				card = card.replace("{POGO_NAME}", post.getPoGoName());
+				card = card.replace("{POGO_LEVEL}", Integer.toString(post.getLevel()));
 				if (post.getRealName() != null)
-					card = card.replaceAll("\\{REAL_NAME\\}", post.getRealName());
+					card = card.replace("{REAL_NAME}", post.getRealName());
 				else
-					card = card.replaceAll("\\{REAL_NAME\\}", "-");
+					card = card.replace("{REAL_NAME}", "-");
 				if (post.getTrainerCode() > 0)
-					card = card.replaceAll("\\{POGO_TRAINER_CODE\\}", post.getTrainerCodeString());
+					card = card.replace("{POGO_TRAINER_CODE}", post.getTrainerCodeString());
 				else
-					card = card.replaceAll("\\{POGO_TRAINER_CODE\\}", "-");
+					card = card.replace("{POGO_TRAINER_CODE}", "-");
 
 				cards.append(card);
 			}
 		}
 
 		if (cards.length() > 0)
-			temp = temp.replaceAll("\\{CARDS\\}", cards.toString());
+			temp = temp.replace("{CARDS}", cards.toString());
 		else
-			temp = temp.replaceAll("\\{CARDS\\}", "<div class=\"col-md-6 col-xl-3 mb-4\">\r\n"
-					+ "    <p class=\"text-center\">No profiles found</p>\r\n" + "</div>");
+			temp = temp.replace("{CARDS}", "<div class=\"col-md-6 col-xl-3 mb-4\">"
+					+ "<p class=\"text-center\">No profiles found</p></div>");
 		return temp;
 	}
 
