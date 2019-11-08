@@ -131,18 +131,19 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
 	public final static String CHANGELOG = "Changelog for v" + StarotaConstants.VERSION + "\n"
-			+ "Public changes:\nNOTE: A few of these were released early\n"
-			+ " + Improve raid embed title and add team emoji to attending and here lists\n"
-			+ " + Add reaction to profile embeds, sends PM with trainer code in QR and text form\n"
-			+ " + New Feature: Weather Predictions\n"
-			+ "   - After adding a AccuWeather API token and community coordinates in the .settings command, "
-			+ "the .weather command is enabled to view weather predictions for your community\n"
-			+ "   - This also shows the current and next hour predictions in raid embeds\n"
-			+ "   - This can be disabled at any time by removing either your community coordinates or API token, or both\n"
-			+ " + Add fields in the \"details\" section of the dex embed to show if the Pokemon has legacy or exclusive moves\n"
-			+ " * Fix error in register command where it gives wrong argument when reporting bad team\n"
-			+ " * Fix some paged embeds not wrapping around when paging to the left from page 1\n"
-			+ " * Misc fixes\n";
+			+ "Public changes:\n" + " + Add new Unova stone evolutions\n"
+			+ " + New feature: Catcher's Cup\n"
+			+ "   - The Catcher's Cup is similar to the House Cup in the Harry Potter franchise and lets teams compete to determine who is best based on a completely arbirary point system\n"
+			+ "   - Admins can add points to a team with the addPoints command\n"
+			+ " + New command: cpTable\n"
+			+ "   - Displays all possible CPs for a given Pokemon at levels that you can catch it at (forms are not currently supproted)\n"
+			+ " * Event sorting has been changed, long term events are defaulted to the end, started events are sorted by end time\n"
+			+ " * The eggHatches command looks different now.  The separate tiers look similar to the overall message, and regional hatches are seperated from normal hatches\n"
+			+ " * Various QoL tweaks to the beta website, if you have access\n"
+			+ " * The Shellos family are now counted as regionals\n"
+			+ " * Overhaul to the credits command to include beta testers and GitHub contributors\n"
+			+ " * Tweaks to the weather command and how weather predictions are displayed across Starota\n"
+			+ " * Weather emoji have been changed\n" + " * Misc fixes\n";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static PrimaryCommandHandler COMMAND_HANDLER;
@@ -229,12 +230,14 @@ public class Starota {
 					"Sets the server's weather API token.", null));
 			StarotaServer.setDefaultValue(new SettingString(StarotaConstants.Settings.COORDS,
 					"Sets the community's coordinates.", null));
-//			StarotaServer
-//					.setDefaultValue(new SettingBoolean(StarotaConstants.Settings.EASY_HOUSE_CUP_ENTRY,
-//							"Allows users with the necessary permissions to distribute House Cup "
-//									+ "points by saying things like \"10 points for instinct!\"."
-//									+ "**NOTE**: Not currently enabled.",
-//							true));
+			// StarotaServer
+			// .setDefaultValue(new
+			// SettingBoolean(StarotaConstants.Settings.EASY_HOUSE_CUP_ENTRY,
+			// "Allows users with the necessary permissions to distribute House
+			// Cup "
+			// + "points by saying things like \"10 points for instinct!\"."
+			// + "**NOTE**: Not currently enabled.",
+			// true));
 			StarotaServer.setDefaultValue(new SettingBoolean(StarotaConstants.Settings.CLOCK_24H,
 					"If true, uses 24 hour clock (1-24) rather than 12 hour clock.", false));
 

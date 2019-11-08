@@ -5,7 +5,7 @@ import discord4j.core.object.util.Snowflake;
 public class StarotaConstants {
 
 	/** Starota version */
-	public final static String VERSION = "3.1.0";
+	public final static String VERSION = "3.2.0";
 
 	/** Starota user ID */
 	public static final Snowflake STAROTA_ID = Snowflake.of(489245655710040099L);
