@@ -124,6 +124,8 @@ public abstract class PermissionHolder {
 	private static final Map<Snowflake, Map<String, PermissionHolder>> HOLDERS = new ConcurrentHashMap<>();
 
 	public static PermissionHolder getNewHolderOwner(Guild guild) {
+		if (guild == null)
+			return PermissionHolderPrivate.INSTANCE;
 		if (HOLDERS.containsKey(guild.getId())) {
 			Map<String, PermissionHolder> holders = HOLDERS.get(guild.getId());
 			String rep = "OWNER";
@@ -134,6 +136,8 @@ public abstract class PermissionHolder {
 	}
 
 	public static PermissionHolder getNewHolderEveryone(Guild guild) {
+		if (guild == null)
+			return PermissionHolderPrivate.INSTANCE;
 		if (HOLDERS.containsKey(guild.getId())) {
 			Map<String, PermissionHolder> holders = HOLDERS.get(guild.getId());
 			String rep = "@everyone";
@@ -144,6 +148,8 @@ public abstract class PermissionHolder {
 	}
 
 	public static PermissionHolder getNewHolderDiscord(Guild guild, Permission permission) {
+		if (guild == null)
+			return PermissionHolderPrivate.INSTANCE;
 		if (HOLDERS.containsKey(guild.getId())) {
 			Map<String, PermissionHolder> holders = HOLDERS.get(guild.getId());
 			String rep = String.format("Discord.%s", permission.name());
@@ -154,6 +160,8 @@ public abstract class PermissionHolder {
 	}
 
 	public static PermissionHolder getNewHolderMember(Guild guild, Member member) {
+		if (guild == null)
+			return PermissionHolderPrivate.INSTANCE;
 		if (HOLDERS.containsKey(guild.getId())) {
 			Map<String, PermissionHolder> holders = HOLDERS.get(guild.getId());
 			String rep = String.format("U%d", member.getId().asLong());
@@ -164,6 +172,8 @@ public abstract class PermissionHolder {
 	}
 
 	public static PermissionHolder getNewHolderRole(Guild guild, Snowflake role) {
+		if (guild == null)
+			return PermissionHolderPrivate.INSTANCE;
 		if (HOLDERS.containsKey(guild.getId())) {
 			Map<String, PermissionHolder> holders = HOLDERS.get(guild.getId());
 			String rep = String.format("R%d", role.asLong());
@@ -174,6 +184,8 @@ public abstract class PermissionHolder {
 	}
 
 	public static PermissionHolder getNewHolderRole(Guild guild, Role role) {
+		if (guild == null)
+			return PermissionHolderPrivate.INSTANCE;
 		if (HOLDERS.containsKey(guild.getId())) {
 			Map<String, PermissionHolder> holders = HOLDERS.get(guild.getId());
 			String rep = String.format("R%d", role.getId().asLong());
@@ -184,6 +196,8 @@ public abstract class PermissionHolder {
 	}
 
 	public static PermissionHolder getNewHolder(Guild guild, String rep) {
+		if (guild == null)
+			return PermissionHolderPrivate.INSTANCE;
 		if (HOLDERS.containsKey(guild.getId())) {
 			Map<String, PermissionHolder> holders = HOLDERS.get(guild.getId());
 			if (holders.containsKey(rep))

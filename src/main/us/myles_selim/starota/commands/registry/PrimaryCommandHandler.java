@@ -17,6 +17,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.GuildChannel;
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.entity.PrivateChannel;
@@ -25,11 +26,11 @@ import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.PermissionSet;
 import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.commands.registry.channel_management.ChannelCommandManager;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.EventListener;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.modules.StarotaModule;
-import us.myles_selim.starota.permissions.holders.PermissionHolder;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class PrimaryCommandHandler implements EventListener {
@@ -149,14 +150,19 @@ public class PrimaryCommandHandler implements EventListener {
 						&& !authorServerPerms.contains(cmd.requiredUsePermission())))
 					continue;
 
-				// check if user has permission via Starota permission system
-				boolean hasStarotaPerms = true;
-				if (guild != null)
-					hasStarotaPerms = PermissionHolder
-							.getNewHolderMember(guild, message.getAuthorAsMember().block())
-							.hasPermission(channel, cmd.getStarotaPermission());
-				if (!hasStarotaPerms)
+				if (!ChannelCommandManager.isAllowedHere(server, cmd.getCategory(), channel))
 					continue;
+
+				// TODO: for proper permission system
+				// // check if user has permission via Starota permission system
+				// boolean hasStarotaPerms = true;
+				// if (guild != null)
+				// hasStarotaPerms = PermissionHolder
+				// .getNewHolderMember(guild,
+				// message.getAuthorAsMember().block())
+				// .hasPermission(channel, cmd.getStarotaPermission());
+				// if (!hasStarotaPerms)
+				// continue;
 
 				// if Starota doesn't have necessary perms, create error msg
 				EnumSet<Permission> reqPerms = cmd.getCommandPermission().asEnumSet().clone();
@@ -199,13 +205,18 @@ public class PrimaryCommandHandler implements EventListener {
 						&& !authorServerPerms.contains(cmd.requiredUsePermission())))
 					continue;
 
-				boolean hasStarotaPerms = true;
-				if (guild != null)
-					hasStarotaPerms = PermissionHolder
-							.getNewHolderMember(guild, message.getAuthorAsMember().block())
-							.hasPermission(channel, cmd.getStarotaPermission());
-				if (!hasStarotaPerms)
+				if (!ChannelCommandManager.isAllowedHere(server, cmd.getCategory(), channel))
 					continue;
+
+				// TODO: for proper permission system
+				// boolean hasStarotaPerms = true;
+				// if (guild != null)
+				// hasStarotaPerms = PermissionHolder
+				// .getNewHolderMember(guild,
+				// message.getAuthorAsMember().block())
+				// .hasPermission(channel, cmd.getStarotaPermission());
+				// if (!hasStarotaPerms)
+				// continue;
 
 				String desciption = cmd.getDescription();
 				builder.appendDesc("- " + prefix + cmd.getName()
@@ -292,18 +303,27 @@ public class PrimaryCommandHandler implements EventListener {
 	public ICommand[] getSuggestions(Guild guild, Message message, String input, int count) {
 		List<DistancedCommand> suggestions = new ArrayList<>();
 		MessageChannel channel = message.getChannel().block();
+
+		// TODO: for proper permission system
+		// PermissionHolder permHolder =
+		// PermissionHolder.getNewHolderMember(guild,
+		// message.getAuthorAsMember().block());
+		Member author = message.getAuthorAsMember().block();
 		for (ICommandHandler ch : COMMAND_HANDLERS) {
 			for (ICommand cmd : ch.getAllCommands(guild)) {
-				boolean hasStarotaPerms = true;
-				if (guild != null)
-					hasStarotaPerms = PermissionHolder
-							.getNewHolderMember(guild, message.getAuthorAsMember().block())
-							.hasPermission(channel, cmd.getStarotaPermission());
-				if (!hasStarotaPerms)
+				if (!ChannelCommandManager.isAllowedHere(StarotaServer.getServer(guild),
+						cmd.getCategory(), channel))
 					continue;
 
-				if (!cmd.hasRequiredRole(guild, message.getAuthorAsMember().block())
-						|| !cmd.isRequiredChannel(guild, message.getChannel().block()))
+				// TODO: for proper permission system
+				// boolean hasStarotaPerms = true;
+				// if (guild != null)
+				// hasStarotaPerms = permHolder.hasPermission(channel,
+				// cmd.getStarotaPermission());
+				// if (!hasStarotaPerms)
+				// continue;
+
+				if (!cmd.hasRequiredRole(guild, author) || !cmd.isRequiredChannel(guild, channel))
 					continue;
 				for (String a : cmd.getAliases()) {
 					DistancedCommand dc = new DistancedCommand(calculateDistance(a, input), cmd);

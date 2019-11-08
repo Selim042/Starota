@@ -29,7 +29,7 @@ public class PermissionsIO {
 	private static final Pattern OPEN_BRACE_PATTERN = Pattern.compile("\\{");
 	private static final Pattern CLOSE_BRACE_PATTERN = Pattern.compile("\\}");
 
-	private static final File PERMISSION_FOLDER = new File(Starota.DATA_FOLDER, "permissions");
+	public static final File PERMISSION_FOLDER = new File(Starota.DATA_FOLDER, "permissions");
 
 	// implement this
 	private static PermissionHolder[] getDefaultPermissions() {
