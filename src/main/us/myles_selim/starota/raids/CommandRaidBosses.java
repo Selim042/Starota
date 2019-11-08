@@ -115,10 +115,16 @@ public class CommandRaidBosses extends BotCommand<StarotaServer> {
 			int numBosses = 0;
 			for (RaidBoss b : SilphRoadData.getBosses(i)) {
 				numBosses++;
-				String postfix = b.getForm() == null ? "" : "_" + b.getForm();
-				fieldDesc += b.getPokemon() + (b.getForm() == null ? "" : " (" + b.getForm() + ")")
-						+ MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji(b.getPokemon() + postfix,
-								ImageHelper.getOfficalArtwork(b.getPokemon(), b.getForm())))
+				String postfix = "";
+				if (!b.getPokemon().getFormSet().isDefaultForm(b.getForm()))
+					postfix = b.getPokemon().getFormSet().isDefaultForm(b.getForm()) ? ""
+							: "_" + b.getForm().getEmojiPostfix();
+				fieldDesc += b.getPokemon().getData().getName()
+						+ (b.getPokemon().getFormSet().isDefaultForm(b.getForm()) ? ""
+								: " (" + b.getForm().getName() + ")")
+						+ MiscUtils.getEmojiDisplay(
+								EmojiServerHelper.getEmoji(b.getPokemon().getData().getName() + postfix,
+										ImageHelper.getOfficalArtwork(b.getPokemon(), b.getForm())))
 						+ (b.isShinyable()
 								? MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("shiny")) + "\n"
 								: "\n");

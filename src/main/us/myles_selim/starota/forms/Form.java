@@ -2,6 +2,7 @@ package us.myles_selim.starota.forms;
 
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
+import us.myles_selim.starota.misc.utils.ImageHelper;
 import us.myles_selim.starota.silph_road.SilphRoadData;
 
 public class Form {
@@ -26,7 +27,7 @@ public class Form {
 	}
 
 	public String getGoHubFormName() {
-		return goHubFormName;
+		return goHubFormName == null ? getName() : goHubFormName;
 	}
 
 	public String getImage() {
@@ -46,7 +47,47 @@ public class Form {
 	}
 
 	public String getEmojiPostfix() {
+		if (emojiPostfix == null)
+			return name;
 		return emojiPostfix;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Form other = (Form) obj;
+		if (emojiPostfix == null) {
+			if (other.emojiPostfix != null)
+				return false;
+		} else if (!emojiPostfix.equals(other.emojiPostfix))
+			return false;
+		if (goHubFormId != other.goHubFormId)
+			return false;
+		if (goHubFormName == null) {
+			if (other.goHubFormName != null)
+				return false;
+		} else if (!goHubFormName.equals(other.goHubFormName))
+			return false;
+		if (image == null) {
+			if (other.image != null)
+				return false;
+		} else if (!image.equals(other.image))
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (type1 != other.type1)
+			return false;
+		if (type2 != other.type2)
+			return false;
+		return true;
 	}
 
 	/**
@@ -105,6 +146,11 @@ public class Form {
 		this.emojiPostfix = emojiPostfix;
 	}
 
+	@Override
+	public String toString() {
+		return "";
+	}
+
 	protected static final class NormalDefaultForm extends Form {
 
 		private final EnumPokemon pokemon;
@@ -130,6 +176,8 @@ public class Form {
 
 		@Override
 		public String getImage() {
+			if (super.getImage() == null)
+				return ImageHelper.getOfficalArtwork(pokemon);
 			return super.getImage();
 		}
 

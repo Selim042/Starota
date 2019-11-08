@@ -26,6 +26,8 @@ public class RaidBoss {
 	}
 
 	public Form getForm() {
+		if (this.form == null)
+			return pokemon.getData().getDefaultForm();
 		return this.form;
 	}
 

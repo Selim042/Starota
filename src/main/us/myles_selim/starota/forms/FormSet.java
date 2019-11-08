@@ -19,6 +19,10 @@ public class FormSet implements Iterable<Form> {
 		return otherForms.length == 0;
 	}
 
+	public boolean isDefaultForm(Form form) {
+		return form == defaultForm || defaultForm.equals(form);
+	}
+
 	public Form getDefaultForm() {
 		return this.defaultForm;
 	}
@@ -62,17 +66,17 @@ public class FormSet implements Iterable<Form> {
 		if (form == null || form.equalsIgnoreCase("Normal") || form.equalsIgnoreCase("null"))
 			return getDefaultForm();
 		for (Form f : this) {
-			String formName = f.toString().replaceAll("\\.", "").replaceAll(" ", "_");
-			String postfix = f.getEmojiPostfix();
-			if ((formName.equalsIgnoreCase(form) || formName.split("_")[0].equalsIgnoreCase(form)
-					|| formName.replaceAll("_", "").equalsIgnoreCase(form)))
-				return f;
-			if ((postfix != null
-					&& (postfix.equalsIgnoreCase(form) || postfix.split("_")[0].equalsIgnoreCase(form)
-							|| postfix.replaceAll("_", "").equalsIgnoreCase(form))))
-				return f;
+			String formName = f.getName().replaceAll("\\.", "").replaceAll(" ", "_");
+			String[] possibleMatches = new String[] { formName, f.getName(), f.getGoHubFormName(),
+					f.getEmojiPostfix() };
+			for (String match : possibleMatches) {
+				if (match == null)
+					continue;
+				if (form.equalsIgnoreCase(match))
+					return f;
+			}
 		}
-		return null;
+		return getDefaultForm();
 	}
 
 	public Form getForm(int form) {

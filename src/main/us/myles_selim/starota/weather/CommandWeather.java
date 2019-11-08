@@ -43,8 +43,8 @@ public class CommandWeather extends BotCommand<StarotaServer> {
 				// need these two extra spaces
 				line.append("No weather forecast found  ");
 			for (EnumWeather weather : boosts)
-				line.append(weather + (weather == null ? ""
-						: MiscUtils.getEmojiDisplay(weather.getEmoji(isDaylight))) + ", ");
+				line.append(String.format("%s %s, ", weather,
+						weather == null ? "" : MiscUtils.getEmojiDisplay(weather.getEmoji(isDaylight))));
 			out.append(line.subSequence(0, line.length() - 2) + "\n");
 			line.setLength(0);
 		}

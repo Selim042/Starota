@@ -251,14 +251,37 @@ public class WebServer {
 
 	protected static String fillBaseStuff(HttpExchange ex, String token, String template) {
 		OAuthUser user = OAuthUtils.getUser(token);
+		boolean inGuild;
 		Cookie serverCookie = WebServer.getCookies(ex).get("current_server");
-		Snowflake serverId = Snowflake.of(serverCookie.value);
-		boolean inGuild = Starota.getClient().getGuilds().any((g) -> g.getId().equals(serverId)).block();
-		if (inGuild)
-			template = template.replaceAll("\\{SERVER_NAME\\}", Starota.getGuild(serverId).getName());
-		else
-			template = template.replaceAll("\\{SERVER_NAME\\}", "No server selected");
-		template = template.replaceAll("\\{LOGGED_IN_DISCORD_AVATAR\\}", user.getAvatarURL());
+		Guild guild;
+		Snowflake serverId;
+		if (serverCookie == null) {
+			inGuild = false;
+			serverId = null;
+		} else {
+			guild = null;
+			serverId = Snowflake.of(serverCookie.value);
+			inGuild = Starota.getClient().getGuilds().any((g) -> g.getId().equals(serverId)).block();
+		}
+		EnumWeather[] boosts = new EnumWeather[0];
+
+		if (inGuild) {
+			guild = Starota.getGuild(serverId);
+			template = template.replace("{SERVER_NAME}", guild.getName());
+			StarotaServer server = StarotaServer.getServer(guild);
+			boosts = server.getCurrentPossibleBoosts();
+		} else
+			template = template.replace("{SERVER_NAME}", "No server selected");
+
+		if (boosts.length > 0) {
+			template = template.replace("{WEATHER_ICON}", boosts[0].getEmoji().getImageUrl());
+			template = template.replace("{WEATHER_VISIBILITY}", "");
+		} else {
+			template = template.replace("{WEATHER_ICON}", "");
+			template = template.replace("{WEATHER_VISIBILITY}", "invisible");
+		}
+		if (user != null)
+			template = template.replace("{LOGGED_IN_DISCORD_AVATAR}", user.getAvatarURL());
 		return template;
 	}
 
