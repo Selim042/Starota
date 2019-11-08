@@ -1,8 +1,6 @@
 package us.myles_selim.starota.misc.data_types;
 
-import java.util.function.Consumer;
-
-import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.core.object.data.stored.embed.EmbedBean;
 
 /**
  * Only really used to turn JSON from
@@ -11,13 +9,8 @@ import discord4j.core.spec.EmbedCreateSpec;
 public class EmbedHolder {
 
 	public String content;
-	public Consumer<? super EmbedCreateSpec> embed;
+	public EmbedBean embed;
 
-	public EmbedHolder() {}
-
-	public EmbedHolder(String content, Consumer<? super EmbedCreateSpec> embed) {
-		this.content = content;
-		this.embed = embed;
-	}
+	private EmbedHolder() {}
 
 }

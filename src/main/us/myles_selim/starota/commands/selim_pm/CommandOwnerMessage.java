@@ -58,13 +58,13 @@ public class CommandOwnerMessage extends JavaCommand {
 				EmbedHolder embed = GSON.fromJson(msg, EmbedHolder.class);
 				if (embed != null) {
 					this.content = embed.content;
-					this.embed = embed.embed;
+					this.embed = EmbedBuilder.fromBean(embed.embed).build();
 					emptyEmbed = false;
 				}
 			} else {
 				String out = "";
 				for (String l : lines)
-					out += l;
+					out += l + "\n";
 				if (!out.isEmpty())
 					this.content = out;
 				this.embed = new EmbedBuilder().build();

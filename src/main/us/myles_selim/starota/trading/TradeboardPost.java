@@ -8,6 +8,8 @@ import discord4j.core.object.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.ebs.DataType;
 import us.myles_selim.ebs.Storage;
+import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.enums.EnumDonorPerm;
 import us.myles_selim.starota.enums.EnumGender;
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.forms.Form;
@@ -93,6 +95,10 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 		return this.owner;
 	}
 
+	public Snowflake getOwnerSnowflake() {
+		return Snowflake.of(this.owner);
+	}
+
 	public EnumPokemon getPokemon() {
 		return this.pokemon;
 	}
@@ -127,6 +133,8 @@ public class TradeboardPost extends DataType<TradeboardPost> {
 	public Consumer<? super EmbedCreateSpec> getPostEmbed(StarotaServer server, boolean includeUsage) {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withTitle("Tradeboard Post #" + String.format("%04d", this.getId()) + "\n\n");
+		if (server.getVoteRewards().contains(EnumDonorPerm.HTTP))
+			builder.withUrl(Starota.getStarotaURL(this)).withAuthorUrl(Starota.getStarotaURL(this));
 		builder.appendField("Trade Type:",
 				"Poster " + (this.isLookingFor() ? "is looking for" : "currently has"), false);
 		Member user = server.getDiscordGuild().getMemberById(Snowflake.of(this.getOwner())).block();

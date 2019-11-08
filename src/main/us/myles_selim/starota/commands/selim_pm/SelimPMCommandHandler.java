@@ -47,6 +47,7 @@ public class SelimPMCommandHandler {
 		registerCommand("Admin", new CommandServerInfo());
 		registerCommand("Admin", new CommandChannelInfo());
 		registerCommand("Admin", new CommandOwnerMessage());
+		registerCommand("Admin", new CommandMapPoints());
 	}
 
 	// private final List<JavaCommand> COMMANDS = new CopyOnWriteArrayList<>();
@@ -137,7 +138,8 @@ public class SelimPMCommandHandler {
 				throws CommandException;
 
 		@Override
-		public final void setCommandHandler(ICommandHandler handler) { /* do nothing */ }
+		public final void setCommandHandler(
+				ICommandHandler handler) { /* do nothing */ }
 
 		@Override
 		public final ICommandHandler getCommandHandler() {

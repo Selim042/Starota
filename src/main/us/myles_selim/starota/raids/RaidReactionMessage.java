@@ -166,7 +166,8 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 		if (pokemon != null && StarotaModule.isModuleEnabled(server, BaseModules.POKEDEX))
 			entry = GoHubDatabase.getEntry(pokemon, form == null ? null : (form.getGoHubFormName()));
 		if (pokemon != null) {
-			String titleString = (form == null ? "" : form + " ") + pokemon + " Raid ";
+			String titleString = (pokemon.getFormSet().isDefaultOnly() ? form.getName() + " " : "")
+					+ pokemon.getData().getName() + " Raid ";
 			if (boss.getTier() == 6)
 				titleString += MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji(EX_RAID_EMOJI));
 			else {
@@ -289,8 +290,9 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 		for (RaidBoss b : bosses) {
 			if (boss != null)
 				break;
-			String postfix = b.getForm() == null ? "" : "_" + b.getForm().getEmojiPostfix();
-			msg.addReaction(EmojiServerHelper.getEmoji(b.getPokemon() + postfix,
+			String postfix = b.getForm() == null || b.getPokemon().getFormSet().isDefaultOnly() ? ""
+					: "_" + b.getForm().getEmojiPostfix();
+			msg.addReaction(EmojiServerHelper.getEmoji(b.getPokemon().getData().getName() + postfix,
 					ImageHelper.getOfficalArtwork(b.getPokemon(), b.getForm()))).block();
 		}
 	}

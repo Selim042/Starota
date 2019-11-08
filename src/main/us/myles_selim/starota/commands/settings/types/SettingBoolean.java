@@ -20,7 +20,7 @@ public class SettingBoolean extends Setting<Boolean> {
 	}
 
 	public SettingBoolean(SettingBoolean setting) {
-		super(setting.getName(), new Boolean(setting.getValue()));
+		super(setting.getName(), setting.getDescription(), new Boolean(setting.getValue()));
 	}
 
 	@Override

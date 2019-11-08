@@ -38,7 +38,7 @@ public class ServerDataHelper {
 
 			@Override
 			public boolean shouldJustDelete(String oldPath) {
-				return oldPath.equals("us.myles_selim.starota.commands.CommandHouseCup$HouseCupData");
+				return oldPath.equals("us.myles_selim.starota.wrappers.InfoChannel$DataTypeInfoChannel");
 			}
 		}).setOnWriteCallback(new FileWriteCallback(ebsFile));
 	}

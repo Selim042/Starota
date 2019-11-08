@@ -17,6 +17,7 @@ import us.myles_selim.ebs.Storage;
 import us.myles_selim.starota.EventFactory;
 import us.myles_selim.starota.EventFactory.ExtraField;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.enums.EnumDonorPerm;
 import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.lua.events.GetProfileEvent;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
@@ -126,6 +127,11 @@ public class PlayerProfile {
 		return new HashMap<>(this.alts);
 	}
 
+	public PlayerProfile setAlts(Map<String, Long> alts) {
+		this.alts = alts;
+		return this;
+	}
+
 	public Instant getLastUpdated() {
 		if (this.lastUpdated == 0)
 			this.lastUpdated = System.currentTimeMillis() / 1000;
@@ -148,6 +154,8 @@ public class PlayerProfile {
 		User user = getDiscordUser();
 		builder.withAuthorName(user.getUsername()).withAuthorIcon(user.getAvatarUrl());
 		builder.withTitle("Profile for " + this.poGoName + ":");
+		if (event.getServer().getVoteRewards().contains(EnumDonorPerm.HTTP))
+			builder.withUrl(Starota.getStarotaURL(this)).withAuthorUrl(Starota.getStarotaURL(this));
 		for (ExtraField f : event.getFields()) {
 			if (f == null)
 				continue;

@@ -19,13 +19,14 @@ public abstract class BotCommand<S extends BotServer> extends JavaCommand {
 		super(name, description);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public final void execute(String[] args, Message message, Guild guild, MessageChannel channel)
 			throws CommandException {
 		if (guild == null)
 			return;
-		execute(args, message, BotServer.getServer(this.getCommandHandler().getDiscordClient(), guild),
-				channel);
+		execute(args, message,
+				(S) BotServer.getServer(this.getCommandHandler().getDiscordClient(), guild), channel);
 	}
 
 	public abstract void execute(String[] args, Message message, S server, MessageChannel channel)

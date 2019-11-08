@@ -17,7 +17,7 @@ public interface ICommand extends Comparable<ICommand> {
 	public default String getStarotaPermission() {
 		StringBuilder builder = new StringBuilder("command.");
 		if (getCategory() != null)
-			builder.append(getCategory() + ".");
+			builder.append(getCategory().toLowerCase() + ".");
 		builder.append(getName());
 		return builder.toString();
 	}

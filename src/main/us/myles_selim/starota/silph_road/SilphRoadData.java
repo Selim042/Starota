@@ -108,9 +108,7 @@ public class SilphRoadData {
 							continue;
 						}
 						boolean shinyable = match2.contains("shiny");
-						Form form = null;
-						if (pokemon.getData().getFormSet() != null)
-							form = pokemon.getData().getFormSet().getForm(pokemonName[1]);
+						Form form = pokemon.getData().getFormSet().getForm(pokemonName[1]);
 						newBosses.add(new RaidBoss(pokemon, form, tier, shinyable));
 					}
 				}

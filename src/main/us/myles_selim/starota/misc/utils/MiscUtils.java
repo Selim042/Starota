@@ -3,12 +3,15 @@ package us.myles_selim.starota.misc.utils;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
+
+import com.google.common.base.Supplier;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.object.Region;
@@ -30,6 +33,14 @@ import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.silph_road.SilphRoadData;
 
 public class MiscUtils {
+
+	public static <K, V, C extends Collection<V>> V getValueOrDefault(Map<K, V> map, K key,
+			Supplier<V> defaultSupplier) {
+		if (map.containsKey(key))
+			return map.get(key);
+		map.put(key, defaultSupplier.get());
+		return map.get(key);
+	}
 
 	public static String getEmojiName(ReactionEmoji emoji) {
 		if (emoji == null)
@@ -100,12 +111,13 @@ public class MiscUtils {
 	}
 
 	public static Role getSidebarRole(Member member) {
-		Flux<Role> hoistedRoles = member.getRoles()
-				.sort((Role r1, Role r2) -> Integer.compare(r2.getRawPosition(), r1.getRawPosition()))
-				.filter((r) -> r.isHoisted());
-		if (hoistedRoles.hasElements().block())
-			return hoistedRoles.blockFirst();
-		return member.getGuild().block().getEveryoneRole().block();
+		return member.getHighestRole().block();
+//		Flux<Role> hoistedRoles = member.getRoles()
+//				.sort((Role r1, Role r2) -> Integer.compare(r2.getRawPosition(), r1.getRawPosition()))
+//				.filter((r) -> r.isHoisted());
+//		if (hoistedRoles.hasElements().block())
+//			return hoistedRoles.blockFirst();
+//		return member.getGuild().block().getEveryoneRole().block();
 	}
 
 	public static Flux<Member> getMembersHereFlux(GuildChannel ch) {

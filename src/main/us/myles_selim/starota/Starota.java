@@ -38,7 +38,6 @@ import us.myles_selim.starota.commands.CommandArticleMessage;
 import us.myles_selim.starota.commands.CommandCatcherCup;
 import us.myles_selim.starota.commands.CommandCatcherCupAddPoints;
 import us.myles_selim.starota.commands.CommandChangelog;
-import us.myles_selim.starota.commands.CommandCredits;
 import us.myles_selim.starota.commands.CommandGetTimezones;
 import us.myles_selim.starota.commands.CommandInvite;
 import us.myles_selim.starota.commands.CommandPing;
@@ -46,6 +45,11 @@ import us.myles_selim.starota.commands.CommandStatus;
 import us.myles_selim.starota.commands.CommandSupportBot;
 import us.myles_selim.starota.commands.CommandTest;
 import us.myles_selim.starota.commands.CommandVote;
+import us.myles_selim.starota.commands.credits.CommandCredits;
+import us.myles_selim.starota.commands.credits.Credit;
+import us.myles_selim.starota.commands.credits.CreditSet;
+import us.myles_selim.starota.commands.credits.Creditable;
+import us.myles_selim.starota.commands.credits.EnumCreditType;
 import us.myles_selim.starota.commands.registry.PrimaryCommandHandler;
 import us.myles_selim.starota.commands.registry.java.JavaCommandHandler;
 import us.myles_selim.starota.commands.selim_pm.SelimPMCommandHandler;
@@ -56,12 +60,15 @@ import us.myles_selim.starota.commands.settings.types.SettingString;
 import us.myles_selim.starota.commands.settings.types.SettingTimeZone;
 import us.myles_selim.starota.debug_server.DebugServer;
 import us.myles_selim.starota.events.CommandEvents;
+import us.myles_selim.starota.github.GitHubAPI;
+import us.myles_selim.starota.github.GitHubContributor;
 import us.myles_selim.starota.leaderboards.commands.CommandEditLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandGetLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandListLeaderboards;
 import us.myles_selim.starota.leaderboards.commands.CommandNewLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandUpdateLeaderboard;
 import us.myles_selim.starota.leek_duck.ditto.CommandDitto;
+import us.myles_selim.starota.link_shortener.YourLSAPI;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
@@ -70,7 +77,9 @@ import us.myles_selim.starota.misc.utils.TwitterHelper;
 import us.myles_selim.starota.misc.utils.WikiGenerator;
 import us.myles_selim.starota.modules.BaseModules;
 import us.myles_selim.starota.modules.CommandModules;
+import us.myles_selim.starota.pokedex.CommandCPTable;
 import us.myles_selim.starota.pokedex.CommandPokedex;
+import us.myles_selim.starota.profiles.PlayerProfile;
 import us.myles_selim.starota.profiles.commands.CommandGetProfilelessPlayers;
 import us.myles_selim.starota.profiles.commands.CommandProfile;
 import us.myles_selim.starota.profiles.commands.CommandProfileHelp;
@@ -94,6 +103,7 @@ import us.myles_selim.starota.search.pokemon.CommandSearchPoke;
 import us.myles_selim.starota.search.pokemon.PokemonOperators;
 import us.myles_selim.starota.silph_road.CommandSilphCard;
 import us.myles_selim.starota.silph_road.eggs.CommandEggHatches;
+import us.myles_selim.starota.trading.TradeboardPost;
 import us.myles_selim.starota.trading.commands.CommandFindTrade;
 import us.myles_selim.starota.trading.commands.CommandForTrade;
 import us.myles_selim.starota.trading.commands.CommandGetTrade;
@@ -184,6 +194,7 @@ public class Starota {
 					PROPERTIES.getProperty("token"));
 			IS_DEV = Boolean.parseBoolean(PROPERTIES.getProperty("is_dev"));
 			ENABLE_AUTO_REBOOT = Boolean.parseBoolean(PROPERTIES.getProperty("enable_auto_reboot"));
+			YourLSAPI.setSignature(PROPERTIES.getProperty("yourls_signature"));
 			CLIENT = clientBuilder.build();
 			Thread botRun = new Thread() {
 
@@ -218,11 +229,12 @@ public class Starota {
 					"Sets the server's weather API token.", null));
 			StarotaServer.setDefaultValue(new SettingString(StarotaConstants.Settings.COORDS,
 					"Sets the community's coordinates.", null));
-			StarotaServer
-					.setDefaultValue(new SettingBoolean(StarotaConstants.Settings.EASY_HOUSE_CUP_ENTRY,
-							"Allows users with the necessary permissions to distribute House Cup "
-									+ "points by saying things like \"10 points for instinct!\".",
-							true));
+//			StarotaServer
+//					.setDefaultValue(new SettingBoolean(StarotaConstants.Settings.EASY_HOUSE_CUP_ENTRY,
+//							"Allows users with the necessary permissions to distribute House Cup "
+//									+ "points by saying things like \"10 points for instinct!\"."
+//									+ "**NOTE**: Not currently enabled.",
+//							true));
 			StarotaServer.setDefaultValue(new SettingBoolean(StarotaConstants.Settings.CLOCK_24H,
 					"If true, uses 24 hour clock (1-24) rather than 12 hour clock.", false));
 
@@ -372,7 +384,8 @@ public class Starota {
 			// auto restart
 			boolean restartEnabled = restartRestartTimer();
 			CLIENT.getUserById(StarotaConstants.SELIM_USER_ID).block().getPrivateChannel().block()
-					.createMessage("Auto reboot is " + (restartEnabled ? "enabled" : "disabled"));
+					.createMessage("Auto reboot is " + (restartEnabled ? "enabled" : "disabled"))
+					.block();
 		} catch (Exception e) {
 			System.err.println("+-------------------------------------------------------------------+");
 			System.err.println("| Starota failed to start properly. Printing exception then exiting |");
@@ -436,6 +449,7 @@ public class Starota {
 		jCmdHandler.registerCommand("PvP", new CommandFindBattles());
 
 		jCmdHandler.registerCommand("Pokedex", new CommandPokedex());
+		jCmdHandler.registerCommand("Pokedex", new CommandCPTable());
 
 		jCmdHandler.registerCommand("Raids", new CommandRaid());
 		jCmdHandler.registerCommand("Raids", new CommandSetRaidEChannel());
@@ -814,6 +828,63 @@ public class Starota {
 		builder.withFooterIcon(author.getAvatarUrl()).withFooterText(author.getUsername());
 		builder.appendDesc("Sent by:");
 		return builder.build();
+	}
+
+	private static final String URL_BASE = "http://starota.myles-selim.us/";
+	private static final String DEV_URL_BASE = "http://dev.myles-selim.us:7366/";
+
+	public static String getStarotaURL(PlayerProfile profile) {
+		if (IS_DEV)
+			return DEV_URL_BASE + "profile/" + profile.getDiscordId();
+		return URL_BASE + "profile/" + profile.getDiscordId();
+	}
+
+	public static String getStarotaURL(TradeboardPost post) {
+		if (IS_DEV)
+			return DEV_URL_BASE + "tradeboard/";
+		return URL_BASE + "tradeboard/";
+	}
+
+	public static String getCreditsURL() {
+		if (IS_DEV)
+			return DEV_URL_BASE + "credits";
+		return URL_BASE + "credits";
+	}
+
+	public static List<Creditable> getCredits() {
+		List<Creditable> ret = new LinkedList<>();
+		CreditSet creditSet = new CreditSet(EnumCreditType.CONTRIBUTOR);
+		ret.add(creditSet);
+		for (GitHubContributor u : GitHubAPI.getContributors("Selim042", "Starota"))
+			creditSet.add(new Credit.Builder(EnumCreditType.CONTRIBUTOR).withName(u.getLogin())
+					.withLink(u.getHtmlUrl()).build());
+
+		ret.add(new Credit.Builder(EnumCreditType.OTHER).withTitle("Discord Java Library")
+				.withName("Discord4J").withLink("https://github.com/Discord4J/Discord4J/").build());
+		ret.add(new Credit.Builder(EnumCreditType.OTHER).withTitle("Pokemon Go Database")
+				.withName("Pokemon Go Hub").withLink("https://pokemongohub.net/").build());
+		ret.add(new Credit.Builder(EnumCreditType.OTHER)
+				.withTitle("Raid Boss, Field Research, and Egg Information").withName("The Silph Road")
+				.withLink("https://thesilphroad.com/").build());
+		ret.add(new Credit.Builder(EnumCreditType.OTHER).withTitle("Ditto Information")
+				.withName("Leek Duck").withLink("https://leekduck.com").build());
+		ret.add(new Credit.Builder(EnumCreditType.OTHER).withTitle("Weather Predictions")
+				.withName("AccuWeather").withLink("https://accuweather.com/").build());
+
+		creditSet = new CreditSet(EnumCreditType.EDITOR);
+		ret.add(creditSet);
+		Guild supportServer = Starota.getSupportServer();
+		for (Member u : MiscUtils.getMembersByRole(supportServer, StarotaConstants.EDITOR_ROLE_ID))
+			creditSet.add(new Credit.Builder(EnumCreditType.EDITOR)
+					.withName(String.format("%s#%s", u.getUsername(), u.getDiscriminator())).build());
+
+		creditSet = new CreditSet(EnumCreditType.BETA_TESTER);
+		ret.add(creditSet);
+		Guild testServer = Starota.getGuild(StarotaConstants.BETA_TEST_SERVER);
+		for (Member u : MiscUtils.getMembersByRole(testServer, Snowflake.of(637851117203488785L)))
+			creditSet.add(new Credit.Builder(EnumCreditType.BETA_TESTER)
+					.withName(String.format("%s#%s", u.getUsername(), u.getDiscriminator())).build());
+		return ret;
 	}
 
 }

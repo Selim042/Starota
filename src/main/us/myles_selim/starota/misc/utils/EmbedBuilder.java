@@ -6,6 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import discord4j.core.object.data.stored.embed.EmbedAuthorBean;
+import discord4j.core.object.data.stored.embed.EmbedBean;
+import discord4j.core.object.data.stored.embed.EmbedFieldBean;
+import discord4j.core.object.data.stored.embed.EmbedFooterBean;
+import discord4j.core.object.data.stored.embed.EmbedImageBean;
+import discord4j.core.object.data.stored.embed.EmbedThumbnailBean;
 import discord4j.core.spec.EmbedCreateSpec;
 
 /**
@@ -20,6 +26,22 @@ public class EmbedBuilder {
 	public static final int FOOTER_CONTENT_LIMIT = DESCRIPTION_CONTENT_LIMIT;
 	public static final int AUTHOR_NAME_LIMIT = 256;
 	public static final int MAX_CHAR_LIMIT = 6000;
+
+	public static EmbedBuilder fromBean(EmbedBean embed) {
+		EmbedBuilder ret = new EmbedBuilder();
+		ret.title = embed.getTitle();
+		ret.description = embed.getDescription();
+		ret.url = embed.getUrl();
+		ret.timestamp = Instant.parse(embed.getTimestamp());
+		ret.color = embed.getColor();
+		ret.footer = FooterObject.fromBean(embed.getFooter());
+		ret.image = ImageObject.fromBean(embed.getImage());
+		ret.thumbnail = ThumbnailObject.fromBean(embed.getThumbnail());
+		ret.author = AuthorObject.fromBean(embed.getAuthor());
+		for (EmbedFieldBean field : embed.getFields())
+			ret.fields.add(EmbedFieldObject.fromBean(field));
+		return ret;
+	}
 
 	private String title;
 	private String description;
@@ -529,6 +551,15 @@ public class EmbedBuilder {
 			this.height = height;
 			this.width = width;
 		}
+
+		public static ThumbnailObject fromBean(EmbedThumbnailBean thumbnail) {
+			ThumbnailObject ret = new ThumbnailObject();
+			ret.url = thumbnail.getUrl();
+			ret.proxy_url = thumbnail.getProxyUrl();
+			ret.height = thumbnail.getHeight();
+			ret.width = thumbnail.getWidth();
+			return ret;
+		}
 	}
 
 	private static class ImageObject {
@@ -557,6 +588,15 @@ public class EmbedBuilder {
 			this.proxy_url = proxy_url;
 			this.height = height;
 			this.width = width;
+		}
+
+		public static ImageObject fromBean(EmbedImageBean image) {
+			ImageObject ret = new ImageObject();
+			ret.url = image.getUrl();
+			ret.proxy_url = image.getProxyUrl();
+			ret.height = image.getHeight();
+			ret.width = image.getWidth();
+			return ret;
 		}
 	}
 
@@ -587,6 +627,15 @@ public class EmbedBuilder {
 			this.icon_url = icon_url;
 			this.proxy_icon_url = proxy_icon_url;
 		}
+
+		public static AuthorObject fromBean(EmbedAuthorBean author) {
+			AuthorObject ret = new AuthorObject();
+			ret.name = author.getName();
+			ret.url = author.getUrl();
+			ret.icon_url = author.getIconUrl();
+			ret.proxy_icon_url = author.getProxyIconUrl();
+			return ret;
+		}
 	}
 
 	private static class FooterObject {
@@ -611,6 +660,14 @@ public class EmbedBuilder {
 			this.icon_url = icon_url;
 			this.proxy_icon_url = proxy_icon_url;
 		}
+
+		public static FooterObject fromBean(EmbedFooterBean footer) {
+			FooterObject ret = new FooterObject();
+			ret.text = footer.getText();
+			ret.icon_url = footer.getIconUrl();
+			ret.proxy_icon_url = footer.getProxyIconUrl();
+			return ret;
+		}
 	}
 
 	private static class EmbedFieldObject {
@@ -634,6 +691,14 @@ public class EmbedBuilder {
 			this.name = name;
 			this.value = value;
 			this.inline = inline;
+		}
+
+		public static EmbedFieldObject fromBean(EmbedFieldBean field) {
+			EmbedFieldObject ret = new EmbedFieldObject();
+			ret.name = field.getName();
+			ret.value = field.getValue();
+			ret.inline = field.isInline();
+			return ret;
 		}
 	}
 

@@ -15,6 +15,8 @@ public class StarotaConstants {
 	public static final Snowflake SELIM_USER_ID = Snowflake.of(134855940938661889L);
 	/** Support guild ID */
 	public static final Snowflake SUPPORT_SERVER = Snowflake.of(436614503606779914L);
+	/** Beta test guild ID */
+	public static final Snowflake BETA_TEST_SERVER = Snowflake.of(613550318101331973L);
 
 	/** Editor role on the support server */
 	public static final Snowflake EDITOR_ROLE_ID = Snowflake.of(572498311525695498L);
@@ -26,7 +28,7 @@ public class StarotaConstants {
 	/** Permament invite link to the support server */
 	public static final String SUPPORT_SERVER_LINK = "https://discord.gg/NxverNw";
 	/** User agent for all HTTP requests */
-	public static final String HTTP_USER_AGENT = "Mozilla/5.0; Starota/" + VERSION;
+	public static final String HTTP_USER_AGENT = "Starota/" + VERSION;
 
 	public static class Settings {
 
