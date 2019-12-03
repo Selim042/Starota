@@ -182,7 +182,8 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 			if (entry != null) {
 				String boostedString = "";
 				for (EnumWeather w : entry.weatherInfluences)
-					boostedString += w.getEmoji().asFormat();
+					if (w != null && w.getEmoji() != null)
+						boostedString += w.getEmoji().asFormat();
 				builder.appendField("Boss Weather Boosts:", boostedString, true);
 			}
 		}
@@ -196,7 +197,7 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 			SimpleDateFormat hourFormat = server.getHourFormat();
 			long time = System.currentTimeMillis();
 			if (forecastedBoosts.length > 0) {
-				forecastedWeather.append(String.format("**%s**:", hourFormat.format(time)));
+				forecastedWeather.append(String.format("**%s**: ", hourFormat.format(time)));
 				for (EnumWeather weather : forecastedBoosts)
 					forecastedWeather.append(MiscUtils.getEmojiDisplay(weather.getEmoji(isDaylight)));
 			} else
@@ -208,13 +209,13 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 			boolean isDaylightNext = server.isDaylight(1);
 			time += 3600000;
 			if (nextForecastedBoosts.length > 0) {
-				forecastedWeather.append(String.format("\n**%s**:", hourFormat.format(time)));
+				forecastedWeather.append(String.format("\n**%s**: ", hourFormat.format(time)));
 				for (EnumWeather weather : nextForecastedBoosts)
 					forecastedWeather
 							.append(MiscUtils.getEmojiDisplay(weather.getEmoji(isDaylightNext)));
 			} else
 				forecastedWeather.append(
-						(String.format("**%s**: No weather forecast found", hourFormat.format(time))));
+						(String.format("\n**%s**: No weather forecast found", hourFormat.format(time))));
 
 			builder.appendField("Weather Forecasts:", forecastedWeather.toString(), false);
 		}
