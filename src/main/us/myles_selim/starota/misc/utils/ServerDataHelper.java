@@ -40,7 +40,7 @@ public class ServerDataHelper {
 			public boolean shouldJustDelete(String oldPath) {
 				return oldPath.equals("us.myles_selim.starota.wrappers.InfoChannel$DataTypeInfoChannel");
 			}
-		}).setOnWriteCallback(new FileWriteCallback(ebsFile));
+		}).registerPrimitives().setOnWriteCallback(new FileWriteCallback(ebsFile));
 	}
 
 	@SuppressWarnings("unchecked")
