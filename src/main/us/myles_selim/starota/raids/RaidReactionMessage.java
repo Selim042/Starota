@@ -85,8 +85,11 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 			pokemon = EnumPokemon.getPokemon(parts[0]);
 			form = getForm(parts);
 			boss = SilphRoadData.getBoss(pokemon, form);
-			if (boss == null)
+			if (boss == null) {
+				pokemon = null;
+				form = null;
 				return;
+			}
 			msg.removeAllReactions().block();
 			try {
 				Thread.sleep(100);
@@ -154,8 +157,8 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 	}
 
 	private Form getForm(String[] parts) {
-		if (parts.length < 2 || pokemon.getData().getFormSet() == null)
-			return null;
+		if (parts.length == 1)
+			return pokemon.getData().getDefaultForm();
 		return pokemon.getData().getFormSet().getForm(parts[1]);
 	}
 
@@ -166,7 +169,7 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 		if (pokemon != null && StarotaModule.isModuleEnabled(server, BaseModules.POKEDEX))
 			entry = GoHubDatabase.getEntry(pokemon, form == null ? null : (form.getGoHubFormName()));
 		if (pokemon != null) {
-			String titleString = (pokemon.getFormSet().isDefaultOnly() ? form.getName() + " " : "")
+			String titleString = (pokemon.getFormSet().isDefaultOnly() ? "" : form.getName() + " ")
 					+ pokemon.getData().getName() + " Raid ";
 			if (boss.getTier() == 6)
 				titleString += MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji(EX_RAID_EMOJI));
