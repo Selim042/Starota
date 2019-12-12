@@ -131,7 +131,7 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
 	public final static String CHANGELOG = "Changelog for v" + StarotaConstants.VERSION + "\n"
-			+ "Public changes:\n" + " * Fix issue raid embeds when displaying weather forecasts";
+			+ "Public changes:\n" + " * Fix raid names and Pokemon selection";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static PrimaryCommandHandler COMMAND_HANDLER;
