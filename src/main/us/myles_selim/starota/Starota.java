@@ -131,19 +131,7 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
 	public final static String CHANGELOG = "Changelog for v" + StarotaConstants.VERSION + "\n"
-			+ "Public changes:\n" + " + Add new Unova stone evolutions\n"
-			+ " + New feature: Catcher's Cup\n"
-			+ "   - The Catcher's Cup is similar to the House Cup in the Harry Potter franchise and lets teams compete to determine who is best based on a completely arbirary point system\n"
-			+ "   - Admins can add points to a team with the addPoints command\n"
-			+ " + New command: cpTable\n"
-			+ "   - Displays all possible CPs for a given Pokemon at levels that you can catch it at (forms are not currently supproted)\n"
-			+ " * Event sorting has been changed, long term events are defaulted to the end, started events are sorted by end time\n"
-			+ " * The eggHatches command looks different now.  The separate tiers look similar to the overall message, and regional hatches are seperated from normal hatches\n"
-			+ " * Various QoL tweaks to the beta website, if you have access\n"
-			+ " * The Shellos family are now counted as regionals\n"
-			+ " * Overhaul to the credits command to include beta testers and GitHub contributors\n"
-			+ " * Tweaks to the weather command and how weather predictions are displayed across Starota\n"
-			+ " * Weather emoji have been changed\n" + " * Misc fixes\n";
+			+ "Public changes:\n" + " * Fix issue raid embeds when displaying weather forecasts";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static PrimaryCommandHandler COMMAND_HANDLER;
