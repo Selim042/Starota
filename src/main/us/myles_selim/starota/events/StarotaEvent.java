@@ -65,7 +65,7 @@ public class StarotaEvent implements Comparable<StarotaEvent> {
 	public long getAdjustedEnd(TimeZone timezone) {
 		if (endTime == 0)
 			return 0;
-		if (localized)
+		if (localized && timezone != null)
 			return endTime + timezone.getOffset(endTime) + timezone.getDSTSavings();
 		return endTime;
 	}
