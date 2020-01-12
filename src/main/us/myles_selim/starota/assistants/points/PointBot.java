@@ -51,7 +51,7 @@ public class PointBot {
 
 	@SuppressWarnings("deprecation")
 	public static void start() {
-		// if (started || Starota.IS_DEV)
+		// disable the bot
 		if (started || !started)
 			return;
 		started = true;

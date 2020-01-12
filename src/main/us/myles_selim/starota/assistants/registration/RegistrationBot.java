@@ -39,7 +39,8 @@ public class RegistrationBot {
 
 	@SuppressWarnings("deprecation")
 	public static void start() {
-		if (started)
+		// disable the bot
+		if (started || !started)
 			return;
 		started = true;
 
