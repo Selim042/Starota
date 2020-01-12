@@ -53,22 +53,33 @@ public class CommandPokedex extends BotCommand<StarotaServer> {
 			pokemon = EnumPokemon.getPokemon(args[1]);
 		}
 		if (pokemon == null) {
-			EmbedBuilder builder = new EmbedBuilder();
-			builder.withTitle("Did you mean...?");
-			for (EnumPokemon poke : MiscUtils.getSuggestedPokemon(args[1], 6)) {
-				if (poke != null)
-					builder.appendDesc("- " + poke + "\n");
-			}
-			channel.createMessage((m) -> m.setContent("Pokemon \"" + args[1] + "\" not found")
-					.setEmbed(builder.build())).block();
+			sendNotFound(args[1], channel);
 			return;
 		}
 		Message oldMessage = null;
 		if (!GoHubDatabase.isEntryLoaded(pokemon))
 			oldMessage = channel.createEmbed(GoHubDatabase.LOADING_EMBED).block();
 		PokedexEntry entry = GoHubDatabase.getEntry(pokemon);
+		if (entry == null) {
+			sendNotFound(args[1], channel);
+			if (oldMessage != null)
+				oldMessage.delete().block();
+			return;
+		}
 		PokedexReactionMessage pokedexMessage = new PokedexReactionMessage(entry);
 		pokedexMessage.editMessage((TextChannel) channel, oldMessage);
+	}
+
+	private void sendNotFound(String name, MessageChannel channel) {
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.withTitle("Did you mean...?");
+		for (EnumPokemon poke : MiscUtils.getSuggestedPokemon(name, 6)) {
+			if (poke != null)
+				builder.appendDesc("- " + poke.getData().getName() + "\n");
+		}
+		channel.createMessage(
+				(m) -> m.setContent("Pokemon \"" + name + "\" not found").setEmbed(builder.build()))
+				.block();
 	}
 
 }

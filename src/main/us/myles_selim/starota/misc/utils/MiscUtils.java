@@ -112,12 +112,13 @@ public class MiscUtils {
 
 	public static Role getSidebarRole(Member member) {
 		return member.getHighestRole().block();
-//		Flux<Role> hoistedRoles = member.getRoles()
-//				.sort((Role r1, Role r2) -> Integer.compare(r2.getRawPosition(), r1.getRawPosition()))
-//				.filter((r) -> r.isHoisted());
-//		if (hoistedRoles.hasElements().block())
-//			return hoistedRoles.blockFirst();
-//		return member.getGuild().block().getEveryoneRole().block();
+		// Flux<Role> hoistedRoles = member.getRoles()
+		// .sort((Role r1, Role r2) -> Integer.compare(r2.getRawPosition(),
+		// r1.getRawPosition()))
+		// .filter((r) -> r.isHoisted());
+		// if (hoistedRoles.hasElements().block())
+		// return hoistedRoles.blockFirst();
+		// return member.getGuild().block().getEveryoneRole().block();
 	}
 
 	public static Flux<Member> getMembersHereFlux(GuildChannel ch) {
@@ -302,7 +303,7 @@ public class MiscUtils {
 	public static EnumPokemon[] getSuggestedPokemon(String input, int count) {
 		List<DistancedEnum<EnumPokemon>> suggestions = new ArrayList<>();
 		for (EnumPokemon e : EnumPokemon.values()) {
-			suggestions.add(new DistancedEnum<>(calculateDistance(e.name(), input), e));
+			suggestions.add(new DistancedEnum<>(calculateDistance(e.getData().getName(), input), e));
 			suggestions.add(new DistancedEnum<>(calculateDistance(e.toString(), input), e));
 		}
 		suggestions.sort(null);
