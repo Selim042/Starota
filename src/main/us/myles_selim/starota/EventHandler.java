@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -117,8 +118,9 @@ public class EventHandler implements EventListener {
 		Snowflake user = event.getUser().getId();
 		if (server.hasProfile(user))
 			server.deleteProfile(user);
-		for (TradeboardPost post : server.getPosts(user))
-			server.removePost(post.getId());
+		List<TradeboardPost> posts = server.getPosts(user);
+		if (posts != null)
+			posts.forEach(p -> server.removePost(p.getId()));
 	}
 
 	private static final Map<String, Consumer<String>> CACHES = new HashMap<>();
