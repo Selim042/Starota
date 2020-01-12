@@ -23,7 +23,7 @@ public class CommandEggHatches extends BotCommand<StarotaServer> {
 
 	private static final String REGIONAL_DISCLAIMER = //
 			"Regional exclusive Pokemon can only be hatched from eggs picked up in their respective regions.\n"
-					+ "There is no way to obtain regional 5km eggs in any other way outside of picking them "
+					+ "There is no way to obtain regional %dkm eggs in any other way outside of picking them "
 					+ "up from a Pokestop in their respective regions.";
 
 	public CommandEggHatches() {
@@ -79,7 +79,7 @@ public class CommandEggHatches extends BotCommand<StarotaServer> {
 
 		boolean foundRegional = false;
 		StringBuilder regionalHatches = new StringBuilder();
-		regionalHatches.append(REGIONAL_DISCLAIMER + "\n\n");
+		regionalHatches.append(String.format(REGIONAL_DISCLAIMER, dist) + "\n\n");
 		for (EggEntry b : SilphRoadData.getEggs(dist)) {
 			if (b.getPokemon().getData().isRegional()) {
 				foundRegional = true;
@@ -129,7 +129,7 @@ public class CommandEggHatches extends BotCommand<StarotaServer> {
 
 			StringBuilder bodyBuilder = new StringBuilder();
 			if (data.regional)
-				bodyBuilder.append(REGIONAL_DISCLAIMER + "\n\n");
+				bodyBuilder.append(String.format(REGIONAL_DISCLAIMER, data.distance) + "\n\n");
 			bodyBuilder.append("**Non-Shinies**:\n");
 			if (data.builder.length() > 2)
 				bodyBuilder.append(data.builder.substring(0, data.builder.length() - 2));
