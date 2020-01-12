@@ -131,7 +131,9 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
 	public final static String CHANGELOG = "Changelog for v" + StarotaConstants.VERSION + "\n"
-			+ "Public changes:\n" + " * Fix raid names and Pokemon selection";
+			+ "Public changes:\n" + " + Add new regionals\n"
+			+ " * Fix lots of issues related to finding Pokemon (including \"eggHatches\" and \"dex\")\n"
+			+ " * Fix distance in regional egg disclaimer";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static PrimaryCommandHandler COMMAND_HANDLER;
