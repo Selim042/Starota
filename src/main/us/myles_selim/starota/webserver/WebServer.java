@@ -28,6 +28,8 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.TextChannel;
+import discord4j.core.object.entity.User;
 import discord4j.core.object.util.Snowflake;
 import reactor.core.publisher.Flux;
 import us.myles_selim.starota.Starota;
@@ -111,68 +113,70 @@ public class WebServer {
 			});
 
 			// TODO: for proper permission system
-//			server.createContext("/data/permissions", new HttpHandler() {
-//
-//				@Override
-//				public void handle(HttpExchange ex) throws IOException {
-//					try {
-//						if (!isLoggedIn(ex)) {
-//							notAllowed(ex);
-//							return;
-//						}
-//						OAuthUser oUser = OAuthUtils.getUser(getCookies(ex).get("token").value);
-//						Snowflake guildId = getGuild(ex);
-//						boolean inGuild = Starota.getClient().getGuilds()
-//								.any((g) -> g.getId().equals(guildId)).block();
-//						if (!inGuild) {
-//							notAllowed(ex);
-//							return;
-//						}
-//						Guild guild = Starota.getGuild(guildId);
-//						if (!guild.getMemberById(Snowflake.of(oUser.id)).block().getBasePermissions()
-//								.block().contains(Permission.ADMINISTRATOR)) {
-//							notAllowed(ex);
-//							return;
-//						}
-//
-//						File permFile = new File(PermissionsIO.PERMISSION_FOLDER,
-//								guildId.asString() + ".starota_perms");
-//						String ret;
-//						if (permFile.exists()) {
-//							StringBuilder contents = new StringBuilder();
-//							FileReader in = new FileReader(permFile);
-//							for (char c = (char) in.read(); in.ready(); c = (char) in.read())
-//								contents.append(c);
-//							in.close();
-//							ret = contents.toString();
-//						} else
-//							ret = "";
-//
-//						byte[] dat = ret.toString().getBytes("UTF-8");
-//						ex.sendResponseHeaders(200, dat.length);
-//						OutputStream out = ex.getResponseBody();
-//						out.write(dat);
-//						out.close();
-//					} catch (Exception e) {
-//						e.printStackTrace();
-//						returnError(ex, e);
-//					}
-//				}
-//
-//				private void notAllowed(HttpExchange ex) {
-//					try {
-//						String ret = "{\"error_message\"=\"not allowed\"}";
-//						byte[] dat = ret.getBytes("UTF-8");
-//						ex.sendResponseHeaders(200, dat.length);
-//						OutputStream out = ex.getResponseBody();
-//						out.write(dat);
-//						out.close();
-//					} catch (IOException e) {
-//						e.printStackTrace();
-//					}
-//				}
-//
-//			});
+			// server.createContext("/data/permissions", new HttpHandler() {
+			//
+			// @Override
+			// public void handle(HttpExchange ex) throws IOException {
+			// try {
+			// if (!isLoggedIn(ex)) {
+			// notAllowed(ex);
+			// return;
+			// }
+			// OAuthUser oUser =
+			// OAuthUtils.getUser(getCookies(ex).get("token").value);
+			// Snowflake guildId = getGuild(ex);
+			// boolean inGuild = Starota.getClient().getGuilds()
+			// .any((g) -> g.getId().equals(guildId)).block();
+			// if (!inGuild) {
+			// notAllowed(ex);
+			// return;
+			// }
+			// Guild guild = Starota.getGuild(guildId);
+			// if
+			// (!guild.getMemberById(Snowflake.of(oUser.id)).block().getBasePermissions()
+			// .block().contains(Permission.ADMINISTRATOR)) {
+			// notAllowed(ex);
+			// return;
+			// }
+			//
+			// File permFile = new File(PermissionsIO.PERMISSION_FOLDER,
+			// guildId.asString() + ".starota_perms");
+			// String ret;
+			// if (permFile.exists()) {
+			// StringBuilder contents = new StringBuilder();
+			// FileReader in = new FileReader(permFile);
+			// for (char c = (char) in.read(); in.ready(); c = (char) in.read())
+			// contents.append(c);
+			// in.close();
+			// ret = contents.toString();
+			// } else
+			// ret = "";
+			//
+			// byte[] dat = ret.toString().getBytes("UTF-8");
+			// ex.sendResponseHeaders(200, dat.length);
+			// OutputStream out = ex.getResponseBody();
+			// out.write(dat);
+			// out.close();
+			// } catch (Exception e) {
+			// e.printStackTrace();
+			// returnError(ex, e);
+			// }
+			// }
+			//
+			// private void notAllowed(HttpExchange ex) {
+			// try {
+			// String ret = "{\"error_message\"=\"not allowed\"}";
+			// byte[] dat = ret.getBytes("UTF-8");
+			// ex.sendResponseHeaders(200, dat.length);
+			// OutputStream out = ex.getResponseBody();
+			// out.write(dat);
+			// out.close();
+			// } catch (IOException e) {
+			// e.printStackTrace();
+			// }
+			// }
+			//
+			// });
 			server.createContext("/assets", new HttpHandler() {
 
 				@Override
@@ -209,9 +213,29 @@ public class WebServer {
 							TopGGVote vote = GSON.fromJson(new InputStreamReader(ex.getRequestBody()),
 									TopGGVote.class);
 							if (Starota.FULLY_STARTED) {
-								Starota.getClient().getUserById(StarotaConstants.SELIM_USER_ID).block()
-										.getPrivateChannel().block().createMessage(vote.toString())
+								// Starota.getClient().getUserById(StarotaConstants.SELIM_USER_ID).block()
+								// .getPrivateChannel().block().createMessage(vote.toString())
+								// .block();
+								User voter = vote.getUserObject();
+								voter.getPrivateChannel().block().createMessage(vote.isWeekend()
+										? "Thank you for voting for Starota on Top.gg on the weekend for double points!"
+										: "Thank you for voting for Starota on Top.gg!").block();
+								TextChannel voteNotifyChannel = ((TextChannel) Starota.getClient()
+										.getChannelById(StarotaConstants.VOTE_NOTIFY_CHANNEL_ID)
+										.block());
+								// Message voteMsg;
+								// if
+								// (voter.asMember(voteNotifyChannel.getGuildId()).block()
+								// != null)
+								// voteMsg = voteNotifyChannel.createMessage(
+								// "Thanks to " + voter.getMention() + " for
+								// voting!");
+								// else
+								voteNotifyChannel
+										.createMessage(
+												"Thanks to " + voter.getMention() + " for voting!")
 										.block();
+								// voteMsg.block();
 							}
 						}
 					}
