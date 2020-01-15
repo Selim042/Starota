@@ -18,12 +18,15 @@ Features:
   - PvP coordination commands (mark yourself as "battle-ready")
   - Command to help coordinate and plan raids
   - Show ongoing and upcoming events
-  - Raid coordination commands
-  - Pokemon search functionality
+  - Raid coordination commands (including raid trains)
+  - Pokemon & event search functionality
   - Command to display current Ditto disguises
   - Command to show all current egg hatches
   - Custom Lua scripting for unique features (Patrons only)
   - WIP web-sided interface (Patrons only)
+  - Predict in-game weather
+  - Catcher's Cup (mini-game type thing, pretty much Harry Potter's house cup, but for PoGo teams)
+  - Show latest Silph Arena Cup counters from Pokebattler
 
 ---
 Server data is stored in the EBS format, as found here: [Selim042/Extendable-Binary-Storage](https://github.com/Selim042/Extendable-Binary-Storage)
