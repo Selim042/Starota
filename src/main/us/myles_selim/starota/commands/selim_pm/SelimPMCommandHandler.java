@@ -48,6 +48,7 @@ public class SelimPMCommandHandler {
 		registerCommand("Admin", new CommandChannelInfo());
 		registerCommand("Admin", new CommandOwnerMessage());
 		registerCommand("Admin", new CommandMapPoints());
+		registerCommand("Admin", new CommandEmojiStatus());
 	}
 
 	// private final List<JavaCommand> COMMANDS = new CopyOnWriteArrayList<>();
