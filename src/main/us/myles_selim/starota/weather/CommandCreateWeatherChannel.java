@@ -2,6 +2,8 @@ package us.myles_selim.starota.weather;
 
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.enums.EnumWeather;
@@ -14,6 +16,16 @@ public class CommandCreateWeatherChannel extends BotCommand<StarotaServer> {
 
 	public CommandCreateWeatherChannel() {
 		super("createWeatherChannel", "Creates the weather info channel.");
+	}
+
+	@Override
+	public Permission requiredUsePermission() {
+		return Permission.ADMINISTRATOR;
+	}
+
+	@Override
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.MANAGE_CHANNELS);
 	}
 
 	@Override

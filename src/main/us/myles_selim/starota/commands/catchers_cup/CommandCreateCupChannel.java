@@ -2,6 +2,8 @@ package us.myles_selim.starota.commands.catchers_cup;
 
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.MessageChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.enums.EnumTeam;
@@ -14,6 +16,16 @@ public class CommandCreateCupChannel extends BotCommand<StarotaServer> {
 
 	public CommandCreateCupChannel() {
 		super("createCupChannel", "Creates the Catcher's Cup info channel.");
+	}
+
+	@Override
+	public Permission requiredUsePermission() {
+		return Permission.ADMINISTRATOR;
+	}
+
+	@Override
+	public PermissionSet getCommandPermission() {
+		return PermissionSet.of(Permission.MANAGE_CHANNELS);
 	}
 
 	@Override
