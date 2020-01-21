@@ -299,7 +299,7 @@ public class Starota {
 
 					@Override
 					public void run() {
-						boolean sentToAll = !CLIENT.getGuilds().map((g) -> {
+						boolean sentToAll = !CLIENT.getGuilds().all((g) -> {
 							StarotaServer server = StarotaServer.getServer(g);
 							TextChannel changesChannel = server
 									.getSetting(StarotaConstants.Settings.CHANGES_CHANNEL);
@@ -312,7 +312,7 @@ public class Starota {
 								return true;
 							} else
 								return false;
-						}).collectList().block().contains(Boolean.FALSE);
+						}).block();
 						if (!IS_DEV && sentToAll)
 							TwitterHelper.sendTweet(CHANGELOG);
 					}
