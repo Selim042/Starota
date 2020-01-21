@@ -94,6 +94,7 @@ import us.myles_selim.starota.pvp.battle_discovery.CommandNotReady;
 import us.myles_selim.starota.raids.CommandRaid;
 import us.myles_selim.starota.raids.CommandRaidBosses;
 import us.myles_selim.starota.raids.CommandSetRaidEChannel;
+import us.myles_selim.starota.raids.raid_train.CommandRaidTrain;
 import us.myles_selim.starota.reaction_messages.ReactionMessageRegistry;
 import us.myles_selim.starota.role_management.commands.CommandAddGroup;
 import us.myles_selim.starota.role_management.commands.CommandGetGroups;
@@ -452,6 +453,9 @@ public class Starota {
 		jCmdHandler.registerCommand("Raids", new CommandRaid());
 		jCmdHandler.registerCommand("Raids", new CommandSetRaidEChannel());
 		jCmdHandler.registerCommand("Raids", new CommandRaidBosses());
+		jCmdHandler.registerCommand("Raids", new CommandRaidTrain());
+		// if (IS_DEV)
+		// jCmdHandler.registerCommand("Raids", new CommandRaidParty());
 
 		jCmdHandler.registerCommand("Search", new CommandSearchPoke());
 		jCmdHandler.registerCommand("Search", new CommandSearchEvents());
