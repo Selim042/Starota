@@ -1,12 +1,12 @@
 package us.myles_selim.starota.pvp.pokebattler;
 
-public class PokeBattlerAttacker {
+public class PokebattlerAttacker {
 
 	private String pokemonId;
 	private int cp;
 	private String numSims;
 	private PokeBattlerAttackerMoveset[] byMove;
-	private PokeBattlerStats stats;
+	private PokebattlerStats stats;
 
 	public String getPokemonId() {
 		return pokemonId;
@@ -28,7 +28,7 @@ public class PokeBattlerAttacker {
 		return byMove;
 	}
 
-	public PokeBattlerStats getStats() {
+	public PokebattlerStats getStats() {
 		return stats;
 	}
 

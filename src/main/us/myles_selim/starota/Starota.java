@@ -873,6 +873,8 @@ public class Starota {
 				.withName("Leek Duck").withLink("https://leekduck.com").build());
 		ret.add(new Credit.Builder(EnumCreditType.OTHER).withTitle("Weather Predictions")
 				.withName("AccuWeather").withLink("https://accuweather.com/").build());
+		ret.add(new Credit.Builder(EnumCreditType.OTHER).withTitle("PvP Counters")
+				.withName("Pokebattler").withLink("https://pokebattler.com").build());
 
 		creditSet = new CreditSet(EnumCreditType.EDITOR);
 		ret.add(creditSet);

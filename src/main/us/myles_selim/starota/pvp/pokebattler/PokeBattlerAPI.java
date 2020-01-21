@@ -17,14 +17,14 @@ import com.google.gson.JsonParser;
 import us.myles_selim.starota.misc.data_types.cache.CachedData;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 
-public class PokeBattlerAPI {
+public class PokebattlerAPI {
 
 	private static final String LEAGUES_ENDPOINT = "https://fight.pokebattler.com/leagues";
 
 	private static final JsonParser PARSER = new JsonParser();
 	private static Gson GSON;
 
-	private static CachedData<PokeBattlerLeague[]> LEAGUE_CACHE;
+	private static CachedData<PokebattlerLeague[]> LEAGUE_CACHE;
 
 	private static void setupGson() {
 		if (GSON != null)
@@ -43,7 +43,7 @@ public class PokeBattlerAPI {
 		GSON = builder.create();
 	}
 
-	public static PokeBattlerLeague[] getLeagues() {
+	public static PokebattlerLeague[] getLeagues() {
 		if (LEAGUE_CACHE != null && !LEAGUE_CACHE.hasPassed(360000)) // 1 hr
 			return LEAGUE_CACHE.getValue();
 		setupGson();
@@ -51,9 +51,9 @@ public class PokeBattlerAPI {
 			URL url = new URL(LEAGUES_ENDPOINT);
 			URLConnection conn = url.openConnection();
 			conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
-			PokeBattlerLeague[] leagues = GSON
+			PokebattlerLeague[] leagues = GSON
 					.fromJson(PARSER.parse(new InputStreamReader(conn.getInputStream()))
-							.getAsJsonObject().get("combatLeagues"), PokeBattlerLeague[].class);
+							.getAsJsonObject().get("combatLeagues"), PokebattlerLeague[].class);
 			LEAGUE_CACHE = new CachedData<>(leagues);
 			return leagues;
 		} catch (IOException e) {

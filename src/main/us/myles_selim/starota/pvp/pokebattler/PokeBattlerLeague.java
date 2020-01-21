@@ -10,7 +10,7 @@ import com.google.gson.JsonParser;
 
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 
-public class PokeBattlerLeague {
+public class PokebattlerLeague {
 
 	private static final JsonParser PARSER = new JsonParser();
 	private static final Gson GSON = new Gson();
@@ -23,7 +23,7 @@ public class PokeBattlerLeague {
 	private static final String COUNTERS_RANKINGS_ENDPOINT = "https://fight.pokebattler.com/pvp/rankings/"
 			+ "attackers/leagues/%s/strategies/"
 			+ "PVP/PVP?sort=WIN&filterType=TOP_DEFENDER_PVP&filterValue=NONE&"
-			+ "shieldStrategy=%s&meta=DUAL_MOVE";
+			+ "shieldStrategy=%s&defenderShieldStrategy=SHIELD_RANDOM&meta=SINGLE_MOVE";
 
 	private String title;
 	private boolean enabled;
@@ -39,10 +39,10 @@ public class PokeBattlerLeague {
 	private String[] bannedPokemon;
 	private String[] currentPokemon;
 
-	private PokeBattlerAttacker[] wellRounded;
-	private PokeBattlerAttacker[] counters;
+	private PokebattlerAttacker[] wellRounded;
+	private PokebattlerAttacker[] counters;
 
-	public PokeBattlerAttacker[] getWellRounded(EnumShieldStrategy shield) {
+	public PokebattlerAttacker[] getWellRounded(EnumShieldStrategy shield) {
 		if (wellRounded != null)
 			return wellRounded;
 		try {
@@ -51,7 +51,7 @@ public class PokeBattlerLeague {
 			URLConnection conn = url.openConnection();
 			conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
 			wellRounded = GSON.fromJson(PARSER.parse(new InputStreamReader(conn.getInputStream()))
-					.getAsJsonObject().get("attackers"), PokeBattlerAttacker[].class);
+					.getAsJsonObject().get("attackers"), PokebattlerAttacker[].class);
 			return wellRounded;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -59,16 +59,16 @@ public class PokeBattlerLeague {
 		}
 	}
 
-	public PokeBattlerAttacker[] getCounters(EnumShieldStrategy shield) {
+	public PokebattlerAttacker[] getCounters() {
 		if (counters != null)
 			return counters;
 		try {
-			URL url = new URL(
-					String.format(COUNTERS_RANKINGS_ENDPOINT, getCombatLeagueType(), shield.toString()));
+			URL url = new URL(String.format(COUNTERS_RANKINGS_ENDPOINT, getCombatLeagueType(),
+					EnumShieldStrategy.SHIELD_RANDOM.toString()));
 			URLConnection conn = url.openConnection();
 			conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
 			counters = GSON.fromJson(PARSER.parse(new InputStreamReader(conn.getInputStream()))
-					.getAsJsonObject().get("attackers"), PokeBattlerAttacker[].class);
+					.getAsJsonObject().get("attackers"), PokebattlerAttacker[].class);
 			return counters;
 		} catch (IOException e) {
 			e.printStackTrace();

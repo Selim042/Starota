@@ -1,6 +1,6 @@
 package us.myles_selim.starota.pvp.pokebattler.pokedex;
 
-import us.myles_selim.starota.pvp.pokebattler.PokeBattlerStats;
+import us.myles_selim.starota.pvp.pokebattler.PokebattlerStats;
 
 public class PokeBattlerPokemon {
 
@@ -11,7 +11,7 @@ public class PokeBattlerPokemon {
 	private String pokemonId;
 	private String type;
 	private String type2;
-	private PokeBattlerStats stats;
+	private PokebattlerStats stats;
 
 	private String[] quickMoves;
 	private String[] cinematicMoves;

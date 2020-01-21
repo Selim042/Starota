@@ -1,6 +1,6 @@
 package us.myles_selim.starota.pvp.pokebattler;
 
-public class PokeBattlerStats {
+public class PokebattlerStats {
 
 	private int baseStamina;
 	private int baseAttack;
