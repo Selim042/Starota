@@ -10,6 +10,8 @@ import discord4j.core.object.util.PermissionSet;
 import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.commands.registry.CommandException;
+import us.myles_selim.starota.enums.EnumPokemon;
+import us.myles_selim.starota.forms.Form;
 import us.myles_selim.starota.misc.data_types.RaidBoss;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
 import us.myles_selim.starota.misc.utils.EmojiServerHelper;
@@ -79,11 +81,14 @@ public class CommandRaidBosses extends BotCommand<StarotaServer> {
 			builder.withTitle("EX Raid " + bossPlural + ":");
 		builder.withDescription("");
 		for (RaidBoss b : SilphRoadData.getBosses(tier)) {
-			String postfix = b.getForm() == null ? "" : "_" + b.getForm();
-			builder.appendDescription(b.getPokemon()
-					+ (b.getForm() == null ? "" : " (" + b.getForm() + ") ")
-					+ MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji(b.getPokemon() + postfix,
-							ImageHelper.getOfficalArtwork(b.getPokemon(), b.getForm())))
+			EnumPokemon pokemon = b.getPokemon();
+			Form form = b.getForm();
+			String emojiName = form.getEmojiDisplay(pokemon);
+			String pokeName = pokemon
+					+ (pokemon.getFormSet().isDefaultForm(form) ? "" : " (" + form + ") ");
+			builder.appendDescription(pokeName
+					+ MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji(emojiName,
+							ImageHelper.getOfficalArtwork(pokemon, form)))
 					+ (b.isShinyable()
 							? MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji("shiny")) + "\n"
 							: "\n"));

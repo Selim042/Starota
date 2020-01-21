@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -65,6 +67,7 @@ import us.myles_selim.starota.commands.settings.types.SettingChannelStarota;
 import us.myles_selim.starota.commands.settings.types.SettingString;
 import us.myles_selim.starota.commands.settings.types.SettingTimeZone;
 import us.myles_selim.starota.debug_server.DebugServer;
+import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.events.CommandEvents;
 import us.myles_selim.starota.github.GitHubAPI;
 import us.myles_selim.starota.github.GitHubContributor;
@@ -75,7 +78,9 @@ import us.myles_selim.starota.leaderboards.commands.CommandNewLeaderboard;
 import us.myles_selim.starota.leaderboards.commands.CommandUpdateLeaderboard;
 import us.myles_selim.starota.leek_duck.ditto.CommandDitto;
 import us.myles_selim.starota.link_shortener.YourLSAPI;
+import us.myles_selim.starota.misc.data_types.Pair;
 import us.myles_selim.starota.misc.utils.EmbedBuilder;
+import us.myles_selim.starota.misc.utils.IndexHolder;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.misc.utils.StatusUpdater;
@@ -439,6 +444,16 @@ public class Starota {
 			e.printStackTrace();
 			Runtime.getRuntime().exit(0);
 		}
+	}
+
+	private static final Map<Snowflake, Integer> RAID_USAGE = new HashMap<>();
+
+	public static void incRaids(Guild guild) {
+		Snowflake id = guild.getId();
+		if (RAID_USAGE.containsKey(id))
+			RAID_USAGE.put(id, RAID_USAGE.get(id) + 1);
+		else
+			RAID_USAGE.put(id, 1);
 	}
 
 	@SuppressWarnings("deprecation")

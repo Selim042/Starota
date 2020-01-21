@@ -2,6 +2,7 @@ package us.myles_selim.starota.misc.data_types;
 
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.forms.Form;
+import us.myles_selim.starota.silph_road.SilphRoadData;
 
 public class RaidBoss {
 
@@ -9,6 +10,10 @@ public class RaidBoss {
 	private final Form form;
 	private final int tier;
 	private final boolean shinyable;
+
+	public RaidBoss(EnumPokemon pokemon, int tier) {
+		this(pokemon, pokemon.getFormSet().getDefaultForm(), tier);
+	}
 
 	public RaidBoss(EnumPokemon pokemon, Form form, int tier) {
 		this(pokemon, form, tier, false);
@@ -59,6 +64,19 @@ public class RaidBoss {
 				return 0x000000;
 			return pokemon.getData().getType1().getColor();
 		}
+	}
+
+	public static RaidBoss getBoss(String pokebattlerBoss) {
+		String pokemonId = pokebattlerBoss;
+		EnumPokemon pokemon = EnumPokemon.getPokemon(pokemonId);
+		boolean purified = false;
+		Form form = pokemon.getFormSet().getDefaultForm();
+		if (pokemonId.endsWith("_PURIFIED_FORM"))
+			purified = true;
+		else if (pokemonId.endsWith("_FORM"))
+			form = pokemon.getFormSet().getForm(
+					pokemonId.substring(pokemonId.indexOf("_") + 1, pokemonId.indexOf("_FORM")));
+		return SilphRoadData.getBoss(pokemon, form);
 	}
 
 }

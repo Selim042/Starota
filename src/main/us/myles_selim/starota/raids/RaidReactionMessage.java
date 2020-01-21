@@ -26,6 +26,8 @@ import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.pokedex.GoHubDatabase;
 import us.myles_selim.starota.pokedex.PokedexEntry;
 import us.myles_selim.starota.pokedex.PokedexEntry.DexCounter;
+import us.myles_selim.starota.raids.raid_party.RaidParty;
+import us.myles_selim.starota.raids.raid_party.RaidPartyAPI;
 import us.myles_selim.starota.reaction_messages.IHelpReactionMessage;
 import us.myles_selim.starota.reaction_messages.ReactionMessage;
 import us.myles_selim.starota.silph_road.SilphRoadData;
@@ -105,6 +107,12 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 				msg.edit((m) -> m.setEmbed(GoHubDatabase.LOADING_EMBED)).block();
 				GoHubDatabase.getEntry(pokemon, form == null ? null : (form.getGoHubFormName()));
 			}
+
+			// TODO: create dummy raid party
+			EnumWeather[] forecasts = server.getCurrentPossibleBoosts();
+			RaidParty party = RaidPartyAPI.createRaidParty(boss,
+					forecasts.length == 0 ? EnumWeather.NO_WEATHER : forecasts[0]);
+			System.out.println("created dummy raid party #" + (party == null ? "null" : party.getId()));
 		} else {
 			// here emoji
 			if (emojiName.equals(EMOJI_NAMES[5])) {
@@ -123,7 +131,7 @@ public class RaidReactionMessage extends ReactionMessage implements IHelpReactio
 					for (Entry<Member, ReactionEmoji> entry : here.entrySet())
 						mentionsMessage.append(entry.getKey().getMention() + ", ");
 					if (mentionsMessage.length() > 2) {
-						mentionsMessage.append("everyone appears to be here");
+						mentionsMessage.append("everyone appears to be at " + location);
 						sentHereMessage = true;
 						channel.createMessage(mentionsMessage.toString()).block();
 					}

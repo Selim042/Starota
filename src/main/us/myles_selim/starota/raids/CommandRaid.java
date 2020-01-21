@@ -9,6 +9,7 @@ import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.PermissionSet;
 import discord4j.core.object.util.Snowflake;
 import us.myles_selim.ebs.EBStorage;
+import us.myles_selim.starota.Starota;
 import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.wrappers.StarotaServer;
@@ -107,6 +108,9 @@ public class CommandRaid extends BotCommand<StarotaServer> {
 			channel.createMessage("Failed to get raid tier").block();
 			return;
 		}
+		// simple raid usage
+		Starota.incRaids(server.getDiscordGuild());
+
 		TextChannel sendChannel = getSendChannel(server, (TextChannel) channel);
 		new RaidReactionMessage(tier, args[1], location).createMessage(sendChannel);
 		if (!sendChannel.equals(channel))

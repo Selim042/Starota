@@ -2,7 +2,9 @@ package us.myles_selim.starota.forms;
 
 import us.myles_selim.starota.enums.EnumPokemon;
 import us.myles_selim.starota.enums.EnumPokemonType;
+import us.myles_selim.starota.misc.utils.EmojiServerHelper;
 import us.myles_selim.starota.misc.utils.ImageHelper;
+import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.silph_road.SilphRoadData;
 
 public class Form {
@@ -50,6 +52,12 @@ public class Form {
 		if (emojiPostfix == null)
 			return name;
 		return emojiPostfix;
+	}
+
+	public String getEmojiDisplay(EnumPokemon pokemon) {
+		String postfix = pokemon.getFormSet().isDefaultForm(this) ? "" : "_" + getName();
+		return MiscUtils.getEmojiDisplay(EmojiServerHelper.getEmoji(
+				pokemon.getData().getName() + postfix, ImageHelper.getOfficalArtwork(pokemon, this)));
 	}
 
 	@Override

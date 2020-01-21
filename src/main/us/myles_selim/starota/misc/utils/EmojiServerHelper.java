@@ -1,5 +1,6 @@
 package us.myles_selim.starota.misc.utils;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,6 +33,14 @@ public class EmojiServerHelper {
 			629422934951460885L, // Emoji Server #11
 			629423110914834476L, // Emoji Server #12
 	};
+
+	public static long[] getEmojiServers() {
+		return Arrays.copyOf(EMOJI_SERVERS, EMOJI_SERVERS.length);
+	}
+
+	public static long[] getNoUploadEmojiServers() {
+		return Arrays.copyOf(NO_UPLOAD, NO_UPLOAD.length);
+	}
 
 	public static boolean isEmojiServer(Guild guild) {
 		return isEmojiServer(guild.getId());
@@ -71,7 +80,8 @@ public class EmojiServerHelper {
 	public static GuildEmoji getGuildEmoji(String name, String fallback) {
 		if (!Starota.FULLY_STARTED)
 			return null;
-		String namef = name.replaceAll("-", "_").replaceAll("♂", "M").replaceAll("♀", "F");
+		String namef = name.replaceAll(" ", "_").replaceAll("('|\\.)", "").replaceAll("-", "_")
+				.replaceAll("♂", "M").replaceAll("♀", "F");
 		GuildEmoji emoji = getGuildEmoji(namef);
 		if (emoji != null)
 			return emoji;
