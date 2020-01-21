@@ -68,7 +68,7 @@ public class RegistrationBot {
 			e.printStackTrace();
 		}
 		StatusUpdater statuses = new StatusUpdater(CLIENT);
-		statuses.addPresence(Presence.online(Activity.playing(
+		statuses.addPresence(() -> Presence.online(Activity.playing(
 				"v" + StarotaConstants.VERSION + (Starota.DEBUG || Starota.IS_DEV ? "d" : ""))));
 		statuses.start();
 

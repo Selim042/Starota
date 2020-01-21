@@ -80,10 +80,10 @@ public class PointBot {
 		}
 		BotServer.registerServerType(PointBot.CLIENT, PointServer.class);
 		StatusUpdater statuses = new StatusUpdater(CLIENT);
-		statuses.addPresence(Presence.online(Activity.playing(
+		statuses.addPresence(() -> Presence.online(Activity.playing(
 				"v" + StarotaConstants.VERSION + (Starota.DEBUG || Starota.IS_DEV ? "d" : ""))));
-		statuses.addPresence(Presence.online(Activity.watching("quest data")));
-		statuses.addPresence(Presence.online(Activity.watching("players complete quests")));
+		statuses.addPresence(() -> Presence.online(Activity.watching("quest data")));
+		statuses.addPresence(() -> Presence.online(Activity.watching("players complete quests")));
 		statuses.start();
 
 		EventDispatcher dispatcher = CLIENT.getEventDispatcher();

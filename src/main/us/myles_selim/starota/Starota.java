@@ -267,16 +267,18 @@ public class Starota {
 
 			System.out.println("v" + StarotaConstants.VERSION + (DEBUG || IS_DEV ? "d" : ""));
 			StatusUpdater statusUpdater = new StatusUpdater(CLIENT);
-			statusUpdater.addPresence(Presence.online(
+			statusUpdater.addPresence(() -> Presence.online(
 					Activity.playing("v" + StarotaConstants.VERSION + (DEBUG || IS_DEV ? "d" : ""))));
-			statusUpdater
-					.addPresence(Presence.online(Activity.watching("people organize raids with .raid")));
+			statusUpdater.addPresence(() -> Presence
+					.online(Activity.watching("people organize raids with .raid and .raidTrain")));
 			statusUpdater.addPresence(
-					Presence.online(Activity.listening("people search for events and Pokemon")));
+					() -> Presence.online(Activity.listening("people search for events and Pokemon")));
 			// statusUpdater.addPresence(Presence.online(Activity.watching(".bots
 			// for new bots")));
-			statusUpdater.addPresence(
-					Presence.online(Activity.watching("people research counters with .dex")));
+			statusUpdater.addPresence(() -> Presence
+					.online(Activity.watching("people research counters & regionals with .dex")));
+			statusUpdater.addPresence(() -> Presence
+					.online(Activity.listening(getHighestTeamCup() + ", global Catcher's Cup leader")));
 			statusUpdater.start();
 
 			if (!IS_DEV) {

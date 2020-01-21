@@ -2,15 +2,15 @@ package us.myles_selim.starota.misc.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import discord4j.core.DiscordClient;
 import discord4j.core.object.presence.Presence;
-import us.myles_selim.starota.Starota;
 
 public class StatusUpdater extends Thread {
 
 	private final DiscordClient client;
-	private final List<Presence> presences = new ArrayList<>();
+	private final List<Supplier<Presence>> presences = new ArrayList<>();
 	private int statusIndex = 0;
 
 	public StatusUpdater(DiscordClient client) {
@@ -19,6 +19,10 @@ public class StatusUpdater extends Thread {
 	}
 
 	public void addPresence(Presence presence) {
+		addPresence(() -> presence);
+	}
+
+	public void addPresence(Supplier<Presence> presence) {
 		if (presence != null)
 			this.presences.add(presence);
 	}
@@ -28,11 +32,11 @@ public class StatusUpdater extends Thread {
 		while (true) {
 			if (statusIndex >= this.presences.size())
 				statusIndex = 0;
-			Presence presence = this.presences.get(statusIndex++);
+			Presence presence = this.presences.get(statusIndex++).get();
 			this.client.updatePresence(presence).block();
-			if (Starota.IS_DEV)
-				System.out.println(this.client.getApplicationInfo().block().getName()
-						+ ": updating presence: " + presence);
+			// if (Starota.IS_DEV)
+			// System.out.println(this.client.getApplicationInfo().block().getName()
+			// + ": updating presence: " + presence);
 			try {
 				Thread.sleep(300000); // 5 mins
 			} catch (InterruptedException e) {
