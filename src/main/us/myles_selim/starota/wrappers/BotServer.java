@@ -17,7 +17,6 @@ import java.util.function.Consumer;
 import discord4j.core.DiscordClient;
 import discord4j.core.object.PermissionOverwrite;
 import discord4j.core.object.entity.Guild;
-import discord4j.core.object.entity.GuildChannel;
 import discord4j.core.object.entity.VoiceChannel;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.PermissionSet;
@@ -266,8 +265,10 @@ public abstract class BotServer {
 		EBStorage infoChannels = ebs.get(INFO_CHANNEL_KEY, EBStorage.class);
 		if (infoChannels == null)
 			return false;
-		return infoChannels.containsKey(key)
-				&& guild.getChannelById(Snowflake.of((long) infoChannels.get(key))).block() != null;
+		return infoChannels.containsKey(key) && guild.getChannels()
+				.filter((c) -> c.getId().equals(Snowflake.of(infoChannels.get(key, Long.class)))
+						&& c instanceof VoiceChannel)
+				.blockFirst() != null;
 	}
 
 	public InfoChannel getOrCreateInfoChannel(String key) {
@@ -278,10 +279,10 @@ public abstract class BotServer {
 			infoChannels = ebs.get(INFO_CHANNEL_KEY, EBStorage.class);
 		}
 		if (infoChannels.containsKey(key)) {
-			GuildChannel ch = guild.getChannelById(Snowflake.of(infoChannels.get(key, Long.class)))
-					.block();
-			if (ch instanceof VoiceChannel)
-				return new InfoChannel((VoiceChannel) ch);
+			Snowflake id = Snowflake.of(infoChannels.get(key, Long.class));
+			VoiceChannel ch = (VoiceChannel) guild.getChannels()
+					.filter((c) -> c.getId().equals(id) && c instanceof VoiceChannel).blockFirst();
+			return new InfoChannel((VoiceChannel) ch);
 		}
 		return createInfoChannel(key);
 	}
