@@ -144,9 +144,11 @@ public class Starota {
 	public static boolean FULLY_STARTED = false;
 	public final static String BOT_NAME = "Starota";
 	public final static String CHANGELOG = "Changelog for v" + StarotaConstants.VERSION + "\n"
-			+ "Public changes:\n" + " + Add new regionals\n"
-			+ " * Fix lots of issues related to finding Pokemon (including \"eggHatches\" and \"dex\")\n"
-			+ " * Fix distance in regional egg disclaimer";
+			+ "Public changes:\n" + " + Add vote notifications in Discord"
+			+ "\n + Add weather and Catcher's Cup info channels"
+			+ "\n + Add regional command and display where regional Pokemon can be caught in the Pokedex"
+			+ "\n + Show Silph Arena stats in silph command" + "\n + Add raid train command/feature"
+			+ "\n + Add command to see latest Silph Arena cup counters";
 	public final static File DATA_FOLDER = new File("starotaData");
 
 	public static PrimaryCommandHandler COMMAND_HANDLER;
