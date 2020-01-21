@@ -100,6 +100,7 @@ import us.myles_selim.starota.profiles.commands.CommandUpdateProfile;
 import us.myles_selim.starota.pvp.battle_discovery.CommandBattleReady;
 import us.myles_selim.starota.pvp.battle_discovery.CommandFindBattles;
 import us.myles_selim.starota.pvp.battle_discovery.CommandNotReady;
+import us.myles_selim.starota.pvp.pokebattler.commands.CommandCupCounters;
 import us.myles_selim.starota.raids.CommandRaid;
 import us.myles_selim.starota.raids.CommandRaidBosses;
 import us.myles_selim.starota.raids.CommandSetRaidEChannel;
@@ -510,6 +511,7 @@ public class Starota {
 		jCmdHandler.registerCommand("PvP", new CommandBattleReady());
 		jCmdHandler.registerCommand("PvP", new CommandNotReady());
 		jCmdHandler.registerCommand("PvP", new CommandFindBattles());
+		jCmdHandler.registerCommand("PvP", new CommandCupCounters());
 
 		jCmdHandler.registerCommand("Pokedex", new CommandPokedex());
 		jCmdHandler.registerCommand("Pokedex", new CommandCPTable());
