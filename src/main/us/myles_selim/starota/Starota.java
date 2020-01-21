@@ -3,10 +3,14 @@ package us.myles_selim.starota;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.concurrent.Callable;
@@ -116,6 +120,7 @@ import us.myles_selim.starota.trading.commands.CommandRemoveTrade;
 import us.myles_selim.starota.trading.commands.CommandTradeboardHelp;
 import us.myles_selim.starota.vote_rewards.CommandVotePerks;
 import us.myles_selim.starota.vote_rewards.VoteReminderThread;
+import us.myles_selim.starota.weather.CommandCreateWeatherChannel;
 import us.myles_selim.starota.weather.CommandWeather;
 import us.myles_selim.starota.webserver.WebServer;
 import us.myles_selim.starota.wrappers.BotServer;
@@ -379,6 +384,49 @@ public class Starota {
 				}
 			}, 0, 1, TimeUnit.HOURS);
 
+			// update weather info channel
+			int minsUntilHour = 60 - LocalDateTime.now().getMinute();
+			Runnable updateWeather = new Runnable() {
+
+				@Override
+				public void run() {
+					// System.out.println("updating weather channels");
+					CLIENT.getGuilds().doOnEach((g) -> {
+						StarotaServer server = StarotaServer.getServer(g.get());
+						if (server != null && server.isWeatherSetup() && server
+								.hasInfoChannel(CommandCreateWeatherChannel.WEATHER_CHANNEL_KEY)) {
+							// System.out.println("updating weather channel on
+							// server: "
+							// + server.getDiscordGuild().getName());
+							CommandCreateWeatherChannel.updateChannelName(server);
+						}
+					}).onErrorContinue((e, o) -> e.printStackTrace()).collectList().block();
+				}
+			};
+			updateWeather.run();
+			// fix delay & interval
+			EXECUTOR.scheduleAtFixedRate(updateWeather, minsUntilHour, 30, TimeUnit.MINUTES);
+
+			// basic raid usage counts
+			EXECUTOR.scheduleAtFixedRate(() -> {
+				try {
+					StringBuilder rates = new StringBuilder();
+					if (RAID_USAGE.isEmpty())
+						rates.append("no raid usage");
+					else
+						for (Entry<Snowflake, Integer> e : RAID_USAGE.entrySet())
+							rates.append(String.format("%s: %d\n",
+									CLIENT.getGuildById(e.getKey()).block().getName(), e.getValue()));
+					CLIENT.getUserById(StarotaConstants.SELIM_USER_ID).block().getPrivateChannel()
+							.block()
+							.createEmbed(e -> e.setTitle("Raid Usage:").setDescription(rates.toString()))
+							.block();
+					RAID_USAGE.clear();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}, 0, 12, TimeUnit.HOURS);
+
 			// auto restart
 			boolean restartEnabled = restartRestartTimer();
 			CLIENT.getUserById(StarotaConstants.SELIM_USER_ID).block().getPrivateChannel().block()
@@ -461,6 +509,7 @@ public class Starota {
 		jCmdHandler.registerCommand("Search", new CommandSearchEvents());
 
 		jCmdHandler.registerCommand("Weather", new CommandWeather());
+		jCmdHandler.registerCommand("Weather", new CommandCreateWeatherChannel());
 
 		jCmdHandler.registerCommand("Catcher Cup", new CommandCatcherCup());
 		CommandCatcherCupAddPoints addPointsCmd = new CommandCatcherCupAddPoints();

@@ -5,7 +5,7 @@ import discord4j.core.object.entity.GuildEmoji;
 import us.myles_selim.starota.Starota;
 
 public enum EnumWeather {
-
+	NO_WEATHER,
 	EXTREME,
 	CLEAR(true, EnumPokemonType.FIRE, EnumPokemonType.GRASS, EnumPokemonType.GROUND),
 	PARTLY_CLOUDY(true, EnumPokemonType.NORMAL, EnumPokemonType.ROCK),
