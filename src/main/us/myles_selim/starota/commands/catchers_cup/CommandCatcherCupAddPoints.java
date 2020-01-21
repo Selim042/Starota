@@ -1,4 +1,4 @@
-package us.myles_selim.starota.commands;
+package us.myles_selim.starota.commands.catchers_cup;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,6 +10,7 @@ import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.PermissionSet;
 import us.myles_selim.starota.Starota;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.misc.utils.EventListener;
@@ -69,6 +70,7 @@ public class CommandCatcherCupAddPoints extends BotCommand<StarotaServer> {
 		}
 		server.addTeamPoints(team, points);
 		channel.createMessage(String.format(SUCCESS_TEMPLATE, points, team.getName())).block();
+		CommandCreateCupChannel.updateChannelName(server);
 	}
 
 	private static final Pattern NUMBER_PATTERN = Pattern.compile("(-?\\d+)");

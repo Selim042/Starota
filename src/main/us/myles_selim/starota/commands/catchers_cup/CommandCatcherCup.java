@@ -1,4 +1,4 @@
-package us.myles_selim.starota.commands;
+package us.myles_selim.starota.commands.catchers_cup;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -8,6 +8,7 @@ import discord4j.core.object.entity.MessageChannel;
 import discord4j.core.object.util.Permission;
 import discord4j.core.object.util.PermissionSet;
 import discord4j.core.spec.EmbedCreateSpec;
+import us.myles_selim.starota.commands.BotCommand;
 import us.myles_selim.starota.commands.registry.CommandException;
 import us.myles_selim.starota.enums.EnumTeam;
 import us.myles_selim.starota.misc.data_types.Pair;

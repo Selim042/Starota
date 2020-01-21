@@ -6,14 +6,21 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import discord4j.core.DiscordClient;
+import discord4j.core.object.PermissionOverwrite;
 import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.GuildChannel;
+import discord4j.core.object.entity.VoiceChannel;
+import discord4j.core.object.util.Permission;
+import discord4j.core.object.util.PermissionSet;
 import discord4j.core.object.util.Snowflake;
 import us.myles_selim.ebs.EBList;
 import us.myles_selim.ebs.EBStorage;
@@ -24,6 +31,7 @@ import us.myles_selim.starota.commands.settings.Setting;
 import us.myles_selim.starota.commands.settings.SettingSet;
 import us.myles_selim.starota.commands.settings.SettingSet.EnumReturnSetStatus;
 import us.myles_selim.starota.commands.settings.types.ServerSetting;
+import us.myles_selim.starota.info_channels.InfoChannel;
 import us.myles_selim.starota.misc.data_types.cache.CachedData;
 import us.myles_selim.starota.misc.utils.MiscUtils;
 import us.myles_selim.starota.misc.utils.ServerDataHelper;
@@ -249,6 +257,58 @@ public abstract class BotServer {
 		return location.getValue();
 	}
 	// end weather stuffs
+
+	// start info channels
+	private static final String INFO_CHANNEL_KEY = "info_channels";
+
+	public boolean hasInfoChannel(String key) {
+		EBStorage ebs = getDataInternal();
+		EBStorage infoChannels = ebs.get(INFO_CHANNEL_KEY, EBStorage.class);
+		if (infoChannels == null)
+			return false;
+		return infoChannels.containsKey(key)
+				&& guild.getChannelById(Snowflake.of((long) infoChannels.get(key))).block() != null;
+	}
+
+	public InfoChannel getOrCreateInfoChannel(String key) {
+		EBStorage ebs = getDataInternal();
+		EBStorage infoChannels = ebs.get(INFO_CHANNEL_KEY, EBStorage.class);
+		if (infoChannels == null) {
+			ebs.set(INFO_CHANNEL_KEY, new EBStorage());
+			infoChannels = ebs.get(INFO_CHANNEL_KEY, EBStorage.class);
+		}
+		if (infoChannels.containsKey(key)) {
+			GuildChannel ch = guild.getChannelById(Snowflake.of(infoChannels.get(key, Long.class)))
+					.block();
+			if (ch instanceof VoiceChannel)
+				return new InfoChannel((VoiceChannel) ch);
+		}
+		return createInfoChannel(key);
+	}
+
+	private InfoChannel createInfoChannel(String key) {
+		EBStorage ebs = getDataInternal();
+		EBStorage infoChannels = ebs.get(INFO_CHANNEL_KEY, EBStorage.class);
+		if (infoChannels == null) {
+			ebs.set(INFO_CHANNEL_KEY, new EBStorage().registerPrimitives());
+			infoChannels = ebs.get(INFO_CHANNEL_KEY, EBStorage.class);
+		}
+		VoiceChannel ch = guild.createVoiceChannel(
+				(chSpec) -> chSpec.setName(key).setPermissionOverwrites(getInfoChannelOverwrite()))
+				.block();
+		infoChannels.set(key, ch.getId().asLong());
+		return new InfoChannel(ch);
+	}
+
+	private Set<PermissionOverwrite> getInfoChannelOverwrite() {
+		Set<PermissionOverwrite> overwrites = new HashSet<>();
+		overwrites.add(PermissionOverwrite.forMember(client.getSelfId().get(), PermissionSet.all(),
+				PermissionSet.none()));
+		overwrites.add(PermissionOverwrite.forRole(guild.getId(), PermissionSet.none(),
+				PermissionSet.of(Permission.CONNECT)));
+		return overwrites;
+	}
+	// end info channels
 
 	// start misc stuffs
 	public void clearPermissions() {

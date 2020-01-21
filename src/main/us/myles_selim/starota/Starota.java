@@ -35,8 +35,6 @@ import discord4j.core.spec.EmbedCreateSpec;
 import us.myles_selim.starota.assistants.CommandBots;
 import us.myles_selim.starota.assistants.registration.RegistrationBot;
 import us.myles_selim.starota.commands.CommandArticleMessage;
-import us.myles_selim.starota.commands.CommandCatcherCup;
-import us.myles_selim.starota.commands.CommandCatcherCupAddPoints;
 import us.myles_selim.starota.commands.CommandChangelog;
 import us.myles_selim.starota.commands.CommandGetTimezones;
 import us.myles_selim.starota.commands.CommandInvite;
@@ -45,6 +43,9 @@ import us.myles_selim.starota.commands.CommandStatus;
 import us.myles_selim.starota.commands.CommandSupportBot;
 import us.myles_selim.starota.commands.CommandTest;
 import us.myles_selim.starota.commands.CommandVote;
+import us.myles_selim.starota.commands.catchers_cup.CommandCatcherCup;
+import us.myles_selim.starota.commands.catchers_cup.CommandCatcherCupAddPoints;
+import us.myles_selim.starota.commands.catchers_cup.CommandCreateCupChannel;
 import us.myles_selim.starota.commands.credits.CommandCredits;
 import us.myles_selim.starota.commands.credits.Credit;
 import us.myles_selim.starota.commands.credits.CreditSet;
@@ -460,6 +461,7 @@ public class Starota {
 		jCmdHandler.registerCommand("Catcher Cup", addPointsCmd);
 		EventDispatcher dispatcher = CLIENT.getEventDispatcher();
 		addPointsCmd.new EasyEntryHandler().setup(dispatcher);
+		jCmdHandler.registerCommand("Catcher Cup", new CommandCreateCupChannel());
 
 		jCmdHandler.registerCommand("Misc", new CommandSilphCard());
 		jCmdHandler.registerCommand("Misc", new CommandEvents());
