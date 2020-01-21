@@ -296,6 +296,9 @@ public abstract class BotServer {
 		VoiceChannel ch = guild.createVoiceChannel(
 				(chSpec) -> chSpec.setName(key).setPermissionOverwrites(getInfoChannelOverwrite()))
 				.block();
+		long id = ch.getId().asLong();
+		if (!infoChannels.acceptsValue(id))
+			infoChannels.registerPrimitives();
 		infoChannels.set(key, ch.getId().asLong());
 		return new InfoChannel(ch);
 	}
