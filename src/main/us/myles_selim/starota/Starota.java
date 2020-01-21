@@ -941,4 +941,60 @@ public class Starota {
 		return ret;
 	}
 
+	/** House cup stuff */
+	public static List<Pair<EnumTeam, Float>> getCupRankings() {
+		IndexHolder count = new IndexHolder(0);
+		Map<EnumTeam, Float> vals = new HashMap<>();
+		for (EnumTeam t : EnumTeam.values())
+			vals.put(t, 0.0f);
+		CLIENT.getGuilds().doOnEach((g) -> {
+			StarotaServer server = StarotaServer.getServer(g.get());
+			if (server != null) {
+				int total = 0;
+				List<Pair<EnumTeam, Integer>> rankings = server.getRankings();
+				for (Pair<EnumTeam, Integer> p : rankings)
+					total += p.right;
+				if (total > 0) {
+					count.value++;
+					for (Pair<EnumTeam, Integer> p : rankings) {
+						float oldV = vals.get(p.left);
+						float newV = (p.right / (float) total);
+						vals.put(p.left, oldV + newV);
+					}
+				}
+			}
+		}).collectList().block();
+		if (count.value == 0)
+			for (EnumTeam t : EnumTeam.values())
+				vals.put(t, 0.0f);
+		else
+			for (EnumTeam t : EnumTeam.values())
+				vals.put(t, vals.get(t) / count.value);
+		List<Pair<EnumTeam, Float>> ret = new ArrayList<>();
+		for (Entry<EnumTeam, Float> e : vals.entrySet())
+			ret.add(new Pair<>(e.getKey(), e.getValue()));
+		ret.sort(new Comparator<Pair<EnumTeam, Float>>() {
+
+			@Override
+			public int compare(Pair<EnumTeam, Float> o1, Pair<EnumTeam, Float> o2) {
+				return Float.compare(o2.right, o1.right);
+			}
+		});
+		return Collections.unmodifiableList(ret);
+	}
+
+	/** House cup stuff */
+	public static float getTeamCupPoints(EnumTeam team) {
+		List<Pair<EnumTeam, Float>> rankings = getCupRankings();
+		for (Pair<EnumTeam, Float> p : rankings)
+			if (p.left == team)
+				return p.right;
+		return 0.0f;
+	}
+
+	/** House cup stuff */
+	public static EnumTeam getHighestTeamCup() {
+		return getCupRankings().get(0).left;
+	}
+
 }
