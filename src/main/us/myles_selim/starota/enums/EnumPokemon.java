@@ -1310,7 +1310,7 @@ public enum EnumPokemon {
 				new PokemonDataBuilder().withPokemon(EnumPokemon.FARFETCHD).withName("Farfetch'd")
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.NORMAL)
 						.withType2(EnumPokemonType.FLYING).withGender(EnumGender.EITHER)
-						.withGeneration(1).isRegional(true).build());
+						.withGeneration(1).withRegion("Asia").build());
 		DATA_LOOKUP.put(EnumPokemon.DODUO,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.DODUO).withStage(EnumPokemonStage.BASE)
 						.withType1(EnumPokemonType.NORMAL).withType2(EnumPokemonType.FLYING)
@@ -1443,7 +1443,7 @@ public enum EnumPokemon {
 		DATA_LOOKUP.put(EnumPokemon.KANGASKHAN,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.KANGASKHAN)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.NORMAL)
-						.withGender(EnumGender.FEMALE).withGeneration(1).isRegional(true).build());
+						.withGender(EnumGender.FEMALE).withGeneration(1).withRegion("Oceania").build());
 		DATA_LOOKUP.put(EnumPokemon.HORSEA,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.HORSEA).withStage(EnumPokemonStage.BASE)
 						.withType1(EnumPokemonType.WATER).withGender(EnumGender.EITHER).withGeneration(1)
@@ -1472,7 +1472,7 @@ public enum EnumPokemon {
 		DATA_LOOKUP.put(EnumPokemon.MR_MIME,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.MR_MIME).withName("Mr. Mime")
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.PSYCHIC)
-						.withGender(EnumGender.EITHER).withGeneration(1).isRegional(true).build());
+						.withGender(EnumGender.EITHER).withGeneration(1).withRegion("Europe").build());
 		DATA_LOOKUP.put(EnumPokemon.SCYTHER,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.SCYTHER)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.BUG)
@@ -1497,7 +1497,7 @@ public enum EnumPokemon {
 		DATA_LOOKUP.put(EnumPokemon.TAUROS,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.TAUROS).withStage(EnumPokemonStage.BASE)
 						.withType1(EnumPokemonType.NORMAL).withGender(EnumGender.MALE).withGeneration(1)
-						.isRegional(true).build());
+						.withRegion("USA & Canada (excluding southern areas of Florida)").build());
 		DATA_LOOKUP.put(EnumPokemon.MAGIKARP,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.MAGIKARP)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.WATER)
@@ -1871,11 +1871,11 @@ public enum EnumPokemon {
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.BUG)
 						.withType2(EnumPokemonType.ROCK).withGender(EnumGender.EITHER).withGeneration(2)
 						.build());
-		DATA_LOOKUP.put(EnumPokemon.HERACROSS,
-				new PokemonDataBuilder().withPokemon(EnumPokemon.HERACROSS)
-						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.BUG)
-						.withType2(EnumPokemonType.FIGHTING).withGender(EnumGender.EITHER)
-						.withGeneration(2).isRegional(true).build());
+		DATA_LOOKUP.put(EnumPokemon.HERACROSS, new PokemonDataBuilder()
+				.withPokemon(EnumPokemon.HERACROSS).withStage(EnumPokemonStage.BASE)
+				.withType1(EnumPokemonType.BUG).withType2(EnumPokemonType.FIGHTING)
+				.withGender(EnumGender.EITHER).withGeneration(2)
+				.withRegion("Central & South America (including southern areas of Florida)").build());
 		DATA_LOOKUP.put(EnumPokemon.SNEASEL,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.SNEASEL)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.DARK)
@@ -1911,7 +1911,7 @@ public enum EnumPokemon {
 				new PokemonDataBuilder().withPokemon(EnumPokemon.CORSOLA)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.WATER)
 						.withType2(EnumPokemonType.ROCK).withGender(EnumGender.EITHER).withGeneration(2)
-						.isRegional(true).build());
+						.withRegion("Near the equator, between 26° & 36° latitude").build());
 		DATA_LOOKUP.put(EnumPokemon.REMORAID,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.REMORAID)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.WATER)
@@ -2319,11 +2319,13 @@ public enum EnumPokemon {
 		DATA_LOOKUP.put(EnumPokemon.VOLBEAT,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.VOLBEAT)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.BUG)
-						.withGender(EnumGender.MALE).withGeneration(3).isRegional(true).build());
+						.withGender(EnumGender.MALE).withGeneration(3)
+						.withRegion("Europe, Asia, Oceania").build());
 		DATA_LOOKUP.put(EnumPokemon.ILLUMISE,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.ILLUMISE)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.BUG)
-						.withGender(EnumGender.FEMALE).withGeneration(3).isRegional(true).build());
+						.withGender(EnumGender.FEMALE).withGeneration(3).withRegion("Americas & Africa")
+						.build());
 		DATA_LOOKUP.put(EnumPokemon.ROSELIA,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.ROSELIA)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.GRASS)
@@ -2367,7 +2369,8 @@ public enum EnumPokemon {
 		DATA_LOOKUP.put(EnumPokemon.TORKOAL,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.TORKOAL)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.ROCK)
-						.withGender(EnumGender.EITHER).withGeneration(3).isRegional(true).build());
+						.withGender(EnumGender.EITHER).withGeneration(3)
+						.withRegion("India/South-east Asia").build());
 		DATA_LOOKUP.put(EnumPokemon.SPOINK,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.SPOINK).withStage(EnumPokemonStage.BASE)
 						.withType1(EnumPokemonType.PSYCHIC).withGender(EnumGender.EITHER)
@@ -2415,21 +2418,23 @@ public enum EnumPokemon {
 		DATA_LOOKUP.put(EnumPokemon.ZANGOOSE,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.ZANGOOSE)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.NORMAL)
-						.withGender(EnumGender.EITHER).withGeneration(3).isRegional(true).build());
+						.withGender(EnumGender.EITHER).withGeneration(3)
+						.withRegion("Europe, Asia, Oceania").build());
 		DATA_LOOKUP.put(EnumPokemon.SEVIPER,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.SEVIPER)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.POISON)
-						.withGender(EnumGender.EITHER).withGeneration(3).isRegional(true).build());
+						.withGender(EnumGender.EITHER).withGeneration(3).withRegion("Americas & Africa")
+						.build());
 		DATA_LOOKUP.put(EnumPokemon.LUNATONE,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.LUNATONE)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.ROCK)
 						.withType2(EnumPokemonType.PSYCHIC).withGender(EnumGender.UNKNOWN)
-						.withGeneration(3).isRegional(true).build());
+						.withGeneration(3).withRegion("Europe, Asia, Oceania").build());
 		DATA_LOOKUP.put(EnumPokemon.SOLROCK,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.SOLROCK)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.ROCK)
 						.withType2(EnumPokemonType.PSYCHIC).withGender(EnumGender.UNKNOWN)
-						.withGeneration(3).isRegional(true).build());
+						.withGeneration(3).withRegion("Americas & Africa").build());
 		DATA_LOOKUP.put(EnumPokemon.BARBOACH,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.BARBOACH)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.WATER)
@@ -2509,7 +2514,7 @@ public enum EnumPokemon {
 				new PokemonDataBuilder().withPokemon(EnumPokemon.TROPIUS)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.GRASS)
 						.withType2(EnumPokemonType.FLYING).withGender(EnumGender.EITHER)
-						.withGeneration(3).isRegional(true).build());
+						.withGeneration(3).withRegion("Africa & sourrounding areas").build());
 		DATA_LOOKUP.put(EnumPokemon.CHIMECHO,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.CHIMECHO)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.PSYCHIC)
@@ -2560,7 +2565,7 @@ public enum EnumPokemon {
 				new PokemonDataBuilder().withPokemon(EnumPokemon.RELICANTH)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.WATER)
 						.withType2(EnumPokemonType.ROCK).withGender(EnumGender.EITHER).withGeneration(3)
-						.isRegional(true).build());
+						.withRegion("New Zealand & nearby islands").build());
 		DATA_LOOKUP.put(EnumPokemon.LUVDISC,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.LUVDISC)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.WATER)
@@ -2775,7 +2780,8 @@ public enum EnumPokemon {
 		DATA_LOOKUP.put(EnumPokemon.PACHIRISU,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.PACHIRISU)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.ELECTRIC)
-						.withGender(EnumGender.EITHER).withGeneration(4).isRegional(true).build());
+						.withGender(EnumGender.EITHER).withGeneration(4)
+						.withRegion("Northern Canada, Russia, Alaska").build());
 		DATA_LOOKUP.put(EnumPokemon.BUIZEL,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.BUIZEL).withStage(EnumPokemonStage.BASE)
 						.withType1(EnumPokemonType.WATER).withGender(EnumGender.EITHER).withGeneration(4)
@@ -2792,15 +2798,15 @@ public enum EnumPokemon {
 				new PokemonDataBuilder().withPokemon(EnumPokemon.CHERRIM)
 						.withStage(EnumPokemonStage.FINAL).withType1(EnumPokemonType.GRASS)
 						.withGender(EnumGender.EITHER).withGeneration(4).build());
-		DATA_LOOKUP.put(EnumPokemon.SHELLOS,
-				new PokemonDataBuilder().withPokemon(EnumPokemon.SHELLOS)
-						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.WATER)
-						.withGender(EnumGender.EITHER).withGeneration(4).isRegional(true).build());
-		DATA_LOOKUP.put(EnumPokemon.GASTRODON,
-				new PokemonDataBuilder().withPokemon(EnumPokemon.GASTRODON)
-						.withStage(EnumPokemonStage.FINAL).withType1(EnumPokemonType.WATER)
-						.withType2(EnumPokemonType.GROUND).withGender(EnumGender.EITHER)
-						.withGeneration(4).isRegional(true).build());
+		DATA_LOOKUP.put(EnumPokemon.SHELLOS, new PokemonDataBuilder().withPokemon(EnumPokemon.SHELLOS)
+				.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.WATER)
+				.withGender(EnumGender.EITHER).withGeneration(4)
+				.withRegion("West sea, west of longitude 0°, east sea, east of longitude 0°").build());
+		DATA_LOOKUP.put(EnumPokemon.GASTRODON, new PokemonDataBuilder()
+				.withPokemon(EnumPokemon.GASTRODON).withStage(EnumPokemonStage.FINAL)
+				.withType1(EnumPokemonType.WATER).withType2(EnumPokemonType.GROUND)
+				.withGender(EnumGender.EITHER).withGeneration(4)
+				.withRegion("West sea, west of longitude 0°, east sea, east of longitude 0°").build());
 		DATA_LOOKUP.put(EnumPokemon.AMBIPOM,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.AMBIPOM)
 						.withStage(EnumPokemonStage.FINAL).withType1(EnumPokemonType.NORMAL)
@@ -2871,7 +2877,7 @@ public enum EnumPokemon {
 				new PokemonDataBuilder().withPokemon(EnumPokemon.MIME_JR).withName("Mime Jr.")
 						.withStage(EnumPokemonStage.BABY).withType1(EnumPokemonType.PSYCHIC)
 						.withType2(EnumPokemonType.FAIRY).withGender(EnumGender.EITHER).withGeneration(4)
-						.build());
+						.withRegion("Europe").build());
 		DATA_LOOKUP.put(EnumPokemon.HAPPINY,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.HAPPINY)
 						.withStage(EnumPokemonStage.BABY).withType1(EnumPokemonType.NORMAL)
@@ -2879,7 +2885,8 @@ public enum EnumPokemon {
 		DATA_LOOKUP.put(EnumPokemon.CHATOT,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.CHATOT).withStage(EnumPokemonStage.BASE)
 						.withType1(EnumPokemonType.NORMAL).withType2(EnumPokemonType.FLYING)
-						.withGender(EnumGender.EITHER).withGeneration(4).isRegional(true).build());
+						.withGender(EnumGender.EITHER).withGeneration(4)
+						.withRegion("Southern Hemisphere").build());
 		DATA_LOOKUP.put(EnumPokemon.SPIRITOMB,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.SPIRITOMB)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.GHOST)
@@ -2941,7 +2948,8 @@ public enum EnumPokemon {
 		DATA_LOOKUP.put(EnumPokemon.CARNIVINE,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.CARNIVINE)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.GRASS)
-						.withGender(EnumGender.EITHER).withGeneration(4).isRegional(true).build());
+						.withGender(EnumGender.EITHER).withGeneration(4).withRegion("South-eastern USA")
+						.build());
 		DATA_LOOKUP.put(EnumPokemon.FINNEON,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.FINNEON)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.WATER)
@@ -3051,15 +3059,13 @@ public enum EnumPokemon {
 		DATA_LOOKUP.put(EnumPokemon.UXIE,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.UXIE).withStage(EnumPokemonStage.LEGEND)
 						.withType1(EnumPokemonType.PSYCHIC).withGender(EnumGender.UNKNOWN)
-						.withGeneration(4).isRegional(true).build());
-		DATA_LOOKUP.put(EnumPokemon.MESPRIT,
-				new PokemonDataBuilder().withPokemon(EnumPokemon.MESPRIT)
-						.withStage(EnumPokemonStage.LEGEND).withType1(EnumPokemonType.PSYCHIC)
-						.withGender(EnumGender.UNKNOWN).withGeneration(4).isRegional(true).build());
-		DATA_LOOKUP.put(EnumPokemon.AZELF,
-				new PokemonDataBuilder().withPokemon(EnumPokemon.AZELF)
-						.withStage(EnumPokemonStage.LEGEND).withType1(EnumPokemonType.PSYCHIC)
-						.withGender(EnumGender.UNKNOWN).withGeneration(4).isRegional(true).build());
+						.withGeneration(4).withRegion("Asia-Pacific").build());
+		DATA_LOOKUP.put(EnumPokemon.MESPRIT, new PokemonDataBuilder().withPokemon(EnumPokemon.MESPRIT)
+				.withStage(EnumPokemonStage.LEGEND).withType1(EnumPokemonType.PSYCHIC)
+				.withGender(EnumGender.UNKNOWN).withGeneration(4).withRegion("Europe & Africa").build());
+		DATA_LOOKUP.put(EnumPokemon.AZELF, new PokemonDataBuilder().withPokemon(EnumPokemon.AZELF)
+				.withStage(EnumPokemonStage.LEGEND).withType1(EnumPokemonType.PSYCHIC)
+				.withGender(EnumGender.UNKNOWN).withGeneration(4).withRegion("Americas").build());
 		DATA_LOOKUP.put(EnumPokemon.DIALGA,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.DIALGA)
 						.withStage(EnumPokemonStage.LEGEND).withType1(EnumPokemonType.STEEL)
@@ -3185,30 +3191,28 @@ public enum EnumPokemon {
 		DATA_LOOKUP.put(EnumPokemon.PANSAGE,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.PANSAGE)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.GRASS)
-						.withGender(EnumGender.EITHER).withGeneration(5).isRegional(true)
+						.withGender(EnumGender.EITHER).withGeneration(5).withRegion("Asia-Pacific")
 						.evolvesWithItem(true).build());
-		DATA_LOOKUP.put(EnumPokemon.SIMISAGE,
-				new PokemonDataBuilder().withPokemon(EnumPokemon.SIMISAGE)
-						.withStage(EnumPokemonStage.FINAL).withType1(EnumPokemonType.GRASS)
-						.withGender(EnumGender.EITHER).withGeneration(5).isRegional(true).build());
+		DATA_LOOKUP.put(EnumPokemon.SIMISAGE, new PokemonDataBuilder().withPokemon(EnumPokemon.SIMISAGE)
+				.withStage(EnumPokemonStage.FINAL).withType1(EnumPokemonType.GRASS)
+				.withGender(EnumGender.EITHER).withGeneration(5).withRegion("Asia-Pacific").build());
 		DATA_LOOKUP.put(EnumPokemon.PANSEAR,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.PANSEAR)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.FIRE)
-						.withGender(EnumGender.EITHER).withGeneration(5).isRegional(true)
+						.withGender(EnumGender.EITHER).withGeneration(5).withRegion("Europe & Africa")
 						.evolvesWithItem(true).build());
-		DATA_LOOKUP.put(EnumPokemon.SIMISEAR,
-				new PokemonDataBuilder().withPokemon(EnumPokemon.SIMISEAR)
-						.withStage(EnumPokemonStage.FINAL).withType1(EnumPokemonType.FIRE)
-						.withGender(EnumGender.EITHER).withGeneration(5).isRegional(true).build());
+		DATA_LOOKUP.put(EnumPokemon.SIMISEAR, new PokemonDataBuilder().withPokemon(EnumPokemon.SIMISEAR)
+				.withStage(EnumPokemonStage.FINAL).withType1(EnumPokemonType.FIRE)
+				.withGender(EnumGender.EITHER).withGeneration(5).withRegion("Europe & Africa").build());
 		DATA_LOOKUP.put(EnumPokemon.PANPOUR,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.PANPOUR)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.WATER)
-						.withGender(EnumGender.EITHER).withGeneration(5).isRegional(true)
+						.withGender(EnumGender.EITHER).withGeneration(5).withRegion("Americas")
 						.evolvesWithItem(true).build());
 		DATA_LOOKUP.put(EnumPokemon.SIMIPOUR,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.SIMIPOUR)
 						.withStage(EnumPokemonStage.FINAL).withType1(EnumPokemonType.WATER)
-						.withGender(EnumGender.EITHER).withGeneration(5).isRegional(true).build());
+						.withGender(EnumGender.EITHER).withGeneration(5).withRegion("Americas").build());
 		DATA_LOOKUP.put(EnumPokemon.MUNNA,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.MUNNA).withStage(EnumPokemonStage.BASE)
 						.withType1(EnumPokemonType.PSYCHIC).withGender(EnumGender.EITHER)
@@ -3302,11 +3306,11 @@ public enum EnumPokemon {
 		DATA_LOOKUP.put(EnumPokemon.THROH,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.THROH).withStage(EnumPokemonStage.BASE)
 						.withType1(EnumPokemonType.FIGHTING).withGender(EnumGender.EITHER)
-						.withGeneration(5).isRegional(true).build());
+						.withGeneration(5).withRegion("Americas & Africa").build());
 		DATA_LOOKUP.put(EnumPokemon.SAWK,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.SAWK).withStage(EnumPokemonStage.BASE)
 						.withType1(EnumPokemonType.FIGHTING).withGender(EnumGender.EITHER)
-						.withGeneration(5).isRegional(true).build());
+						.withGeneration(5).withRegion("Europe, Asia, Oceania").build());
 		DATA_LOOKUP.put(EnumPokemon.SEWADDLE,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.SEWADDLE)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.BUG)
@@ -3358,7 +3362,10 @@ public enum EnumPokemon {
 		DATA_LOOKUP.put(EnumPokemon.BASCULIN,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.BASCULIN)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.WATER)
-						.withGender(EnumGender.EITHER).withGeneration(5).isRegional(true).build());
+						.withGender(EnumGender.EITHER).withGeneration(5)
+						.withRegion(
+								"Red stripe in Eastern Hemisphere, blue stripe in Western Hemisphere")
+						.build());
 		DATA_LOOKUP.put(EnumPokemon.SANDILE,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.SANDILE)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.GROUND)
@@ -3385,7 +3392,8 @@ public enum EnumPokemon {
 		DATA_LOOKUP.put(EnumPokemon.MARACTUS,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.MARACTUS)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.GRASS)
-						.withGender(EnumGender.EITHER).withGeneration(5).isRegional(true).build());
+						.withGender(EnumGender.EITHER).withGeneration(5)
+						.withRegion("Southern USA, Mexico, Central & South America, Caribbean").build());
 		DATA_LOOKUP.put(EnumPokemon.DWEBBLE,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.DWEBBLE)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.BUG)
@@ -3410,7 +3418,7 @@ public enum EnumPokemon {
 				new PokemonDataBuilder().withPokemon(EnumPokemon.SIGILYPH)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.PSYCHIC)
 						.withType2(EnumPokemonType.FLYING).withGender(EnumGender.EITHER)
-						.withGeneration(5).isRegional(true).build());
+						.withGeneration(5).withRegion("Egypt, Greece").build());
 		DATA_LOOKUP.put(EnumPokemon.YAMASK,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.YAMASK).withStage(EnumPokemonStage.BASE)
 						.withType1(EnumPokemonType.GHOST).withGender(EnumGender.EITHER).withGeneration(5)
@@ -3716,11 +3724,13 @@ public enum EnumPokemon {
 		DATA_LOOKUP.put(EnumPokemon.HEATMOR,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.HEATMOR)
 						.withStage(EnumPokemonStage.BASE).withType1(EnumPokemonType.FIRE)
-						.withGender(EnumGender.EITHER).withGeneration(5).isRegional(true).build());
+						.withGender(EnumGender.EITHER).withGeneration(5).withRegion("Western Hemisphere")
+						.build());
 		DATA_LOOKUP.put(EnumPokemon.DURANT,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.DURANT).withStage(EnumPokemonStage.BASE)
 						.withType1(EnumPokemonType.BUG).withType2(EnumPokemonType.STEEL)
-						.withGender(EnumGender.EITHER).withGeneration(5).isRegional(true).build());
+						.withGender(EnumGender.EITHER).withGeneration(5).withRegion("Eastern Hemisphere")
+						.build());
 		DATA_LOOKUP.put(EnumPokemon.DEINO,
 				new PokemonDataBuilder().withPokemon(EnumPokemon.DEINO).withStage(EnumPokemonStage.BASE)
 						.withType1(EnumPokemonType.DARK).withType2(EnumPokemonType.DRAGON)
@@ -4906,6 +4916,9 @@ public enum EnumPokemon {
 			int id = Integer.parseInt(name);
 			return getPokemon(id);
 		}
+		String formName = null;
+		if (name.endsWith("FORM") && name.indexOf("_") != -1)
+			formName = name.substring(0, name.indexOf("_"));
 		name = name.replaceAll(" ", "_").replaceAll("[^a-zA-Z0-9]", "");
 		if (name.toLowerCase().matches("farfetch.d"))
 			return EnumPokemon.FARFETCHD;
@@ -4917,6 +4930,8 @@ public enum EnumPokemon {
 			names.add(data.getName().replaceAll("_", "").toLowerCase());
 			names.add(p.name().replaceAll("_", "").toLowerCase());
 			if (names.contains(name.toLowerCase()))
+				return p;
+			if (formName != null && names.contains(formName.toLowerCase()))
 				return p;
 		}
 		return null;

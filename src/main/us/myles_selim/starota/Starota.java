@@ -39,6 +39,7 @@ import us.myles_selim.starota.commands.CommandChangelog;
 import us.myles_selim.starota.commands.CommandGetTimezones;
 import us.myles_selim.starota.commands.CommandInvite;
 import us.myles_selim.starota.commands.CommandPing;
+import us.myles_selim.starota.commands.CommandRegionals;
 import us.myles_selim.starota.commands.CommandStatus;
 import us.myles_selim.starota.commands.CommandSupportBot;
 import us.myles_selim.starota.commands.CommandTest;
@@ -446,6 +447,7 @@ public class Starota {
 
 		jCmdHandler.registerCommand("Pokedex", new CommandPokedex());
 		jCmdHandler.registerCommand("Pokedex", new CommandCPTable());
+		jCmdHandler.registerCommand("Pokedex", new CommandRegionals());
 
 		jCmdHandler.registerCommand("Raids", new CommandRaid());
 		jCmdHandler.registerCommand("Raids", new CommandSetRaidEChannel());

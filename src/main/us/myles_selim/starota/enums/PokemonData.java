@@ -17,7 +17,7 @@ public class PokemonData {
 	private final int generation;
 	private final boolean isStarter;
 	private final boolean evolvesWithItem;
-	private final boolean isRegional;
+	private final String region;
 
 	private PokemonData(PokemonDataBuilder builder) {
 		if (builder.pokemon == null)
@@ -44,7 +44,7 @@ public class PokemonData {
 		this.generation = builder.generation;
 		this.isStarter = builder.isStarter;
 		this.evolvesWithItem = builder.evolvesWithItem;
-		this.isRegional = builder.isRegional;
+		this.region = builder.region;
 	}
 
 	public EnumPokemon getPokemon() {
@@ -128,7 +128,11 @@ public class PokemonData {
 	}
 
 	public final boolean isRegional() {
-		return this.isRegional;
+		return this.region != null;
+	}
+
+	public final String getRegion() {
+		return this.region;
 	}
 
 	// public final String getArtwork(int formId) {
@@ -147,7 +151,7 @@ public class PokemonData {
 		private Integer generation;
 		private boolean isStarter;
 		private boolean evolvesWithItem;
-		private boolean isRegional;
+		private String region;
 
 		public PokemonDataBuilder() {}
 
@@ -234,8 +238,8 @@ public class PokemonData {
 		/**
 		 * Optional, defaults to false
 		 */
-		public PokemonDataBuilder isRegional(boolean isRegional) {
-			this.isRegional = isRegional;
+		public PokemonDataBuilder withRegion(String region) {
+			this.region = region;
 			return this;
 		}
 
