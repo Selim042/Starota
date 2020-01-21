@@ -61,7 +61,7 @@ public class PokedexReactionMessage extends ReactionMessage {
 		String name = MiscUtils.getEmojiName(react);
 		if (name.startsWith(entry.name + "_")) {
 			msg.removeReaction(react, user.getId()).block();
-			String formName = name.substring(name.indexOf("_") + 1);
+			String formName = name.substring(name.indexOf("_") + 1).replaceAll("_", " ");
 			if (!isFormValid(formName) || form.equals(formName))
 				return;
 			form = formName;

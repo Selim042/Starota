@@ -167,6 +167,24 @@ public class PokedexEntry extends ReactionMessage {
 		return charged;
 	}
 
+	public DexMove getMove(String moveName) {
+		if (moveName.equalsIgnoreCase("return"))
+			return GoHubDatabase.getMove(323);
+		if (moveName.equalsIgnoreCase("frustration"))
+			return GoHubDatabase.getMove(322);
+		if (moveName.endsWith("_FAST")) {
+			moveName = moveName.substring(0, moveName.indexOf("_FAST"));
+			for (DexMove move : getFastMoves())
+				if (move.name.toUpperCase().replace(" ", "_").equals(moveName))
+					return move;
+		} else {
+			for (DexMove move : getChargedMoves())
+				if (move.name.toUpperCase().replace(" ", "_").equals(moveName))
+					return move;
+		}
+		return null;
+	}
+
 	// movesets
 	/**
 	 * @deprecated Do not use directly, for internal use only
@@ -316,27 +334,24 @@ public class PokedexEntry extends ReactionMessage {
 			form = "Normal";
 		if (embeds.containsKey(form))
 			return embeds.get(form);
-		int formId = getFormId(form);
+		// int formId = getFormId(form);
 		PokedexEntry entry = getFormData(form);
+		EnumPokemon pokemon = entry.getPokemon();
 
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withColor(entry.type1.getColor());
 		builder.withAuthorName("Pokémon Go Hub Database").withAuthorUrl("https://db.pokemongohub.net/")
 				.withAuthorIcon("https://db.pokemongohub.net/images/icons/favicon-32x32.png");
 		String pokeName = entry.name;
-		// if (entry.form == null && entry.forms.length > 1)
-		// entry.form = forms[0].value;
 		String embForm = entry.form;
 		if (entry.form == null)
 			embForm = "Normal";
-		Form formS = null;
-		if (entry.getPokemon().getData().getFormSet() != null)
-			formS = entry.getPokemon().getData().getFormSet().getForm(embForm);
+		Form formS = getStarotaForm(entry, embForm);
 		if (entry.forms.length > 1)
 			pokeName += String.format(" (%s)", embForm);
 		builder.withTitle(String.format("%s #%d", pokeName, entry.id))
 				.withUrl(String.format("https://db.pokemongohub.net/pokemon/%d", entry.id));
-		builder.withThumbnail(ImageHelper.getOfficalArtwork(entry.getPokemon(), formId));
+		builder.withThumbnail(ImageHelper.getOfficalArtwork(pokemon, formS));
 		builder.appendDesc(MiscUtils.fixCharacters(entry.getDescription()));
 
 		// stats
@@ -366,12 +381,14 @@ public class PokedexEntry extends ReactionMessage {
 		if (formS != null) {
 			if (formS.isShinyable())
 				detailsString += "\nShinyable: True";
-		} else if (SilphRoadData.isShinyable(entry.getPokemon()))
+		} else if (SilphRoadData.isShinyable(pokemon))
 			detailsString += "\nShinyable: True";
-		if (SilphRoadData.isNesting(entry.getPokemon()))
+		if (SilphRoadData.isNesting(pokemon))
 			detailsString += "\nNesting: True";
-		if (SilphRoadData.isShadowable(entry.getPokemon()))
+		if (SilphRoadData.isShadowable(pokemon))
 			detailsString += "\nShadowable: True";
+		if (pokemon.getData().isRegional())
+			detailsString += "\nRegional: " + pokemon.getData().getRegion();
 		builder.appendField("Details:",
 				String.format(detailsString, entry.generation, (int) (entry.baseCaptureRate * 100),
 						(int) (entry.baseFleeRate * 100), entry.kmBuddyDistance),
@@ -381,14 +398,14 @@ public class PokedexEntry extends ReactionMessage {
 
 		// egg & raid cp stuff
 		StringBuilder cps = new StringBuilder();
-		RaidBoss boss = SilphRoadData.getBoss(entry.getPokemon(), formS);
+		RaidBoss boss = SilphRoadData.getBoss(pokemon, formS);
 		if (boss != null) {
 			cps.append(String.format("Raid Catch Min/Max: %d-%d CP\n", entry.getCP(20, 10, 10, 10),
 					entry.getCP(20, 15, 15, 15)));
 			cps.append(String.format("Raid Boosted Min/Max: %d-%d CP\n", entry.getCP(25, 10, 10, 10),
 					entry.getCP(25, 15, 15, 15)));
 		}
-		EggEntry egg = SilphRoadData.getEgg(entry.getPokemon(), formS);
+		EggEntry egg = SilphRoadData.getEgg(pokemon, formS);
 		if (egg != null)
 			cps.append(String.format("Egg Hatch Min/Max: %d-%d CP\n", getCP(20, 10, 10, 10),
 					getCP(20, 15, 15, 15)));
@@ -476,13 +493,8 @@ public class PokedexEntry extends ReactionMessage {
 		return embed;
 	}
 
-	private int getFormId(String form) {
-		if (form == null || this.forms == null || this.forms.length == 1)
-			return 0;
-		for (int i = 0; i < this.forms.length; i++)
-			if (form.equals(this.forms[i].name))
-				return i;
-		return 0;
+	private static Form getStarotaForm(PokedexEntry entry, String embForm) {
+		return entry.getPokemon().getData().getFormSet().getForm(embForm);
 	}
 
 	// classes
@@ -497,7 +509,8 @@ public class PokedexEntry extends ReactionMessage {
 				return ReactionEmoji.custom(type.getEmoji());
 			}
 			return EmojiServerHelper.getEmoji(entry.name + "_" + name,
-					ImageHelper.getOfficalArtwork(entry.getPokemon(), entry.getFormId(name)));
+					ImageHelper.getOfficalArtwork(entry.getPokemon(),
+							getStarotaForm(entry, entry.form == null ? "Normal" : entry.form)));
 		}
 
 	}

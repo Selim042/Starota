@@ -119,15 +119,26 @@ public class GoHubDatabase {
 		GSON = builder.create();
 	}
 
+	private static String getDefaultForm(EnumPokemon pokemon) {
+		switch (pokemon) {
+		case BASCULIN:
+			return "Blue Striped";
+		default:
+			return "Normal";
+		}
+	}
+
 	public static boolean isEntryLoaded(EnumPokemon pokemon) {
-		return POKEMON_CACHE.containsKey(pokemon.toString().toLowerCase() + "Normal");
+		return POKEMON_CACHE.containsKey(pokemon.toString().toLowerCase() + getDefaultForm(pokemon));
 	}
 
 	public static PokedexEntry getEntry(EnumPokemon pokemon) {
-		return getEntry(pokemon, "Normal");
+		return getEntry(pokemon, getDefaultForm(pokemon));
 	}
 
 	public static PokedexEntry getEntry(EnumPokemon pokemon, String form) {
+		if (form != null && pokemon == EnumPokemon.CASTFORM)
+			form = null;
 		String key = pokemon.toString().toLowerCase() + form;
 		if (isCached(POKEMON_CACHE, key))
 			return POKEMON_CACHE.get(key).getValue();
@@ -136,7 +147,8 @@ public class GoHubDatabase {
 			if (form == null || (form.equals("Normal") && !pokemon.equals(EnumPokemon.ARCEUS)))
 				url = new URL(POKEMON_API + pokemon.getData().getId());
 			else
-				url = new URL(POKEMON_API + pokemon.getData().getId() + "?form=" + form);
+				url = new URL(POKEMON_API + pokemon.getData().getId() + "?form="
+						+ form.replaceAll(" ", "%20"));
 			URLConnection conn = url.openConnection();
 			conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
 			PokedexEntry entry = GSON.fromJson(
@@ -162,7 +174,8 @@ public class GoHubDatabase {
 			if (form == null || (form.equals("Normal") && !pokemon.equals(EnumPokemon.ARCEUS)))
 				url = new URL(POKEMON_MOVES_API + pokemon.getData().getId());
 			else
-				url = new URL(POKEMON_MOVES_API + pokemon.getData().getId() + "?form=" + form);
+				url = new URL(POKEMON_MOVES_API + pokemon.getData().getId() + "?form="
+						+ form.replaceAll(" ", "%20"));
 			URLConnection conn = url.openConnection();
 			conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
 			DexMove[] moves = GSON.fromJson(PARSER.parse(new InputStreamReader(conn.getInputStream())),
@@ -221,7 +234,8 @@ public class GoHubDatabase {
 			if (form == null || (form.equals("Normal") && !pokemon.equals(EnumPokemon.ARCEUS)))
 				url = new URL(MOVESETS_API + pokemon.getData().getId());
 			else
-				url = new URL(MOVESETS_API + pokemon.getData().getId() + "?form=" + form);
+				url = new URL(MOVESETS_API + pokemon.getData().getId() + "?form="
+						+ form.replaceAll(" ", "%20"));
 			URLConnection conn = url.openConnection();
 			conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
 			DexMoveset[] movesets = GSON.fromJson(
@@ -247,7 +261,8 @@ public class GoHubDatabase {
 			if (form == null || (form.equals("Normal") && !pokemon.equals(EnumPokemon.ARCEUS)))
 				url = new URL(COUNTERS_API + pokemon.getData().getId());
 			else
-				url = new URL(COUNTERS_API + pokemon.getData().getId() + "?form=" + form);
+				url = new URL(COUNTERS_API + pokemon.getData().getId() + "?form="
+						+ form.replaceAll(" ", "%20"));
 			URLConnection conn = url.openConnection();
 			conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
 			DexCounter[] counters = GSON.fromJson(
