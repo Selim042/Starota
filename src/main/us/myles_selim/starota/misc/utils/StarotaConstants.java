@@ -24,6 +24,8 @@ public class StarotaConstants {
 	public static final Snowflake EDITOR_CHANNEL_ID = Snowflake.of(572498506359635968L);
 	/** Tutorial channel on the support server */
 	public static final Snowflake TUTORIAL_CHANNEL_ID = Snowflake.of(569938166988013588L);
+	/** Channel on support server to post when votes come in */
+	public static final Snowflake VOTE_NOTIFY_CHANNEL_ID = Snowflake.of(436614504277737472L);
 
 	/** Permament invite link to the support server */
 	public static final String SUPPORT_SERVER_LINK = "https://discord.gg/NxverNw";

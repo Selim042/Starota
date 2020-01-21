@@ -231,10 +231,10 @@ public class WebServer {
 								// "Thanks to " + voter.getMention() + " for
 								// voting!");
 								// else
-								voteNotifyChannel
-										.createMessage(
-												"Thanks to " + voter.getMention() + " for voting!")
-										.block();
+								voteNotifyChannel.createMessage("Thanks to " + voter.getMention()
+										+ " for voting!\n"
+										+ "To vote for Starota on Top.gg visit https://top.gg/bot/489245655710040099/vote.\n"
+										+ "Every vote helps!").block();
 								// voteMsg.block();
 							}
 						}
@@ -306,6 +306,7 @@ public class WebServer {
 					}
 				}
 			});
+			server.createContext("/server_settings", new HttpHandlerServerSettings());
 			server.createContext("/", new HttpHandlerDashboard());
 			server.setExecutor(null);
 			server.start();
