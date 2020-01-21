@@ -20,6 +20,7 @@ import us.myles_selim.starota.modules.BaseModules;
 import us.myles_selim.starota.modules.StarotaModule;
 import us.myles_selim.starota.silph_road.SilphCard.SilphBadgeData;
 import us.myles_selim.starota.silph_road.SilphCard.SilphSocial;
+import us.myles_selim.starota.silph_road.arena_stats.SilphArenaData;
 import us.myles_selim.starota.wrappers.StarotaServer;
 
 public class CommandSilphCard extends BotCommand<StarotaServer> {
@@ -126,6 +127,17 @@ public class CommandSilphCard extends BotCommand<StarotaServer> {
 				builder.appendField(
 						"Badges" + (badgesStrings.size() > 1 ? " Part " + (i + 1) + ":" : ":"), bs,
 						false);
+		}
+
+		SilphArenaData arena = SilphRoadCardUtils.getArenaData(target);
+		if (arena != null) {
+			builder.appendField("Arena Tier:", arena.data.getArenaPlayerTier(), false);
+			builder.appendField("Arena Rank:", String.format("%s (Top: %s)",
+					arena.data.getArenaGlobalRankReal(), arena.data.getArenaGlobalRankPercentile()),
+					false);
+			builder.appendField("Ranked Battles:",
+					Float.toString(arena.data.getArenaTotalRankedMatchups()), true);
+			builder.appendField("Win/Lose:", Float.toString(arena.data.getArenaWL()) + "%", true);
 		}
 
 		builder.withFooterText("Last updated " + card.data.modified);

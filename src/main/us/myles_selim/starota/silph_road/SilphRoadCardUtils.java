@@ -25,15 +25,20 @@ import us.myles_selim.starota.misc.data_types.cache.ClearCache;
 import us.myles_selim.starota.misc.utils.StarotaConstants;
 import us.myles_selim.starota.silph_road.SilphCard.SilphBadgeData;
 import us.myles_selim.starota.silph_road.SilphCard.SilphCheckin;
+import us.myles_selim.starota.silph_road.arena_stats.SilphArenaData;
 
 public class SilphRoadCardUtils {
 
 	private static final String API_URL = "https://sil.ph/";
+	private static final String ARENA_API_URL = "https://sil.ph/card/cardData.json?user_id=";
 	private static final JsonParser PARSER = new JsonParser();
 	private static final Gson GSON;
 
 	private static final Map<String, CachedData<Boolean>> HAS_CARD_CACHE = new HashMap<>();
 	private static final Map<String, CachedData<SilphCard>> CARD_CACHE = new HashMap<>();
+
+	private static final Map<String, CachedData<Boolean>> HAS_ARENA_CACHE = new HashMap<>();
+	private static final Map<String, CachedData<SilphArenaData>> ARENA_CACHE = new HashMap<>();
 
 	static {
 		GsonBuilder builder = new GsonBuilder();
@@ -128,7 +133,6 @@ public class SilphRoadCardUtils {
 	}
 
 	public static SilphCard getCard(String pogoName) {
-		CARD_CACHE.remove(pogoName);
 		if (!hasCard(pogoName) && HAS_CARD_CACHE.get(pogoName) != null
 				&& HAS_CARD_CACHE.get(pogoName).getValue() == false)
 			return null;
@@ -142,6 +146,35 @@ public class SilphRoadCardUtils {
 					SilphCard.class);
 			CARD_CACHE.put(pogoName, new CachedData<>(card));
 			return card;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public static SilphArenaData getArenaData(String pogoName) {
+		SilphCard card = getCard(pogoName);
+		if (card == null)
+			return null;
+		int id = Integer.parseInt(card.data.card_id.substring(1, card.data.card_id.length()), 16);
+		if (!hasCard(pogoName) && HAS_ARENA_CACHE.get(pogoName) != null
+				&& HAS_ARENA_CACHE.get(pogoName).getValue() == false)
+			return null;
+		if (isCached(ARENA_CACHE, pogoName))
+			return ARENA_CACHE.get(pogoName).getValue();
+		try {
+			URL url = new URL(ARENA_API_URL + id);
+			URLConnection conn = url.openConnection();
+			conn.setRequestProperty("User-Agent", StarotaConstants.HTTP_USER_AGENT);
+			JsonElement json = PARSER.parse(new InputStreamReader(conn.getInputStream()));
+			try {
+				SilphArenaData arenaData = GSON.fromJson(json, SilphArenaData.class);
+				HAS_CARD_CACHE.put(pogoName, new CachedData<>(true));
+				return arenaData;
+			} catch (NumberFormatException e2) {
+				HAS_CARD_CACHE.put(pogoName, new CachedData<>(false));
+				return null;
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;

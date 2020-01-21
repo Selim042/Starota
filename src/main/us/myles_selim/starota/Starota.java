@@ -167,7 +167,7 @@ public class Starota {
 
 			@Override
 			public void run() {
-				System.out.println("running shutdown thread");
+				System.out.println("[" + new Date() + "] running shutdown thread");
 				if (CLIENT.isConnected()) {
 					CLIENT.getUserById(StarotaConstants.SELIM_USER_ID).block().getPrivateChannel()
 							.block().createMessage("Shutting down").block();
