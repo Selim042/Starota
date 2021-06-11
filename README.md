@@ -1,4 +1,8 @@
 # Starota
+
+# THIS PROJECT IS DEAD.  BOT IS OFFLINE AND LINKS ARE NOT GUARANTEED TO WORK
+
+
 [![](https://discordbots.org/api/widget/489245655710040099.svg)](https://discordbots.org/bot/489245655710040099)
 
 [![](https://img.shields.io/discord/436614503606779914.svg)](https://discord.gg/NxverNw)
